@@ -1,0 +1,13 @@
+import { activeRoleMixin } from "@lib";
+import { object, objectIdValidation } from "lesan";
+import { selectStruct } from "../../../mod.ts";
+
+export const getValidator = () => {
+  return object({
+    set: object({
+      ...activeRoleMixin,
+      _id: objectIdValidation,
+    }),
+    get: selectStruct("file", 2),
+  });
+};

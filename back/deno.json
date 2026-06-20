@@ -1,0 +1,31 @@
+{
+  "name": "lesanSatek-backend",
+  "version": "0.1.0",
+  "tasks": {
+    "dev": "deno run --allow-all --watch mod.ts",
+    "bc-dev": "deno run --allow-all --watch mod.ts"
+  },
+  "fmt": {
+    "include": ["src/", "models/", "utils/", "mod.ts"],
+    "semiColons": true,
+    "singleQuote": false,
+    "indentWidth": 2
+  },
+  "lint": {
+    "include": ["src/", "models/", "utils/", "mod.ts"],
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "imports": {
+    "@da/bcrypt": "jsr:@da/bcrypt@^1.0.1",
+    "lesan": "jsr:@hemedani/lesan@^0.2.3",
+    "@std/fs/ensure-dir": "jsr:@std/fs@0.223/ensure-dir",
+    "djwt": "https://deno.land/x/djwt@v2.8/mod.ts",
+    "@lib": "./utils/mod.ts",
+    "@model": "./models/mod.ts"
+  },
+  "compilerOptions": {
+    "strict": true
+  }
+}
