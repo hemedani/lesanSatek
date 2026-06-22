@@ -12,6 +12,7 @@ import {
   activeRoleMixin,
 } from "@lib";
 import {
+  feature_enums,
   role_array,
   role_emums,
   role_scope_type_emums,
@@ -36,6 +37,11 @@ export const addUserValidator = () => {
       email: string(),
       password: string(),
       is_verified: defaulted(boolean(), false),
+      features: optional(array(object({ feature: feature_enums }))),
+      allowWareTypeIds: optional(array(string())),
+      allowWareClassIds: optional(array(string())),
+      allowWareGroupIds: optional(array(string())),
+      allowWareModelIds: optional(array(string())),
       avatar: optional(objectIdValidation),
       organization: optional(objectIdValidation),
     }),

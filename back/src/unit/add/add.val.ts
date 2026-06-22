@@ -1,7 +1,7 @@
-import { boolean, defaulted, number, object, objectIdValidation, optional, string } from "lesan";
+import { array, boolean, defaulted, number, object, objectIdValidation, optional, string } from "lesan";
 import { activeRoleMixin } from "@lib";
 import { selectStruct } from "../../../mod.ts";
-import { unit_type_emums } from "@model";
+import { feature_enums, unit_type_emums } from "@model";
 
 export const addValidator = () => {
   return object({
@@ -19,6 +19,11 @@ export const addValidator = () => {
       hasColdStorage: optional(boolean()),
       fleetSize: optional(number()),
       serviceRadius: optional(number()),
+      features: optional(array(object({ feature: feature_enums }))),
+      allowWareTypeIds: optional(array(string())),
+      allowWareClassIds: optional(array(string())),
+      allowWareGroupIds: optional(array(string())),
+      allowWareModelIds: optional(array(string())),
       organizationId: optional(objectIdValidation),
       parentUnitId: optional(objectIdValidation),
       creatorId: optional(objectIdValidation),

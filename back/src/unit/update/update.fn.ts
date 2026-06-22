@@ -8,6 +8,11 @@ export const updateFn: ActFn = async (body) => {
       address, phone, email,
       warehouseCapacity, hasColdStorage,
       fleetSize, serviceRadius,
+      features,
+      allowWareTypeIds,
+      allowWareClassIds,
+      allowWareGroupIds,
+      allowWareModelIds,
     },
     get,
   } = body.details;
@@ -28,6 +33,11 @@ export const updateFn: ActFn = async (body) => {
   hasColdStorage !== undefined && (updateObj.hasColdStorage = hasColdStorage);
   fleetSize !== undefined && (updateObj.fleetSize = fleetSize);
   serviceRadius !== undefined && (updateObj.serviceRadius = serviceRadius);
+  features !== undefined && (updateObj.features = features);
+  allowWareTypeIds !== undefined && (updateObj.allowWareTypeIds = allowWareTypeIds);
+  allowWareClassIds !== undefined && (updateObj.allowWareClassIds = allowWareClassIds);
+  allowWareGroupIds !== undefined && (updateObj.allowWareGroupIds = allowWareGroupIds);
+  allowWareModelIds !== undefined && (updateObj.allowWareModelIds = allowWareModelIds);
 
   return await unit.findOneAndUpdate({
     filter: { _id: new ObjectId(_id as string) },

@@ -9,6 +9,7 @@ import {
 import { selectStruct } from "../../../mod.ts";
 import { activeRoleMixin } from "@lib";
 import {
+  feature_enums,
   role_emums,
   role_scope_type_emums,
   user_genders,
@@ -35,6 +36,11 @@ export const updateUserValidator = () => {
       is_verified: optional(boolean()),
       position: optional(string()),
       isActive: optional(boolean()),
+      features: optional(array(object({ feature: feature_enums }))),
+      allowWareTypeIds: optional(array(string())),
+      allowWareClassIds: optional(array(string())),
+      allowWareGroupIds: optional(array(string())),
+      allowWareModelIds: optional(array(string())),
     }),
     get: selectStruct("user", 1),
   });

@@ -6,7 +6,7 @@ import { hash } from "@da/bcrypt";
 export const addUserFn: ActFn = async (body) => {
   const { set, get } = body.details;
 
-  const { activeRoleId, avatar, organization, password, roles, ...rest } = set;
+  const { activeRoleId, avatar, organization, password, roles, features, allowWareTypeIds, allowWareClassIds, allowWareGroupIds, allowWareModelIds, ...rest } = set;
 
   const rolesWithIds = (roles as { name: string; scopeType?: "organization" | "unit"; scopeId?: string; roleId?: string }[] | undefined)?.map((r) => ({
     ...r,

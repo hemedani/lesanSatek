@@ -13,6 +13,11 @@ export const addFn: ActFn = async (body) => {
     parentUnitId,
     creatorId,
     headId,
+    features,
+    allowWareTypeIds,
+    allowWareClassIds,
+    allowWareGroupIds,
+    allowWareModelIds,
     ...rest
   } = set;
 
@@ -55,7 +60,14 @@ export const addFn: ActFn = async (body) => {
   }
 
   return await unit.insertOne({
-    doc: rest,
+    doc: {
+      ...rest,
+      ...(features !== undefined && { features }),
+      ...(allowWareTypeIds !== undefined && { allowWareTypeIds }),
+      ...(allowWareClassIds !== undefined && { allowWareClassIds }),
+      ...(allowWareGroupIds !== undefined && { allowWareGroupIds }),
+      ...(allowWareModelIds !== undefined && { allowWareModelIds }),
+    },
     relations,
     projection: get,
   });

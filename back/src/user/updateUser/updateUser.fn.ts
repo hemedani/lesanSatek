@@ -17,6 +17,11 @@ export const updateUserFn: ActFn = async (body) => {
       is_verified,
       position,
       isActive,
+      features,
+      allowWareTypeIds,
+      allowWareClassIds,
+      allowWareGroupIds,
+      allowWareModelIds,
     },
     get,
   } = body.details;
@@ -35,6 +40,11 @@ export const updateUserFn: ActFn = async (body) => {
     ...(is_verified !== undefined && { is_verified }),
     ...(position !== undefined && { position }),
     ...(isActive !== undefined && { isActive }),
+    ...(features !== undefined && { features }),
+    ...(allowWareTypeIds !== undefined && { allowWareTypeIds }),
+    ...(allowWareClassIds !== undefined && { allowWareClassIds }),
+    ...(allowWareGroupIds !== undefined && { allowWareGroupIds }),
+    ...(allowWareModelIds !== undefined && { allowWareModelIds }),
   };
 
   return await user.findOneAndUpdate({

@@ -1,10 +1,12 @@
 import { coreApp } from "../mod.ts";
 import {
+  array,
   boolean,
   coerce,
   defaulted,
   enums,
   number,
+  object,
   optional,
   type RelationDataType,
   type RelationSortOrderType,
@@ -16,6 +18,7 @@ import {
   user_excludes,
   unit_excludes,
 } from "./excludes.ts";
+import { feature_enums } from "./featureConstants.ts";
 
 export const unit_type_array = ["General", "Warehouse", "Logistics", "Production", "Administration", "Expert"];
 export const unit_type_emums = enums(unit_type_array);
@@ -40,6 +43,11 @@ export const unit_pure = {
   hasColdStorage: optional(boolean()),
   fleetSize: optional(number()),
   serviceRadius: optional(number()),
+  features: defaulted(array(object({ feature: feature_enums })), []),
+  allowWareTypeIds: optional(array(string())),
+  allowWareClassIds: optional(array(string())),
+  allowWareGroupIds: optional(array(string())),
+  allowWareModelIds: optional(array(string())),
   ...createUpdateAt,
 };
 

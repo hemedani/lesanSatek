@@ -15,6 +15,7 @@ import {
 } from "lesan";
 import { createUpdateAt } from "@lib";
 import { file_excludes, organization_excludes, unit_excludes } from "./excludes.ts";
+import { feature_enums } from "./featureConstants.ts";
 
 export const role_array = [
   "Manager",
@@ -57,6 +58,11 @@ export const user_pure = {
   position: optional(string()),
   isActive: defaulted(boolean(), true),
   isGhost: defaulted(boolean(), false),
+  features: defaulted(array(object({ feature: feature_enums })), []),
+  allowWareTypeIds: optional(array(string())),
+  allowWareClassIds: optional(array(string())),
+  allowWareGroupIds: optional(array(string())),
+  allowWareModelIds: optional(array(string())),
   roles: defaulted(
     array(object({
       roleId: string(),
