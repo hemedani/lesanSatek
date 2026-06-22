@@ -20,7 +20,7 @@ import {
 export const group_operator_array = ["AND", "OR"];
 export const group_operator_emums = enums(group_operator_array);
 
-export const step_type_array = ["Approval", "Review", "Notification", "Action"];
+export const step_type_array = ["Approval", "Review", "Notification", "Action", "Delivery", "Receipt", "Payment"];
 export const step_type_emums = enums(step_type_array);
 
 export const assigneeGroup_pure = {

@@ -6,6 +6,9 @@ import { updateRelationsSetup } from "./updateRelations/mod.ts";
 import { removeSetup } from "./remove/mod.ts";
 import { countSetup } from "./count/mod.ts";
 
+import { activateProcessSetup } from "./activateProcess/mod.ts";
+import { duplicateProcessSetup } from "./duplicateProcess/mod.ts";
+
 export const processSetup = () => {
 	addSetup();
 	updateSetup();
@@ -14,4 +17,6 @@ export const processSetup = () => {
 	getsSetup();
 	removeSetup();
 	countSetup();
+	activateProcessSetup();
+	duplicateProcessSetup();
 };

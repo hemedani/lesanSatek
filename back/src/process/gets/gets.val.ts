@@ -1,4 +1,4 @@
-import { enums, object, optional, string } from "lesan";
+import { enums, object, objectIdValidation, optional, string } from "lesan";
 import { selectStruct } from "../../../mod.ts";
 import { pagination, activeRoleMixin } from "@lib";
 
@@ -8,6 +8,7 @@ export const getsValidator = () => {
 			...activeRoleMixin,
 			...pagination,
 			search: optional(string()),
+			organizationId: optional(objectIdValidation),
 			sortBy: optional(enums(["name", "status", "version", "isActive", "createdAt", "updatedAt"])),
 			sortOrder: optional(enums(["asc", "desc"])),
 		}),

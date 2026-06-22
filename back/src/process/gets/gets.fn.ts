@@ -1,4 +1,5 @@
 import type { ActFn, Document } from "lesan";
+import { ObjectId } from "lesan";
 import { process } from "../../../mod.ts";
 
 export const getsFn: ActFn = async (body) => {
@@ -8,6 +9,7 @@ export const getsFn: ActFn = async (body) => {
 			limit,
 			skip,
 			search,
+			organizationId,
 			sortBy,
 			sortOrder,
 		},
@@ -19,6 +21,11 @@ export const getsFn: ActFn = async (body) => {
 	search &&
 		pipeline.push({
 			$match: { $text: { $search: search } },
+		});
+
+	organizationId &&
+		pipeline.push({
+			$match: { "organization._id": new ObjectId(organizationId as string) },
 		});
 
 	if (search && (!sortBy || sortBy === "relevance")) {
