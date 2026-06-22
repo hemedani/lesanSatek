@@ -19,6 +19,19 @@ import {
   stuffs,
   stores,
   stepApprovals,
+  purchaseOrderItems,
+  tenders,
+  tenderOffers,
+  inventories,
+  stockMovements,
+  goodsReceipts,
+  paymentOrders,
+  fiscalYears,
+  budgetLines,
+  budgetAllocations,
+  budgetEncumbrances,
+  consumptionRecords,
+  createInventoryIndex,
   createUserTextIndex,
 } from "@model";
 import { functionsSetup } from "./src/mod.ts";
@@ -51,6 +64,18 @@ export const ware = wares();
 export const stuff = stuffs();
 export const store = stores();
 export const stepApproval = stepApprovals();
+export const purchaseOrderItem = purchaseOrderItems();
+export const tender = tenders();
+export const tenderOffer = tenderOffers();
+export const inventory = inventories();
+export const stockMovement = stockMovements();
+export const goodsReceipt = goodsReceipts();
+export const paymentOrder = paymentOrders();
+export const fiscalYear = fiscalYears();
+export const budgetLine = budgetLines();
+export const budgetAllocation = budgetAllocations();
+export const budgetEncumbrance = budgetEncumbrances();
+export const consumptionRecord = consumptionRecords();
 
 export const { setAct, setService, getAtcsWithServices } = coreApp.acts;
 
@@ -58,6 +83,7 @@ export const { selectStruct, getSchemas } = coreApp.schemas;
 
 functionsSetup();
 
+createInventoryIndex();
 createUserTextIndex();
 
 coreApp.runServer({

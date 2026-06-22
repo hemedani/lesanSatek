@@ -99,3 +99,63 @@ export const stepApproval_excludes: string[] = [
   "updatedAt",
 ];
 
+export const purchaseOrderItem_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];
+
+export const tender_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];
+
+export const tenderOffer_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];
+
+export const inventory_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];
+
+export const stockMovement_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];
+
+export const goodsReceipt_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];
+
+export const paymentOrder_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];
+
+export const fiscalYear_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];
+
+export const budgetLine_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];
+
+export const budgetAllocation_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];
+
+export const budgetEncumbrance_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];
+
+export const consumptionRecord_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];
+

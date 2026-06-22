@@ -17,6 +17,19 @@ import { wareSetup } from "./ware/mod.ts";
 import { stuffSetup } from "./stuff/mod.ts";
 import { storeSetup } from "./store/mod.ts";
 import { stepApprovalSetup } from "./stepApproval/mod.ts";
+import { purchaseOrderItemSetup } from "./purchaseOrderItem/mod.ts";
+import { tenderSetup } from "./tender/mod.ts";
+import { tenderOfferSetup } from "./tenderOffer/mod.ts";
+import { inventorySetup } from "./inventory/mod.ts";
+import { stockMovementSetup } from "./stockMovement/mod.ts";
+import { goodsReceiptSetup } from "./goodsReceipt/mod.ts";
+import { paymentOrderSetup } from "./paymentOrder/mod.ts";
+import { fiscalYearSetup } from "./fiscalYear/mod.ts";
+import { budgetLineSetup } from "./budgetLine/mod.ts";
+import { budgetAllocationSetup } from "./budgetAllocation/mod.ts";
+import { budgetEncumbranceSetup } from "./budgetEncumbrance/mod.ts";
+
+import { consumptionRecordSetup } from "./consumptionRecord/mod.ts";
 
 export const functionsSetup = () => {
 	userSetup();
@@ -38,4 +51,16 @@ export const functionsSetup = () => {
 	stuffSetup();
 	storeSetup();
 	stepApprovalSetup();
+  purchaseOrderItemSetup();
+  tenderSetup();
+  tenderOfferSetup();
+  inventorySetup();
+  stockMovementSetup();
+  goodsReceiptSetup();
+  paymentOrderSetup();
+  fiscalYearSetup();
+  budgetLineSetup();
+  budgetAllocationSetup();
+  budgetEncumbranceSetup();
+  consumptionRecordSetup();
 };
