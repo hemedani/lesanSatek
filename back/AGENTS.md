@@ -33,31 +33,46 @@ LesanSatek backend is a Deno + Lesan application for an organizational process m
 
 ### Data Models
 
-The backend defines the following core models across two domains:
+The backend defines models across four domains: Organizational, Procurement/Purchasing, Warehouse/Inventory, and Budget/Finance.
 
 #### Organizational Management Domain
-- **User** - User authentication and authorization (first_name, last_name, gender, birth_date, mobile, email, password, is_verified, isGhost, roles, position, isActive). Relations: avatar, organization, units. *Employee was merged into User - User now has position, isActive, and can be assigned to units directly. Level was replaced by multi-role `roles` array.*
+- **User** - User authentication and authorization (first_name, last_name, gender, birth_date, mobile, email, password, is_verified, isGhost, roles, position, isActive, features, allowWareTypeIds, allowWareClassIds, allowWareGroupIds, allowWareModelIds). Relations: avatar, organization, units. *Employee was merged into User. Level was replaced by multi-role `roles` array.*
 - **File** - File upload management (name, mimeType, size, type: image/video/docs/other, alt_text)
 - **Tag** - Metadata categorization (name, description, color, icon)
 - **Organization** - Organizations that own purchasing processes (name, enName, description, isActive)
-- **Unit** - Hierarchical units/subunits in a tree (name, enName, description, isActive, organization denormalized on all units, parentUnit for nesting, head as User). Unit has a `type` enum (General|Warehouse|Logistics|Production|Administration|Expert, defaults to "General") and optional attribute fields: address, phone, email, warehouseCapacity, hasColdStorage, fleetSize, serviceRadius. *Department was eliminated - Unit now connects directly to Organization.*
-- **Process** - Process builder workflow definitions (name, description, status, version, isActive, assignedUnits for scope)
-- **ProcessStep** - Individual steps within a purchasing process (name, description, stepType, order, required, groupsOperator). *Assignees are now via ProcessStepAssigneeGroup with OR/AND logic instead of direct assignedDepartment/assignedUnit/assignedUser.*
-- **ProcessStepAssigneeGroup** - OR/AND grouping of units for a process step (operator: AND|OR, relations to processStep and units)
-- **StepApproval** - Per-unit per-step approval decisions (status: pending|approved|rejected, comment, decidedAt, relations to purchasingRequest, processStep, unit, decidedBy)
-- **PurchasingRequest** - Actual purchasing requests flowing through processes (title, description, amount, status, currentStep, stepApprovals)
+- **Unit** - Hierarchical units/subunits in a tree (name, enName, description, isActive, organization denormalized on all units, parentUnit for nesting, head as User, features, allowWareTypeIds, allowWareClassIds, allowWareGroupIds, allowWareModelIds). Unit has a `type` enum (General|Warehouse|Logistics|Production|Administration|Expert) and optional attribute fields (address, phone, email, warehouseCapacity, hasColdStorage, fleetSize, serviceRadius). *Department was eliminated.*
+- **Process** - Process builder workflow definitions (name, description, status: Draft|Active|Archived, version, isActive, assignedUnits for scope). Custom actions: activateProcess, duplicateProcess.
+- **ProcessStep** - Individual steps within a process (name, description, stepType: Approval|Review|Notification|Action|Delivery|Receipt|Payment, order, required, groupsOperator: AND|OR, assigneeGroups: embedded array of {operator, unitIds}). *ProcessStepAssigneeGroup was eliminated — assignee groups are now embedded directly in ProcessStep.*
+
+#### Procurement & Purchasing Domain
+- **StepApproval** - Per-unit per-step approval decisions (status: pending|approved|rejected, comment, decidedAt). Relations: purchasingRequest, processStep, unit, decidedBy.
+- **PurchasingRequest** - Actual purchasing requests flowing through processes (title, description, amount, status: Draft|Pending|InProgress|Approved|Rejected|Completed|Cancelled, currentStep, items: embedded array, history: embedded array). Custom actions: submit, getHistory, convertItems, warehouseCheck. Relations: process, requester, requestingUnit, attachments, stepApprovals, purchaseOrderItems, tender, goodsReceipts, paymentOrders.
+- **PurchaseOrderItem** - Line items on a purchase order (wareModelId, wareModelName, wareId?, wareName?, quantity, unitPrice?, totalPrice?, status: pending|assigned|ordered|received|cancelled). Relations: purchasingRequest, assignedFrom (store), assignedBy (user).
+- **Tender** - RFP/RFQ for vendor selection (title, description, status: open|closed|awarded|cancelled, deadline). Custom actions: close, award. Relations: purchasingRequest, createdBy, assignedVendors (stores), offers (tenderOffers).
+- **TenderOffer** - Vendor bid on a tender (price, deliveryTime, paymentTerms?, description?, status: submitted|accepted|rejected, submittedAt). Relations: tender, store.
 
 #### Warehouse/Inventory Domain
 - **State** - Geographic state/province (name, enName)
 - **City** - Geographic city (name, enName, state relation)
 - **Manufacturer** - Product manufacturer/producer (name, enName, country)
-- **WareType** - Top-level ware classification (name, enName) - e.g. "laboratory equipment", "medicine"
-- **WareClass** - Second-level classification (name, enName, wareType relation) - e.g. "hematology", "biochemistry"
-- **WareGroup** - Third-level classification (name, enName, wareType relation) - e.g. "kit", "vial", "liquid"
-- **WareModel** - Fourth-level specific model (name, enName, wareType, wareClass, wareGroup relations) - e.g. "TSH kit", "Lize 0.5 litre"
-- **Ware** - The actual product (name, enName, brand, price, orderedNumber, irc, umdns, gtin, photoUrl, relations to manufacturer + all 4 hierarchy levels)
+- **WareType** - Top-level ware classification (name, enName)
+- **WareClass** - Second-level classification (name, enName, wareType relation)
+- **WareGroup** - Third-level classification (name, enName, wareType relation, M:N with wareClasses)
+- **WareModel** - Fourth-level specific model (name, enName, wareType, wareClass, wareGroup relations)
+- **Ware** - Actual product (name, enName, brand, price, orderedNumber, irc, umdns, gtin, photoUrl, relations to manufacturer + all 4 hierarchy levels)
 - **Stuff** - Store inventory (ware, store, inventoryNo, price, pricing mode, expiration, barcode, qrc, photoUrl, long payment pricing)
-- **Store** - Seller entity (name, address, location, contact, logo, city, state, storeHead, wareTypes, ceoname, working hours, delivery info, status, score, email, storeType, economicCode, postalCode, bank info, certificate info)
+- **Store** - Seller entity (name, address, contact, logo, city, state, storeHead, wareTypes, status, score, bank info, certificate info, economicCode, postalCode, etc.)
+- **Inventory** - Per-unit stock tracking (wareModelId, wareModelName, wareId?, wareName?, quantity, minQuantity?, maxQuantity?, batchNo?, expirationDate?, location?). Unique index on (unit, wareModelId). Relations: unit, warehouseUnit.
+- **StockMovement** - Audit trail for every inventory change (wareModelId, wareModelName, quantity, balanceBefore, balanceAfter, reason: goods_receipt|goods_issue|transfer_in|transfer_out|consumption|adjustment|return|write_off, referenceType?, referenceId?). Relations: unit, createdBy. Read-only; created by system actions.
+- **ConsumptionRecord** - Goods usage tracking (wareModelId, wareModelName, wareId?, wareName?, quantity, consumedAt, reason?, patientId?, notes?). Custom action: add triggers inventoryManager.removeStock. Relations: unit, consumedBy, inventory.
+
+#### Budget & Finance Domain
+- **FiscalYear** - Annual budget period (name, startDate, endDate, isActive, status: open|closed). Custom action: close.
+- **BudgetLine** - Spending category (code, title, description, totalAllocated, totalEncumbered, totalSpent, remainingBudget). Relations: fiscalYear, organization, unit?, wareType?.
+- **BudgetAllocation** - Funds assigned to a budget line (amount, description, allocatedAt). Custom action: add increments budgetLine.totalAllocated. Relations: budgetLine, allocatedBy.
+- **BudgetEncumbrance** - Commitment tracking (amount, status: reserved|spent|released, referenceType, referenceId, description). Custom actions: add (reserves), release, convertToSpend. Relations: budgetLine, createdBy.
+- **GoodsReceipt** - Incoming goods document (receiptNumber, description, receivedAt, status: pending|completed|partially_rejected, items: embedded array of {purchaseOrderItemId, wareModelId, quantityReceived/Accepted/Rejected, batchNo?, expirationDate?}). Custom action: add triggers inventory, PO status update, auto-payment, budget conversion. Relations: purchasingRequest, receivedBy, receivingUnit.
+- **PaymentOrder** - Payment authorization (title, amount, description, status: draft|sent_to_finance|paid|cancelled, paidAt). Custom action: markPaid converts encumbrances to spent. Relations: purchasingRequest, issuedBy, approvedBy?, payTo (store), financialUnit.
 
 ### Organization Hierarchy
 
@@ -83,8 +98,8 @@ Key points:
 The system provides a flexible workflow engine with unit-based assignment and OR/AND logic:
 
 1. **Process** defines a purchasing workflow (Draft → Active → Archived). Each process has `assignedUnits` which scopes which units participate.
-2. **ProcessStep** defines individual steps (Approval/Review/Notification/Action) with ordering.
-3. **ProcessStepAssigneeGroup** groups units with an `operator` (AND/OR). Steps have a `groupsOperator` (AND/OR) that defines how groups combine.
+2. **ProcessStep** defines individual steps (Approval/Review/Notification/Action/Delivery/Receipt/Payment) with ordering.
+3. **Assignee groups** are embedded in ProcessStep as `assigneeGroups: array({ operator, unitIds })`. Steps have a `groupsOperator` (AND/OR) that defines how groups combine. *Standalone ProcessStepAssigneeGroup model was eliminated.*
 4. **StepApproval** tracks per-unit, per-step decisions (approved/rejected/pending) on each PurchasingRequest.
 5. **PurchasingRequest** flows through a process, tracking `currentStep` and status via StepApprovals.
 
@@ -98,6 +113,81 @@ The system provides a flexible workflow engine with unit-based assignment and OR
 | (U1 AND U2) OR (U3 AND U4) | `groupsOperator: "OR"`, two groups with `{ operator: "AND" }` each |
 
 **Step evaluation utility:** `utils/stepEvaluator.ts` contains `evaluateStepStatus()` which computes a step's overall status from individual unit approvals + the OR/AND group configuration.
+
+### Automated Process Lifecycle
+
+The process lifecycle is automated with guardrails at each transition:
+
+```
+Draft  ──►  activateProcess()  ──►  Active  ──►  update(status: "Archived")  ──►  Archived
+```
+
+**`activateProcess` (custom action):** Validates before activating:
+1. At least one ProcessStep exists
+2. Step `order` values are consecutive (1, 2, 3, ...N) with no gaps or duplicates
+3. All `unitIds` in step assigneeGroups reference valid Unit documents
+4. If process has `assignedUnits`, all step unitIds are within that scope
+5. On success: sets `status: "Active"`, `isActive: true`, auto-increments `version`
+6. Rejects if already Active
+
+**`duplicateProcess` (custom action):** Clones a process and all its steps:
+1. Fetches source process and all its ProcessSteps (with assigneeGroups)
+2. Creates new Process (Draft, version 1, isActive: false) with same organization + assignedUnits
+3. Copies all steps with identical properties
+4. Default name: `"{source name} (Copy)"`, custom name optionally passed
+
+**Archive guard (in process.update):** Prevents archiving a process when any PurchasingRequest has status `["Pending", "InProgress", "Approved"]` for that process. Returns error with active request count.
+
+### Automated Purchase Lifecycle (Procure-to-Pay)
+
+The complete purchase-to-payment flow is automated:
+
+```
+PR Draft ──► submit() ──► Pending ──► submitDecision() (per step) ──► InProgress/Approved
+      │                                                                    │
+      ├──► (optional Tender ──► close ──► award ──► creates PO items)     │
+      │                                                                    │
+      └────────────────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+                    goodsReceipt.add()
+                    │  ├──► inventoryManager.addStock()
+                    │  ├──► update PO item status → "received"
+                    │  ├──► auto-advance workflow (Receipt/Delivery steps)
+                    │  ├──► auto-create draft PaymentOrder
+                    │  └──► auto-convert budget encumbrance → spent
+                    │
+                    ▼
+              paymentOrder.markPaid()
+                    │  └──► convert remaining encumbrance → spent
+                    │
+                    ▼
+                 Completed
+```
+
+**`purchasingRequest.submit`:** Creates a request with status=Pending, currentStep=0. Creates StepApproval(status:pending) for each unit in the first step's assigneeGroups. Optionally auto-creates BudgetEncumbrance if `budgetLineId` and `amount` are provided (validates sufficient remaining budget first). Pushes "submitted" history entry.
+
+**`stepApproval.submitDecision`:** Processes a unit's decision (approved/rejected):
+1. Validates request is Pending/InProgress, step matches currentStep, unit is in step's assigneeGroups
+2. Upserts StepApproval record (insert or update + set decidedBy via addRelation)
+3. Fetches all approvals for current step, runs `evaluateStepStatus()`
+4. On **approved**: auto-advances `currentStep` (creates pending approvals for next step) or marks request **Completed** if last step
+5. On **rejected**: marks request **Rejected**
+6. Pushes "step_approved" / "step_rejected" history entries
+
+**`tender.close` → `tender.award`:** On award, winning offer is accepted, all others rejected. PurchaseOrderItems are created from the PR's embedded `items` array, assigned to the winning store. Pushes "item_assigned" history entry.
+
+**`goodsReceipt.add`:** Comprehensive auto-flow:
+1. Creates GoodsReceipt document
+2. For each accepted item: calls `inventoryManager.addStock()` to update inventory
+3. Updates PO item status to "received"
+4. Collects pricing from PO items to calculate order total
+5. Auto-advances workflow if current step type is "Receipt" or "Delivery" (creates auto-approved StepApproval, evaluates step status)
+6. Auto-creates draft PaymentOrder from order total
+7. Auto-converts budget encumbrance to spent (supports partial conversion prorated from receipt amount)
+8. Pushes "goods_received" history entry
+
+**`paymentOrder.markPaid`:** Sets status to "paid", records paidAt. Finds all reserved budget encumbrances linked to the same purchasingRequest and converts them to spent (decrements totalEncumbered, increments totalSpent on the budgetLine).
 
 ### Product Classification Hierarchy (Warehouse)
 
@@ -143,11 +233,22 @@ lesanSatek/back/
 │   ├── tag/                # Tag actions
 │   ├── organization/       # Organization actions
 │   ├── unit/               # Unit actions
-│   ├── process/            # Process actions
+│   ├── process/            # Process actions (+ activateProcess, duplicateProcess)
 │   ├── processStep/        # ProcessStep actions
-│   ├── processStepAssigneeGroup/  # ProcessStepAssigneeGroup actions (new)
-│   ├── stepApproval/       # StepApproval actions (new)
-│   ├── purchasingRequest/  # PurchasingRequest actions
+│   ├── stepApproval/       # StepApproval actions (+ submitDecision)
+│   ├── purchasingRequest/  # PurchasingRequest actions (+ submit, warehouseCheck, getHistory, convertItems)
+│   ├── purchaseOrderItem/  # PurchaseOrderItem CRUD (NEW)
+│   ├── tender/             # Tender CRUD + close + award (NEW)
+│   ├── tenderOffer/        # TenderOffer submit + get (NEW)
+│   ├── inventory/          # Inventory CRUD + adjust + transfer (NEW)
+│   ├── stockMovement/      # StockMovement read-only (NEW)
+│   ├── goodsReceipt/       # GoodsReceipt CRUD (NEW)
+│   ├── paymentOrder/       # PaymentOrder CRUD + markPaid (NEW)
+│   ├── fiscalYear/         # FiscalYear CRUD + close (NEW)
+│   ├── budgetLine/         # BudgetLine CRUD + reports (NEW)
+│   ├── budgetAllocation/   # BudgetAllocation add + get (NEW)
+│   ├── budgetEncumbrance/  # BudgetEncumbrance add + release + convert (NEW)
+│   ├── consumptionRecord/  # ConsumptionRecord CRUD (NEW)
 │   ├── state/              # State actions
 │   ├── city/               # City actions
 │   ├── manufacturer/       # Manufacturer actions
@@ -159,7 +260,7 @@ lesanSatek/back/
 │   ├── stuff/              # Stuff actions
 │   └── store/              # Store actions
 ├── uploads/                # Static file uploads directory
-└── utils/                  # Utility functions (context, grantAccess, activeRole, setToken, setUser, stepEvaluator, etc.)
+└── utils/                  # Utility functions (context, grantAccess, activeRole, setToken, setUser, stepEvaluator, checkFeature, checkWareModelAccess, inventoryManager, etc.)
 ```
 
 ## Building and Running
@@ -193,7 +294,7 @@ The backend provides an API playground accessible at `/playground` when running 
 - Uses Lesan framework for API generation and data modeling
 - TypeScript with strict typing
 - Zod-like validation syntax for schema definitions
-- Auto-generated type declarations for frontend integration
+- Auto-generated type declarations for frontend integration (`typeGeneration: true` in `coreApp.runServer()` — run `deno task bc-dev` to regenerate `declarations/` folder)
 - MongoDB ODM with relationship support
 - Relations are one-directional (define on owning model only)
 - Separate pure field updates from relation updates
@@ -343,11 +444,18 @@ Ware and Stuff models use denormalized relations to WareType, WareClass, WareGro
 | **Tag** | add, get, gets, update, remove, count | - | Mixed |
 | **Organization** | add, get, gets, update, updateRelations, remove, count | - | Mixed |
 | **Unit** | add, get, gets, update, updateRelations, remove, count | type filter in gets/count; UnitHead can CRUD their own units | Mixed |
-| **Process** | add, get, gets, update, updateRelations, remove, count | - | Mixed |
-| **ProcessStep** | add, get, gets, update, updateRelations, remove, count | - | Mixed |
-| **ProcessStepAssigneeGroup** | add, get, gets, update, updateRelations, remove, count | - | Mixed |
-| **StepApproval** | add, get, gets | - | Mixed |
-| **PurchasingRequest** | add, get, gets, update, updateRelations, remove, count | - | Mixed |
+| **Process** | add, get, gets, update, updateRelations, remove, count | activateProcess, duplicateProcess | Mixed |
+| **ProcessStep** | add, get, gets, update, updateRelations, remove, count | auto-reorders on add/remove/update | Mixed |
+
+### Procurement & Purchasing Models
+
+| Model | Acts | Custom Actions | Auth Required |
+|-------|------|----------------|---------------|
+| **StepApproval** | add, get, gets | submitDecision | Mixed |
+| **PurchasingRequest** | add, get, gets, update, updateRelations, remove, count | submit, getHistory, convertItems, warehouseCheck | Mixed |
+| **PurchaseOrderItem** | add, get, gets, update, updateRelations, remove, count | - | Mixed |
+| **Tender** | add, get, gets, update, updateRelations, remove, count | close, award | Mixed |
+| **TenderOffer** | get, gets | submit (by vendors) | Mixed |
 
 ### Warehouse/Inventory Models
 
@@ -363,6 +471,20 @@ Ware and Stuff models use denormalized relations to WareType, WareClass, WareGro
 | **Ware** | add, get, gets, update, updateRelations, remove, count | name, enName, brand, price, orderedNumber, irc, umdns, gtin, photoUrl | Mixed |
 | **Stuff** | add, get, gets, update, updateRelations, remove, count | inventoryNo, price, hasAbsolutePrice, pricePercentage, expiration, barcode, qrc, isBarcodeSet, isQrcSet, isExpirationNear, photoUrl, apiId, apiLink, availableLongPayment, month price fields | Mixed |
 | **Store** | add, get, gets, update, updateRelations, remove, count | name, address, location, contact, logoUrl, ceoname, workingHours, delivery times, fastDelivery, isAvailableInHolidays, status, score, totalSoldAmount, totalSoldNum, email, storeType, economicCode, postalCode, certificateUrl, bankCardNumber, shebaNumber, nameOfAccountHolder, bankName, certificateNumber, registerNumber, certificateExpireDate, legalPerson, nationalId | Mixed |
+| **Inventory** | add, get, gets, update, count | adjust, transfer (custom) | Mixed |
+| **StockMovement** | get, gets, count | read-only (created by system) | Mixed |
+| **ConsumptionRecord** | add, get, gets, count | add triggers removeStock | Mixed |
+
+### Budget & Finance Models
+
+| Model | Acts | Custom Actions | Auth Required |
+|-------|------|----------------|---------------|
+| **FiscalYear** | add, get, gets, update | close | Mixed |
+| **BudgetLine** | add, get, gets, update, count | getBudgetReport, getYearEndReport | Mixed |
+| **BudgetAllocation** | add, get, gets | add increments totalAllocated | Mixed |
+| **BudgetEncumbrance** | add, get, gets | release, convertToSpend | Mixed |
+| **GoodsReceipt** | add, get, gets, update | add triggers inventory + auto-flows | Mixed |
+| **PaymentOrder** | add, get, gets, update | markPaid | Mixed |
 
 ### User Roles
 - Manager, Admin, OrgHead, UnitHead, Employee, Ordinary
@@ -378,76 +500,9 @@ Ware and Stuff models use denormalized relations to WareType, WareClass, WareGro
    - **Percentage**: `pricePercentage` is applied to `Ware.price` → `stuffPrice = warePrice * (1 + pricePercentage/100)`.
 3. **Long payment prices**: For each month, if a `{month}MonthPricePercent` is set, the price = `ware.price * (1 + percent/100)` (or `stuffPrice` if `isExpirationNear`).
 
-## Recent Architectural Changes (Session Summary)
+## Complete Relation Maps
 
-### 1. Employee → Merged into User
-- **Why**: No user would log in without having an employee role. The separation was unnecessary.
-- **What moved**: `position`, `isActive`, `department` relation, `units` relation → User model.
-- **Deleted**: `models/employee.ts`, `src/employee/` (entire directory).
-- **Reverse relations updated**: `department.head` (user), `unit.head` (user), `department.members` (users via user.department), `unit.members` (users via user.units).
-
-### 2. Department → Eliminated
-- **Why**: Redundant since Unit already supports infinite nesting via `parentUnit`/`subUnits`. The entire hierarchy can be represented as Organization → Unit (tree).
-- **Unit.organization** added (denormalized on all units for query efficiency) to replace `Unit.department`.
-- **User.department** removed (User lost the department relation added during the Employee merge).
-- **Organization.departments** removed.
-- **User levels**: Removed `DeptHead`.
-- **Deleted**: `models/department.ts`, `src/department/` (entire directory).
-
-### 3. Process Redesign (OR/AND + Unit-Based Assignment)
-- **Old approach**: ProcessStep had `assignedDepartment`, `assignedUnit`, `assignedUser` as single optional relations.
-- **New approach**:
-  - **Process.assignedUnits** — scopes which units participate in the process.
-  - **ProcessStep.groupsOperator** (AND|OR) — how assignee groups combine.
-  - **ProcessStepAssigneeGroup** — each group has an `operator` (AND|OR) and multiple `units`.
-  - **StepApproval** — tracks per-unit, per-step decisions (approved/rejected/pending) on each PurchasingRequest.
-- **New files**: `models/processStepAssigneeGroup.ts`, `models/stepApproval.ts`, `utils/stepEvaluator.ts`, `src/processStepAssigneeGroup/`, `src/stepApproval/`.
-
-### 4. Multi-Role Authorization System (Implemented)
-
-- **Why**: A user may hold multiple roles across different orgs/units (e.g., OrgHead of OrgA, UnitHead of UnitB). The old single-level system couldn't represent this.
-- **What replaced `level`**: A `roles` array on User: `[{ roleId, name, scopeType?, scopeId? }]`. Each role has a UUID `roleId` for client reference.
-- **Auth flow**:
-  - Token in request header (`token` key) — verified by `setTokens`
-  - `activeRoleId` in `body.details.set` — tells the system which role the user is acting as
-  - `grantAccess` resolves the role and checks permissions + optional scope match
-  - `isGhost` boolean on User bypasses all auth checks (bootstrap user)
-- **`getMe`** is the only auth'd action that doesn't require `activeRoleId` — it returns the user's full profile including roles, so the client can select one.
-- **Scope checking**: OrgHead can be scoped to an organization (`scopeType: "organization"`), UnitHead scoped to a unit (`scopeType: "unit"`). `grantAccess` accepts a `getScope` callback that extracts the resource's scope from the request body.
-- **Read actions**: All `get`/`gets`/`count` now require authentication (previously public), with any role accepted.
-- **Public endpoints** (no auth): `login`, `register`, `tempUser`.
-- **New files**: `utils/activeRole.ts` — contains `activeRoleMixin` (shared validator spread) and `stripActiveRole` helper.
-- **Deleted**: `user_level_array`, `user_level_emums`, old `grantAccess` with `{ levels, isOwn }` format.
-
-### 5. Unit Type Enum + Attribute Fields (Implemented)
-
-- **Why**: Units needed semantic categorization (Warehouse, Logistics, Expert, etc.) with type-specific attribute fields, without a separate model.
-- **What was added to `unit_pure`**:
-  - `type` enum field: `["General", "Warehouse", "Logistics", "Production", "Administration", "Expert"]`, defaults to `"General"`.
-  - Attribute fields: `address`, `phone`, `email` (common), `warehouseCapacity`, `hasColdStorage` (warehouse), `fleetSize`, `serviceRadius` (logistics).
-- **Auth updates**: UnitHead can now add/update/remove units scoped to their own unit (add requires `parentUnitId` matching their unit; update/remove/updateRelations require `_id` matching their unit).
-- **New files**: None (all changes in-place on existing model/actions).
-- **No new model**: Type is a simple enum on Unit — no separate UnitType model.
-
-### 6. ClassGroup Removed + One-Directional Relations Fixed (Implemented)
-
-- **Why**: ClassGroup was a join table from PostgreSQL — unnecessary in NoSQL. Parent models (wareType, manufacturer, store) had duplicate relation definitions that should be one-directional.
-- **Deleted**: `models/classGroup.ts`, `src/classGroup/` (entire directory).
-- **Fixed duplicate relations**:
-  - `wareType_relations` — removed all 5 child relations (wareClasses, wareGroups, wareModels, wares, stuffs) — now empty `{}`.
-  - `manufacturer_relations` — removed `wares` relation — now empty `{}`.
-  - `store_relations` — removed `stuffs` relation (stuff.store already defines this via relatedRelations).
-- **New M:N**: `wareGroup.wareClasses` replaces the ClassGroup join table — direct M:N with `limit: 50` (wareGroup → infinite classes → paginated) and no limit on reverse (wareClass → ~300-400 groups → all embedded).
-
-### 7. Child Relations Removed from All Parent Models (Implemented)
-
-- **Why**: Every parent model (wareClass, wareGroup, wareModel) had child relations (`wares`, `stuffs`, `wareModels`) explicitly defined — but these are already auto-created by Lesan via `relatedRelations` on the child models (ware, stuff, wareModel).
-- **Deleted from `wareClass_relations`**: `wareModels`, `wares`, `stuffs` (only `wareType` + `wareGroups` M:N remain).
-- **Deleted from `wareGroup_relations`**: `wareModels`, `wares`, `stuffs` (only `wareType` + `wareClasses` M:N remain).
-- **Deleted from `wareModel_relations`**: `wares`, `stuffs` (only `wareType`, `wareClass`, `wareGroup` remain).
-- **Rule**: A model should only define its own direct relations — its parents (single) and its own children (multiple). Relations of deeper descendants belong on those descendant models.
-
-### 8. Current Relation Map (Organizational)
+### Organizational Relation Map
 
 ```
 User
@@ -474,18 +529,18 @@ Process
 
 ProcessStep
   ├── process (Process)
-  └── assigneeGroups (ProcessStepAssigneeGroup) [multiple]
-
-ProcessStepAssigneeGroup
-  ├── processStep (ProcessStep)
-  └── units (Unit) [multiple]
+  └── assigneeGroups [embedded: array({ operator, unitIds })]
 
 PurchasingRequest
   ├── process (Process)
   ├── requester (User)
   ├── requestingUnit (Unit)
   ├── attachments (File)
-  └── stepApprovals (StepApproval) [multiple]
+  ├── stepApprovals (StepApproval) [multiple]
+  ├── purchaseOrderItems (PurchaseOrderItem) [multiple]
+  ├── tender (Tender) [single, optional]
+  ├── goodsReceipts (GoodsReceipt) [multiple]
+  └── paymentOrders (PaymentOrder) [multiple]
 
 StepApproval
   ├── purchasingRequest (PurchasingRequest)
@@ -494,7 +549,26 @@ StepApproval
   └── decidedBy (User) [optional]
 ```
 
-### 9. Warehouse Relation Map
+### Procurement Relation Map
+
+```
+PurchaseOrderItem
+  ├── purchasingRequest (PurchasingRequest) [single]
+  ├── assignedFrom (Store) [single, optional]
+  └── assignedBy (User) [single, optional]
+
+Tender
+  ├── purchasingRequest (PurchasingRequest) [single]
+  ├── createdBy (User) [single]
+  ├── assignedVendors (Store) [multiple, optional]
+  └── offers (TenderOffer) [multiple, optional]
+
+TenderOffer
+  ├── tender (Tender) [single]
+  └── store (Store) [single]
+```
+
+### Warehouse & Inventory Relation Map
 
 ```
 Manufacturer
@@ -549,4 +623,52 @@ Store
   ├── city (City) [single, optional]
   ├── state (State) [single, optional]
   └── wareTypes (WareType) [multiple, M:N]
+
+Inventory
+  ├── unit (Unit) [single — inventory owner]
+  └── warehouseUnit (Unit) [single, optional — org warehouse]
+
+StockMovement
+  ├── unit (Unit) [single]
+  └── createdBy (User) [single]
+
+ConsumptionRecord
+  ├── unit (Unit) [single]
+  ├── consumedBy (User) [single]
+  └── inventory (Inventory) [single, optional]
+```
+
+### Budget & Finance Relation Map
+
+```
+FiscalYear
+  └── budgetLines (BudgetLine) [multiple]
+
+BudgetLine
+  ├── fiscalYear (FiscalYear) [single]
+  ├── organization (Organization) [single]
+  ├── unit (Unit) [single, optional]
+  ├── wareType (WareType) [single, optional]
+  ├── allocations (BudgetAllocation) [multiple]
+  └── encumbrances (BudgetEncumbrance) [multiple]
+
+BudgetAllocation
+  ├── budgetLine (BudgetLine) [single]
+  └── allocatedBy (User) [single]
+
+BudgetEncumbrance
+  ├── budgetLine (BudgetLine) [single]
+  └── createdBy (User) [single]
+
+GoodsReceipt
+  ├── purchasingRequest (PurchasingRequest) [single]
+  ├── receivedBy (User) [single]
+  └── receivingUnit (Unit) [single]
+
+PaymentOrder
+  ├── purchasingRequest (PurchasingRequest) [single]
+  ├── issuedBy (User) [single]
+  ├── approvedBy (User) [single, optional]
+  ├── payTo (Store) [single]
+  └── financialUnit (Unit) [single]
 ```

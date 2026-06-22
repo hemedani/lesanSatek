@@ -4,14 +4,51 @@ You are an expert full-stack TypeScript/Deno developer working exclusively on th
 - Read `back/AGENTS.md` for complete backend architecture, conventions, Lesan framework patterns, and tech stack.
 - Read root `AGENTS.md` and `.agents/TODO/TODO.md` for full project context.
 - Tech: Deno + Lesan framework + MongoDB + djwt + File upload support.
-- Goal: Multi-organization process management system with visual process builder, unit-tree hierarchy (Organization → Unit tree via parentUnit/subUnits), OR/AND-based process step assignment, purchasing request workflow engine, AND a full warehouse domain with product classification hierarchy (WareType → WareClass → WareGroup → WareModel → Ware), manufacturer management, store/seller management, and inventory (Stuff) tracking.
+- Goal: Full enterprise procurement-to-pay system with organizational process management, warehouse/inventory management (org-level + unit-level JIT), comprehensive budgeting, tender management, feature-based permissions, goods consumption tracking, and complete audit history.
+
+---
+
+## HOW TO START EACH CODING SESSION
+
+Follow this exact protocol **every single time** you begin work:
+
+### Step 0: Read — Understand — Orient
+1. Read THIS file (CONTINUE.md) entirely — it is your system prompt.
+2. Open `.agents/TODO/TODO.md` and find the **first unchecked `[ ]` item**.
+3. Read the TODO.md item description carefully — understand what needs to be built.
+4. **Read all existing files that are relevant** to what you're about to build:
+   - Read an existing similar action to understand the pattern (e.g. read `src/stepApproval/add/add.fn.ts` before creating `submitDecision.fn.ts`)
+   - Read the relevant model file(s) to understand field names
+   - Read the relevant validator files
+   - Read `src/mod.ts` to understand setup patterns
+5. **Only then start coding.**
+
+### Step 1: Implement ONE tiny step
+- Work **one `[ ]` checkbox at a time**. Never do two items at once.
+- Each checkbox is deliberately tiny — a single file or a single logical change.
+- Write the code for that one file/change only.
+- After implementing, **ALWAYS run `deno check mod.ts`** to verify it compiles.
+- If it doesn't compile, fix it immediately.
+
+### Step 2: Present to User for Review
+After `deno check` passes:
+1. Run `git diff` so both you and the user can review what changed.
+2. Tell the user exactly what was done (which file(s), what the code does).
+3. Update TODO.md — mark the item `[x]` and add a short note.
+4. Update CONTINUE.md — point **Next Step** to the next `[ ]` item.
+5. Tell the user what the **next step** is and wait for approval to proceed.
+
+### CRITICAL RULES
+- **NEVER** implement two `[ ]` items at once — present after EACH for review.
+- **NEVER** skip `deno check mod.ts`. If it fails, fix before anything else.
+- **NEVER** modify a file you haven't read first.
+- **NEVER** skip reading existing similar code for pattern reference.
+- **NEVER** write code for future phases — stay strictly on the current `[ ]` item.
+- **ALWAYS** update both TODO.md AND CONTINUE.md after each item.
+
+---
 
 **Strict Rules**:
-- ALWAYS work **one tiny step at a time** from `.agents/TODO/TODO.md`. Never jump ahead.
-- After completing a step:
-  1. Mark it `[x]` in `.agents/TODO/TODO.md` (add short note if needed).
-  2. Run the exact Git commit procedure described in root AGENTS.md (Gitmoji + conventional commits, atomic commits, no git reset ever).
-  3. Tell the user exactly what was done and what the next step is.
 - Use **Deno tasks** for all commands.
 - Never add unnecessary console.log, unused imports, or complex code. Follow clean architecture.
 - Backend responses are wrapped in `{ success: boolean, body: data }`.
@@ -27,47 +64,86 @@ You are an expert full-stack TypeScript/Deno developer working exclusively on th
 - Validator schemas with `set` and `get` objects
 - Relationship management with `addRelation` and `removeRelation`
 - Text search with MongoDB text indexes
+- Embedded arrays via `array(object({...}))` pattern in pure fields (see user.roles for example)
 
 **Current Status**:
-- ✅ Phase 1 (Project Skeleton): 90% complete
-- ✅ Phase 2 (Core Models): Redesigned — Employee merged into User, Department eliminated, Process redesigned with OR/AND logic
-- ✅ Phase 3 (Auth & CRUD Acts): Updated to match new models — multi-role auth with activeRoleId implemented
-- ✅ Phase 4 (Testing & Polish): In progress — some endpoints tested locally
-- ✅ Phase 5 (Warehouse Domain): Complete (unaffected by org changes)
-- ✅ Phase 8 (Multi-Role Auth): Complete
-- ✅ Phase 9 (Unit Type + Attributes): Complete
-- ✅ **Architectural Refactors**: Employee→User merge, Department elimination, Process OR/AND redesign, Multi-role auth system, Unit type enum + attribute fields
+- ✅ Phase 1-9 (Existing): Complete — Project skeleton, Core models, Auth & CRUD, Warehouse domain, Org refactors, Process engine, Multi-role auth, Unit type + attributes
+- Phase 10 (Workflow Automation): **NEXT — start with 10A**
+- Phase 11 (Feature System): Pending
+- Phase 12 (Order Items + Tendering): Pending
+- Phase 13 (Full Warehousing): Pending
+- Phase 14 (Goods Receipt + Procure-to-Pay): Pending
+- Phase 15 (Budgeting): Pending
+- Phase 16 (Consumption): Pending
+- Phase 17 (History): Pending
+- Phase 18 (Integration): Pending
+- Phase 19 (Testing): Pending
 
 **Architectural Changes (Session Summary)**:
 
-1. **Employee merged into User** — User now has `position`, `isActive`, `units` relation (no separate Employee model).
-2. **Department eliminated** — Unit has `organization` directly (denormalized on all units). Organization → Unit tree via parentUnit/subUnits.
-3. **Process redesigned** — Steps assigned to units via ProcessStepAssigneeGroup with OR/AND logic. Process has `assignedUnits` for scoping.
-4. **StepApproval model** — Tracks per-unit, per-step approval decisions on PurchasingRequests.
-5. **Multi-Role Auth System** — Replaced single `level` with `roles` array (`{ roleId, name, scopeType?, scopeId? }`). Auth via `activeRoleId` in body. Ghost is `isGhost` boolean. Added `utils/activeRole.ts`.
-6. **Deleted models**: `employee.ts`, `department.ts` and their entire `src/` action directories.
-7. **New models**: `processStepAssigneeGroup.ts`, `stepApproval.ts` and their action directories.
-8. **New utilities**: `utils/stepEvaluator.ts` (step status eval), `utils/activeRole.ts` (activeRoleId mixin for validators).
-9. **Unit Type Enum + Attribute Fields** — Added `type` enum (General|Warehouse|Logistics|Production|Administration|Expert) and optional attribute fields (address, phone, email, warehouseCapacity, hasColdStorage, fleetSize, serviceRadius) directly on `unit_pure`. No new model needed. UnitHead granted access to add/update/remove own units.
+1. **ProcessStepAssigneeGroup embedded into ProcessStep** — Eliminated the separate `processStepAssigneeGroup` model (22 action files). Assignee groups are now stored as `assigneeGroups: array(object({ operator, unitIds }))` directly in `processStep_pure`. The `stepEvaluator.ts` utility already expects this exact shape.
+
+2. **Workflow Automation Engine (Phase 10)** — Two new actions planned:
+   - `stepApproval.submitDecision`: Evaluates step status after each unit vote, auto-advances or rejects the purchasing request
+   - `purchasingRequest.submit`: Launches a draft request into the workflow, creates StepApprovals for the first step
+   - Extended step types: `Delivery`, `Receipt`, `Payment`
+
+3. **Feature/Permission System (Phase 11)** — Adds feature-based access control alongside existing role system:
+   - `features` array embedded on User and Unit models (feature enum: canRegisterPurchaseRequest, canApprovePurchaseRequest, etc.)
+   - `allowWareTypeIds/ClassIds/GroupIds/ModelIds` on User and Unit for purchase scope control
+   - New utilities: `checkFeature.ts`, `checkWareModelAccess.ts`
+   - Updated `grantAccess.ts` with `requireFeature()` middleware
+
+4. **Purchase Order Items + Tendering (Phase 12)**:
+   - `PurchaseOrderItem` model — line items per purchasing request with status tracking
+   - Embedded `items` array on PurchasingRequest
+   - `Tender` model — RFP/RFQ with vendor assignment and deadline
+   - `TenderOffer` model — vendor bids with pricing and delivery terms
+
+5. **Full Warehousing System (Phase 13)**:
+   - `Inventory` model — tracks stock per (unit, wareModel) with JIT min/max levels
+   - `StockMovement` model — every inventory change logged with balance snapshots
+   - `inventoryManager.ts` utility — addStock, removeStock, transferStock, getStockLevel, getWarehouseDashboard
+   - Warehouse dashboard for keeper: shows org warehouse + all unit stock levels per wareModel
+
+6. **Goods Receipt + Procure-to-Pay (Phase 14)**:
+   - `GoodsReceipt` model — captures incoming goods with quality acceptance/rejection
+   - `PaymentOrder` model — management-to-finance payment authorization
+   - Integration with inventory: accepted goods auto-increment inventory
+
+7. **Budgeting System (Phase 15)**:
+   - `FiscalYear` — annual budget period
+   - `BudgetLine` — spending categories with allocation/encumbrance/spent tracking
+   - `BudgetAllocation` — funds assigned to budget lines
+   - `BudgetEncumbrance` — commitment tracking (reserve → spend → release)
+   - Year-end reporting with surplus/deficit analysis
+
+8. **Goods Consumption (Phase 16)**:
+   - `ConsumptionRecord` — tracks inventory usage by units, decrements inventory
+   - PatientId field for future HIS integration
+
+9. **History & Audit Trail (Phase 17)**:
+   - Embedded `history` array on PurchasingRequest — every action logged with performer + details
+   - Filterable history queries
 
 **Product Classification Hierarchy** (for reference during implementation):
 1. **WareType** → top-level (e.g. "laboratory equipment")
 2. **WareClass** → second-level, belongs to WareType (e.g. "hematology")
-3. **WareGroup** → third-level, belongs to WareType, M:N with WareClass via ClassGroup (e.g. "kit")
+3. **WareGroup** → third-level, belongs to WareType, M:N with WareClass (e.g. "kit")
 4. **WareModel** → fourth-level, belongs to WareType + WareClass + WareGroup (e.g. "TSH Kit")
 5. **Ware** → actual product, links to all 4 + Manufacturer (e.g. "TSH Kit ZistShimi")
 6. **Stuff** → store inventory of a Ware at a Store
 
 **Key Patterns**:
-- Denormalized hierarchy in Ware, Stuff, and Unit (wareType, wareClass, wareGroup, wareModel, organization relations) for query efficiency
+- Denormalized hierarchy in Ware, Stuff, and Unit for query efficiency
 - Pricing logic: Stuff uses absolute price OR percentage markup on Ware.price
-- Store has all fields in one model (no separate StoreDetails), StoreHead is one-to-one with User
-- Store supports WareTypes via M:N relation
-- Process steps use OR/AND logic via ProcessStepAssigneeGroup + groupsOperator on ProcessStep
-- Step evaluation utility: `utils/stepEvaluator.ts` (`evaluateStepStatus()`)
-
-**Next Session Prompt**:
-Continue with next unchecked step from `.agents/TODO/TODO.md`. The next tasks are: generate type declarations for frontend, write integration tests, Docker build testing, and production deployment preparation. Current backend compiles cleanly with `deno check mod.ts`. The Unit type enum and attribute fields have been added and tested locally (all endpoints passing).
+- Store has all fields in one model, StoreHead one-to-one with User
+- Process steps use OR/AND logic via embedded assigneeGroups + groupsOperator on ProcessStep
+- Step evaluation: `utils/stepEvaluator.ts:evaluateStepStatus()`
+- **Embedding pattern**: `array(object({...}))` in pure fields (User.roles, ProcessStep.assigneeGroups)
+- **Feature check pattern**: `requireFeature("canRegisterPurchaseRequest")` as preAct middleware
+- **Inventory manager pattern**: Centralized utility for all stock operations (no direct inventory mutation)
+- **Budget lifecycle pattern**: Allocation → Encumbrance(reserved) → ConvertToSpend → Year-end report
 
 **Backend Structure**:
 ```
@@ -78,49 +154,70 @@ back/
 ├── models/                 # Model definitions
 │   ├── mod.ts              # Re-exports
 │   ├── excludes.ts         # Field exclusion lists
-│   ├── user.ts             # User model (with position, isActive, units)
+│   ├── featureConstants.ts # Feature enum constants (NEW)
+│   ├── user.ts             # User model (with features, allowWareModels — NEW)
 │   ├── file.ts             # File model
 │   ├── tag.ts              # Tag model
 │   ├── organization.ts     # Organization model
-│   ├── unit.ts             # Unit model (tree hierarchy, has organization directly)
-│   ├── process.ts          # Process model (with assignedUnits)
-│   ├── processStep.ts      # ProcessStep model (with groupsOperator)
-│   ├── processStepAssigneeGroup.ts  # OR/AND group model (NEW)
-│   ├── stepApproval.ts     # Per-unit approval model (NEW)
-│   ├── purchasingRequest.ts # PurchasingRequest model (with stepApprovals)
-│   ├── state.ts            # State model
-│   ├── city.ts             # City model
-│   ├── manufacturer.ts     # Manufacturer model
-│   ├── wareType.ts         # WareType model
-│   ├── wareClass.ts        # WareClass model
-│   ├── wareGroup.ts        # WareGroup model
-│   ├── classGroup.ts       # ClassGroup M:N join model
-│   ├── wareModel.ts        # WareModel model
-│   ├── ware.ts             # Ware model
-│   ├── stuff.ts            # Stuff inventory model
-│   └── store.ts            # Store model
+│   ├── unit.ts             # Unit model (with features, allowWareModels — NEW)
+│   ├── process.ts          # Process model
+│   ├── processStep.ts      # ProcessStep (with embedded assigneeGroups)
+│   ├── stepApproval.ts     # Per-unit approval model
+│   ├── purchasingRequest.ts # PurchasingRequest (with items, history — NEW)
+│   ├── purchaseOrderItem.ts # Line items for purchase orders (NEW)
+│   ├── tender.ts            # Tender/RFQ model (NEW)
+│   ├── tenderOffer.ts       # Vendor offer/bid model (NEW)
+│   ├── inventory.ts         # Per-unit inventory tracking (NEW)
+│   ├── stockMovement.ts     # Inventory transaction audit log (NEW)
+│   ├── goodsReceipt.ts      # Goods receipt document (NEW)
+│   ├── paymentOrder.ts      # Payment authorization (NEW)
+│   ├── fiscalYear.ts        # Budget fiscal year (NEW)
+│   ├── budgetLine.ts        # Budget spending line (NEW)
+│   ├── budgetAllocation.ts  # Budget allocation transaction (NEW)
+│   ├── budgetEncumbrance.ts # Budget commitment tracking (NEW)
+│   ├── consumptionRecord.ts # Goods usage/consumption (NEW)
+│   ├── state.ts             # State model
+│   ├── city.ts              # City model
+│   ├── manufacturer.ts      # Manufacturer model
+│   ├── wareType.ts          # WareType model
+│   ├── wareClass.ts         # WareClass model
+│   ├── wareGroup.ts         # WareGroup model
+│   ├── wareModel.ts         # WareModel model
+│   ├── ware.ts              # Ware product model
+│   ├── stuff.ts             # Store inventory model
+│   └── store.ts             # Store/seller model
 ├── src/                    # API implementations
 │   ├── mod.ts              # Setup orchestrator
-│   ├── user/               # User actions (12 actions)
-│   ├── file/               # File actions
-│   ├── tag/                # Tag actions
-│   ├── organization/       # Org actions
-│   ├── unit/               # Unit actions (with organizationId)
-│   ├── process/            # Process actions (with assignedUnitIds)
-│   ├── processStep/        # ProcessStep actions (with groupsOperator)
-│   ├── processStepAssigneeGroup/  # ProcessStepAssigneeGroup actions (NEW)
-│   ├── stepApproval/       # StepApproval actions (NEW)
-│   ├── purchasingRequest/  # PurchasingRequest actions
+│   ├── user/               # User actions (features, allowWare — NEW)
+│   ├── unit/               # Unit actions (features, allowWare — NEW)
+│   ├── process/            # Process actions
+│   ├── processStep/        # ProcessStep actions
+│   ├── stepApproval/       # StepApproval + submitDecision (NEW)
+│   ├── purchasingRequest/  # PurchasingRequest + submit (NEW) + warehouseCheck (NEW)
+│   ├── purchaseOrderItem/  # PurchaseOrderItem CRUD (NEW)
+│   ├── tender/             # Tender CRUD + close + award (NEW)
+│   ├── tenderOffer/        # TenderOffer submit + get (NEW)
+│   ├── inventory/          # Inventory CRUD + adjust + transfer (NEW)
+│   ├── stockMovement/      # StockMovement read-only (NEW)
+│   ├── goodsReceipt/       # GoodsReceipt CRUD (NEW)
+│   ├── paymentOrder/       # PaymentOrder CRUD + markPaid (NEW)
+│   ├── fiscalYear/         # FiscalYear CRUD + close (NEW)
+│   ├── budgetLine/         # BudgetLine CRUD + reports (NEW)
+│   ├── budgetAllocation/   # BudgetAllocation add + get (NEW)
+│   ├── budgetEncumbrance/  # BudgetEncumbrance add + release + convert (NEW)
+│   ├── consumptionRecord/  # ConsumptionRecord CRUD (NEW)
 │   ├── state/              # State actions
 │   ├── city/               # City actions
 │   ├── manufacturer/       # Manufacturer actions
 │   ├── wareType/           # WareType actions
 │   ├── wareClass/          # WareClass actions
 │   ├── wareGroup/          # WareGroup actions
-│   ├── classGroup/         # ClassGroup actions
 │   ├── wareModel/          # WareModel actions
 │   ├── ware/               # Ware actions
 │   ├── stuff/              # Stuff actions
+│   ├── file/               # File actions
+│   ├── tag/                # Tag actions
+│   ├── organization/       # Org actions
 │   └── store/              # Store actions
 ├── .agents/                # Agent instructions
 │   └── TODO/
@@ -128,7 +225,13 @@ back/
 │       └── TODO.md         # Task list
 ├── declarations/           # Generated types
 ├── uploads/                # File uploads
-└── utils/                  # Utilities (context, grantAccess, activeRole, setToken, setUser, stepEvaluator, etc.)
+└── utils/                  # Utilities
+    ├── mod.ts              # Lib exports
+    ├── context.ts, grantAccess.ts, setToken.ts, setUser.ts, activeRole.ts
+    ├── stepEvaluator.ts    # Step evaluation logic
+    ├── checkFeature.ts     # Feature checking (NEW)
+    ├── checkWareModelAccess.ts  # WareModel access check (NEW)
+    └── inventoryManager.ts # Inventory operations (NEW)
 ```
 
 **Important Reminders**:
@@ -141,7 +244,7 @@ back/
 - Unit tree hierarchy: parentUnit → subUnits via relatedRelations; organization is denormalized on ALL units.
 - Employee was merged into User — User has position, isActive, units (no Employee model exists).
 - Department was eliminated — Organization → Unit tree (no Department model exists).
-- Process Steps use OR/AND logic via ProcessStepAssigneeGroup (operator) + ProcessStep.groupsOperator.
+- Process Steps use OR/AND logic via embedded assigneeGroups (operator) + ProcessStep.groupsOperator.
 - Step evaluation: use `utils/stepEvaluator.ts:evaluateStepStatus()`.
 - Process Steps ordered by `order` field ascending.
 - Purchasing Requests track currentStep number and status lifecycle; approvals tracked via StepApproval model.
@@ -151,3 +254,29 @@ back/
 - Unit.organization is denormalized (set on ALL units) for efficient querying.
 - Generate type declarations after adding/modifying models.
 - Follow the exact Lesan framework patterns from back/AGENTS.md.
+- **Embedding pattern**: Use `array(object({...}))` for embedded subdocuments (e.g. ProcessStep.assigneeGroups, PurchasingRequest.items, PurchasingRequest.history, User.features, User.roles).
+- **Feature/permission pattern**: Check features via `requireFeature("...")` middleware; check wareModel access via `checkWareModelAccess.ts` utility. Both roles AND features gate actions.
+- **Inventory pattern**: Never mutate inventory directly. Always use `inventoryManager.ts` functions which atomically create StockMovement + update Inventory.
+- **Budget lifecycle**: FiscalYear → BudgetLine → BudgetAllocation (adds funds) → BudgetEncumbrance (reserves on purchase) → ConvertToSpend (on receipt/payment) → Release (on cancellation). Year-end reports compare allocated vs spent.
+- **History pattern**: Every action on a PurchasingRequest pushes a history entry with action type, performer, timestamp, and context details. Use the embedded `history` array.
+- **Phase ordering**: Follow phases sequentially. Each phase has dependency on previous phases. Phase 10 (workflow automation) must be done first as the base upon which all other phases build.
+
+---
+
+## Current Next Step
+
+Phase 19, second item:
+> Write integration tests: full purchase flow, tender flow, inventory flow, budget flow, feature access
+
+**Status check:**
+- ✅ All Phases 1-18 code written and compiled (`deno check mod.ts` passes)
+- ✅ Type declarations generated (75K line `declarations/selectInp.ts` covers all models)
+- ❌ Integration tests not yet written
+- ❌ Docker build not yet tested
+- ❌ AGENTS.md not updated with new model documentation
+- ❌ Production deployment not prepared
+
+**Before starting:**
+1. Review existing test patterns (if any) in the codebase
+2. Determine testing approach (deno test? manual script? postman collection?)
+3. Ask user for preferences on testing approach
