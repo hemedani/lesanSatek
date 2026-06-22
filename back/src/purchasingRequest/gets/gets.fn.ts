@@ -12,6 +12,7 @@ export const getsFn: ActFn = async (body) => {
       status,
       processId,
       requesterId,
+      filterByAction,
       sortBy,
       sortOrder,
     },
@@ -38,6 +39,11 @@ export const getsFn: ActFn = async (body) => {
   requesterId &&
     pipeline.push({
       $match: { "requester._id": new ObjectId(requesterId as string) },
+    });
+
+  filterByAction &&
+    pipeline.push({
+      $match: { "history.action": filterByAction },
     });
 
   if (search && (!sortBy || sortBy === "relevance")) {

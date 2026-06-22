@@ -151,8 +151,34 @@ export const submitDecisionFn: ActFn = async (body) => {
     step.assigneeGroups,
   );
 
+  const stepType = step.stepType as string;
+
   if (overallStatus === "approved") {
     const nextStepIndex = stepIndex + 1;
+
+    // Push step_approved history
+    await purchasingRequest.findOneAndUpdate({
+      filter: { _id: prId },
+      update: {
+        $push: {
+          history: {
+            action: "step_approved",
+            performedBy: user._id.toString(),
+            performedByName: `${user.first_name} ${user.last_name}`,
+            performedAt: now,
+            details: {
+              stepName: step.name,
+              stepIndex,
+              stepType,
+              unitId,
+              comment: comment || "",
+            },
+          },
+        },
+      },
+      projection: { _id: 1 },
+    });
+
     if (nextStepIndex < steps.length) {
       const nextStep = steps[nextStepIndex];
       const nextUnitIds = [...new Set<string>(
@@ -194,6 +220,22 @@ export const submitDecisionFn: ActFn = async (body) => {
             completedAt: now,
             updatedAt: now,
           },
+          $push: {
+            history: {
+              action: "step_approved",
+              performedBy: user._id.toString(),
+              performedByName: `${user.first_name} ${user.last_name}`,
+              performedAt: now,
+              details: {
+                stepName: step.name,
+                stepIndex,
+                stepType,
+                unitId,
+                comment: comment || "",
+                completed: true,
+              },
+            },
+          },
         },
         projection: { _id: 1 },
       });
@@ -201,7 +243,24 @@ export const submitDecisionFn: ActFn = async (body) => {
   } else if (overallStatus === "rejected") {
     await purchasingRequest.findOneAndUpdate({
       filter: { _id: prId },
-      update: { $set: { status: "Rejected", updatedAt: now } },
+      update: {
+        $set: { status: "Rejected", updatedAt: now },
+        $push: {
+          history: {
+            action: "step_rejected",
+            performedBy: user._id.toString(),
+            performedByName: `${user.first_name} ${user.last_name}`,
+            performedAt: now,
+            details: {
+              stepName: step.name,
+              stepIndex,
+              stepType,
+              unitId,
+              comment: comment || "",
+            },
+          },
+        },
+      },
       projection: { _id: 1 },
     });
   }

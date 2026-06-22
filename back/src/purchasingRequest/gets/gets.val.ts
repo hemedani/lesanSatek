@@ -12,6 +12,15 @@ export const getsValidator = () => {
       status: optional(enums(request_status_array)),
       processId: optional(objectIdValidation),
       requesterId: optional(objectIdValidation),
+      filterByAction: optional(enums([
+        "created",
+        "submitted",
+        "step_approved",
+        "step_rejected",
+        "goods_received",
+        "payment_ordered",
+        "goods_consumed",
+      ])),
       sortBy: optional(
         enums([
           "createdAt",

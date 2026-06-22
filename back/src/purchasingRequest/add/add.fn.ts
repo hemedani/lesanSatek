@@ -39,9 +39,20 @@ export const addFn: ActFn = async (body) => {
     };
   }
 
-  return await purchasingRequest.insertOne({
-    doc: rest,
+  const result = await purchasingRequest.insertOne({
+    doc: {
+      ...rest,
+      history: [{
+        action: "created",
+        performedBy: user._id.toString(),
+        performedByName: `${user.first_name} ${user.last_name}`,
+        performedAt: new Date(),
+        details: {},
+      }],
+    },
     relations,
     projection: get,
   });
+
+  return result;
 };

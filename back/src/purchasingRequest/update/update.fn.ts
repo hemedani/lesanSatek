@@ -4,7 +4,7 @@ import { purchasingRequest_pure } from "../../../models/purchasingRequest.ts";
 
 export const updateFn: ActFn = async (body) => {
   const {
-    set: { _id, title, description, amount, status, currentStep, requestedAt, completedAt },
+    set: { _id, title, description, amount, status, currentStep, requestedAt, completedAt, items },
     get,
   } = body.details;
 
@@ -20,6 +20,7 @@ export const updateFn: ActFn = async (body) => {
   currentStep !== undefined && (updateObj.currentStep = currentStep);
   requestedAt && (updateObj.requestedAt = new Date(requestedAt as string));
   completedAt && (updateObj.completedAt = new Date(completedAt as string));
+  items !== undefined && (updateObj.items = items);
 
   return await purchasingRequest.findOneAndUpdate({
     filter: { _id: new ObjectId(_id as string) },
