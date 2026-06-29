@@ -1,4 +1,4 @@
-import { grantAccess, setTokens, setUser } from "@lib";
+import { grantAccess, requireFeature, setTokens, setUser } from "@lib";
 import { coreApp } from "../../../mod.ts";
 import { closeFn } from "./close.fn.ts";
 import { closeValidator } from "./close.val.ts";
@@ -12,8 +12,8 @@ export const closeSetup = () =>
       setTokens,
       setUser,
       grantAccess([
-        { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead", "UnitHead", "Employee"] },
+        { roles: ["Manager", "Admin"], features: ["canCreateTender"] },
+        { roles: ["OrgHead", "UnitHead", "Employee"], features: ["canCreateTender"] },
       ]),
     ],
     validator: closeValidator(),

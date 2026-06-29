@@ -31,7 +31,7 @@ export const updateRelationsFn: ActFn = async (body) => {
       relations: {
         assignedFrom: {
           _ids: new ObjectId(assignedFromId as string),
-          relatedRelations: {},
+          relatedRelations: { purchaseOrderItems: true },
         },
       },
       projection: get,

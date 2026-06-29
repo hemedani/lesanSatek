@@ -5,7 +5,7 @@ import type { MyContext } from "@lib";
 export const awardFn: ActFn = async (body) => {
   const { set, get } = body.details;
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
-  const { _id, winningOfferId } = set;
+  const { activeRoleId, _id, winningOfferId } = set;
 
   const now = new Date();
 
@@ -25,7 +25,7 @@ export const awardFn: ActFn = async (body) => {
 
   const winningOffer = await tenderOffer.findOne({
     filters: { _id: new ObjectId(winningOfferId as string) },
-    projection: { _id: 1, status: 1, store: 1 },
+    projection: { _id: 1, status: 1, store: 1, price: 1 },
   }) as Record<string, unknown>;
 
   if (!winningOffer) {
@@ -33,6 +33,7 @@ export const awardFn: ActFn = async (body) => {
   }
 
   const winningStoreId = (winningOffer.store as Record<string, unknown>)?._id as string;
+  const offerPrice = (winningOffer.price as number) || 0;
 
   // Accept winning offer
   await tenderOffer.findOneAndUpdate({
@@ -57,76 +58,93 @@ export const awardFn: ActFn = async (body) => {
     });
   }
 
-  // Load the PR to get its items
+  // Load the PR to get its wareModel + quantity
   const pr = await purchasingRequest.findOne({
     filters: { _id: new ObjectId(prRef) },
-    projection: { _id: 1, items: 1 },
+    projection: {
+      _id: 1,
+      quantity: 1,
+      wareModel: { _id: 1, name: 1, enName: 1 },
+    },
   }) as Record<string, unknown>;
 
-  const prItems = (pr?.items as Array<Record<string, unknown>>) || [];
+  const wareModel = pr?.wareModel as Record<string, unknown> | undefined;
+  const wareModelId = wareModel?._id?.toString() || "";
+  const wareModelName = (wareModel?.name as string) || "";
+  const quantity = (pr?.quantity as number) || 0;
 
-  // Create purchaseOrderItems from PR items
-  for (const item of prItems) {
-    const poRelations: Record<string, unknown> = {
-      purchasingRequest: {
-        _ids: new ObjectId(prRef),
-        relatedRelations: { purchaseOrderItems: true },
-      },
+  // Create a single PurchaseOrderItem from the PR's wareModel + quantity
+  const poRelations: Record<string, unknown> = {
+    purchasingRequest: {
+      _ids: new ObjectId(prRef),
+      relatedRelations: { purchaseOrderItems: true },
+    },
+  };
+
+  if (winningStoreId) {
+    poRelations.assignedFrom = {
+      _ids: new ObjectId(winningStoreId),
+      relatedRelations: { purchaseOrderItems: true },
     };
-
-    if (winningStoreId) {
-      poRelations.assignedFrom = {
-        _ids: new ObjectId(winningStoreId),
-        relatedRelations: {},
-      };
-    }
-
-    poRelations.assignedBy = {
-      _ids: user._id,
-      relatedRelations: {},
-    };
-
-    await purchaseOrderItem.insertOne({
-      doc: {
-        wareModelId: item.wareModelId as string,
-        wareModelName: item.wareModelName as string,
-        wareId: item.wareId as string | undefined,
-        wareName: item.wareName as string | undefined,
-        quantity: item.quantity as number,
-        unitPrice: item.unitPrice as number | undefined,
-        status: "assigned",
-      },
-      relations: poRelations,
-      projection: { _id: 1 },
-    });
   }
+
+  poRelations.assignedBy = {
+    _ids: user._id,
+    relatedRelations: {},
+  };
+
+  poRelations.tenderOffer = {
+    _ids: new ObjectId(winningOfferId as string),
+    relatedRelations: { purchaseOrderItem: true },
+  };
+
+  await purchaseOrderItem.insertOne({
+    doc: {
+      wareModelId,
+      wareModelName,
+      quantity,
+      unitPrice: offerPrice,
+      totalPrice: offerPrice * quantity,
+      status: "assigned",
+    },
+    relations: poRelations,
+    projection: { _id: 1 },
+  });
 
   // Push item_assigned history on the PR
-  const historyEntries = prItems.map((item) => ({
-    action: "item_assigned",
-    performedBy: user._id.toString(),
-    performedByName: `${(user as Record<string, unknown>).first_name} ${(user as Record<string, unknown>).last_name}`,
-    performedAt: now,
-    details: {
-      wareModelId: item.wareModelId,
-      wareModelName: item.wareModelName,
-      quantity: item.quantity,
-      storeId: winningStoreId,
-      itemCount: prItems.length,
-      totalItems: prItems.length,
-    },
-  }));
+  const activeRole = ((user as Record<string, unknown>).roles as Array<{ roleId: string; name: string; scopeType?: string; scopeId?: string }> || [])
+    .find((r) => r.roleId === activeRoleId);
 
-  if (historyEntries.length > 0) {
-    // Push first entry with full details, remaining as simplified entries
-    const firstEntry = historyEntries[0];
-    firstEntry.details.itemCount = prItems.length;
-    await purchasingRequest.findOneAndUpdate({
-      filter: { _id: new ObjectId(prRef) },
-      update: { $push: { history: firstEntry } },
-      projection: { _id: 1 },
-    });
-  }
+  await purchasingRequest.findOneAndUpdate({
+    filter: { _id: new ObjectId(prRef) },
+    update: {
+      $push: {
+        history: {
+          action: "item_assigned",
+          performed: {
+            by: user._id.toString(),
+            name: `${(user as Record<string, unknown>).first_name} ${(user as Record<string, unknown>).last_name}`,
+            at: now,
+            role: activeRole ? {
+              id: activeRole.roleId,
+              name: activeRole.name,
+              scopeType: activeRole.scopeType,
+              scopeId: activeRole.scopeId,
+            } : { id: "", name: "" },
+          },
+          details: {
+            wareModelId,
+            wareModelName,
+            quantity,
+            unitPrice: offerPrice,
+            storeId: winningStoreId,
+            tenderOfferId: winningOfferId,
+          },
+        },
+      },
+    },
+    projection: { _id: 1 },
+  });
 
   // Mark tender as awarded
   return await tender.findOneAndUpdate({

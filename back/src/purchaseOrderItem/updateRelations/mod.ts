@@ -1,4 +1,4 @@
-import { grantAccess, setTokens, setUser } from "@lib";
+import { grantAccess, requireFeature, setTokens, setUser } from "@lib";
 import { coreApp } from "../../../mod.ts";
 import { updateRelationsFn } from "./updateRelations.fn.ts";
 import { updateRelationsValidator } from "./updateRelations.val.ts";
@@ -12,7 +12,7 @@ export const updateRelationsSetup = () =>
       setTokens,
       setUser,
       grantAccess([
-        { roles: ["Manager", "Admin"] },
+        { roles: ["Manager", "Admin"], features: ["canAssignItemsToOrder"] },
       ]),
     ],
     validator: updateRelationsValidator(),

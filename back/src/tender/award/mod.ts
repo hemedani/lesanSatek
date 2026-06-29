@@ -1,4 +1,4 @@
-import { grantAccess, setTokens, setUser } from "@lib";
+import { grantAccess, requireFeature, setTokens, setUser } from "@lib";
 import { coreApp } from "../../../mod.ts";
 import { awardFn } from "./award.fn.ts";
 import { awardValidator } from "./award.val.ts";
@@ -12,8 +12,8 @@ export const awardSetup = () =>
       setTokens,
       setUser,
       grantAccess([
-        { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead", "UnitHead", "Employee"] },
+        { roles: ["Manager", "Admin"], features: ["canCreateTender"] },
+        { roles: ["OrgHead", "UnitHead", "Employee"], features: ["canCreateTender"] },
       ]),
     ],
     validator: awardValidator(),

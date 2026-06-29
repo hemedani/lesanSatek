@@ -1,4 +1,4 @@
-import { grantAccess, setTokens, setUser } from "@lib";
+import { grantAccess, requireFeature, setTokens, setUser } from "@lib";
 import { coreApp } from "../../../mod.ts";
 import { submitFn } from "./submit.fn.ts";
 import { submitValidator } from "./submit.val.ts";
@@ -12,9 +12,9 @@ export const submitSetup = () =>
       setTokens,
       setUser,
       grantAccess([
-        { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead", "UnitHead", "Employee"] },
-        { roles: ["Ordinary"] },
+        { roles: ["Manager", "Admin"], features: ["canRespondToTender"] },
+        { roles: ["OrgHead", "UnitHead", "Employee"], features: ["canRespondToTender"] },
+        { roles: ["Ordinary"], features: ["canRespondToTender"] },
       ]),
     ],
     validator: submitValidator(),

@@ -1,4 +1,4 @@
-import { grantAccess, setTokens, setUser } from "@lib";
+import { grantAccess, requireFeature, setTokens, setUser } from "@lib";
 import { coreApp } from "../../../mod.ts";
 import { addFn } from "./add.fn.ts";
 import { addValidator } from "./add.val.ts";
@@ -12,8 +12,8 @@ export const addSetup = () =>
       setTokens,
       setUser,
       grantAccess([
-        { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead", "UnitHead", "Employee"] },
+        { roles: ["Manager", "Admin"], features: ["canCreateTender"] },
+        { roles: ["OrgHead", "UnitHead", "Employee"], features: ["canCreateTender"] },
       ]),
     ],
     validator: addValidator(),

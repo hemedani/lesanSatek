@@ -1,7 +1,7 @@
 import { coreApp } from "../../../mod.ts";
 import { updateFn } from "./update.fn.ts";
 import { updateValidator } from "./update.val.ts";
-import { grantAccess, setTokens, setUser } from "@lib";
+import { grantAccess, requireFeature, setTokens, setUser } from "@lib";
 
 export const updateSetup = () =>
   coreApp.acts.setAct({
@@ -11,7 +11,9 @@ export const updateSetup = () =>
     preAct: [
       setTokens,
       setUser,
-      grantAccess([{ roles: ["Manager", "Admin"] }]),
+      grantAccess([
+        { roles: ["Manager", "Admin"], features: ["canAssignItemsToOrder"] },
+      ]),
     ],
     validator: updateValidator(),
   });
