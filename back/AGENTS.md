@@ -41,12 +41,12 @@ The backend defines models across four domains: Organizational, Procurement/Purc
 - **Tag** - Metadata categorization (name, description, color, icon)
 - **Organization** - Organizations that own purchasing processes (name, enName, description, isActive)
 - **Unit** - Hierarchical units/subunits in a tree (name, enName, description, isActive, organization denormalized on all units, parentUnit for nesting, head as User, features, allowWareTypeIds, allowWareClassIds, allowWareGroupIds, allowWareModelIds). Unit has a `type` enum (General|Warehouse|Logistics|Production|Administration|Expert) and optional attribute fields (address, phone, email, warehouseCapacity, hasColdStorage, fleetSize, serviceRadius). *Department was eliminated.*
-- **Process** - Process builder workflow definitions (name, description, status: Draft|Active|Archived, version, isActive, assignedUnits for scope). Custom actions: activateProcess, duplicateProcess.
+- **Process** - Process builder workflow definitions (name, description, status: Draft|Active|Archived, version, isActive). Custom actions: activateProcess, duplicateProcess.
 - **ProcessStep** - Individual steps within a process (name, description, stepType: Approval|Review|Notification|Action|Delivery|Receipt|Payment, order, required, groupsOperator: AND|OR, assigneeGroups: embedded array of {operator, unitIds}). *ProcessStepAssigneeGroup was eliminated — assignee groups are now embedded directly in ProcessStep.*
 
 #### Procurement & Purchasing Domain
 - **StepApproval** - Per-unit per-step approval decisions (status: pending|approved|rejected, comment, decidedAt). Relations: purchasingRequest, processStep, unit, decidedBy.
-- **PurchasingRequest** - Actual purchasing requests flowing through processes (title, description, amount, status: Draft|Pending|InProgress|Approved|Rejected|Completed|Cancelled, currentStep, items: embedded array, history: embedded array). Custom actions: submit, getHistory, convertItems, warehouseCheck. Relations: process, requester, requestingUnit, attachments, stepApprovals, purchaseOrderItems, tender, goodsReceipts, paymentOrders.
+- **PurchasingRequest** - Actual purchasing requests flowing through processes (title, description, estimatedAmount, quantity, status: Draft|Pending|InProgress|Approved|Rejected|Completed|Cancelled, currentStep, history: embedded array with nested performed{by,name,at,role} + optional unit + details). Custom actions: submit, getHistory, assignStore, warehouseCheck, checkStoreAvailability. Relations: wareModel (WareModel), process, requester, requestingUnit, attachments, stepApprovals, purchaseOrderItems, tender, goodsReceipts, paymentOrders, budgetLine.
 - **PurchaseOrderItem** - Line items on a purchase order (wareModelId, wareModelName, wareId?, wareName?, quantity, unitPrice?, totalPrice?, status: pending|assigned|ordered|received|cancelled). Relations: purchasingRequest, assignedFrom (store), assignedBy (user).
 - **Tender** - RFP/RFQ for vendor selection (title, description, status: open|closed|awarded|cancelled, deadline). Custom actions: close, award. Relations: purchasingRequest, createdBy, assignedVendors (stores), offers (tenderOffers).
 - **TenderOffer** - Vendor bid on a tender (price, deliveryTime, paymentTerms?, description?, status: submitted|accepted|rejected, submittedAt). Relations: tender, store.
@@ -97,7 +97,7 @@ Key points:
 
 The system provides a flexible workflow engine with unit-based assignment and OR/AND logic:
 
-1. **Process** defines a purchasing workflow (Draft → Active → Archived). Each process has `assignedUnits` which scopes which units participate.
+1. **Process** defines a purchasing workflow (Draft → Active → Archived).
 2. **ProcessStep** defines individual steps (Approval/Review/Notification/Action/Delivery/Receipt/Payment) with ordering.
 3. **Assignee groups** are embedded in ProcessStep as `assigneeGroups: array({ operator, unitIds })`. Steps have a `groupsOperator` (AND/OR) that defines how groups combine. *Standalone ProcessStepAssigneeGroup model was eliminated.*
 4. **StepApproval** tracks per-unit, per-step decisions (approved/rejected/pending) on each PurchasingRequest.
@@ -126,13 +126,12 @@ Draft  ──►  activateProcess()  ──►  Active  ──►  update(status
 1. At least one ProcessStep exists
 2. Step `order` values are consecutive (1, 2, 3, ...N) with no gaps or duplicates
 3. All `unitIds` in step assigneeGroups reference valid Unit documents
-4. If process has `assignedUnits`, all step unitIds are within that scope
-5. On success: sets `status: "Active"`, `isActive: true`, auto-increments `version`
-6. Rejects if already Active
+4. On success: sets `status: "Active"`, `isActive: true`, auto-increments `version`
+5. Rejects if already Active
 
 **`duplicateProcess` (custom action):** Clones a process and all its steps:
 1. Fetches source process and all its ProcessSteps (with assigneeGroups)
-2. Creates new Process (Draft, version 1, isActive: false) with same organization + assignedUnits
+2. Creates new Process (Draft, version 1, isActive: false) with same organization
 3. Copies all steps with identical properties
 4. Default name: `"{source name} (Copy)"`, custom name optionally passed
 
@@ -145,7 +144,13 @@ The complete purchase-to-payment flow is automated:
 ```
 PR Draft ──► submit() ──► Pending ──► submitDecision() (per step) ──► InProgress/Approved
       │                                                                    │
-      ├──► (optional Tender ──► close ──► award ──► creates PO items)     │
+      │  ┌── Path A (Direct Store Assignment)                              │
+      ├──► checkStoreAvailability() ──► assignStore(assignedFromId)        │
+      │  └── creates PurchaseOrderItem (auto-price from Stuff)             │
+      │                                                                    │
+      │  ┌── Path B (Auction/Tender)                                       │
+      ├──► tender.add() ──► close() ──► award(winningOfferId)              │
+      │  └── creates PurchaseOrderItem (price from offer, links tenderOffer)│
       │                                                                    │
       └────────────────────────────────────────────────────────────────────┘
                            │
@@ -165,7 +170,7 @@ PR Draft ──► submit() ──► Pending ──► submitDecision() (per st
                  Completed
 ```
 
-**`purchasingRequest.submit`:** Creates a request with status=Pending, currentStep=0. Creates StepApproval(status:pending) for each unit in the first step's assigneeGroups. Optionally auto-creates BudgetEncumbrance if `budgetLineId` and `amount` are provided (validates sufficient remaining budget first). Pushes "submitted" history entry.
+**`purchasingRequest.submit`:** Creates a request with status=Pending, currentStep=0. Sets `wareModel` relation and optionally `budgetLine` relation on the PR. Creates StepApproval(status:pending) for each unit in the first step's assigneeGroups. Optionally auto-creates BudgetEncumbrance if `budgetLineId` and `estimatedAmount` are provided (validates sufficient remaining budget first). Pushes "submitted" history entry.
 
 **`stepApproval.submitDecision`:** Processes a unit's decision (approved/rejected):
 1. Validates request is Pending/InProgress, step matches currentStep, unit is in step's assigneeGroups
@@ -173,9 +178,15 @@ PR Draft ──► submit() ──► Pending ──► submitDecision() (per st
 3. Fetches all approvals for current step, runs `evaluateStepStatus()`
 4. On **approved**: auto-advances `currentStep` (creates pending approvals for next step) or marks request **Completed** if last step
 5. On **rejected**: marks request **Rejected**
-6. Pushes "step_approved" / "step_rejected" history entries
+6. Pushes "step_approved" / "step_rejected" history entries with nested performed + unit objects
 
-**`tender.close` → `tender.award`:** On award, winning offer is accepted, all others rejected. PurchaseOrderItems are created from the PR's embedded `items` array, assigned to the winning store. Pushes "item_assigned" history entry.
+**`purchasingRequest.assignStore` (Path A):** Creates a PurchaseOrderItem from the PR's `wareModel` + `quantity`. When `assignedFromId` (Store) is provided, auto-looks up `Stuff.price` (absolute or percentage-based) for that store + wareModel and uses it as `unitPrice`. Requires `canAssignItemsToOrder` feature. Pushes "item_assigned" history entry.
+
+**`purchasingRequest.checkStoreAvailability`:** Queries `Stuff` records for the PR's `wareModel`. Returns all stores carrying the item with their effective pricing (computed from absolute price or percentage markup). Optionally filter by `storeId`.
+
+**`purchasingRequest.updateRelations` (tender support):** Now accepts `tenderId` to link/unlink a tender to the PR via Lesan relations (`replace: true`).
+
+**`tender.close` → `tender.award` (Path B):** On award, winning offer is accepted, all others rejected. A single PurchaseOrderItem is created from the PR's `wareModel` + `quantity`, using `winningOffer.price` as `unitPrice`. The PO item is linked back to the winning `tenderOffer` via Lesan relation for audit trail. Pushes "item_assigned" history entry.
 
 **`goodsReceipt.add`:** Comprehensive auto-flow:
 1. Creates GoodsReceipt document
@@ -185,9 +196,35 @@ PR Draft ──► submit() ──► Pending ──► submitDecision() (per st
 5. Auto-advances workflow if current step type is "Receipt" or "Delivery" (creates auto-approved StepApproval, evaluates step status)
 6. Auto-creates draft PaymentOrder from order total
 7. Auto-converts budget encumbrance to spent (supports partial conversion prorated from receipt amount)
-8. Pushes "goods_received" history entry
+8. Pushes "goods_received" history entry with nested performed + unit objects
 
 **`paymentOrder.markPaid`:** Sets status to "paid", records paidAt. Finds all reserved budget encumbrances linked to the same purchasingRequest and converts them to spent (decrements totalEncumbered, increments totalSpent on the budgetLine).
+
+### History Structure
+
+Every PurchasingRequest history entry uses nested objects instead of flat fields:
+
+```typescript
+{
+  action: "submitted" | "step_approved" | "step_rejected" | "item_assigned" | "goods_received" | "goods_consumed" | "payment_ordered" | "created",
+  performed: {
+    by: string,          // User._id
+    name: string,        // "First Last"
+    at: Date,
+    role: {
+      id: string,        // roleId (UUID)
+      name: string,      // "Manager" | "Admin" | "UnitHead" | etc.
+      scopeType?: string, // "organization" | "unit"
+      scopeId?: string,
+    },
+  },
+  unit?: {
+    _id: string,
+    name: string,
+  },
+  details?: object,      // Action-specific extra fields
+}
+```
 
 ### Product Classification Hierarchy (Warehouse)
 
@@ -236,7 +273,7 @@ lesanSatek/back/
 │   ├── process/            # Process actions (+ activateProcess, duplicateProcess)
 │   ├── processStep/        # ProcessStep actions
 │   ├── stepApproval/       # StepApproval actions (+ submitDecision)
-│   ├── purchasingRequest/  # PurchasingRequest actions (+ submit, warehouseCheck, getHistory, convertItems)
+│   ├── purchasingRequest/  # PurchasingRequest actions (+ submit, warehouseCheck, getHistory, assignStore, checkStoreAvailability)
 │   ├── purchaseOrderItem/  # PurchaseOrderItem CRUD (NEW)
 │   ├── tender/             # Tender CRUD + close + award (NEW)
 │   ├── tenderOffer/        # TenderOffer submit + get (NEW)
@@ -452,7 +489,7 @@ Ware and Stuff models use denormalized relations to WareType, WareClass, WareGro
 | Model | Acts | Custom Actions | Auth Required |
 |-------|------|----------------|---------------|
 | **StepApproval** | add, get, gets | submitDecision | Mixed |
-| **PurchasingRequest** | add, get, gets, update, updateRelations, remove, count | submit, getHistory, convertItems, warehouseCheck | Mixed |
+| **PurchasingRequest** | add, get, gets, update, updateRelations, remove, count | submit, getHistory, assignStore, warehouseCheck, checkStoreAvailability | Mixed |
 | **PurchaseOrderItem** | add, get, gets, update, updateRelations, remove, count | - | Mixed |
 | **Tender** | add, get, gets, update, updateRelations, remove, count | close, award | Mixed |
 | **TenderOffer** | get, gets | submit (by vendors) | Mixed |
@@ -525,7 +562,7 @@ Unit
 Process
   ├── organization (Organization)
   ├── createdBy (User)
-  └── assignedUnits (Unit) [multiple, optional]
+
 
 ProcessStep
   ├── process (Process)
@@ -540,7 +577,14 @@ PurchasingRequest
   ├── purchaseOrderItems (PurchaseOrderItem) [multiple]
   ├── tender (Tender) [single, optional]
   ├── goodsReceipts (GoodsReceipt) [multiple]
-  └── paymentOrders (PaymentOrder) [multiple]
+  ├── paymentOrders (PaymentOrder) [multiple]
+  └── budgetLine (BudgetLine) [single, optional]
+
+StepApproval
+  ├── purchasingRequest (PurchasingRequest)
+  ├── processStep (ProcessStep)
+  ├── unit (Unit)
+  └── decidedBy (User) [optional]
 
 StepApproval
   ├── purchasingRequest (PurchasingRequest)
@@ -555,7 +599,8 @@ StepApproval
 PurchaseOrderItem
   ├── purchasingRequest (PurchasingRequest) [single]
   ├── assignedFrom (Store) [single, optional]
-  └── assignedBy (User) [single, optional]
+  ├── assignedBy (User) [single, optional]
+  └── tenderOffer (TenderOffer) [single, optional]
 
 Tender
   ├── purchasingRequest (PurchasingRequest) [single]
@@ -565,7 +610,8 @@ Tender
 
 TenderOffer
   ├── tender (Tender) [single]
-  └── store (Store) [single]
+  ├── store (Store) [single]
+  └── purchaseOrderItem (PurchaseOrderItem) [single, optional]
 ```
 
 ### Warehouse & Inventory Relation Map
@@ -622,7 +668,8 @@ Store
   ├── storeHead (User) [single, optional]
   ├── city (City) [single, optional]
   ├── state (State) [single, optional]
-  └── wareTypes (WareType) [multiple, M:N]
+  ├── wareTypes (WareType) [multiple, M:N]
+  └── purchaseOrderItems (PurchaseOrderItem) [multiple, optional — assigned PO items]
 
 Inventory
   ├── unit (Unit) [single — inventory owner]
@@ -650,7 +697,8 @@ BudgetLine
   ├── unit (Unit) [single, optional]
   ├── wareType (WareType) [single, optional]
   ├── allocations (BudgetAllocation) [multiple]
-  └── encumbrances (BudgetEncumbrance) [multiple]
+  ├── encumbrances (BudgetEncumbrance) [multiple]
+  └── purchasingRequests (PurchasingRequest) [multiple, optional]
 
 BudgetAllocation
   ├── budgetLine (BudgetLine) [single]
