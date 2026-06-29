@@ -1,3 +1,57 @@
+/**
+ * Store — Vendor/seller entity.
+ *
+ * Represents a supplier or vendor that sells wares. Contains comprehensive
+ * business information: contact, location (city/state), bank details, certificates,
+ * delivery settings, and status lifecycle (NotConfirmed → Confirmed → Suspension).
+ * Stores can participate in tenders as assigned vendors and receive PurchaseOrderItems.
+ * Supported WareTypes are tracked via M:N relation.
+ *
+ * Pure fields: name, address, location, contact, logoUrl, ceoname, workingHours,
+ *   cityDeliveryTime, stateDeliveryTime, selectedStateDeliveryTime, countryDeliveryTime,
+ *   availableFastDeliveryTime, fastDelivery, isAvailableInHolidays, status,
+ *   updateStatusDescription, score, totalSoldAmount, totalSoldNum, email, storeType,
+ *   economicCode, postalCode, lastNewspaperUrl, certificateUrl, bankCardNumber,
+ *   shebaNumber, nameOfAccountHolder, bankName, certificateNumber, registerNumber,
+ *   certificateExpireDate, legalPerson, nationalId
+ * Relations: storeHead (User), city (City), state (State), wareTypes (WareType[], M:N)
+ *
+ * @example
+ * // A confirmed medical equipment supplier (Salamat Co.) — lost the TSH tender to ZistShimi
+ * // Supports Laboratory Equipment ware type
+ * {
+ *   _id: ObjectId("store_salamat"),
+ *   name: "شرکت تجهیزات پزشکی سلامت",
+ *   address: "تهران، خیابان ولیعصر، پلاک ۱۲۳",
+ *   contact: "021-87654321",
+ *   status: "Confirmed",
+ *   score: 4.5,
+ *   totalSoldAmount: 500000000,
+ *   totalSoldNum: 120,
+ *   storeType: "توزیع‌کننده",
+ *   economicCode: "123456789",
+ *   postalCode: "1234567890",
+ *   shebaNumber: "IR123456789012345678901234",
+ *   bankName: "ملی",
+ *   fastDelivery: true,
+ *   // Relations (populated via Lesan):
+ *   // storeHead → { _id: ObjectId("..."), first_name: "Reza", last_name: "Mohammadi" }
+ *   // city → { _id: ObjectId("..."), name: "تهران" }
+ *   // state → { _id: ObjectId("..."), name: "تهران" }
+ *   // wareTypes → [{ _id: ObjectId("wt_lab"), name: "تجهیزات آزمایشگاهی" }]
+ *   createdAt: ISODate("2023-06-01T08:00:00Z"),
+ *   updatedAt: ISODate("2024-05-20T09:00:00Z")
+ * }
+ * // ── ZistShimi Co. — the winning vendor for tender_tsh ──
+ * // {
+ * //   _id: ObjectId("store_zist"),
+ * //   name: "شرکت زیست شیمی",
+ * //   status: "Confirmed",
+ * //   score: 4.8,
+ * //   storeType: "تولیدکننده",
+ * //   wareTypes: [{ _id: ObjectId("wt_lab") }]
+ * // }
+ */
 import { coreApp } from "../mod.ts";
 import {
   boolean,
@@ -11,6 +65,7 @@ import {
 } from "lesan";
 import { createUpdateAt } from "@lib";
 import {
+  purchaseOrderItem_excludes,
   user_excludes,
   city_excludes,
   state_excludes,
@@ -91,6 +146,19 @@ export const store_relations = {
     excludes: wareType_excludes,
     sort: { field: "_id", order: "desc" as RelationSortOrderType },
     relatedRelations: {},
+  },
+  purchaseOrderItems: {
+    schemaName: "purchaseOrderItem",
+    type: "multiple" as RelationDataType,
+    optional: true,
+    limit: 50,
+    excludes: purchaseOrderItem_excludes,
+    sort: { field: "_id", order: "desc" as RelationSortOrderType },
+    relatedRelations: {
+      assignedFrom: {
+        type: "single" as RelationDataType,
+      },
+    },
   },
 };
 

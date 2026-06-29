@@ -1,3 +1,14 @@
+/**
+ * Excludes — Field exclusion lists for relation projections.
+ *
+ * Each array defines which pure fields to exclude when fetching a related
+ * document through a relation. Most models exclude createdAt/updatedAt for
+ * brevity in nested relations. Some models (user, ware) exclude additional
+ * sensitive or large fields (password, price, orderedNumber, etc.).
+ *
+ * These arrays are referenced by the `excludes` property in relation definitions
+ * across all model files to keep relation payloads lean.
+ */
 export const file_excludes: string[] = [
   "createdAt",
   "updatedAt",
