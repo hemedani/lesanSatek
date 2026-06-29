@@ -3,7 +3,7 @@ import { process } from "../../../mod.ts";
 
 export const updateRelationsFn: ActFn = async (body) => {
 	const {
-		set: { _id, organizationId, assignedUnitIds },
+		set: { _id, organizationId },
 		get,
 	} = body.details;
 
@@ -17,22 +17,6 @@ export const updateRelationsFn: ActFn = async (body) => {
 					_ids: new ObjectId(organizationId as string),
 					relatedRelations: {
 						processes: true,
-					},
-				},
-			},
-			projection: get,
-			replace: true,
-		});
-	}
-
-	if (assignedUnitIds) {
-		await process.addRelation({
-			filters: { _id: processId },
-			relations: {
-				assignedUnits: {
-					_ids: (assignedUnitIds as string[]).map((id: string) => new ObjectId(id)),
-					relatedRelations: {
-						assignedProcesses: true,
 					},
 				},
 			},

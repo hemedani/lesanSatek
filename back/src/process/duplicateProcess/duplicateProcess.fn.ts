@@ -15,7 +15,6 @@ export const duplicateProcessFn: ActFn = async (body) => {
       name: 1,
       description: 1,
       organization: { _id: 1 },
-      assignedUnits: 1,
     },
   }) as Record<string, unknown>;
 
@@ -56,14 +55,6 @@ export const duplicateProcessFn: ActFn = async (body) => {
       relatedRelations: { createdProcesses: true },
     },
   };
-
-  const assignedUnitDocs = sourceProcess.assignedUnits as Array<Record<string, unknown>> | undefined;
-  if (assignedUnitDocs && assignedUnitDocs.length > 0) {
-    newProcessRelations.assignedUnits = {
-      _ids: assignedUnitDocs.map((u: Record<string, unknown>) => u._id),
-      relatedRelations: { assignedProcesses: true },
-    };
-  }
 
   const newProcess = await process.insertOne({
     doc: {

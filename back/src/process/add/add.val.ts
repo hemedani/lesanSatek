@@ -1,4 +1,4 @@
-import { array, object, objectIdValidation, optional } from "lesan";
+import { object, objectIdValidation, optional } from "lesan";
 import { selectStruct } from "../../../mod.ts";
 import { process_pure } from "@model";
 import { activeRoleMixin } from "@lib";
@@ -9,7 +9,6 @@ export const addValidator = () => {
 			...activeRoleMixin,
 			...process_pure,
 			organizationId: objectIdValidation,
-			assignedUnitIds: optional(array(objectIdValidation)),
 		}),
 		get: selectStruct("process", 1),
 	});

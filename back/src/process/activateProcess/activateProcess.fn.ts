@@ -11,7 +11,7 @@ export const activateProcessFn: ActFn = async (body) => {
 
   const proc = await process.findOne({
     filters: { _id: new ObjectId(_id as string) },
-    projection: { _id: 1, status: 1, organization: { _id: 1 }, assignedUnits: 1 },
+    projection: { _id: 1, status: 1, organization: { _id: 1 } },
   }) as Record<string, unknown>;
 
   if (!proc) {
@@ -71,23 +71,6 @@ export const activateProcessFn: ActFn = async (body) => {
         `Found ${validUnitCount} valid out of ${allUnitIds.length}.`,
       );
       return;
-    }
-  }
-
-  // Validate assignedUnits scope (if process has assignedUnits, all step unitIds must be within them)
-  const assignedUnitDocs = proc.assignedUnits as Array<Record<string, unknown>> | undefined;
-  if (assignedUnitDocs && assignedUnitDocs.length > 0 && allUnitIds.length > 0) {
-    const assignedUnitIds = assignedUnitDocs.map(
-      (u: Record<string, unknown>) => (u._id as ObjectId).toString(),
-    );
-
-    for (const stepUnitId of allUnitIds) {
-      if (!assignedUnitIds.includes(stepUnitId)) {
-        throwError(
-          `Unit ${stepUnitId} is not in the process's assigned units scope`,
-        );
-        return;
-      }
     }
   }
 

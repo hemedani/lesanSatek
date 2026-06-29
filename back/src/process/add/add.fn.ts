@@ -6,7 +6,7 @@ export const addFn: ActFn = async (body) => {
 	const { set, get } = body.details;
 	const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
 
-	const { activeRoleId, organizationId, assignedUnitIds, ...rest } = set;
+	const { activeRoleId, organizationId, ...rest } = set;
 
 	const relations: Record<string, unknown> = {
 		organization: {
@@ -22,15 +22,6 @@ export const addFn: ActFn = async (body) => {
 			},
 		},
 	};
-
-	if (assignedUnitIds) {
-		relations.assignedUnits = {
-			_ids: (assignedUnitIds as string[]).map((id: string) => new ObjectId(id)),
-			relatedRelations: {
-				assignedProcesses: true,
-			},
-		};
-	}
 
 	return await process.insertOne({
 		doc: rest,
