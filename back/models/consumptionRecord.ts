@@ -1,3 +1,37 @@
+/**
+ * ConsumptionRecord — Goods usage/consumption tracking.
+ *
+ * Records when inventory stock is consumed (used, dispensed, etc.). The `add`
+ * custom action triggers inventoryManager.removeStock to decrement the relevant
+ * inventory record. Includes optional patientId for healthcare contexts and
+ * a reason/notes field for documentation.
+ *
+ * Pure fields: wareModelId, wareModelName, wareId, wareName, quantity,
+ *   consumedAt, reason, patientId, notes
+ * Relations: unit (Unit), consumedBy (User), inventory (Inventory, optional)
+ *
+ * @example
+ * // A consumption record for using 2 TSH kits from the Hematology Lab inventory on a patient
+ * {
+ *   _id: ObjectId("cr_tsh_pat1"),
+ *   wareModelId: "wm_tsh",
+ *   wareModelName: "کیت TSH پیشرفته",
+ *   wareId: "w_tsh_zist",
+ *   wareName: "کیت TSH پیشرفته ZistShimi",
+ *   quantity: 2,
+ *   consumedAt: ISODate("2024-06-15T09:30:00Z"),
+ *   reason: "استفاده برای آزمایش بیمار",
+ *   patientId: "PAT-12345",
+ *   notes: "کیت‌های شماره سریال KT-001 و KT-002 مصرف شدند",
+ *   // Relations (populated via Lesan):
+ *   // unit → { _id: ObjectId("unit_lab"), name: "آزمایشگاه هماتولوژی" }
+ *   // consumedBy → { _id: ObjectId("user_ahmadi"), first_name: "Dr.", last_name: "Ahmadi" }
+ *   // inventory → { _id: ObjectId("inv_tsh_lab"), wareModelName: "کیت TSH پیشرفته", quantity: 48 }
+ *   //   (inv_tsh_lab is decremented from 50 to 48 by inventoryManager.removeStock)
+ *   createdAt: ISODate("2024-06-15T09:30:00Z"),
+ *   updatedAt: ISODate("2024-06-15T09:30:00Z")
+ * }
+ */
 import { coreApp } from "../mod.ts";
 import {
   coerce,

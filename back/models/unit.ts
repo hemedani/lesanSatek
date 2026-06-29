@@ -1,3 +1,54 @@
+/**
+ * Unit — Hierarchical organizational unit (infinite tree).
+ *
+ * Represents departments, warehouses, logistics teams, and other sub-units
+ * within an organization. Supports infinite nesting via parentUnit/subUnits.
+ * The `type` discriminator (General|Warehouse|Logistics|Production|Administration|Expert)
+ * drives which features/actions are available. Each unit has an optional head (User),
+ * feature flags, and warehouse classification access controls.
+ * `organization` is denormalized on every unit for query efficiency.
+ *
+ * Pure fields: name, enName, description, isActive, type, address, phone, email,
+ *   warehouseCapacity, hasColdStorage, fleetSize, serviceRadius, features,
+ *   allowWareTypeIds, allowWareClassIds, allowWareGroupIds, allowWareModelIds
+ * Relations: organization (Organization), parentUnit (Unit), creator (User), head (User)
+ *
+ * @example
+ * // A warehouse unit nested under the hospital organization, created by Ali, headed by Dr. Ahmadi
+ * // Also demonstrates a child unit (Hematology Lab) via parentUnit
+ * {
+ *   _id: ObjectId("unit_warehouse"),
+ *   name: "انبار مرکزی",
+ *   enName: "Central Warehouse",
+ *   description: "انبار اصلی تجهیزات پزشکی",
+ *   isActive: true,
+ *   type: "Warehouse",
+ *   address: "طبقه همکف، بخش شمالی",
+ *   phone: "021-12345678",
+ *   email: "warehouse@hospital.com",
+ *   warehouseCapacity: 5000,
+ *   hasColdStorage: true,
+ *   fleetSize: 3,
+ *   serviceRadius: 50,
+ *   features: [{ feature: "canViewWarehouse" }, { feature: "canManageUnitInventory" }],
+ *   // Relations (populated via Lesan): organization → org_beheshti
+ *   // parentUnit → null (top-level unit)
+ *   // creator → { _id: ObjectId("user_ali"), first_name: "Ali", last_name: "Rezaei" }
+ *   // head → { _id: ObjectId("user_ahmadi"), first_name: "Dr.", last_name: "Ahmadi" }
+ *   createdAt: ISODate("2023-06-15T08:00:00Z"),
+ *   updatedAt: ISODate("2024-02-20T14:00:00Z")
+ * }
+ * // ── A child unit (lab) nested under the warehouse above ──
+ * // {
+ * //   _id: ObjectId("unit_lab"),
+ * //   name: "آزمایشگاه هماتولوژی",
+ * //   enName: "Hematology Lab",
+ * //   type: "Expert",
+ * //   organization: { _id: ObjectId("org_beheshti") },
+ * //   parentUnit: { _id: ObjectId("unit_warehouse") },
+ * //   head: { _id: ObjectId("user_ahmadi") },
+ * // }
+ */
 import { coreApp } from "../mod.ts";
 import {
   array,

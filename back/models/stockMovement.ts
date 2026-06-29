@@ -1,3 +1,48 @@
+/**
+ * StockMovement — Audit trail for every inventory change.
+ *
+ * Read-only model; records are created by the system (inventoryManager) whenever
+ * inventory quantity changes. Each entry captures the before/after balance, reason
+ * (goods_receipt, goods_issue, transfer_in, transfer_out, consumption, adjustment,
+ * return, write_off), and an optional reference to the triggering document
+ * (e.g. a GoodsReceipt or ConsumptionRecord).
+ *
+ * Pure fields: wareModelId, wareModelName, wareId, wareName, quantity,
+ *   balanceBefore, balanceAfter, reason, referenceType, referenceId, description
+ * Relations: unit (Unit), createdBy (User)
+ *
+ * @example
+ * // A stock movement from goods receipt — 50 TSH kits added to Central Warehouse
+ * // Also shows a consumption movement that decremented the Lab's inventory
+ * {
+ *   _id: ObjectId("sm_gr_tsh"),
+ *   wareModelId: "wm_tsh",
+ *   wareModelName: "کیت TSH پیشرفته",
+ *   quantity: 50,
+ *   balanceBefore: 0,
+ *   balanceAfter: 50,
+ *   reason: "goods_receipt",
+ *   referenceType: "goodsReceipt",
+ *   referenceId: ObjectId("gr_tsh"),
+ *   description: "رسید کالا شماره GR-1403-001",
+ *   // Relations (populated via Lesan):
+ *   // unit → { _id: ObjectId("unit_warehouse"), name: "انبار مرکزی" }
+ *   // createdBy → { _id: ObjectId("user_mehdi"), first_name: "Mehdi", last_name: "Mohammadi" }
+ *   createdAt: ISODate("2024-06-20T10:30:00Z"),
+ *   updatedAt: ISODate("2024-06-20T10:30:00Z")
+ * }
+ * // ── Consumption movement that decremented Lab inventory ──
+ * // {
+ * //   _id: ObjectId("sm_consume_tsh"),
+ * //   wareModelId: "wm_tsh",
+ * //   quantity: -2,
+ * //   balanceBefore: 50, balanceAfter: 48,
+ * //   reason: "consumption",
+ * //   referenceType: "consumptionRecord",
+ * //   referenceId: ObjectId("cr_tsh_pat1"),
+ * //   unit: { _id: ObjectId("unit_lab") }
+ * // }
+ */
 import { coreApp } from "../mod.ts";
 import {
   coerce,

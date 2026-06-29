@@ -1,3 +1,34 @@
+/**
+ * Ware — Actual product item.
+ *
+ * The concrete product entity. Links to all 4 classification levels and an
+ * optional Manufacturer. Contains base price, brand, and regulatory identifiers
+ * (IRC, UMDNS, GTIN). This is the final node in the classification hierarchy
+ * before Stuff (store inventory). Denormalized hierarchy relations enable
+ * efficient filtering at any level.
+ *
+ * Pure fields: name, enName, brand, price, orderedNumber, irc, umdns, gtin, photoUrl
+ * Relations: manufacturer (Manufacturer), wareType (WareType), wareClass (WareClass),
+ *   wareGroup (WareGroup), wareModel (WareModel) —
+ *   Lesan auto-creates reverse on all parent models; stuffs from stuff.ware.
+ *
+ * @example
+ * // A specific product: TSH Kit from ZistShimi
+ * {
+ *   _id: ObjectId("..."),
+ *   name: "کیت TSH پیشرفته ZistShimi",
+ *   enName: "Advanced TSH Kit ZistShimi",
+ *   brand: "ZistShimi",
+ *   price: 250000,
+ *   orderedNumber: 500,
+ *   irc: "1234567890",
+ *   umdns: 12345,
+ *   gtin: 9876543210123,
+ *   photoUrl: "/uploads/tsh_kit.jpg",
+ *   createdAt: ISODate("2024-01-01T00:00:00Z"),
+ *   updatedAt: ISODate("2024-06-01T12:00:00Z")
+ * }
+ */
 import { coreApp } from "../mod.ts";
 import {
   defaulted,

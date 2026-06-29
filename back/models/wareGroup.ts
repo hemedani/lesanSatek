@@ -1,3 +1,26 @@
+/**
+ * WareGroup — Third-level product classification.
+ *
+ * Level 3 of the warehouse hierarchy. Sub-type of WareType, with M:N relationship
+ * to WareClass (e.g. "Kit" group can belong to both "Hematology" and "Chemistry"
+ * classes). The M:N is defined on WareGroup via `wareClasses` with `relatedRelations`,
+ * and no join table is needed — Lesan handles it natively.
+ *
+ * Pure fields: name, enName
+ * Relations: wareType (WareType), wareClasses (WareClass[], M:N) —
+ *   Lesan auto-creates wareType.wareGroups and wareClass.wareGroups reverse;
+ *   also receives wareModels, wares, stuffs from child models.
+ *
+ * @example
+ * // A "Kit" group that could apply to multiple ware classes
+ * {
+ *   _id: ObjectId("..."),
+ *   name: "کیت",
+ *   enName: "Kit",
+ *   createdAt: ISODate("2024-01-01T00:00:00Z"),
+ *   updatedAt: ISODate("2024-01-01T00:00:00Z")
+ * }
+ */
 import { coreApp } from "../mod.ts";
 import { optional, type RelationDataType, type RelationSortOrderType, string } from "lesan";
 import { createUpdateAt } from "@lib";

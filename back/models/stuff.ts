@@ -1,3 +1,40 @@
+/**
+ * Stuff — Store inventory of a specific Ware.
+ *
+ * Represents a specific quantity of a Ware available at a Store. Pricing can be
+ * absolute (hasAbsolutePrice) or percentage-based (pricePercentage applied to
+ * Ware.price). Supports long-term payment pricing with per-month markups
+ * (twoMonthPricePercent through twentyFourMonthPricePercent). Expiration tracking,
+ * barcode/QR code, and API sync fields are included.
+ * All 4 hierarchy levels are denormalized on Stuff for query efficiency.
+ *
+ * Pure fields: inventoryNo, price, hasAbsolutePrice, pricePercentage, expiration,
+ *   barcode, qrc, isBarcodeSet, isQrcSet, isExpirationNear, photoUrl, apiId, apiLink,
+ *   availableLongPayment, twoMonthPricePercent … twentyFourMonthPricePercent,
+ *   twoMonth … twentyFourMonth
+ * Relations: ware (Ware), store (Store), wareType (WareType), wareClass (WareClass),
+ *   wareGroup (WareGroup), wareModel (WareModel)
+ *
+ * @example
+ * // TSH Kit available at a pharmacy store
+ * {
+ *   _id: ObjectId("..."),
+ *   inventoryNo: 1001,
+ *   price: 260000,
+ *   hasAbsolutePrice: true,
+ *   expiration: ISODate("2025-06-01"),
+ *   barcode: 1234567890123,
+ *   qrc: "QR-ABC123",
+ *   isBarcodeSet: true,
+ *   isQrcSet: true,
+ *   isExpirationNear: false,
+ *   availableLongPayment: "12 ماهه",
+ *   sixMonthPricePercent: 10,
+ *   twelveMonthPricePercent: 20,
+ *   createdAt: ISODate("2024-03-01T10:00:00Z"),
+ *   updatedAt: ISODate("2024-06-15T14:00:00Z")
+ * }
+ */
 import { coreApp } from "../mod.ts";
 import {
   boolean,

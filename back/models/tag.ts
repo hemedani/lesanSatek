@@ -1,3 +1,24 @@
+/**
+ * Tag — Metadata categorization label.
+ *
+ * Lightweight tagging system for attaching metadata labels to entities.
+ * Each tag can have a display name, description, color, and icon.
+ *
+ * Pure fields: name, description, color, icon
+ * Relations: registrar (User)
+ *
+ * @example
+ * // A tag for "Urgent" purchases
+ * {
+ *   _id: ObjectId("..."),
+ *   name: "فوری",
+ *   description: "خریدهای فوری و اضطراری",
+ *   color: "#FF0000",
+ *   icon: "alert-circle",
+ *   createdAt: ISODate("2024-01-10T09:00:00Z"),
+ *   updatedAt: ISODate("2024-01-10T09:00:00Z")
+ * }
+ */
 import { coreApp } from "../mod.ts";
 import {
   type RelationDataType,

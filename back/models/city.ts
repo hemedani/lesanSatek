@@ -1,3 +1,22 @@
+/**
+ * City — Geographic city within a state/province.
+ *
+ * Second-level geographic entity. Links to a State and is used to locate stores,
+ * delivery zones, and other location-based features.
+ *
+ * Pure fields: name, enName
+ * Relations: state (State) — Lesan auto-creates state.cities reverse relation
+ *
+ * @example
+ * // A city within Tehran province
+ * {
+ *   _id: ObjectId("..."),
+ *   name: "شهر ری",
+ *   enName: "Shahr-e Rey",
+ *   createdAt: ISODate("2024-01-01T00:00:00Z"),
+ *   updatedAt: ISODate("2024-01-01T00:00:00Z")
+ * }
+ */
 import { coreApp } from "../mod.ts";
 import { optional, type RelationDataType, type RelationSortOrderType, string } from "lesan";
 import { createUpdateAt } from "@lib";

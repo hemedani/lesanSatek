@@ -1,3 +1,35 @@
+/**
+ * PaymentOrder — Payment authorization document.
+ *
+ * Represents a payment order to a vendor (Store). Automatically created as
+ * "draft" when a GoodsReceipt is completed. The `markPaid` custom action
+ * sets status to "paid" and converts all reserved budget encumbrances linked
+ * to the same PurchasingRequest to "spent".
+ *
+ * Pure fields: title, amount, description, status (draft|sent_to_finance|paid|cancelled), paidAt
+ * Relations: purchasingRequest (PurchasingRequest), issuedBy (User),
+ *   approvedBy (User, optional), payTo (Store), financialUnit (Unit)
+ *
+ * @example
+ * // A paid payment order for 98 accepted TSH kits (230,000 × 98)
+ * // Auto-created as "draft" by goodsReceipt.add, then marked "paid" via markPaid action
+ * {
+ *   _id: ObjectId("po_tsh"),
+ *   title: "پرداخت خرید کیت TSH",
+ *   amount: 22540000,
+ *   description: "پرداخت بابت خرید ۹۸ عدد کیت TSH (۲۳۰,۰۰۰ × ۹۸)",
+ *   status: "paid",
+ *   paidAt: ISODate("2024-06-25T12:00:00Z"),
+ *   // Relations (populated via Lesan):
+ *   // purchasingRequest → { _id: ObjectId("pr_tsh"), title: "خرید کیت TSH" }
+ *   // issuedBy → { _id: ObjectId("user_ali"), first_name: "Ali", last_name: "Rezaei" }
+ *   // approvedBy → { _id: ObjectId("..."), first_name: "Manager" }
+ *   // payTo → { _id: ObjectId("store_zist"), name: "شرکت زیست شیمی" }
+ *   // financialUnit → { _id: ObjectId("unit_purchasing"), name: "واحد خرید" }
+ *   createdAt: ISODate("2024-06-20T10:30:00Z"),
+ *   updatedAt: ISODate("2024-06-25T12:00:00Z")
+ * }
+ */
 import { coreApp } from "../mod.ts";
 import {
   coerce,

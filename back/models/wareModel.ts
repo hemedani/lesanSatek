@@ -1,3 +1,26 @@
+/**
+ * WareModel — Fourth-level specific product model.
+ *
+ * Level 4 of the warehouse hierarchy. The most specific classification level,
+ * representing a named model (e.g. "TSH Kit"). Belongs to exactly one WareType,
+ * one WareClass, and one WareGroup. This is the key level used in
+ * PurchasingRequest items and Inventory tracking (wareModelId/wareModelName).
+ *
+ * Pure fields: name, enName
+ * Relations: wareType (WareType), wareClass (WareClass), wareGroup (WareGroup) —
+ *   Lesan auto-creates reverse relations on all three parent models,
+ *   plus wares and stuffs from child models.
+ *
+ * @example
+ * // A specific lab kit model
+ * {
+ *   _id: ObjectId("..."),
+ *   name: "کیت TSH پیشرفته",
+ *   enName: "Advanced TSH Kit",
+ *   createdAt: ISODate("2024-01-01T00:00:00Z"),
+ *   updatedAt: ISODate("2024-01-01T00:00:00Z")
+ * }
+ */
 import { coreApp } from "../mod.ts";
 import { optional, type RelationDataType, type RelationSortOrderType, string } from "lesan";
 import { createUpdateAt } from "@lib";

@@ -1,3 +1,26 @@
+/**
+ * File — Uploaded file metadata.
+ *
+ * Tracks uploaded files (images, videos, documents, etc.) with MIME type, size,
+ * and an optional uploader relation. Used as an attachment across the system
+ * (avatars, logos, purchasing request attachments, certificates, etc.).
+ *
+ * Pure fields: name, mimeType, size, type (image|video|docs|other), alt_text
+ * Relations: uploader (User)
+ *
+ * @example
+ * // A profile picture uploaded by a user
+ * {
+ *   _id: ObjectId("..."),
+ *   name: "profile_photo_2024.jpg",
+ *   mimeType: "image/jpeg",
+ *   size: 245760,
+ *   type: "image",
+ *   alt_text: "John Doe's profile picture",
+ *   createdAt: ISODate("2024-01-15T10:30:00Z"),
+ *   updatedAt: ISODate("2024-01-15T10:30:00Z")
+ * }
+ */
 import { coreApp } from "../mod.ts";
 import {
   coerce,

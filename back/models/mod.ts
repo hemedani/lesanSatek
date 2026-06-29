@@ -1,3 +1,19 @@
+/**
+ * Model Module — Central barrel export.
+ *
+ * Re-exports all model definitions (pure fields, relations, and factory functions)
+ * from every individual model file. Also re-exports shared utilities from
+ * excludes.ts and featureConstants.ts.
+ *
+ * Import this module in src/mod.ts and elsewhere to register all models with
+ * Lesan's ODM via the factory functions (users(), organizations(), etc.).
+ *
+ * @example
+ * import { users, organizations, units, wares, ... } from "./models/mod.ts";
+ * users();  // registers the "user" model with Lesan ODM
+ * organizations();  // registers the "organization" model
+ * // ... register all models
+ */
 export * from "./excludes.ts";
 export * from "./featureConstants.ts";
 export * from "./file.ts";

@@ -1,3 +1,45 @@
+/**
+ * ProcessStep — Individual step within a process workflow.
+ *
+ * Each step has a type (Approval|Review|Notification|Action|Delivery|Receipt|Payment),
+ * an order number (auto-validated for consecutiveness on activation), and
+ * assignee groups with OR/AND logic. The `groupsOperator` combines groups,
+ * while each group's internal `operator` combines its unitIds.
+ * Steps are sorted by `order` ascending on the process relation.
+ * The embedded assigneeGroups { operator, unitIds } replace the former standalone
+ * model (ProcessStepAssigneeGroup was eliminated).
+ *
+ * Pure fields: name, description, stepType, order, required, groupsOperator, assigneeGroups
+ * Relations: process (Process)
+ *
+ * @example
+ * // Step 1 of proc_lab: the Purchasing Dept OR Warehouse must approve (OR within group, AND across groups)
+ * {
+ *   _id: ObjectId("step1"),
+ *   name: "تأیید مدیر خرید",
+ *   description: "مدیر خرید درخواست را بررسی و تأیید می‌کند",
+ *   stepType: "Approval",
+ *   order: 1,
+ *   required: true,
+ *   groupsOperator: "AND",
+ *   assigneeGroups: [
+ *     { operator: "OR", unitIds: [ObjectId("unit_purchasing"), ObjectId("unit_warehouse")] }
+ *   ],
+ *   // Relations (populated via Lesan):
+ *   // process → { _id: ObjectId("proc_lab"), name: "فرآیند خرید تجهیزات پزشکی" }
+ *   createdAt: ISODate("2023-10-01T08:00:00Z"),
+ *   updatedAt: ISODate("2023-10-01T08:00:00Z")
+ * }
+ * // ── Step 2: Lab must approve (single unit, AND) ──
+ * // {
+ * //   _id: ObjectId("step2"),
+ * //   name: "تأیید آزمایشگاه",
+ * //   order: 2,
+ * //   groupsOperator: "AND",
+ * //   assigneeGroups: [{ operator: "AND", unitIds: [ObjectId("unit_lab")] }],
+ * //   process: { _id: ObjectId("proc_lab") }
+ * // }
+ */
 import { coreApp } from "../mod.ts";
 import {
   array,

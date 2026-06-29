@@ -1,3 +1,63 @@
+/**
+ * User — System user with role-based access control.
+ *
+ * Central authentication entity. Supports multi-role assignment (Manager, Admin,
+ * OrgHead, UnitHead, Employee, Ordinary), feature-based permissions, and
+ * warehouse classification access control (allowWareTypeIds, etc.).
+ * The `isGhost` flag identifies the bootstrap superuser.
+ * Passwords are excluded from API responses by default.
+ *
+ * Pure fields: first_name, last_name, gender, birth_date, mobile, email,
+ *   password, is_verified, position, isActive, isGhost, features,
+ *   allowWareTypeIds, allowWareClassIds, allowWareGroupIds, allowWareModelIds, roles
+ * Relations: avatar (File), organization (Organization), units (Unit[])
+ *
+ * @example
+ * // A Manager user (Ali Rezaei) — the Purchasing Manager at org_beheshti
+ * // Belongs to Purchasing Dept and can register/approve purchase requests
+ * // Also shows Dr. Ahmadi (Lab Head) as a second example
+ * {
+ *   _id: ObjectId("user_ali"),
+ *   first_name: "Ali",
+ *   last_name: "Rezaei",
+ *   gender: "Male",
+ *   birth_date: ISODate("1990-05-15"),
+ *   mobile: "09121234567",
+ *   email: "ali.rezaei@example.com",
+ *   is_verified: true,
+ *   position: "مدیر خرید",
+ *   isActive: true,
+ *   isGhost: false,
+ *   features: [{ feature: "canRegisterPurchaseRequest" }, { feature: "canApprovePurchaseRequest" }, { feature: "canCreateTender" }],
+ *   allowWareTypeIds: [ObjectId("wt_lab")],
+ *   allowWareClassIds: [ObjectId("wc_hemato")],
+ *   allowWareGroupIds: [ObjectId("wg_kit")],
+ *   allowWareModelIds: [ObjectId("wm_tsh")],
+ *   roles: [
+ *     { roleId: "uuid-1", name: "Manager", scopeType: "organization", scopeId: ObjectId("org_beheshti") },
+ *     { roleId: "uuid-2", name: "Ordinary" }
+ *   ],
+ *   // Relations (populated via Lesan):
+ *   // avatar → { _id: ObjectId("file_avatar"), name: "ali_rezaei.jpg", type: "image" }
+ *   // organization → { _id: ObjectId("org_beheshti"), name: "بیمارستان شهید بهشتی" }
+ *   // units → [
+ *   //   { _id: ObjectId("unit_purchasing"), name: "واحد خرید" },
+ *   //   { _id: ObjectId("unit_warehouse"), name: "انبار مرکزی" }
+ *   // ]
+ *   createdAt: ISODate("2024-01-01T08:00:00Z"),
+ *   updatedAt: ISODate("2024-06-01T12:00:00Z")
+ * }
+ * // ── Dr. Ahmadi, Head of Hematology Lab ──
+ * // {
+ * //   _id: ObjectId("user_ahmadi"),
+ * //   first_name: "Dr.",
+ * //   last_name: "Ahmadi",
+ * //   position: "رئیس آزمایشگاه",
+ * //   features: [{ feature: "canViewWarehouse" }, { feature: "canCreateConsumptionRecord" }],
+ * //   roles: [{ roleId: "uuid-3", name: "UnitHead", scopeType: "unit", scopeId: ObjectId("unit_lab") }],
+ * //   units: [{ _id: ObjectId("unit_lab") }]
+ * // }
+ */
 import { coreApp } from "../mod.ts";
 import {
   array,

@@ -1,3 +1,29 @@
+/**
+ * Organization — Top-level organizational entity.
+ *
+ * Represents an organization that owns purchasing processes, units, users,
+ * and budget lines. Each organization can have a creator, a head, and a logo.
+ * All units are denormalized with their organization ID for query efficiency.
+ *
+ * Pure fields: name, enName, description, isActive
+ * Relations: logo (File), creator (User), head (User)
+ *
+ * @example
+ * // A hospital organization, created by Ali Rezaei, with a logo file
+ * {
+ *   _id: ObjectId("org_beheshti"),
+ *   name: "بیمارستان شهید بهشتی",
+ *   enName: "Shahid Beheshti Hospital",
+ *   description: "بیمارستان تخصصی و فوق تخصصی",
+ *   isActive: true,
+ *   // Relations (populated via Lesan): logo → file, creator → user, head → user
+ *   // logo: { _id: ObjectId("file_logo"), name: "beheshti_logo.png" }
+ *   // creator: { _id: ObjectId("user_ali"), first_name: "Ali", last_name: "Rezaei" }
+ *   // head: { _id: ObjectId("user_ahmadi"), first_name: "Dr.", last_name: "Ahmadi" }
+ *   createdAt: ISODate("2023-06-01T08:00:00Z"),
+ *   updatedAt: ISODate("2024-03-15T10:30:00Z")
+ * }
+ */
 import { coreApp } from "../mod.ts";
 import {
   boolean,
