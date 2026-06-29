@@ -9,6 +9,7 @@ export const updateRelationsValidator = () => {
       _id: objectIdValidation,
       requestingUnitId: optional(objectIdValidation),
       attachmentIds: optional(array(objectIdValidation)),
+      tenderId: optional(objectIdValidation),
     }),
     get: selectStruct("purchasingRequest", 2),
   });

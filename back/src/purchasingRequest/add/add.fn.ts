@@ -8,11 +8,15 @@ export const addFn: ActFn = async (body) => {
     .getContextModel() as MyContext;
 
   const {
+    activeRoleId,
     processId,
+    wareModelId,
     requestingUnitId,
     attachmentIds,
     ...rest
   } = set;
+
+  const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
 
   const relations: Record<string, unknown> = {
     process: {
@@ -22,6 +26,10 @@ export const addFn: ActFn = async (body) => {
     requester: {
       _ids: user._id,
       relatedRelations: { requests: true },
+    },
+    wareModel: {
+      _ids: new ObjectId(wareModelId as string),
+      relatedRelations: { purchasingRequests: true },
     },
   };
 
@@ -44,9 +52,17 @@ export const addFn: ActFn = async (body) => {
       ...rest,
       history: [{
         action: "created",
-        performedBy: user._id.toString(),
-        performedByName: `${user.first_name} ${user.last_name}`,
-        performedAt: new Date(),
+        performed: {
+          by: user._id.toString(),
+          name: `${user.first_name} ${user.last_name}`,
+          at: new Date(),
+          role: activeRole ? {
+            id: activeRole.roleId,
+            name: activeRole.name,
+            scopeType: activeRole.scopeType,
+            scopeId: activeRole.scopeId,
+          } : { id: "", name: "" },
+        },
         details: {},
       }],
     },

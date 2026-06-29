@@ -13,28 +13,27 @@ export const getHistoryFn: ActFn = async (body) => {
     pipeline.push({ $match: { "history.action": action } });
   }
   if (performer) {
-    pipeline.push({ $match: { "history.performedBy": performer } });
+    pipeline.push({ $match: { "history.performed.by": performer } });
   }
   if (fromDate) {
     pipeline.push({
-      $match: { "history.performedAt": { $gte: new Date(fromDate as string) } },
+      $match: { "history.performed.at": { $gte: new Date(fromDate as string) } },
     });
   }
   if (toDate) {
     pipeline.push({
-      $match: { "history.performedAt": { $lte: new Date(toDate as string) } },
+      $match: { "history.performed.at": { $lte: new Date(toDate as string) } },
     });
   }
 
-  pipeline.push({ $sort: { "history.performedAt": -1 } });
+  pipeline.push({ $sort: { "history.performed.at": -1 } });
 
   pipeline.push({
     $project: {
       _id: 0,
       action: "$history.action",
-      performedBy: "$history.performedBy",
-      performedByName: "$history.performedByName",
-      performedAt: "$history.performedAt",
+      performed: "$history.performed",
+      unit: "$history.unit",
       details: "$history.details",
     },
   });

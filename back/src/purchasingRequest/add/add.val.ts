@@ -1,8 +1,7 @@
-import { array, coerce, defaulted, enums, number, object, objectIdValidation, optional, string } from "lesan";
+import { array, number, object, objectIdValidation, optional, string } from "lesan";
 import { selectStruct } from "../../../mod.ts";
-import { request_status_emums } from "../../../models/purchasingRequest.ts";
-import { po_item_status_array } from "../../../models/purchaseOrderItem.ts";
 import { activeRoleMixin } from "@lib";
+import { request_status_emums } from "../../../models/purchasingRequest.ts";
 
 export const addValidator = () => {
   return object({
@@ -10,29 +9,15 @@ export const addValidator = () => {
       ...activeRoleMixin,
       title: string(),
       description: optional(string()),
-      amount: optional(number()),
+      estimatedAmount: optional(number()),
+      quantity: number(),
       status: optional(request_status_emums),
       currentStep: optional(number()),
       requestedAt: optional(string()),
       completedAt: optional(string()),
-      items: optional(array(object({
-        wareModelId: string(),
-        wareModelName: string(),
-        wareId: optional(string()),
-        wareName: optional(string()),
-        quantity: number(),
-        unitPrice: optional(number()),
-        status: defaulted(
-          coerce(
-            enums(po_item_status_array),
-            string(),
-            (value) => value as typeof po_item_status_array[number],
-          ),
-          "pending",
-        ),
-      }))),
       organizationId: optional(objectIdValidation),
       processId: objectIdValidation,
+      wareModelId: objectIdValidation,
       requestingUnitId: optional(objectIdValidation),
       attachmentIds: optional(array(objectIdValidation)),
     }),

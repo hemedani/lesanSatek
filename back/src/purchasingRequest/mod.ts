@@ -9,7 +9,8 @@ import { submitSetup } from "./submit/mod.ts";
 import { warehouseCheckSetup } from "./warehouseCheck/mod.ts";
 
 import { getHistorySetup } from "./getHistory/mod.ts";
-import { convertItemsSetup } from "./convertItems/mod.ts";
+import { assignStoreSetup } from "./assignStore/mod.ts";
+import { checkStoreAvailabilitySetup } from "./checkStoreAvailability/mod.ts";
 
 export const purchasingRequestSetup = () => {
   addSetup();
@@ -22,5 +23,6 @@ export const purchasingRequestSetup = () => {
   submitSetup();
   warehouseCheckSetup();
   getHistorySetup();
-  convertItemsSetup();
+  assignStoreSetup();
+  checkStoreAvailabilitySetup();
 };

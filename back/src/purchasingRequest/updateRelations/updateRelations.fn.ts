@@ -3,7 +3,7 @@ import { purchasingRequest } from "../../../mod.ts";
 
 export const updateRelationsFn: ActFn = async (body) => {
   const {
-    set: { _id, requestingUnitId, attachmentIds },
+    set: { _id, requestingUnitId, attachmentIds, tenderId },
     get,
   } = body.details;
 
@@ -32,6 +32,20 @@ export const updateRelationsFn: ActFn = async (body) => {
         attachments: {
           _ids: (attachmentIds as string[]).map((id: string) => new ObjectId(id)),
           relatedRelations: {},
+        },
+      },
+      projection: get,
+      replace: true,
+    });
+  }
+
+  if (tenderId !== undefined) {
+    await purchasingRequest.addRelation({
+      filters: { _id: requestId },
+      relations: {
+        tender: {
+          _ids: new ObjectId(tenderId as string),
+          relatedRelations: { purchasingRequest: true },
         },
       },
       projection: get,

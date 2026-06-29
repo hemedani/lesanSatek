@@ -29,9 +29,10 @@ export const warehouseCheckFn: ActFn = async (body) => {
       title: 1,
       description: 1,
       amount: 1,
+      quantity: 1,
       status: 1,
       currentStep: 1,
-      items: 1,
+      wareModel: { _id: 1, name: 1, enName: 1 },
       "requestingUnit._id": 1,
       "requestingUnitInfo.name": 1,
       "requestingUnitInfo._id": 1,
@@ -43,40 +44,23 @@ export const warehouseCheckFn: ActFn = async (body) => {
   }
 
   const req = requests[0] as Document;
-  const items = (req.items || []) as Array<{
-    wareModelId: string;
-    wareModelName: string;
-    wareId?: string;
-    wareName?: string;
-    quantity: number;
-  }>;
+  const wareModel = req.wareModel as Record<string, unknown> | undefined;
+  const requestedQuantity = req.quantity as number || 0;
+  const wareModelId = wareModel?._id?.toString() || "";
+  const wareModelName = (wareModel?.name as string) || "";
 
-  const stockInfo = await Promise.all(
-    items.map(async (item) => {
-      const dashboard = await getWarehouseDashboard(
-        warehouseUnitId as string,
-        item.wareModelId,
-      );
+  const dashboard = await getWarehouseDashboard(
+    warehouseUnitId as string,
+    wareModelId,
+  );
 
-      const warehouseStock = dashboard.find(
-        (d: Document) => d.unitId?.toString() === whId.toString(),
-      );
-      const unitStock = dashboard.find(
-        (d: Document) =>
-          d.unitId?.toString() ===
-          (req.requestingUnit?._id?.toString() || req.requestingUnitInfo?._id?.toString()),
-      );
-
-      return {
-        wareModelId: item.wareModelId,
-        wareModelName: item.wareModelName,
-        requestedQuantity: item.quantity,
-        warehouseStock: warehouseStock?.quantity || 0,
-        unitStock: unitStock?.quantity || 0,
-        sufficientInWarehouse: (warehouseStock?.quantity || 0) >= item.quantity,
-        allStocks: dashboard,
-      };
-    }),
+  const warehouseStock = dashboard.find(
+    (d: Document) => d.unitId?.toString() === whId.toString(),
+  );
+  const unitStock = dashboard.find(
+    (d: Document) =>
+      d.unitId?.toString() ===
+      (req.requestingUnit?._id?.toString() || req.requestingUnitInfo?._id?.toString()),
   );
 
   return {
@@ -86,11 +70,14 @@ export const warehouseCheckFn: ActFn = async (body) => {
       status: req.status,
       requestingUnit: req.requestingUnitInfo?.name || req.requestingUnit?._id,
     },
-    items: stockInfo,
-    summary: {
-      totalItems: items.length,
-      itemsFullyStocked: stockInfo.filter((s) => s.sufficientInWarehouse).length,
-      warehouseUnitId,
+    wareCheck: {
+      wareModelId,
+      wareModelName,
+      requestedQuantity,
+      warehouseStock: warehouseStock?.quantity || 0,
+      unitStock: unitStock?.quantity || 0,
+      sufficientInWarehouse: (warehouseStock?.quantity || 0) >= requestedQuantity,
+      allStocks: dashboard,
     },
   };
 };

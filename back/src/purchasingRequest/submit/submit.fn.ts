@@ -15,8 +15,10 @@ export const submitFn: ActFn = async (body) => {
   const { user }: MyContext = coreApp.contextFns
     .getContextModel() as MyContext;
 
-  const { activeRoleId, processId, requestingUnitId, attachmentIds, budgetLineId, ...rest } =
+  const { activeRoleId, processId, requestingUnitId, attachmentIds, budgetLineId, wareModelId, ...rest } =
     set;
+
+  const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
 
   const now = new Date();
   const relations: Record<string, unknown> = {
@@ -27,6 +29,10 @@ export const submitFn: ActFn = async (body) => {
     requester: {
       _ids: user._id,
       relatedRelations: { requests: true },
+    },
+    wareModel: {
+      _ids: new ObjectId(wareModelId as string),
+      relatedRelations: { purchasingRequests: true },
     },
   };
 
@@ -41,6 +47,13 @@ export const submitFn: ActFn = async (body) => {
     relations.attachments = {
       _ids: (attachmentIds as string[]).map((id: string) => new ObjectId(id)),
       relatedRelations: {},
+    };
+  }
+
+  if (budgetLineId) {
+    relations.budgetLine = {
+      _ids: new ObjectId(budgetLineId as string),
+      relatedRelations: { purchasingRequests: true },
     };
   }
 
@@ -76,9 +89,17 @@ export const submitFn: ActFn = async (body) => {
       $push: {
         history: {
           action: "submitted",
-          performedBy: user._id.toString(),
-          performedByName: `${user.first_name} ${user.last_name}`,
-          performedAt: now,
+          performed: {
+            by: user._id.toString(),
+            name: `${user.first_name} ${user.last_name}`,
+            at: now,
+            role: activeRole ? {
+              id: activeRole.roleId,
+              name: activeRole.name,
+              scopeType: activeRole.scopeType,
+              scopeId: activeRole.scopeId,
+            } : { id: "", name: "" },
+          },
           details: { status: "Pending", currentStep: 0 },
         },
       },
@@ -116,8 +137,8 @@ export const submitFn: ActFn = async (body) => {
   }
 
   // Auto-create budget encumbrance if budgetLineId is provided
-  if (budgetLineId && rest.amount) {
-    const amount = rest.amount as number;
+  if (budgetLineId && rest.estimatedAmount) {
+    const amount = rest.estimatedAmount as number;
     const budgetLineDoc = await budgetLine.findOne({
       filters: { _id: new ObjectId(budgetLineId as string) },
       projection: { _id: 1, remainingBudget: 1 },

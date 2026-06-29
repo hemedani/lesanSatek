@@ -1,3 +1,51 @@
+/**
+ * PurchasingRequest — Actual purchasing request flowing through a process.
+ *
+ * The core procurement document. Created as Draft, then submitted (Pending) to
+ * begin the workflow. Each PR is for a single WareModel with a specific quantity.
+ * The lifecycle: Draft → submit() → Pending → (step approvals) → InProgress →
+ * Approved → (tender/award/PO) → goodsReceipt → Completed.
+ * Also supports budget encumbrance auto-creation on submit and tender integration.
+ *
+ * Pure fields: title, description, estimatedAmount, quantity,
+ *   status, currentStep, requestedAt, completedAt,
+ *   history[{action, performed{by, name, at, role{id, name, scopeType?, scopeId?}}, unit{_id, name}?, details{...}}]
+ * Relations: wareModel (WareModel), process (Process), requester (User),
+ *   requestingUnit (Unit), attachments (File[]), stepApprovals (StepApproval[]),
+ *   purchaseOrderItems (PurchaseOrderItem[]), tender (Tender),
+ *   budgetLine (BudgetLine)
+ *
+ * @example
+ * // A submitted request for 100 TSH kits, flowing through proc_lab
+ * // Currently at step 2 (Review by Warehouse), with a tender awarded
+ * {
+ *   _id: ObjectId("pr_tsh"),
+ *   title: "خرید کیت TSH",
+ *   description: "کیت آزمایشگاهی TSH برای آزمایشگاه هماتولوژی",
+ *   estimatedAmount: 25000000,
+ *   quantity: 100,
+ *   status: "InProgress",
+ *   currentStep: 2,
+ *   requestedAt: ISODate("2024-06-01T08:00:00Z"),
+ *   completedAt: null,
+ *   history: [
+ *     { action: "submitted",
+ *       performed: { by: "user_ali", name: "علی رضایی", at: ISODate("..."),
+ *         role: { id: "uuid-1", name: "Manager", scopeType: "organization", scopeId: "org_beheshti" } },
+ *       details: {} }
+ *   ],
+ *   // Relations (populated via Lesan):
+ *   // wareModel → { _id: ObjectId("wm_tsh"), name: "کیت TSH پیشرفته" }
+ *   // process → { _id: ObjectId("proc_lab"), name: "فرآیند خرید تجهیزات پزشکی" }
+ *   // requester → { _id: ObjectId("user_ali"), first_name: "Ali", last_name: "Rezaei" }
+ *   // requestingUnit → { _id: ObjectId("unit_lab"), name: "آزمایشگاه هماتولوژی" }
+ *   // stepApprovals → [ ... ]
+ *   // purchaseOrderItems → [{ _id: ObjectId("poi_tsh"), status: "assigned" }]
+ *   // tender → { _id: ObjectId("tender_tsh"), title: "مناقصه کیت TSH", status: "awarded" }
+ *   createdAt: ISODate("2024-06-01T08:00:00Z"),
+ *   updatedAt: ISODate("2024-06-20T09:00:00Z")
+ * }
+ */
 import { coreApp } from "../mod.ts";
 import {
   array,
@@ -14,6 +62,7 @@ import {
 } from "lesan";
 import { createUpdateAt } from "@lib";
 import {
+  budgetLine_excludes,
   process_excludes,
   user_excludes,
   unit_excludes,
@@ -22,8 +71,8 @@ import {
   purchaseOrderItem_excludes,
   purchasingRequest_excludes,
   tender_excludes,
+  wareModel_excludes,
 } from "./excludes.ts";
-import { po_item_status_array } from "./purchaseOrderItem.ts";
 
 export const request_status_array = [
   "Draft",
@@ -39,7 +88,7 @@ export const request_status_emums = enums(request_status_array);
 export const purchasingRequest_pure = {
   title: string(),
   description: optional(string()),
-  amount: optional(number()),
+  estimatedAmount: optional(number()),
   status: defaulted(
     coerce(
       request_status_emums,
@@ -51,31 +100,25 @@ export const purchasingRequest_pure = {
   currentStep: defaulted(number(), 0),
   requestedAt: optional(coerce(date(), string(), (value) => new Date(value))),
   completedAt: optional(coerce(date(), string(), (value) => new Date(value))),
-  items: defaulted(
-    array(object({
-      wareModelId: string(),
-      wareModelName: string(),
-      wareId: optional(string()),
-      wareName: optional(string()),
-      quantity: number(),
-      unitPrice: optional(number()),
-      status: defaulted(
-        coerce(
-          enums(po_item_status_array),
-          string(),
-          (value) => value as typeof po_item_status_array[number],
-        ),
-        "pending",
-      ),
-    })),
-    [],
-  ),
+  quantity: number(),
   history: defaulted(
     array(object({
       action: string(),
-      performedBy: string(),
-      performedByName: string(),
-      performedAt: coerce(date(), string(), (value) => new Date(value)),
+      performed: object({
+        by: string(),
+        name: string(),
+        at: coerce(date(), string(), (value) => new Date(value)),
+        role: object({
+          id: string(),
+          name: string(),
+          scopeType: optional(string()),
+          scopeId: optional(string()),
+        }),
+      }),
+      unit: optional(object({
+        _id: string(),
+        name: string(),
+      })),
       details: optional(object({})),
     })),
     [],
@@ -187,6 +230,38 @@ export const purchasingRequest_relations = {
       purchasingRequest: {
         type: "single" as RelationDataType,
         excludes: purchasingRequest_excludes,
+      },
+    },
+  },
+  budgetLine: {
+    schemaName: "budgetLine",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: budgetLine_excludes,
+    relatedRelations: {
+      purchasingRequests: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  wareModel: {
+    schemaName: "wareModel",
+    type: "single" as RelationDataType,
+    optional: false,
+    excludes: wareModel_excludes,
+    relatedRelations: {
+      purchasingRequests: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
       },
     },
   },
