@@ -8,6 +8,8 @@ export const addFn: ActFn = async (body) => {
 
   const { activeRoleId, purchasingRequestId, assignedFromId, assignedById, ...rest } = set;
 
+  const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
+
   const relations: Record<string, unknown> = {};
 
   relations.purchasingRequest = {
@@ -20,7 +22,7 @@ export const addFn: ActFn = async (body) => {
   if (assignedFromId) {
     relations.assignedFrom = {
       _ids: new ObjectId(assignedFromId as string),
-      relatedRelations: {},
+      relatedRelations: { purchaseOrderItems: true },
     };
   }
 
@@ -45,9 +47,17 @@ export const addFn: ActFn = async (body) => {
         $push: {
           history: {
             action: "item_assigned",
-            performedBy: (assignedById as string) || user._id.toString(),
-            performedByName: `${user.first_name} ${user.last_name}`,
-            performedAt: new Date(),
+            performed: {
+              by: (assignedById as string) || user._id.toString(),
+              name: `${user.first_name} ${user.last_name}`,
+              at: new Date(),
+              role: activeRole ? {
+                id: activeRole.roleId,
+                name: activeRole.name,
+                scopeType: activeRole.scopeType,
+                scopeId: activeRole.scopeId,
+              } : { id: "", name: "" },
+            },
             details: {
               wareModelId: rest.wareModelId,
               wareModelName: rest.wareModelName,

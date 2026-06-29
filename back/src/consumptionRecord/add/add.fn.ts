@@ -9,6 +9,8 @@ export const addFn: ActFn = async (body) => {
 
   const { activeRoleId, unitId, consumedById, inventoryId, purchasingRequestId, ...rest } = set;
 
+  const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
+
   const relations: Record<string, unknown> = {};
 
   relations.unit = {
@@ -68,9 +70,17 @@ export const addFn: ActFn = async (body) => {
         $push: {
           history: {
             action: "goods_consumed",
-            performedBy: consumedById as string,
-            performedByName: `${user.first_name} ${user.last_name}`,
-            performedAt: new Date(),
+            performed: {
+              by: consumedById as string,
+              name: `${user.first_name} ${user.last_name}`,
+              at: new Date(),
+              role: activeRole ? {
+                id: activeRole.roleId,
+                name: activeRole.name,
+                scopeType: activeRole.scopeType,
+                scopeId: activeRole.scopeId,
+              } : { id: "", name: "" },
+            },
             details: {
               consumptionRecordId: result._id?.toString(),
               wareModelId: rest.wareModelId,

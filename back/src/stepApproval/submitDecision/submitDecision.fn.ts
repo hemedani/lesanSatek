@@ -24,6 +24,8 @@ export const submitDecisionFn: ActFn = async (body) => {
     comment,
   } = set;
 
+  const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
+
   const prId = new ObjectId(purchasingRequestId as string);
   const psId = new ObjectId(processStepId as string);
   const uId = new ObjectId(unitId as string);
@@ -163,9 +165,18 @@ export const submitDecisionFn: ActFn = async (body) => {
         $push: {
           history: {
             action: "step_approved",
-            performedBy: user._id.toString(),
-            performedByName: `${user.first_name} ${user.last_name}`,
-            performedAt: now,
+            performed: {
+              by: user._id.toString(),
+              name: `${user.first_name} ${user.last_name}`,
+              at: now,
+              role: activeRole ? {
+                id: activeRole.roleId,
+                name: activeRole.name,
+                scopeType: activeRole.scopeType,
+                scopeId: activeRole.scopeId,
+              } : { id: "", name: "" },
+            },
+            unit: { _id: unitId, name: step.name },
             details: {
               stepName: step.name,
               stepIndex,
@@ -223,9 +234,18 @@ export const submitDecisionFn: ActFn = async (body) => {
           $push: {
             history: {
               action: "step_approved",
-              performedBy: user._id.toString(),
-              performedByName: `${user.first_name} ${user.last_name}`,
-              performedAt: now,
+              performed: {
+                by: user._id.toString(),
+                name: `${user.first_name} ${user.last_name}`,
+                at: now,
+                role: activeRole ? {
+                  id: activeRole.roleId,
+                  name: activeRole.name,
+                  scopeType: activeRole.scopeType,
+                  scopeId: activeRole.scopeId,
+                } : { id: "", name: "" },
+              },
+              unit: { _id: unitId, name: step.name },
               details: {
                 stepName: step.name,
                 stepIndex,
@@ -248,9 +268,18 @@ export const submitDecisionFn: ActFn = async (body) => {
         $push: {
           history: {
             action: "step_rejected",
-            performedBy: user._id.toString(),
-            performedByName: `${user.first_name} ${user.last_name}`,
-            performedAt: now,
+            performed: {
+              by: user._id.toString(),
+              name: `${user.first_name} ${user.last_name}`,
+              at: now,
+              role: activeRole ? {
+                id: activeRole.roleId,
+                name: activeRole.name,
+                scopeType: activeRole.scopeType,
+                scopeId: activeRole.scopeId,
+              } : { id: "", name: "" },
+            },
+            unit: { _id: unitId, name: step.name },
             details: {
               stepName: step.name,
               stepIndex,

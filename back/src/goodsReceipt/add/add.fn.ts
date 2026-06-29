@@ -16,6 +16,8 @@ export const addFn: ActFn = async (body) => {
     ...rest
   } = set;
 
+  const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
+
   const now = new Date();
 
   const relations: Record<string, unknown> = {};
@@ -121,9 +123,18 @@ export const addFn: ActFn = async (body) => {
         $push: {
           history: {
             action: "goods_received",
-            performedBy: userId,
-            performedByName: `${user.first_name} ${user.last_name}`,
-            performedAt: now,
+            performed: {
+              by: userId,
+              name: `${user.first_name} ${user.last_name}`,
+              at: now,
+              role: activeRole ? {
+                id: activeRole.roleId,
+                name: activeRole.name,
+                scopeType: activeRole.scopeType,
+                scopeId: activeRole.scopeId,
+              } : { id: "", name: "" },
+            },
+            unit: receivingUnitId ? { _id: receivingUnitId, name: "" } : undefined,
             details: {
               goodsReceiptId: result._id?.toString(),
               itemCount: items.length,
@@ -226,9 +237,18 @@ export const addFn: ActFn = async (body) => {
                     $push: {
                       history: {
                         action: "step_approved",
-                        performedBy: userId,
-                        performedByName: `${user.first_name} ${user.last_name}`,
-                        performedAt: now,
+                        performed: {
+                          by: userId,
+                          name: `${user.first_name} ${user.last_name}`,
+                          at: now,
+                          role: activeRole ? {
+                            id: activeRole.roleId,
+                            name: activeRole.name,
+                            scopeType: activeRole.scopeType,
+                            scopeId: activeRole.scopeId,
+                          } : { id: "", name: "" },
+                        },
+                        unit: { _id: receivingUnitId, name: step.name },
                         details: {
                           stepName: step.name,
                           stepIndex,
@@ -274,9 +294,18 @@ export const addFn: ActFn = async (body) => {
                       $push: {
                         history: {
                           action: "step_approved",
-                          performedBy: userId,
-                          performedByName: `${user.first_name} ${user.last_name}`,
-                          performedAt: now,
+                          performed: {
+                            by: userId,
+                            name: `${user.first_name} ${user.last_name}`,
+                            at: now,
+                            role: activeRole ? {
+                              id: activeRole.roleId,
+                              name: activeRole.name,
+                              scopeType: activeRole.scopeType,
+                              scopeId: activeRole.scopeId,
+                            } : { id: "", name: "" },
+                          },
+                          unit: { _id: receivingUnitId, name: step.name },
                           details: { stepName: step.name, stepIndex, stepType, unitId: receivingUnitId, comment: "Auto-approved via goods receipt", completed: true, autoApproved: true },
                         },
                       },

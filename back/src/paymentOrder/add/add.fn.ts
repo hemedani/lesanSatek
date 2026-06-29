@@ -8,6 +8,8 @@ export const addFn: ActFn = async (body) => {
 
   const { activeRoleId, purchasingRequestId, issuedById, approvedById, payToId, financialUnitId, ...rest } = set;
 
+  const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
+
   const relations: Record<string, unknown> = {};
 
   relations.purchasingRequest = {
@@ -67,9 +69,17 @@ export const addFn: ActFn = async (body) => {
         $push: {
           history: {
             action: "payment_ordered",
-            performedBy: user._id.toString(),
-            performedByName: `${user.first_name} ${user.last_name}`,
-            performedAt: new Date(),
+            performed: {
+              by: user._id.toString(),
+              name: `${user.first_name} ${user.last_name}`,
+              at: new Date(),
+              role: activeRole ? {
+                id: activeRole.roleId,
+                name: activeRole.name,
+                scopeType: activeRole.scopeType,
+                scopeId: activeRole.scopeId,
+              } : { id: "", name: "" },
+            },
             details: {
               paymentOrderId: result._id?.toString(),
               amount: rest.amount,
