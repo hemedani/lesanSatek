@@ -247,11 +247,27 @@ These `@utility` classes were implemented alongside the theme tokens and are use
 }
 
 @utility admin-canvas {
-  /* bg-blueprint-grid + midnight-ink background — root layout surface */
+  /* midnight-ink + radial glow + light grid — root layout surface */
+}
+
+@utility admin-canvas-animated {
+  /* midnight-ink + 3 soft radial gradients (shift over 45s) + light grid — animated depth */
 }
 
 @utility blueprint-glow {
   /* radial-gradient ellipse 80% 60% at 50% -10% — subtle top wash */
+}
+
+@utility blueprint-radial-glow {
+  /* deeper radial glow for behind panels/sections */
+}
+```
+
+### Background Animation
+
+```css
+@keyframes bg-shift {
+  /* background-position 0%→100%→0% over 45s, ease-in-out, infinite alternate */
 }
 ```
 
@@ -259,7 +275,23 @@ These `@utility` classes were implemented alongside the theme tokens and are use
 
 ```css
 @utility glass-card {
-  /* backdrop-filter blur(16px), translucent bg, hairline border, near-black shadow */
+  /* backdrop-filter blur(20px), translucent bg (#2f343e at 0.55), multi-layer inset hairlines, near-black shadow */
+}
+
+@utility glass-card-hover {
+  /* &:hover brightens border + intensifies inset glow */
+}
+
+@utility glass-dialog {
+  /* backdrop-filter blur(24px), 0.7 opacity, deeper shadows — for modal overlays */
+}
+
+@utility glass-header {
+  /* backdrop-filter blur(20px), midnight-ink at 0.75, subtle bottom hairline */
+}
+
+@utility glass-sidebar {
+  /* backdrop-filter blur(24px), midnight-ink at 0.85, right-edge hairline */
 }
 
 @utility conic-border-top {
@@ -300,13 +332,13 @@ The following shadcn/ui components were aligned to AuthKit tokens during the adm
 | Component | Key Changes |
 |-----------|-------------|
 | `card.tsx` | `shadow-subtle-4` default elevation; `hover:border-[rgba(186,215,247,0.2)]` for card hover brightening |
-| `button.tsx` | All variants use `rounded-sm` (2px); ghost adds `shadow-subtle` inset hairline; outline uses `hover:bg-graphite-plate` |
+| `button.tsx` | All variants use `rounded-sm` (2px); default: Electric Iris fill + subtle inset highlight + hover glow; ghost: `shadow-subtle` hairline + `hover:bg-white/[0.03]` + enhanced inset; outline: `border-steel-border/60` → `hover:border-frost-link/30`; destructive: matched `border-destructive/10` with clean hover; `active:scale-[0.97]` on all variants; `transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]` |
 | `input.tsx` | `rounded-sm` (2px) for sharp radius |
 | `select.tsx` | Trigger uses `rounded-sm` (2px) |
 | `dialog.tsx` | `rounded-lg` (10px) matches card radius |
 | `badge.tsx` | `rounded-md` (6px) per AuthKit badge spec |
 | `tabs.tsx` | `bg-graphite-plate` instead of `bg-muted` |
-| `table.tsx` + `data-table.tsx` | Container `rounded-lg bg-graphite-plate shadow-subtle-4`; header `bg-[#282c35]`; alternating `bg-white/[0.015]` rows; hover glow on rows; sticky first column on mobile |
+| `table.tsx` + `data-table.tsx` | Container `rounded-lg glass-card`; header `bg-[#282c35] border-b border-steel-border/30`; alternating `bg-white/[0.012]` rows; `hover:bg-white/[0.02]` with left accent; responsive card view via `cardView`/`onViewToggle` props + `renderCard` custom renderer; `hideOnCard` column option; view toggle buttons (Table2/LayoutGrid icons); `card-list` loading skeleton variant |
 | `pagination.tsx` | Pill-shaped `rounded-full` nav buttons, ghost variant, `rtl:rotate-180` chevrons |
 | `empty-state.tsx` | Frost Link icon, Moonlight title, Fog description, ghost action button |
 | `error-state.tsx` | Ember icon, Moonlight title, Fog message, card container with `border-ember/20`, ghost retry button |
@@ -319,17 +351,17 @@ The following shadcn/ui components were aligned to AuthKit tokens during the adm
 
 ### Admin Panel Page Patterns
 
-**Page wrapper:** `<div className="admin-canvas relative flex h-screen overflow-hidden">` with 2 `blob` divs for animated gradient depth.
+**Page wrapper:** `<div className="admin-canvas-animated relative flex h-screen overflow-hidden">` with 3 `blob` divs for animated gradient depth. The `admin-canvas-animated` utility layers a 45s subtle background-position shift between deep midnight blue tones, creating quiet ambient depth.
 
 **Content fade-in:** `<main className="... animate-in fade-in duration-300">` on the admin layout main element.
 
 **Dashboard layout:** 4 KPI cards in `grid gap-4 sm:grid-cols-2 lg:grid-cols-4` with `shadow-subtle-4`, Frost Link icons, Glacier heading-sm values, Fog labels, and hairline bottom gradient accent. Quick Actions in ghost pill buttons (`rounded-full`). System status via `StatusBadge`.
 
-**Data list pages:** `PageHeader` (Glacier heading-sm, Fog body-sm, `border-b border-steel-border/50`) → `FilterBar` → `DataTable` (sticky first column for mobile) → `Pagination` (pill nav).
+**Data list pages:** `PageHeader` (Glacier heading-sm, Fog body-sm, `border-b border-steel-border/50`) → `FilterBar` → `DataTable` (glass-card container, responsive: table on desktop ↔ card list on mobile via `cardView` toggle + custom `renderCard`) → `Pagination` (responsive: stacked on mobile, horizontal on sm+).
 
-**Form pages:** Back `ArrowRight` link → `PageHeader` (borderless) → `FormCard` (shadow-subtle-4) with `space-y-4` field spacing → button row (Electric Iris primary + Ghost cancel). Max width `max-w-2xl`.
+**Form pages:** Back `ArrowRight` link → `PageHeader` (borderless) → `FormCard` (`glass-card`) with `space-y-4` field spacing → button row (Electric Iris primary + Ghost cancel). Max width `max-w-2xl`.
 
-**Loading states:** Admin `loading.tsx` matched to page structure; `LoadingSkeleton` with `type="table"|"card"|"list"` for sub-pages; blueprint shimmer on all `<Skeleton>` elements.
+**Loading states:** Admin `loading.tsx` matched to page structure; `LoadingSkeleton` with `type="table"|"card"|"list"|"card-list"` for sub-pages; blueprint shimmer on all `<Skeleton>` elements; `card-list` variant matches the card view layout for seamless loading transitions.
 
 **Error handling:** `error.tsx` at `/admin/` root with `ErrorState` + `reset()`; not-found states per page use `ErrorState` + back navigation link.
 

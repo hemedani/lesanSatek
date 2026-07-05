@@ -357,8 +357,7 @@ Every admin listing page follows this structure:
 ```
 src/app/admin/<entity>/
 ├── page.tsx              # Server Component: fetch data, pass to client
-├── <entity>-table.tsx    # Table component
-├── admin-<entity>-client.tsx  # Client component: view toggle, pagination, actions
+├── <entity>-client.tsx   # Client component: view toggle (table/cards), pagination, actions
 └── loading.tsx           # Skeleton loading state
 ```
 
@@ -374,6 +373,26 @@ export default async function AdminPage({ searchParams }) {
   return <AdminClient items={items} prevPageUrl={prevPageUrl} nextPageUrl={nextPageUrl} />;
 }
 ```
+
+**Responsive DataTable Pattern (`<entity>-client.tsx`)**:
+The `DataTable` component supports both table and card views. On desktop, a traditional table renders; on mobile (or via toggle), items render as stacked glass cards. Use `cardView`/`onViewToggle` state + `renderCard` prop:
+```tsx
+const [cardView, setCardView] = useState(false);
+
+<DataTable
+  columns={columns}
+  data={items}
+  keyExtractor={(item) => item._id}
+  cardView={cardView}
+  onViewToggle={() => setCardView((v) => !v)}
+  renderCard={(item) => (
+    <div className="glass-card glass-card-hover rounded-xl p-4 space-y-3">
+      {/* Card content matching column structure */}
+    </div>
+  )}
+/>
+```
+Use `hideOnCard: true` on column definitions to exclude fields from the auto-generated card view when no custom `renderCard` is provided.
 
 ### Loading States
 - Use `shadcn/ui` `Skeleton` component for data lists while loading.
