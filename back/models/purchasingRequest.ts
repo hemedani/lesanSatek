@@ -13,7 +13,8 @@
  * Relations: wareModel (WareModel), process (Process), requester (User),
  *   requestingUnit (Unit), attachments (File[]), stepApprovals (StepApproval[]),
  *   purchaseOrderItems (PurchaseOrderItem[]), tender (Tender),
- *   budgetLine (BudgetLine)
+ *   budgetLine (BudgetLine), store (Store), ware (Ware),
+ *   wareType (WareType), wareClass (WareClass), wareGroup (WareGroup)
  *
  * @example
  * // A submitted request for 100 TSH kits, flowing through proc_lab
@@ -72,6 +73,11 @@ import {
   purchasingRequest_excludes,
   tender_excludes,
   wareModel_excludes,
+  store_excludes,
+  ware_excludes,
+  wareType_excludes,
+  wareClass_excludes,
+  wareGroup_excludes,
 } from "./excludes.ts";
 
 export const request_status_array = [
@@ -254,6 +260,86 @@ export const purchasingRequest_relations = {
     type: "single" as RelationDataType,
     optional: false,
     excludes: wareModel_excludes,
+    relatedRelations: {
+      purchasingRequests: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  store: {
+    schemaName: "store",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: store_excludes,
+    relatedRelations: {
+      purchasingRequests: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  ware: {
+    schemaName: "ware",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: ware_excludes,
+    relatedRelations: {
+      purchasingRequests: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  wareType: {
+    schemaName: "wareType",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: wareType_excludes,
+    relatedRelations: {
+      purchasingRequests: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  wareClass: {
+    schemaName: "wareClass",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: wareClass_excludes,
+    relatedRelations: {
+      purchasingRequests: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  wareGroup: {
+    schemaName: "wareGroup",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: wareGroup_excludes,
     relatedRelations: {
       purchasingRequests: {
         type: "multiple" as RelationDataType,

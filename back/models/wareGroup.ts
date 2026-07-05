@@ -7,7 +7,7 @@
  * and no join table is needed — Lesan handles it natively.
  *
  * Pure fields: name, enName
- * Relations: wareType (WareType), wareClasses (WareClass[], M:N) —
+ * Relations: creator (User), wareType (WareType), wareClasses (WareClass[], M:N) —
  *   Lesan auto-creates wareType.wareGroups and wareClass.wareGroups reverse;
  *   also receives wareModels, wares, stuffs from child models.
  *
@@ -25,6 +25,7 @@ import { coreApp } from "../mod.ts";
 import { optional, type RelationDataType, type RelationSortOrderType, string } from "lesan";
 import { createUpdateAt } from "@lib";
 import {
+  user_excludes,
   wareType_excludes,
   wareClass_excludes,
 } from "./excludes.ts";
@@ -36,6 +37,13 @@ export const wareGroup_pure = {
 };
 
 export const wareGroup_relations = {
+  creator: {
+    schemaName: "user",
+    type: "single" as RelationDataType,
+    optional: false,
+    excludes: user_excludes,
+    relatedRelations: {},
+  },
   wareType: {
     schemaName: "wareType",
     type: "single" as RelationDataType,

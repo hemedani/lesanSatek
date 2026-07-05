@@ -6,20 +6,16 @@
  * winning vendor (store). Tracks pricing and lifecycle status
  * (pending → assigned → ordered → received → cancelled).
  *
- * Pure fields: wareModelId, wareModelName, wareId, wareName, quantity,
- *   unitPrice, totalPrice, status
- * Relations: purchasingRequest (PurchasingRequest), assignedFrom (Store), assignedBy (User),
- *   tenderOffer (TenderOffer)
+ * Pure fields: quantity, unitPrice, totalPrice, status
+ * Relations: purchasingRequest (PurchasingRequest), assignedFrom (Store),
+ *   assignedBy (User), tenderOffer (TenderOffer), wareModel (WareModel),
+ *   ware (Ware, optional)
  *
  * @example
  * // A purchase order item assigned to ZistShimi after the tender award
  * // Part of purchasing request pr_tsh
  * {
  *   _id: ObjectId("poi_tsh"),
- *   wareModelId: "wm_tsh",
- *   wareModelName: "کیت TSH پیشرفته",
- *   wareId: "w_tsh_zist",
- *   wareName: "کیت TSH پیشرفته ZistShimi",
  *   quantity: 100,
  *   unitPrice: 230000,
  *   totalPrice: 23000000,
@@ -28,6 +24,8 @@
  *   // purchasingRequest → { _id: ObjectId("pr_tsh"), title: "خرید کیت TSH" }
  *   // assignedFrom → { _id: ObjectId("store_zist"), name: "شرکت زیست شیمی" }
  *   // assignedBy → { _id: ObjectId("user_ahmadi"), first_name: "Dr.", last_name: "Ahmadi" }
+ *   // wareModel → { _id: ObjectId("wm_tsh"), name: "کیت TSH پیشرفته" }
+ *   // ware → { _id: ObjectId("w_tsh_zist"), name: "کیت TSH پیشرفته ZistShimi" }
  *   createdAt: ISODate("2024-06-15T10:00:00Z"),
  *   updatedAt: ISODate("2024-06-15T10:00:00Z")
  * }
@@ -50,16 +48,14 @@ import {
   store_excludes,
   tenderOffer_excludes,
   user_excludes,
+  wareModel_excludes,
+  ware_excludes,
 } from "./excludes.ts";
 
 export const po_item_status_array = ["pending", "assigned", "ordered", "received", "cancelled"];
 export const po_item_status_emums = enums(po_item_status_array);
 
 export const purchaseOrderItem_pure = {
-  wareModelId: string(),
-  wareModelName: string(),
-  wareId: optional(string()),
-  wareName: optional(string()),
   quantity: number(),
   unitPrice: optional(number()),
   totalPrice: optional(number()),
@@ -120,6 +116,32 @@ export const purchaseOrderItem_relations = {
       purchaseOrderItem: {
         type: "single" as RelationDataType,
         excludes: purchaseOrderItem_excludes,
+      },
+    },
+  },
+  wareModel: {
+    schemaName: "wareModel",
+    type: "single" as RelationDataType,
+    optional: false,
+    excludes: wareModel_excludes,
+    relatedRelations: {
+      purchaseOrderItems: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: { field: "_id", order: "desc" as RelationSortOrderType },
+      },
+    },
+  },
+  ware: {
+    schemaName: "ware",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: ware_excludes,
+    relatedRelations: {
+      purchaseOrderItems: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: { field: "_id", order: "desc" as RelationSortOrderType },
       },
     },
   },

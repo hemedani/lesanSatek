@@ -8,7 +8,7 @@
  * efficient filtering at any level.
  *
  * Pure fields: name, enName, brand, price, orderedNumber, irc, umdns, gtin, photoUrl
- * Relations: manufacturer (Manufacturer), wareType (WareType), wareClass (WareClass),
+ * Relations: creator (User), manufacturer (Manufacturer), wareType (WareType), wareClass (WareClass),
  *   wareGroup (WareGroup), wareModel (WareModel) —
  *   Lesan auto-creates reverse on all parent models; stuffs from stuff.ware.
  *
@@ -41,6 +41,7 @@ import {
 import { createUpdateAt } from "@lib";
 import {
   manufacturer_excludes,
+  user_excludes,
   wareType_excludes,
   wareClass_excludes,
   wareGroup_excludes,
@@ -61,6 +62,13 @@ export const ware_pure = {
 };
 
 export const ware_relations = {
+  creator: {
+    schemaName: "user",
+    type: "single" as RelationDataType,
+    optional: false,
+    excludes: user_excludes,
+    relatedRelations: {},
+  },
   manufacturer: {
     schemaName: "manufacturer",
     type: "single" as RelationDataType,

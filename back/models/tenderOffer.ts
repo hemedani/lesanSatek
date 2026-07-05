@@ -7,7 +7,8 @@
  *
  * Pure fields: price, deliveryTime, paymentTerms, description,
  *   status (submitted|accepted|rejected), submittedAt
- * Relations: tender (Tender), store (Store)
+ * Relations: tender (Tender), store (Store).
+ * Note: tenderOffer.purchaseOrderItem is auto-generated from purchaseOrderItem.tenderOffer.
  *
  * @example
  * // ZistShimi's winning offer on tender_tsh — accepted after the tender award
@@ -40,7 +41,6 @@ import {
 } from "lesan";
 import { createUpdateAt } from "@lib";
 import {
-  purchaseOrderItem_excludes,
   tender_excludes,
   store_excludes,
 } from "./excludes.ts";
@@ -95,17 +95,6 @@ export const tenderOffer_relations = {
           field: "_id",
           order: "desc" as RelationSortOrderType,
         },
-      },
-    },
-  },
-  purchaseOrderItem: {
-    schemaName: "purchaseOrderItem",
-    type: "single" as RelationDataType,
-    optional: true,
-    excludes: purchaseOrderItem_excludes,
-    relatedRelations: {
-      tenderOffer: {
-        type: "single" as RelationDataType,
       },
     },
   },

@@ -28,15 +28,7 @@
  * }
  */
 import { coreApp } from "../mod.ts";
-import {
-  boolean,
-  coerce,
-  date,
-  defaulted,
-  enums,
-  optional,
-  string,
-} from "lesan";
+import { boolean, coerce, date, defaulted, enums, string } from "lesan";
 import { createUpdateAt } from "@lib";
 
 export const fiscalYear_status_array = ["open", "closed"];

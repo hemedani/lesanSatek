@@ -7,17 +7,16 @@
  * return, write_off), and an optional reference to the triggering document
  * (e.g. a GoodsReceipt or ConsumptionRecord).
  *
- * Pure fields: wareModelId, wareModelName, wareId, wareName, quantity,
- *   balanceBefore, balanceAfter, reason, referenceType, referenceId, description
- * Relations: unit (Unit), createdBy (User)
+ * Pure fields: quantity, balanceBefore, balanceAfter, reason,
+ *   referenceType, referenceId, description
+ * Relations: unit (Unit), createdBy (User), store (Store, optional),
+ *   wareModel (WareModel), ware (Ware, optional)
  *
  * @example
  * // A stock movement from goods receipt — 50 TSH kits added to Central Warehouse
  * // Also shows a consumption movement that decremented the Lab's inventory
  * {
  *   _id: ObjectId("sm_gr_tsh"),
- *   wareModelId: "wm_tsh",
- *   wareModelName: "کیت TSH پیشرفته",
  *   quantity: 50,
  *   balanceBefore: 0,
  *   balanceAfter: 50,
@@ -28,25 +27,25 @@
  *   // Relations (populated via Lesan):
  *   // unit → { _id: ObjectId("unit_warehouse"), name: "انبار مرکزی" }
  *   // createdBy → { _id: ObjectId("user_mehdi"), first_name: "Mehdi", last_name: "Mohammadi" }
+ *   // wareModel → { _id: ObjectId("wm_tsh"), name: "کیت TSH پیشرفته" }
  *   createdAt: ISODate("2024-06-20T10:30:00Z"),
  *   updatedAt: ISODate("2024-06-20T10:30:00Z")
  * }
  * // ── Consumption movement that decremented Lab inventory ──
  * // {
  * //   _id: ObjectId("sm_consume_tsh"),
- * //   wareModelId: "wm_tsh",
  * //   quantity: -2,
  * //   balanceBefore: 50, balanceAfter: 48,
  * //   reason: "consumption",
  * //   referenceType: "consumptionRecord",
  * //   referenceId: ObjectId("cr_tsh_pat1"),
- * //   unit: { _id: ObjectId("unit_lab") }
+ * //   unit: { _id: ObjectId("unit_lab") },
+ * //   wareModel: { _id: ObjectId("wm_tsh") }
  * // }
  */
 import { coreApp } from "../mod.ts";
 import {
   coerce,
-  date,
   defaulted,
   enums,
   number,
@@ -56,7 +55,13 @@ import {
   string,
 } from "lesan";
 import { createUpdateAt } from "@lib";
-import { unit_excludes, user_excludes } from "./excludes.ts";
+import {
+  store_excludes,
+  unit_excludes,
+  user_excludes,
+  ware_excludes,
+  wareModel_excludes,
+} from "./excludes.ts";
 
 export const stockMovement_reason_array = [
   "goods_receipt",
@@ -71,10 +76,6 @@ export const stockMovement_reason_array = [
 export const stockMovement_reason_emums = enums(stockMovement_reason_array);
 
 export const stockMovement_pure = {
-  wareModelId: string(),
-  wareModelName: string(),
-  wareId: optional(string()),
-  wareName: optional(string()),
   quantity: number(),
   balanceBefore: number(),
   balanceAfter: number(),
@@ -125,7 +126,59 @@ export const stockMovement_relations = {
       },
     },
   },
+  store: {
+    schemaName: "store",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: store_excludes,
+    relatedRelations: {
+      stockMovements: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  wareModel: {
+    schemaName: "wareModel",
+    type: "single" as RelationDataType,
+    optional: false,
+    excludes: wareModel_excludes,
+    relatedRelations: {
+      stockMovements: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  ware: {
+    schemaName: "ware",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: ware_excludes,
+    relatedRelations: {
+      stockMovements: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
 };
 
 export const stockMovements = () =>
-  coreApp.odm.newModel("stockMovement", stockMovement_pure, stockMovement_relations);
+  coreApp.odm.newModel(
+    "stockMovement",
+    stockMovement_pure,
+    stockMovement_relations,
+  );

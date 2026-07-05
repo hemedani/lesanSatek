@@ -11,8 +11,8 @@
  * Relations: fiscalYear (FiscalYear), organization (Organization),
  *   unit (Unit, optional), wareType (WareType, optional) —
  *   Lesan auto-creates reverse relations on all parents;
- *   allocations (BudgetAllocation[]) and encumbrances (BudgetEncumbrance[])
- *   are auto-generated from child models.
+ *   allocations (BudgetAllocation[]), encumbrances (BudgetEncumbrance[]),
+ *   and purchasingRequests (PurchasingRequest[]) are auto-generated from child models.
  *
  * @example
  * // Budget line for lab equipment, under fiscal year fy_1403 and org_beheshti
@@ -51,10 +51,8 @@ import {
 } from "lesan";
 import { createUpdateAt } from "@lib";
 import {
-  budgetLine_excludes,
   fiscalYear_excludes,
   organization_excludes,
-  purchasingRequest_excludes,
   unit_excludes,
   wareType_excludes,
 } from "./excludes.ts";
@@ -132,23 +130,6 @@ export const budgetLine_relations = {
           field: "_id",
           order: "desc" as RelationSortOrderType,
         },
-      },
-    },
-  },
-  purchasingRequests: {
-    schemaName: "purchasingRequest",
-    type: "multiple" as RelationDataType,
-    optional: true,
-    excludes: purchasingRequest_excludes,
-    limit: 50,
-    sort: {
-      field: "_id",
-      order: "desc" as RelationSortOrderType,
-    },
-    relatedRelations: {
-      budgetLine: {
-        type: "single" as RelationDataType,
-        excludes: budgetLine_excludes,
       },
     },
   },

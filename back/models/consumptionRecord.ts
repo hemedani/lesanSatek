@@ -6,18 +6,14 @@
  * inventory record. Includes optional patientId for healthcare contexts and
  * a reason/notes field for documentation.
  *
- * Pure fields: wareModelId, wareModelName, wareId, wareName, quantity,
- *   consumedAt, reason, patientId, notes
- * Relations: unit (Unit), consumedBy (User), inventory (Inventory, optional)
+ * Pure fields: quantity, consumedAt, reason, patientId, notes
+ * Relations: unit (Unit), consumedBy (User), inventory (Inventory, optional),
+ *   wareModel (WareModel), ware (Ware, optional)
  *
  * @example
  * // A consumption record for using 2 TSH kits from the Hematology Lab inventory on a patient
  * {
  *   _id: ObjectId("cr_tsh_pat1"),
- *   wareModelId: "wm_tsh",
- *   wareModelName: "کیت TSH پیشرفته",
- *   wareId: "w_tsh_zist",
- *   wareName: "کیت TSH پیشرفته ZistShimi",
  *   quantity: 2,
  *   consumedAt: ISODate("2024-06-15T09:30:00Z"),
  *   reason: "استفاده برای آزمایش بیمار",
@@ -26,7 +22,9 @@
  *   // Relations (populated via Lesan):
  *   // unit → { _id: ObjectId("unit_lab"), name: "آزمایشگاه هماتولوژی" }
  *   // consumedBy → { _id: ObjectId("user_ahmadi"), first_name: "Dr.", last_name: "Ahmadi" }
- *   // inventory → { _id: ObjectId("inv_tsh_lab"), wareModelName: "کیت TSH پیشرفته", quantity: 48 }
+ *   // wareModel → { _id: ObjectId("wm_tsh"), name: "کیت TSH پیشرفته" }
+ *   // ware → { _id: ObjectId("w_tsh_zist"), name: "کیت TSH پیشرفته ZistShimi" }
+ *   // inventory → { _id: ObjectId("inv_tsh_lab"), quantity: 48 }
  *   //   (inv_tsh_lab is decremented from 50 to 48 by inventoryManager.removeStock)
  *   createdAt: ISODate("2024-06-15T09:30:00Z"),
  *   updatedAt: ISODate("2024-06-15T09:30:00Z")
@@ -43,13 +41,9 @@ import {
   string,
 } from "lesan";
 import { createUpdateAt } from "@lib";
-import { inventory_excludes, unit_excludes, user_excludes } from "./excludes.ts";
+import { inventory_excludes, unit_excludes, user_excludes, wareModel_excludes, ware_excludes } from "./excludes.ts";
 
 export const consumptionRecord_pure = {
-  wareModelId: string(),
-  wareModelName: string(),
-  wareId: optional(string()),
-  wareName: optional(string()),
   quantity: number(),
   consumedAt: coerce(date(), string(), (value) => new Date(value)),
   reason: optional(string()),
@@ -96,6 +90,38 @@ export const consumptionRecord_relations = {
     type: "single" as RelationDataType,
     optional: true,
     excludes: inventory_excludes,
+    relatedRelations: {
+      consumptionRecords: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  wareModel: {
+    schemaName: "wareModel",
+    type: "single" as RelationDataType,
+    optional: false,
+    excludes: wareModel_excludes,
+    relatedRelations: {
+      consumptionRecords: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  ware: {
+    schemaName: "ware",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: ware_excludes,
     relatedRelations: {
       consumptionRecords: {
         type: "multiple" as RelationDataType,

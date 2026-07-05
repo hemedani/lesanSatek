@@ -4,7 +4,7 @@
  * Represents a supplier or vendor that sells wares. Contains comprehensive
  * business information: contact, location (city/state), bank details, certificates,
  * delivery settings, and status lifecycle (NotConfirmed → Confirmed → Suspension).
- * Stores can participate in tenders as assigned vendors and receive PurchaseOrderItems.
+ * Stores can participate in tenders as assigned vendors and are linked to PurchaseOrderItems
  * Supported WareTypes are tracked via M:N relation.
  *
  * Pure fields: name, address, location, contact, logoUrl, ceoname, workingHours,
@@ -14,7 +14,8 @@
  *   economicCode, postalCode, lastNewspaperUrl, certificateUrl, bankCardNumber,
  *   shebaNumber, nameOfAccountHolder, bankName, certificateNumber, registerNumber,
  *   certificateExpireDate, legalPerson, nationalId
- * Relations: storeHead (User), city (City), state (State), wareTypes (WareType[], M:N)
+ * Relations: storeHead (User), city (City), state (State), wareTypes (WareType[], M:N).
+ * Note: store.purchaseOrderItems is auto-generated from purchaseOrderItem.assignedFrom.
  *
  * @example
  * // A confirmed medical equipment supplier (Salamat Co.) — lost the TSH tender to ZistShimi
@@ -65,7 +66,6 @@ import {
 } from "lesan";
 import { createUpdateAt } from "@lib";
 import {
-  purchaseOrderItem_excludes,
   user_excludes,
   city_excludes,
   state_excludes,
@@ -146,19 +146,6 @@ export const store_relations = {
     excludes: wareType_excludes,
     sort: { field: "_id", order: "desc" as RelationSortOrderType },
     relatedRelations: {},
-  },
-  purchaseOrderItems: {
-    schemaName: "purchaseOrderItem",
-    type: "multiple" as RelationDataType,
-    optional: true,
-    limit: 50,
-    excludes: purchaseOrderItem_excludes,
-    sort: { field: "_id", order: "desc" as RelationSortOrderType },
-    relatedRelations: {
-      assignedFrom: {
-        type: "single" as RelationDataType,
-      },
-    },
   },
 };
 

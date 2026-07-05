@@ -7,7 +7,7 @@
  * PurchasingRequest items and Inventory tracking (wareModelId/wareModelName).
  *
  * Pure fields: name, enName
- * Relations: wareType (WareType), wareClass (WareClass), wareGroup (WareGroup) —
+ * Relations: creator (User), wareType (WareType), wareClass (WareClass), wareGroup (WareGroup) —
  *   Lesan auto-creates reverse relations on all three parent models,
  *   plus wares and stuffs from child models.
  *
@@ -25,6 +25,7 @@ import { coreApp } from "../mod.ts";
 import { optional, type RelationDataType, type RelationSortOrderType, string } from "lesan";
 import { createUpdateAt } from "@lib";
 import {
+  user_excludes,
   wareType_excludes,
   wareClass_excludes,
   wareGroup_excludes,
@@ -37,6 +38,13 @@ export const wareModel_pure = {
 };
 
 export const wareModel_relations = {
+  creator: {
+    schemaName: "user",
+    type: "single" as RelationDataType,
+    optional: false,
+    excludes: user_excludes,
+    relatedRelations: {},
+  },
   wareType: {
     schemaName: "wareType",
     type: "single" as RelationDataType,

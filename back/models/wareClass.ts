@@ -6,7 +6,7 @@
  * (defined on wareGroup.wareClasses) allowing flexible cross-classification.
  *
  * Pure fields: name, enName
- * Relations: wareType (WareType) — Lesan auto-creates wareType.wareClasses reverse;
+ * Relations: creator (User), wareType (WareType) — Lesan auto-creates wareType.wareClasses reverse;
  *   also receives auto-generated wareGroups (M:N from wareGroup.wareClasses),
  *   wareModels, wares, and stuffs from child models.
  *
@@ -24,6 +24,7 @@ import { coreApp } from "../mod.ts";
 import { optional, type RelationDataType, type RelationSortOrderType, string } from "lesan";
 import { createUpdateAt } from "@lib";
 import {
+  user_excludes,
   wareType_excludes,
 } from "./excludes.ts";
 
@@ -34,6 +35,13 @@ export const wareClass_pure = {
 };
 
 export const wareClass_relations = {
+  creator: {
+    schemaName: "user",
+    type: "single" as RelationDataType,
+    optional: false,
+    excludes: user_excludes,
+    relatedRelations: {},
+  },
   wareType: {
     schemaName: "wareType",
     type: "single" as RelationDataType,
