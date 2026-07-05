@@ -1,0 +1,289 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: 'Estedad', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: 'Estedad', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'Estedad', ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --color-midnight-ink: #05060f;
+  --color-graphite-plate: #2f343e;
+  --color-steel-border: #3f4959;
+  --color-fog: #81899b;
+  --color-pebble: #9da7ba;
+  --color-moonlight: #c7d3ea;
+  --color-ice: #d1e4fa;
+  --color-glacier: #d8ecf8;
+  --color-frost-link: #b6d9fc;
+  --color-electric-iris: #663af3;
+  --color-ember: #e46d4c;
+  --color-azure: #027dea;
+  --color-cipher-mint: #269684;
+  --color-blueprint-glow: #bacff7;
+  --gradient-blueprint-glow: linear-gradient(0deg, #d8ecf8 0%, #98c0ef 100%);
+
+  --text-caption: 12px;
+  --leading-caption: 1.5;
+  --tracking-caption: -0.01px;
+  --text-body-sm: 14px;
+  --leading-body-sm: 1.43;
+  --tracking-body-sm: -0.01px;
+  --text-body: 16px;
+  --leading-body: 1.5;
+  --tracking-body: -0.01px;
+  --text-subheading: 18px;
+  --leading-subheading: 1.33;
+  --tracking-subheading: -0.01px;
+  --text-heading-sm: 24px;
+  --leading-heading-sm: 1.2;
+  --tracking-heading-sm: -0.01px;
+  --text-heading: 28px;
+  --leading-heading: 1.17;
+  --text-display: 48px;
+  --leading-display: 1.14;
+
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-36: 36px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-56: 56px;
+  --spacing-100: 100px;
+  --spacing-120: 120px;
+  --spacing-200: 200px;
+
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-3xl-2: 28px;
+  --radius-3xl-3: 44px;
+  --radius-full: 999px;
+  --radius-full-2: 4999.5px;
+  --radius-full-3: 9999px;
+
+  --shadow-sm: rgba(186, 207, 247, 0.32) 0px 0px 6px 0px;
+  --shadow-md: rgba(238, 186, 247, 0.24) 0px 0px 12px 0px;
+  --shadow-subtle: rgba(186, 215, 247, 0.12) 0px 0px 0px 1px inset;
+  --shadow-subtle-2: rgba(199, 211, 234, 0.12) -0.5px 0.5px 1px 0px inset, rgba(186, 215, 247, 0.08) 0px 0px 96px 0px inset;
+  --shadow-subtle-3: rgba(186, 214, 247, 0.06) 0px 0px 0px 1px inset;
+  --shadow-subtle-4: rgba(199, 211, 234, 0.12) 0px 1px 1px 0px inset, rgba(199, 211, 234, 0.05) 0px 24px 48px 0px inset, rgba(6, 6, 14, 0.7) 0px 24px 32px 0px;
+  --shadow-subtle-5: rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
+  --shadow-subtle-6: rgba(216, 236, 248, 0.2) 0px 1px 1px 0px inset, rgba(168, 216, 245, 0.06) 0px 24px 48px 0px inset, rgba(0, 0, 0, 0.3) 0px 16px 32px 0px;
+  --shadow-subtle-7: rgba(216, 236, 248, 0.2) 0px 1px 1px 0px inset, rgba(168, 216, 245, 0.06) 0px 24px 48px 0px inset;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --background: #05060f;
+  --foreground: #c7d3ea;
+  --card: #2f343e;
+  --card-foreground: #c7d3ea;
+  --popover: #2f343e;
+  --popover-foreground: #c7d3ea;
+  --primary: #663af3;
+  --primary-foreground: #ffffff;
+  --secondary: #2f343e;
+  --secondary-foreground: #c7d3ea;
+  --muted: #2f343e;
+  --muted-foreground: #81899b;
+  --accent: #2f343e;
+  --accent-foreground: #c7d3ea;
+  --destructive: #e46d4c;
+  --destructive-foreground: #ffffff;
+  --border: #3f4959;
+  --input: #3f4959;
+  --ring: #b6d9fc;
+  --chart-1: #663af3;
+  --chart-2: #027dea;
+  --chart-3: #269684;
+  --chart-4: #e46d4c;
+  --chart-5: #d1e4fa;
+  --radius: 0.625rem;
+  --sidebar: #2f343e;
+  --sidebar-foreground: #c7d3ea;
+  --sidebar-primary: #663af3;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2f343e;
+  --sidebar-accent-foreground: #c7d3ea;
+  --sidebar-border: #3f4959;
+  --sidebar-ring: #b6d9fc;
+}
+
+::selection {
+  background: #663af3;
+  color: #ffffff;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+@utility text-gradient-blueprint {
+  background: linear-gradient(0deg, #d8ecf8 0%, #98c0ef 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Blueprint Grid ─────────────────────────────────────── */
+
+@utility bg-blueprint-grid {
+  background-color: var(--color-midnight-ink);
+  background-image:
+    linear-gradient(rgba(186, 215, 247, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(186, 215, 247, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── Admin Canvas (grid + midnight ink) ─────────────────── */
+
+@utility admin-canvas {
+  background-color: var(--color-midnight-ink);
+  background-image:
+    linear-gradient(rgba(186, 215, 247, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(186, 215, 247, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── Blueprint Glow Wash ────────────────────────────────── */
+
+@utility blueprint-glow {
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(186, 207, 247, 0.15) 0%, transparent 70%);
+}
+
+/* ── Glass Card (frosted glass surface) ─────────────────── */
+
+@utility glass-card {
+  background-color: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+/* ── Conic Top Border ───────────────────────────────────── */
+
+@utility conic-border-top {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px 0 0 0;
+    background: conic-gradient(from 180deg at 50% -5%, transparent, rgba(124, 145, 182, 0.3) 25%, transparent 50%, rgba(124, 145, 182, 0.3) 75%, transparent);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+/* ── Fluid Gradient Blobs ───────────────────────────────── */
+
+@keyframes blob-float {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(2%, -3%) scale(1.05);
+  }
+  50% {
+    transform: translate(-1%, 2%) scale(0.95);
+  }
+  75% {
+    transform: translate(3%, 1%) scale(1.02);
+  }
+  100% {
+    transform: translate(-2%, -1%) scale(1);
+  }
+}
+
+@utility blob {
+  width: 60vw;
+  height: 60vw;
+  filter: blur(100px);
+  animation: blob-float 20s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* ── Blueprint Shimmer (for skeleton loading) ────────────── */
+
+@keyframes blueprint-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@utility skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #2f343e 25%,
+    rgba(186, 215, 247, 0.08) 50%,
+    #2f343e 75%
+  );
+  background-size: 200% 100%;
+  animation: blueprint-shimmer 2s ease-in-out infinite;
+}
+
+/* ── AuthKit Inset Hairline (for ghost buttons / cards) ─── */
+
+@utility hairline-inset {
+  box-shadow: rgba(186, 215, 247, 0.12) 0px 0px 0px 1px inset;
+}
