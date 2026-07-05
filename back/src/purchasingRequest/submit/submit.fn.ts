@@ -5,6 +5,8 @@ import {
   stepApproval,
   budgetEncumbrance,
   budgetLine,
+  wareModel,
+  inventory,
   coreApp,
 } from "../../../mod.ts";
 import type { MyContext } from "@lib";
@@ -15,7 +17,7 @@ export const submitFn: ActFn = async (body) => {
   const { user }: MyContext = coreApp.contextFns
     .getContextModel() as MyContext;
 
-  const { activeRoleId, processId, requestingUnitId, attachmentIds, budgetLineId, wareModelId, ...rest } =
+  const { activeRoleId, processId, requestingUnitId, attachmentIds, budgetLineId, wareModelId, storeId, wareId, wareTypeId, wareClassId, wareGroupId, ...rest } =
     set;
 
   const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
@@ -57,6 +59,83 @@ export const submitFn: ActFn = async (body) => {
     };
   }
 
+  // Auto-resolve wareType, wareClass, wareGroup from wareModel if not explicitly provided
+  if (wareModelId) {
+    const resolvedWareTypeId = wareTypeId || null;
+    const resolvedWareClassId = wareClassId || null;
+    const resolvedWareGroupId = wareGroupId || null;
+
+    if (!resolvedWareTypeId || !resolvedWareClassId || !resolvedWareGroupId) {
+      const wm = await wareModel.findOne({
+        filters: { _id: new ObjectId(wareModelId as string) },
+        projection: { wareType: { _id: 1 }, wareClass: { _id: 1 }, wareGroup: { _id: 1 } },
+      }) as Record<string, unknown> | undefined;
+
+      if (wm) {
+        if (!resolvedWareTypeId) {
+          const wt = wm.wareType as Record<string, unknown> | undefined;
+          if (wt?._id) {
+            relations.wareType = {
+              _ids: new ObjectId(wt._id as string),
+              relatedRelations: { purchasingRequests: true },
+            };
+          }
+        }
+        if (!resolvedWareClassId) {
+          const wc = wm.wareClass as Record<string, unknown> | undefined;
+          if (wc?._id) {
+            relations.wareClass = {
+              _ids: new ObjectId(wc._id as string),
+              relatedRelations: { purchasingRequests: true },
+            };
+          }
+        }
+        if (!resolvedWareGroupId) {
+          const wg = wm.wareGroup as Record<string, unknown> | undefined;
+          if (wg?._id) {
+            relations.wareGroup = {
+              _ids: new ObjectId(wg._id as string),
+              relatedRelations: { purchasingRequests: true },
+            };
+          }
+        }
+      }
+    }
+
+    if (wareTypeId) {
+      relations.wareType = {
+        _ids: new ObjectId(wareTypeId as string),
+        relatedRelations: { purchasingRequests: true },
+      };
+    }
+    if (wareClassId) {
+      relations.wareClass = {
+        _ids: new ObjectId(wareClassId as string),
+        relatedRelations: { purchasingRequests: true },
+      };
+    }
+    if (wareGroupId) {
+      relations.wareGroup = {
+        _ids: new ObjectId(wareGroupId as string),
+        relatedRelations: { purchasingRequests: true },
+      };
+    }
+  }
+
+  if (storeId) {
+    relations.store = {
+      _ids: new ObjectId(storeId as string),
+      relatedRelations: { purchasingRequests: true },
+    };
+  }
+
+  if (wareId) {
+    relations.ware = {
+      _ids: new ObjectId(wareId as string),
+      relatedRelations: { purchasingRequests: true },
+    };
+  }
+
   const createdRequest = await purchasingRequest.insertOne({
     doc: {
       ...rest,
@@ -82,6 +161,23 @@ export const submitFn: ActFn = async (body) => {
     return;
   }
 
+  // Get requesting unit's current inventory for this ware model
+  let unitInventory: Record<string, unknown> | null = null;
+  if (requestingUnitId && wareModelId) {
+    unitInventory = await inventory.findOne({
+      filters: {
+        unit: new ObjectId(requestingUnitId as string),
+        "wareModel._id": new ObjectId(wareModelId as string),
+      },
+      projection: {
+        quantity: 1,
+        minQuantity: 1,
+        maxQuantity: 1,
+        wareModel: { _id: 1, name: 1 },
+      },
+    }) as Record<string, unknown> | null;
+  }
+
   // Push "submitted" history entry
   await purchasingRequest.findOneAndUpdate({
     filter: { _id: createdRequest._id },
@@ -100,7 +196,19 @@ export const submitFn: ActFn = async (body) => {
               scopeId: activeRole.scopeId,
             } : { id: "", name: "" },
           },
-          details: { status: "Pending", currentStep: 0 },
+          details: {
+            status: "Pending",
+            currentStep: 0,
+            ...(unitInventory && {
+              requestingUnitInventory: {
+                quantity: unitInventory.quantity,
+                minQuantity: unitInventory.minQuantity,
+                maxQuantity: unitInventory.maxQuantity,
+                wareModelId,
+                wareModelName: (unitInventory.wareModel as Record<string, unknown>)?.name,
+              },
+            }),
+          },
         },
       },
     },

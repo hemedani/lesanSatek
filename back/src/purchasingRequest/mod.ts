@@ -11,6 +11,7 @@ import { warehouseCheckSetup } from "./warehouseCheck/mod.ts";
 import { getHistorySetup } from "./getHistory/mod.ts";
 import { assignStoreSetup } from "./assignStore/mod.ts";
 import { checkStoreAvailabilitySetup } from "./checkStoreAvailability/mod.ts";
+import { removeFromPurchaseSetup } from "./removeFromPurchase/mod.ts";
 
 export const purchasingRequestSetup = () => {
   addSetup();
@@ -25,4 +26,5 @@ export const purchasingRequestSetup = () => {
   getHistorySetup();
   assignStoreSetup();
   checkStoreAvailabilitySetup();
+  removeFromPurchaseSetup();
 };

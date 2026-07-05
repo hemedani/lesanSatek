@@ -10,6 +10,12 @@ export const updateRelationsValidator = () => {
       requestingUnitId: optional(objectIdValidation),
       attachmentIds: optional(array(objectIdValidation)),
       tenderId: optional(objectIdValidation),
+      purchaseOrderItemIds: optional(array(objectIdValidation)),
+      storeId: optional(objectIdValidation),
+      wareId: optional(objectIdValidation),
+      wareTypeId: optional(objectIdValidation),
+      wareClassId: optional(objectIdValidation),
+      wareGroupId: optional(objectIdValidation),
     }),
     get: selectStruct("purchasingRequest", 2),
   });

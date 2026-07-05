@@ -20,6 +20,11 @@ export const addValidator = () => {
       wareModelId: objectIdValidation,
       requestingUnitId: optional(objectIdValidation),
       attachmentIds: optional(array(objectIdValidation)),
+      storeId: optional(objectIdValidation),
+      wareId: optional(objectIdValidation),
+      wareTypeId: optional(objectIdValidation),
+      wareClassId: optional(objectIdValidation),
+      wareGroupId: optional(objectIdValidation),
     }),
     get: selectStruct("purchasingRequest", 2),
   });

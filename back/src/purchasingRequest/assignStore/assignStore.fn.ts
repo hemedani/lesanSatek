@@ -5,7 +5,7 @@ import type { MyContext } from "@lib";
 export const assignStoreFn: ActFn = async (body) => {
   const { set, get } = body.details;
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
-  const { activeRoleId, _id, assignedFromId } = set;
+  const { activeRoleId, _id, assignedFromId, replaceExistingItemId } = set;
 
   const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
 
@@ -24,6 +24,10 @@ export const assignStoreFn: ActFn = async (body) => {
 
   if (!pr) {
     throw { error: "Purchasing request not found" };
+  }
+
+  if (!["Pending", "InProgress"].includes(pr.status as string)) {
+    throw { error: "Can only assign store items to an active purchasing request (Pending/InProgress)" };
   }
 
   const wareModel = pr.wareModel as Record<string, unknown> | undefined;
@@ -58,9 +62,57 @@ export const assignStoreFn: ActFn = async (body) => {
     }
   }
 
+  // If replacing an existing item, cancel it first
+  if (replaceExistingItemId) {
+    const existingItem = await purchaseOrderItem.findOne({
+      filters: { _id: new ObjectId(replaceExistingItemId as string) },
+      projection: { _id: 1, wareModel: { _id: 1, name: 1 }, status: 1 },
+    }) as Record<string, unknown>;
+
+    const existingWareModel = existingItem?.wareModel as Record<string, unknown> | undefined;
+
+    if (existingItem && (existingItem.status as string) !== "cancelled") {
+      await purchaseOrderItem.findOneAndUpdate({
+        filter: { _id: new ObjectId(replaceExistingItemId as string) },
+        update: { $set: { status: "cancelled", updatedAt: now } },
+        projection: { _id: 1 },
+      });
+
+      await purchasingRequest.findOneAndUpdate({
+        filter: { _id: prId },
+        update: {
+          $push: {
+            history: {
+              action: "item_removed",
+              performed: {
+                by: user._id.toString(),
+                name: `${user.first_name} ${user.last_name}`,
+                at: now,
+                role: activeRole
+                  ? { id: activeRole.roleId, name: activeRole.name, scopeType: activeRole.scopeType, scopeId: activeRole.scopeId }
+                  : { id: "", name: "" },
+              },
+              details: {
+                purchaseOrderItemId: replaceExistingItemId,
+                wareModelId: existingWareModel?._id?.toString(),
+                wareModelName: existingWareModel?.name,
+                reason: "Replaced with new store assignment",
+              },
+            },
+          },
+        },
+        projection: { _id: 1 },
+      });
+    }
+  }
+
   const poRelations: Record<string, unknown> = {
     purchasingRequest: {
       _ids: prId,
+      relatedRelations: { purchaseOrderItems: true },
+    },
+    wareModel: {
+      _ids: new ObjectId(wareModelId),
       relatedRelations: { purchaseOrderItems: true },
     },
     assignedBy: {
@@ -78,8 +130,6 @@ export const assignStoreFn: ActFn = async (body) => {
 
   await purchaseOrderItem.insertOne({
     doc: {
-      wareModelId,
-      wareModelName,
       quantity,
       unitPrice,
       totalPrice: unitPrice ? unitPrice * quantity : undefined,
@@ -119,6 +169,21 @@ export const assignStoreFn: ActFn = async (body) => {
     },
     projection: { _id: 1 },
   });
+
+  // Auto-populate store on the PR
+  if (assignedFromId) {
+    await purchasingRequest.addRelation({
+      filters: { _id: prId },
+      relations: {
+        store: {
+          _ids: new ObjectId(assignedFromId as string),
+          relatedRelations: { purchasingRequests: true },
+        },
+      },
+      projection: { _id: 1 },
+      replace: true,
+    });
+  }
 
   return await purchasingRequest.findOne({
     filters: { _id: prId },

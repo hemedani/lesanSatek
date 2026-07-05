@@ -9,6 +9,11 @@ export const countValidator = () => {
       status: optional(enums(request_status_array)),
       processId: optional(objectIdValidation),
       requesterId: optional(objectIdValidation),
+      storeId: optional(objectIdValidation),
+      wareId: optional(objectIdValidation),
+      wareTypeId: optional(objectIdValidation),
+      wareClassId: optional(objectIdValidation),
+      wareGroupId: optional(objectIdValidation),
     }),
     get: object({ qty: optional(enums([0, 1])) }),
   });

@@ -34,6 +34,11 @@ export const getsValidator = () => {
         ]),
       ),
       sortOrder: optional(enums(["asc", "desc"])),
+      storeId: optional(objectIdValidation),
+      wareId: optional(objectIdValidation),
+      wareTypeId: optional(objectIdValidation),
+      wareClassId: optional(objectIdValidation),
+      wareGroupId: optional(objectIdValidation),
     }),
     get: selectStruct("purchasingRequest", 2),
   });

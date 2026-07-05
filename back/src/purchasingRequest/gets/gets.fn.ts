@@ -15,6 +15,11 @@ export const getsFn: ActFn = async (body) => {
       filterByAction,
       sortBy,
       sortOrder,
+      storeId,
+      wareId,
+      wareTypeId,
+      wareClassId,
+      wareGroupId,
     },
     get,
   } = body.details;
@@ -44,6 +49,31 @@ export const getsFn: ActFn = async (body) => {
   filterByAction &&
     pipeline.push({
       $match: { "history.action": filterByAction },
+    });
+
+  storeId &&
+    pipeline.push({
+      $match: { "store._id": new ObjectId(storeId as string) },
+    });
+
+  wareId &&
+    pipeline.push({
+      $match: { "ware._id": new ObjectId(wareId as string) },
+    });
+
+  wareTypeId &&
+    pipeline.push({
+      $match: { "wareType._id": new ObjectId(wareTypeId as string) },
+    });
+
+  wareClassId &&
+    pipeline.push({
+      $match: { "wareClass._id": new ObjectId(wareClassId as string) },
+    });
+
+  wareGroupId &&
+    pipeline.push({
+      $match: { "wareGroup._id": new ObjectId(wareGroupId as string) },
     });
 
   if (search && (!sortBy || sortBy === "relevance")) {
