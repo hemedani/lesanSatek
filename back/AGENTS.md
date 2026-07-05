@@ -464,6 +464,16 @@ export const parent_relations = {
 - `manufacturer` should NOT define `wares` (ware already defines `manufacturer`)
 - `store` should NOT define `stuffs` (stuff already defines `store`)
 
+### Lesan Relation Storage Model — Single Relations Are Embedded
+
+Lesan **embeds** single-type relations directly in the parent document as an inline subdocument containing the full related object (all pure fields + `_id`). This means:
+
+- **No performance penalty**: A `type: "single"` relation is just a nested object in the same document. Reading it requires zero additional queries or joins.
+- **Fully indexable**: You can create MongoDB indexes on relation sub-fields like `relatedModel._id` or `relatedModel.name` just as you would on any top-level field.
+- **No denormalization needed for performance**: Storing `relatedModelId` and `relatedModelName` as separate pure fields provides no query or speed advantage over a single Lesan relation — the data lives in the same document either way.
+
+Use Lesan relations by default for single-model references. Only resort to pure-field IDs/names when the referenced model may be deleted and you need the reference to survive (orphan resilience), or when the data must be an immutable snapshot that should not track source-of-truth updates.
+
 ### Denormalized Hierarchy Pattern
 Ware and Stuff models use denormalized relations to WareType, WareClass, WareGroup, and WareModel. Unit.organization is also denormalized. This enables:
 - Filtering by any level of the hierarchy without joins
@@ -621,6 +631,7 @@ Manufacturer
   └── (wares via relatedRelations from ware.manufacturer) [multiple]
 
 WareType
+  ├── creator (User) [single]
   └── (wareClasses via relatedRelations from wareClass.wareType) [multiple]
   └── (wareGroups via relatedRelations from wareGroup.wareType) [multiple]
   └── (wareModels via relatedRelations from wareModel.wareType) [multiple]
@@ -628,6 +639,7 @@ WareType
   └── (stuffs via relatedRelations from stuff.wareType) [multiple]
 
 WareClass
+  ├── creator (User) [single]
   ├── wareType (WareType) [single]
   ├── wareGroups (WareGroup) [multiple, M:N via wareGroup.wareClasses]
   ├── wareModels (WareModel) [multiple]
@@ -635,6 +647,7 @@ WareClass
   └── stuffs (Stuff) [multiple]
 
 WareGroup
+  ├── creator (User) [single]
   ├── wareType (WareType) [single]
   ├── wareClasses (WareClass) [multiple, M:N, limit: 50]
   ├── wareModels (WareModel) [multiple]
@@ -642,6 +655,7 @@ WareGroup
   └── stuffs (Stuff) [multiple]
 
 WareModel
+  ├── creator (User) [single]
   ├── wareType (WareType) [single]
   ├── wareClass (WareClass) [single]
   ├── wareGroup (WareGroup) [single]
@@ -649,6 +663,7 @@ WareModel
   └── stuffs (Stuff) [multiple]
 
 Ware
+  ├── creator (User) [single]
   ├── manufacturer (Manufacturer) [single, optional]
   ├── wareType (WareType) [single]
   ├── wareClass (WareClass) [single]
@@ -668,21 +683,26 @@ Store
   ├── storeHead (User) [single, optional]
   ├── city (City) [single, optional]
   ├── state (State) [single, optional]
-  ├── wareTypes (WareType) [multiple, M:N]
-  └── purchaseOrderItems (PurchaseOrderItem) [multiple, optional — assigned PO items]
+  └── wareTypes (WareType) [multiple, M:N]
+  └── (purchaseOrderItems auto-generated from purchaseOrderItem.assignedFrom via Lesan) [multiple, optional]
 
 Inventory
   ├── unit (Unit) [single — inventory owner]
-  └── warehouseUnit (Unit) [single, optional — org warehouse]
+  ├── warehouseUnit (Unit) [single, optional — org warehouse]
+  ├── wareModel (WareModel) [single]
+  └── ware (Ware) [single, optional]
 
 StockMovement
   ├── unit (Unit) [single]
-  └── createdBy (User) [single]
+  ├── createdBy (User) [single]
+  └── store (Store) [single, optional]
 
 ConsumptionRecord
   ├── unit (Unit) [single]
   ├── consumedBy (User) [single]
-  └── inventory (Inventory) [single, optional]
+  ├── inventory (Inventory) [single, optional]
+  ├── wareModel (WareModel) [single]
+  └── ware (Ware) [single, optional]
 ```
 
 ### Budget & Finance Relation Map
@@ -698,7 +718,7 @@ BudgetLine
   ├── wareType (WareType) [single, optional]
   ├── allocations (BudgetAllocation) [multiple]
   ├── encumbrances (BudgetEncumbrance) [multiple]
-  └── purchasingRequests (PurchasingRequest) [multiple, optional]
+  └── (purchasingRequests auto-generated from purchasingRequest.budgetLine via Lesan) [multiple, optional]
 
 BudgetAllocation
   ├── budgetLine (BudgetLine) [single]
