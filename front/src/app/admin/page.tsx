@@ -40,7 +40,7 @@ export default function AdminDashboard() {
     <div className="space-y-8">
       {/* Page Header */}
       <div className="relative">
-        <div className="blueprint-glow h-24 absolute inset-x-0 top-0 pointer-events-none" />
+        <div className="blueprint-radial-glow h-32 absolute inset-x-0 top-0 pointer-events-none" />
         <PageHeader
           title="داشبورد"
           description="خلاصه وضعیت سامانه"
@@ -52,11 +52,11 @@ export default function AdminDashboard() {
         {stats.map((stat) => {
           const Icon = stat.icon
           return (
-            <Card key={stat.label} className="relative overflow-hidden">
+            <Card key={stat.label} className="relative overflow-hidden glass-card glass-card-hover">
               <div className="absolute inset-0 bg-gradient-to-br from-frost-link/[0.03] to-transparent pointer-events-none" />
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-electric-iris/10">
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-electric-iris/10 ring-1 ring-inset ring-electric-iris/15">
                     <Icon className="size-5 text-electric-iris" />
                   </div>
                   <CardTitle className="text-sm font-medium text-fog leading-5">
@@ -77,7 +77,7 @@ export default function AdminDashboard() {
 
       {/* Quick Actions & System Status */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
+        <Card className="glass-card glass-card-hover">
           <CardHeader className="pb-3">
             <p className="text-caption font-medium text-fog tracking-wide leading-4">دسترسی سریع</p>
             <CardTitle className="text-base font-medium text-frost-link mt-1 leading-6">
@@ -93,7 +93,7 @@ export default function AdminDashboard() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="gap-2 rounded-full text-moonlight h-9"
+                      className="gap-2 rounded-full text-moonlight h-9 transition-all duration-200 hover:bg-white/[0.04] hover:text-glacier active:scale-[0.97]"
                     >
                       <Icon className="size-4" />
                       {action.label}
@@ -105,7 +105,7 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-card glass-card-hover">
           <CardHeader className="pb-3">
             <p className="text-caption font-medium text-fog tracking-wide leading-4">وضعیت سامانه</p>
             <CardTitle className="text-base font-medium text-frost-link mt-1 leading-6">
