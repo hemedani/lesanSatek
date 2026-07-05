@@ -92,6 +92,8 @@
   --radius-3xl-2: 28px;
   --radius-3xl-3: 44px;
   --radius-full: 999px;
+
+  --animate-slow-drift: slow-drift 20s ease-in-out infinite;
   --radius-full-2: 4999.5px;
   --radius-full-3: 9999px;
 
@@ -384,6 +386,17 @@
   filter: blur(100px);
   animation: blob-float 20s ease-in-out infinite alternate;
   pointer-events: none;
+}
+
+/* ── Slow Drift (for Digital Aurora moving gradient) ────── */
+
+@keyframes slow-drift {
+  0%, 100% {
+    transform: translate(0px, 0px);
+  }
+  50% {
+    transform: translate(-40px, 30px);
+  }
 }
 
 /* ── Blueprint Shimmer (for skeleton loading) ────────────── */
