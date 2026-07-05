@@ -11,5 +11,11 @@ export const addFn: ActFn = async (body) => {
 	return await wareType.insertOne({
 		doc: stripActiveRole(set),
 		projection: get,
+		relations: {
+			creator: {
+				_ids: user._id,
+				relatedRelations: {},
+			},
+		},
 	});
 };

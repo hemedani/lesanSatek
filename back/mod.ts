@@ -37,7 +37,7 @@ import {
 import { functionsSetup } from "./src/mod.ts";
 
 const MONGO_URI = Deno.env.get("MONGO_URI") || "mongodb://127.0.0.1:27017/";
-const APP_PORT = Deno.env.get("APP_PORT") || 1405;
+const APP_PORT = Deno.env.get("APP_PORT") || 1370;
 const ENV = Deno.env.get("ENV") || "development";
 
 export const coreApp = lesan();

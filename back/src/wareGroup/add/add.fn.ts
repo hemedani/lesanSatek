@@ -1,12 +1,18 @@
 import { type ActFn, ObjectId } from "lesan";
-import { wareGroup } from "../../../mod.ts";
+import { wareGroup, coreApp } from "../../../mod.ts";
+import type { MyContext } from "@lib";
 
 export const addFn: ActFn = async (body) => {
 	const { set, get } = body.details;
+	const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
 
 	const { activeRoleId, wareTypeId, wareClassIds, ...rest } = set;
 
 	const relations: Record<string, unknown> = {
+		creator: {
+			_ids: user._id,
+			relatedRelations: {},
+		},
 		wareType: {
 			_ids: new ObjectId(wareTypeId as string),
 			relatedRelations: {

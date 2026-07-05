@@ -79,6 +79,10 @@ export const awardFn: ActFn = async (body) => {
       _ids: new ObjectId(prRef),
       relatedRelations: { purchaseOrderItems: true },
     },
+    wareModel: {
+      _ids: new ObjectId(wareModelId),
+      relatedRelations: { purchaseOrderItems: true },
+    },
   };
 
   if (winningStoreId) {
@@ -100,8 +104,6 @@ export const awardFn: ActFn = async (body) => {
 
   await purchaseOrderItem.insertOne({
     doc: {
-      wareModelId,
-      wareModelName,
       quantity,
       unitPrice: offerPrice,
       totalPrice: offerPrice * quantity,
@@ -145,6 +147,21 @@ export const awardFn: ActFn = async (body) => {
     },
     projection: { _id: 1 },
   });
+
+  // Auto-populate store on the PR
+  if (winningStoreId) {
+    await purchasingRequest.addRelation({
+      filters: { _id: new ObjectId(prRef) },
+      relations: {
+        store: {
+          _ids: new ObjectId(winningStoreId),
+          relatedRelations: { purchasingRequests: true },
+        },
+      },
+      projection: { _id: 1 },
+      replace: true,
+    });
+  }
 
   // Mark tender as awarded
   return await tender.findOneAndUpdate({
