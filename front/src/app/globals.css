@@ -210,7 +210,15 @@
   background-size: 40px 40px;
 }
 
-/* ── Admin Canvas (blueprint grid + midnight ink + glow) ── */
+/* ── Subtle animated background shift ──── */
+
+@keyframes bg-shift {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+/* ── Admin Canvas (midnight ink + light grid + soft glow + animated depth) ── */
 
 @utility admin-canvas {
   background-color: var(--color-midnight-ink);
@@ -224,23 +232,73 @@
     40px 40px;
 }
 
+@utility admin-canvas-animated {
+  background-color: var(--color-midnight-ink);
+  background-image:
+    radial-gradient(ellipse 60% 40% at 20% 20%, rgba(15, 23, 42, 0.6) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 30% at 80% 70%, rgba(30, 41, 59, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 50% at 50% 50%, rgba(15, 20, 35, 0.3) 0%, transparent 50%),
+    linear-gradient(rgba(186, 215, 247, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(186, 215, 247, 0.03) 1px, transparent 1px);
+  background-size:
+    200% 200%,
+    200% 200%,
+    200% 200%,
+    40px 40px,
+    40px 40px;
+  animation: bg-shift 45s ease-in-out infinite alternate;
+}
+
 /* ── Blueprint Glow Wash ────────────────────────────────── */
 
 @utility blueprint-glow {
   background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(186, 207, 247, 0.15) 0%, transparent 70%);
 }
 
+/* ── Blueprint Radial Glow (deeper, for behind panels) ──── */
+
+@utility blueprint-radial-glow {
+  background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(186, 207, 247, 0.12) 0%, transparent 70%);
+}
+
 /* ── Glass Card (crystalline frosted glass surface) ─────── */
 
 @utility glass-card {
-  background-color: rgba(47, 52, 62, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background-color: rgba(47, 52, 62, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(186, 215, 247, 0.08);
   box-shadow:
     0 0 0 1px rgba(186, 215, 247, 0.12) inset,
+    0 1px 1px 0 rgba(199, 211, 234, 0.08) inset,
     0 0 48px -8px rgba(186, 207, 247, 0.06) inset,
     0 24px 48px -12px rgba(0, 0, 0, 0.6);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@utility glass-card-hover {
+  &:hover {
+    border-color: rgba(186, 215, 247, 0.15);
+    box-shadow:
+      0 0 0 1px rgba(186, 215, 247, 0.16) inset,
+      0 1px 1px 0 rgba(199, 211, 234, 0.1) inset,
+      0 0 56px -8px rgba(186, 207, 247, 0.1) inset,
+      0 24px 48px -12px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* ── Glass Dialog (premium overlay surface) ─────────────── */
+
+@utility glass-dialog {
+  background-color: rgba(47, 52, 62, 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(186, 215, 247, 0.1);
+  box-shadow:
+    0 0 0 1px rgba(186, 215, 247, 0.12) inset,
+    0 1px 1px 0 rgba(199, 211, 234, 0.08) inset,
+    0 0 80px -16px rgba(186, 207, 247, 0.08) inset,
+    0 32px 64px -16px rgba(0, 0, 0, 0.7);
 }
 
 /* ── Glass Header (for sticky top bars) ─────────────────── */
