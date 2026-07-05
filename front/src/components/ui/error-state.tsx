@@ -18,7 +18,7 @@ function ErrorState({
   className,
 }: ErrorStateProps) {
   return (
-    <div className={cn("flex flex-col items-center justify-center py-12 px-6 text-center rounded-lg bg-graphite-plate shadow-subtle-4 border border-ember/20", className)}>
+    <div className={cn("flex flex-col items-center justify-center py-12 px-6 text-center rounded-lg glass-card border-ember/20", className)}>
       <AlertTriangle className="size-10 text-ember mb-3" />
       <h3 className="text-sm font-medium text-moonlight">{title}</h3>
       <p className="mt-1 text-sm text-fog max-w-xs">{message}</p>
