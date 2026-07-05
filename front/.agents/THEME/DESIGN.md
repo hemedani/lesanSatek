@@ -178,6 +178,15 @@ Four 12px squares, 2px radius, filled with Electric Iris, Ember, Azure, and Ciph
 
 1px lines in rgba(186, 215, 247, 0.04) forming a ~40px square grid. Plus a radial blue glow at the top center using the Blueprint Glow palette, and thin conic gradient borders around the hero frame. The grid is the 'blueprint' in the north star — it makes the page feel drafted, not designed.
 
+### Digital Aurora (Admin Background — Option A)
+**Role:** Fixed canvas layer behind admin content. Replaces animated blobs for better GPU performance.
+
+- Base: `#05060f` (Midnight Ink)
+- Static low-opacity radial gradient at bottom-center: `bg-[#663af3]/5` with `blur-3xl`
+- Moving radial gradient at top-right: `bg-[#3b8bfd]/5` with `blur-3xl` and `animate-slow-drift` (20s translateX)
+- Subtle SVG dot-grid texture at `opacity-40` (60px squares, 3% white dots)
+- No `filter: blur()` on the moving element — uses `blur-3xl` (CSS `filter`) with `will-change-transform` for GPU acceleration
+
 ### Hero Wordmark Lockup
 **Role:** Centered 'AuthKit' display headline with eyebrow above and subtitle below.
 
@@ -314,6 +323,10 @@ These `@utility` classes were implemented alongside the theme tokens and are use
   /* 60vw, blur(100px), blob-float — animated gradient orb for background depth */
 }
 
+@keyframes slow-drift {
+  /* translate(0,0)→(-40px,30px)→(0,0) over 20s, ease-in-out, infinite — Digital Aurora moving gradient */
+}
+
 @keyframes blueprint-shimmer {
   /* background-position -200% → 200% over 2s — skeleton loading effect */
 }
@@ -351,11 +364,37 @@ The following shadcn/ui components were aligned to AuthKit tokens during the adm
 
 ### Admin Panel Page Patterns
 
-**Page wrapper:** `<div className="admin-canvas-animated relative flex h-screen overflow-hidden">` with 3 `blob` divs for animated gradient depth. The `admin-canvas-animated` utility layers a 45s subtle background-position shift between deep midnight blue tones, creating quiet ambient depth.
+**Page wrapper:** Digital Aurora fixed canvas layer (no animated blobs — replaced for GPU performance):
+
+```tsx
+<div className="relative flex h-screen overflow-hidden bg-[#05060f]">
+  {/* Digital Aurora canvas */}
+  <div className="fixed inset-0 -z-10 bg-[#05060f]" aria-hidden="true">
+    {/* Static bottom-center Electric Iris glow */}
+    <div className="absolute bottom-0 left-1/2 h-[600px] w-[800px] -translate-x-1/2 translate-y-1/3 rounded-full bg-[#663af3]/5 blur-3xl will-change-transform" />
+    {/* Animated top-right blue glow */}
+    <div className="absolute right-0 top-0 h-[400px] w-[600px] animate-slow-drift rounded-full bg-[#3b8bfd]/5 blur-3xl will-change-transform" />
+    {/* Subtle dot-grid texture */}
+    <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,...')] bg-[length:60px_60px] opacity-40" />
+  </div>
+  ...
+</div>
+```
+
+Animated gradient uses `translateX` only (no `filter: blur()` on the animated element — `blur-3xl` is baked into the static `bg-*` class), paired with `will-change-transform` for GPU acceleration. The `@keyframes slow-drift` animation shifts the top-right glow 20s ease-in-out infinite.
+
+**Card styling:** Never use `bg-card shadow-subtle-4` in the admin route. Apply this exact class to card wrappers:
+```
+bg-[rgba(47,52,62,0.55)] backdrop-blur-[16px] border border-white/8
+shadow-[inset_0_0_48px_rgba(186,207,247,0.06),inset_0_1px_0_rgba(199,211,234,0.12),0_32px_64px_-32px_rgba(5,6,15,0.85)]
+transition-all duration-200
+hover:border-white/15
+hover:shadow-[inset_0_0_48px_rgba(186,207,247,0.10),inset_0_1px_0_rgba(199,211,234,0.18),0_32px_64px_-32px_rgba(5,6,15,0.9)]
+```
 
 **Content fade-in:** `<main className="... animate-in fade-in duration-300">` on the admin layout main element.
 
-**Dashboard layout:** 4 KPI cards in `grid gap-4 sm:grid-cols-2 lg:grid-cols-4` with `shadow-subtle-4`, Frost Link icons, Glacier heading-sm values, Fog labels, and hairline bottom gradient accent. Quick Actions in ghost pill buttons (`rounded-full`). System status via `StatusBadge`.
+**Dashboard layout:** 4 KPI cards in `grid gap-4 sm:grid-cols-2 lg:grid-cols-4` with the glass-card elevation stack above, Frost Link icons, Glacier heading-sm values, Fog labels, and hairline bottom gradient accent. Quick Actions in ghost pill buttons (`rounded-full`). System status via `StatusBadge`.
 
 **Data list pages:** `PageHeader` (Glacier heading-sm, Fog body-sm, `border-b border-steel-border/50`) → `FilterBar` → `DataTable` (glass-card container, responsive: table on desktop ↔ card list on mobile via `cardView` toggle + custom `renderCard`) → `Pagination` (responsive: stacked on mobile, horizontal on sm+).
 
@@ -505,10 +544,18 @@ The following shadcn/ui components were aligned to AuthKit tokens during the adm
   --shadow-subtle-6: rgba(216, 236, 248, 0.2) 0px 1px 1px 0px inset, rgba(168, 216, 245, 0.06) 0px 24px 48px 0px inset, rgba(0, 0, 0, 0.3) 0px 16px 32px 0px;
   --shadow-subtle-7: rgba(216, 236, 248, 0.2) 0px 1px 1px 0px inset, rgba(168, 216, 245, 0.06) 0px 24px 48px 0px inset;
 
+  /* Animations */
+  --animate-slow-drift: slow-drift 20s ease-in-out infinite;
+
   /* Surfaces */
   --surface-canvas: #05060f;
   --surface-plate: #2f343;
   --surface-iris-lift: #663af3;
+}
+
+@keyframes slow-drift {
+  0%, 100% { transform: translate(0px, 0px); }
+  50% { transform: translate(-40px, 30px); }
 }
 ```
 
@@ -585,6 +632,9 @@ The following shadcn/ui components were aligned to AuthKit tokens during the adm
   --radius-full: 999px;
   --radius-full-2: 4999.5px;
   --radius-full-3: 9999px;
+
+  /* Animations */
+  --animate-slow-drift: slow-drift 20s ease-in-out infinite;
 
   /* Shadows */
   --shadow-sm: rgba(186, 207, 247, 0.32) 0px 0px 6px 0px;

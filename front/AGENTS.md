@@ -351,6 +351,32 @@ Server actions rely on:
 
 ## Admin Panel Best Practices
 
+### Admin Background & Card Conventions
+
+**Background (Digital Aurora):** Replace the old `admin-canvas-animated` + 3 `blob` divs with a fixed canvas layer:
+```tsx
+<div className="relative flex h-screen overflow-hidden bg-[#05060f]">
+  <div className="fixed inset-0 -z-10 bg-[#05060f]" aria-hidden="true">
+    <div className="absolute bottom-0 left-1/2 h-[600px] w-[800px] -translate-x-1/2 translate-y-1/3 rounded-full bg-[#663af3]/5 blur-3xl will-change-transform" />
+    <div className="absolute right-0 top-0 h-[400px] w-[600px] animate-slow-drift rounded-full bg-[#3b8bfd]/5 blur-3xl will-change-transform" />
+    <div className="absolute inset-0 bg-[url('...')] bg-[length:60px_60px] opacity-40" />
+  </div>
+  ...
+</div>
+```
+
+**Card styling in admin:** Never use `bg-card` or `shadow-subtle-4` directly on card wrappers in the admin route. Apply the exact glass-card elevation stack:
+```
+bg-[rgba(47,52,62,0.55)] backdrop-blur-[16px] border border-white/8
+shadow-[inset_0_0_48px_rgba(186,207,247,0.06),inset_0_1px_0_rgba(199,211,234,0.12),0_32px_64px_-32px_rgba(5,6,15,0.85)]
+transition-all duration-200
+hover:border-white/15
+hover:shadow-[inset_0_0_48px_rgba(186,207,247,0.10),inset_0_1px_0_rgba(199,211,234,0.18),0_32px_64px_-32px_rgba(5,6,15,0.9)]
+```
+This ensures the glass backdrop-blur works (parent must have `relative` stacking context) and prevents generic shadcn defaults from overriding the AuthKit elevation.
+
+**Input focus state in admin:** Use `focus:border-[#663af3] focus:ring-1 focus:ring-[#663af3]/20` — 2px Electric Iris border without heavy outer glow ring. The Input component is already configured globally.
+
 ### Standard Page Pattern (Server Component)
 
 Every admin listing page follows this structure:
@@ -386,7 +412,7 @@ const [cardView, setCardView] = useState(false);
   cardView={cardView}
   onViewToggle={() => setCardView((v) => !v)}
   renderCard={(item) => (
-    <div className="glass-card glass-card-hover rounded-xl p-4 space-y-3">
+    <div className="rounded-xl bg-[rgba(47,52,62,0.55)] backdrop-blur-[16px] border border-white/8 shadow-[inset_0_0_48px_rgba(186,207,247,0.06),inset_0_1px_0_rgba(199,211,234,0.12),0_32px_64px_-32px_rgba(5,6,15,0.85)] transition-all duration-200 hover:border-white/15 hover:shadow-[inset_0_0_48px_rgba(186,207,247,0.10),inset_0_1px_0_rgba(199,211,234,0.18),0_32px_64px_-32px_rgba(5,6,15,0.9)] p-4 space-y-3">
       {/* Card content matching column structure */}
     </div>
   )}
