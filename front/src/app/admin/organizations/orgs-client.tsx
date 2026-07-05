@@ -120,21 +120,17 @@ export function OrganizationsClient({
         aria-hidden="true"
       />
       <div className="relative z-[1]">
-        <div className="conic-border-top pb-4">
-          <div className="blueprint-glow h-16 absolute inset-x-0 top-0 pointer-events-none" />
-          <PageHeader
-            title="سازمان‌ها"
-            description="مدیریت سازمان‌های فعال در سامانه"
-            className="border-none pb-0 mb-0"
-          >
-            <Link href="/admin/organizations/add">
-              <Button size="sm" className="gap-1.5">
-                <Plus className="size-4" />
-                سازمان جدید
-              </Button>
-            </Link>
-          </PageHeader>
-        </div>
+        <PageHeader
+          title="سازمان‌ها"
+          description="مدیریت سازمان‌های فعال در سامانه"
+        >
+          <Link href="/admin/organizations/add">
+            <Button size="sm" className="gap-1.5">
+              <Plus className="size-4" />
+              سازمان جدید
+            </Button>
+          </Link>
+        </PageHeader>
       </div>
 
       <FilterBar

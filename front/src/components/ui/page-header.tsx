@@ -9,7 +9,7 @@ interface PageHeaderProps {
 
 function PageHeader({ title, description, children, className }: PageHeaderProps) {
   return (
-    <div className={cn("flex flex-col gap-1 mb-6 pb-4 border-b border-steel-border/50 sm:flex-row sm:items-center sm:justify-between", className)}>
+    <div className={cn("flex flex-col gap-1 mb-8 pb-5 border-b border-steel-border/50 sm:flex-row sm:items-center sm:justify-between", className)}>
       <div>
         <h1 className="text-heading-sm font-medium text-glacier">{title}</h1>
         {description && (

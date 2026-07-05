@@ -45,23 +45,25 @@ function Breadcrumbs({ className }: { className?: string }) {
   })
 
   return (
-    <nav className={cn("flex items-center gap-1.5 text-sm", className)}>
+    <nav className={cn("flex items-center gap-1.5 text-sm sm:text-base", className)}>
       {crumbs.map((crumb) => (
-        <span key={crumb.href} className="flex items-center gap-1">
+        <div key={crumb.href} className="flex items-center">
           {!crumb.isLast ? (
             <Link
               href={crumb.href}
-              className="text-fog hover:text-moonlight transition-colors"
+              className="flex items-center rounded-md px-2.5 py-1.5 text-fog hover:text-moonlight hover:bg-white/[0.04] transition-colors"
             >
               {crumb.label}
             </Link>
           ) : (
-            <span className="text-moonlight font-medium">{crumb.label}</span>
+            <span className="flex items-center px-2.5 py-1.5 text-moonlight font-medium">
+              {crumb.label}
+            </span>
           )}
           {!crumb.isLast && (
-            <ChevronLeft className="size-3.5 text-fog rtl:rotate-180" />
+            <ChevronLeft className="size-4 text-fog/60 rtl:rotate-180 shrink-0" />
           )}
-        </span>
+        </div>
       ))}
     </nav>
   )

@@ -22,7 +22,7 @@ interface FilterBarProps {
   onSearchChange: (value: string) => void
   searchPlaceholder?: string
   status?: string
-  onStatusChange?: (value: string) => void
+  onStatusChange?: (value: string | null) => void
   statusOptions?: FilterOption[]
   onReset?: () => void
   children?: React.ReactNode
@@ -54,12 +54,11 @@ function FilterBar({
         <Select
           value={status || ""}
           onValueChange={onStatusChange}
-          dir="rtl"
         >
-          <SelectTrigger className="w-36 h-8 text-sm" dir="rtl">
+          <SelectTrigger className="w-36 h-8 text-sm">
             <SelectValue placeholder="همه وضعیت‌ها" />
           </SelectTrigger>
-          <SelectContent dir="rtl">
+          <SelectContent>
             {statusOptions.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>
                 {opt.label}
