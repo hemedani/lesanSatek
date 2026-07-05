@@ -6,10 +6,6 @@ export const addValidator = () => {
   return object({
     set: object({
       ...activeRoleMixin,
-      wareModelId: string(),
-      wareModelName: string(),
-      wareId: optional(string()),
-      wareName: optional(string()),
       quantity: defaulted(number(), 0),
       minQuantity: optional(number()),
       maxQuantity: optional(number()),
@@ -19,6 +15,8 @@ export const addValidator = () => {
       lastCountedAt: optional(coerce(date(), string(), (value) => new Date(value))),
       unitId: objectIdValidation,
       warehouseUnitId: optional(objectIdValidation),
+      wareModelId: objectIdValidation,
+      wareId: optional(objectIdValidation),
     }),
     get: selectStruct("inventory", 1),
   });

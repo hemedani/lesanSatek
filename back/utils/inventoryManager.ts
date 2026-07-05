@@ -7,12 +7,12 @@ type StockOptions = {
   referenceType?: string;
   referenceId?: string;
   description?: string;
+  storeId?: string;
 };
 
 export async function addStock(
   unitId: string,
   wareModelId: string,
-  wareModelName: string,
   quantity: number,
   reason: string,
   createdByUserId: string,
@@ -21,9 +21,9 @@ export async function addStock(
   const existing = await inventory.findOne({
     filters: {
       unit: new ObjectId(unitId),
-      wareModelId,
+      "wareModel._id": new ObjectId(wareModelId),
     },
-    projection: { _id: 1, quantity: 1, wareModelId: 1 },
+    projection: { _id: 1, quantity: 1 },
   }) as Document;
 
   let balanceBefore = 0;
@@ -35,40 +35,68 @@ export async function addStock(
       update: {
         $inc: { quantity },
         $set: { updatedAt: new Date() },
-        $setOnInsert: {
-          wareModelName,
-          unit: new ObjectId(unitId),
-        },
       },
       projection: { _id: 1, quantity: 1 },
     });
   } else {
+    const inventoryRelations: Record<string, unknown> = {
+      unit: {
+        _ids: new ObjectId(unitId),
+        relatedRelations: { inventories: true },
+      },
+      wareModel: {
+        _ids: new ObjectId(wareModelId),
+        relatedRelations: { inventories: true },
+      },
+    };
+    if (options?.wareId) {
+      inventoryRelations.ware = {
+        _ids: new ObjectId(options.wareId),
+        relatedRelations: { inventories: true },
+      };
+    }
     await inventory.insertOne({
       doc: {
-        wareModelId,
-        wareModelName,
         quantity,
-        ...(options?.wareId && { wareId: options.wareId }),
-        ...(options?.wareName && { wareName: options.wareName }),
       },
-      relations: {
-        unit: {
-          _ids: new ObjectId(unitId),
-          relatedRelations: { inventories: true },
-        },
-      },
+      relations: inventoryRelations,
       projection: { _id: 1, quantity: 1 },
     });
   }
 
   const balanceAfter = balanceBefore + quantity;
 
+  const stockMovementRelations: Record<string, unknown> = {
+    unit: {
+      _ids: new ObjectId(unitId),
+      relatedRelations: { stockMovements: true },
+    },
+    createdBy: {
+      _ids: new ObjectId(createdByUserId),
+      relatedRelations: { createdStockMovements: true },
+    },
+    wareModel: {
+      _ids: new ObjectId(wareModelId),
+      relatedRelations: { stockMovements: true },
+    },
+  };
+
+  if (options?.wareId) {
+    stockMovementRelations.ware = {
+      _ids: new ObjectId(options.wareId),
+      relatedRelations: { stockMovements: true },
+    };
+  }
+
+  if (options?.storeId) {
+    stockMovementRelations.store = {
+      _ids: new ObjectId(options.storeId),
+      relatedRelations: { stockMovements: true },
+    };
+  }
+
   await stockMovement.insertOne({
     doc: {
-      wareModelId,
-      wareModelName,
-      ...(options?.wareId && { wareId: options.wareId }),
-      ...(options?.wareName && { wareName: options.wareName }),
       quantity,
       balanceBefore,
       balanceAfter,
@@ -77,16 +105,7 @@ export async function addStock(
       ...(options?.referenceId && { referenceId: options.referenceId }),
       ...(options?.description && { description: options.description }),
     },
-    relations: {
-      unit: {
-        _ids: new ObjectId(unitId),
-        relatedRelations: { stockMovements: true },
-      },
-      createdBy: {
-        _ids: new ObjectId(createdByUserId),
-        relatedRelations: { createdStockMovements: true },
-      },
-    },
+    relations: stockMovementRelations,
     projection: { _id: 1, quantity: 1, balanceBefore: 1, balanceAfter: 1 },
   });
 
@@ -96,7 +115,6 @@ export async function addStock(
 export async function removeStock(
   unitId: string,
   wareModelId: string,
-  wareModelName: string,
   quantity: number,
   reason: string,
   createdByUserId: string,
@@ -105,7 +123,7 @@ export async function removeStock(
   const existing = await inventory.findOne({
     filters: {
       unit: new ObjectId(unitId),
-      wareModelId,
+      "wareModel._id": new ObjectId(wareModelId),
     },
     projection: { _id: 1, quantity: 1 },
   }) as Document;
@@ -133,12 +151,37 @@ export async function removeStock(
 
   const balanceAfter = balanceBefore - quantity;
 
+  const stockMovementRelations: Record<string, unknown> = {
+    unit: {
+      _ids: new ObjectId(unitId),
+      relatedRelations: { stockMovements: true },
+    },
+    createdBy: {
+      _ids: new ObjectId(createdByUserId),
+      relatedRelations: { createdStockMovements: true },
+    },
+    wareModel: {
+      _ids: new ObjectId(wareModelId),
+      relatedRelations: { stockMovements: true },
+    },
+  };
+
+  if (options?.wareId) {
+    stockMovementRelations.ware = {
+      _ids: new ObjectId(options.wareId),
+      relatedRelations: { stockMovements: true },
+    };
+  }
+
+  if (options?.storeId) {
+    stockMovementRelations.store = {
+      _ids: new ObjectId(options.storeId),
+      relatedRelations: { stockMovements: true },
+    };
+  }
+
   await stockMovement.insertOne({
     doc: {
-      wareModelId,
-      wareModelName,
-      ...(options?.wareId && { wareId: options.wareId }),
-      ...(options?.wareName && { wareName: options.wareName }),
       quantity: negQuantity,
       balanceBefore,
       balanceAfter,
@@ -147,16 +190,7 @@ export async function removeStock(
       ...(options?.referenceId && { referenceId: options.referenceId }),
       ...(options?.description && { description: options.description }),
     },
-    relations: {
-      unit: {
-        _ids: new ObjectId(unitId),
-        relatedRelations: { stockMovements: true },
-      },
-      createdBy: {
-        _ids: new ObjectId(createdByUserId),
-        relatedRelations: { createdStockMovements: true },
-      },
-    },
+    relations: stockMovementRelations,
     projection: { _id: 1, quantity: 1, balanceBefore: 1, balanceAfter: 1 },
   });
 
@@ -167,19 +201,18 @@ export async function transferStock(
   fromUnitId: string,
   toUnitId: string,
   wareModelId: string,
-  wareModelName: string,
   quantity: number,
   createdByUserId: string,
   options?: StockOptions,
 ): Promise<Document> {
-  await removeStock(fromUnitId, wareModelId, wareModelName, quantity, "transfer_out", createdByUserId, {
+  await removeStock(fromUnitId, wareModelId, quantity, "transfer_out", createdByUserId, {
     ...options,
     referenceType: options?.referenceType || "unit",
     referenceId: options?.referenceId || toUnitId,
     description: options?.description || `Transfer to unit ${toUnitId}`,
   });
 
-  await addStock(toUnitId, wareModelId, wareModelName, quantity, "transfer_in", createdByUserId, {
+  await addStock(toUnitId, wareModelId, quantity, "transfer_in", createdByUserId, {
     ...options,
     referenceType: options?.referenceType || "unit",
     referenceId: options?.referenceId || fromUnitId,
@@ -196,12 +229,10 @@ export async function getStockLevel(
   const result = await inventory.findOne({
     filters: {
       unit: new ObjectId(unitId),
-      wareModelId,
+      "wareModel._id": new ObjectId(wareModelId),
     },
     projection: {
       _id: 1,
-      wareModelId: 1,
-      wareModelName: 1,
       quantity: 1,
       minQuantity: 1,
       maxQuantity: 1,
@@ -209,10 +240,11 @@ export async function getStockLevel(
       expirationDate: 1,
       location: 1,
       unit: 1,
+      wareModel: 1,
     },
   });
 
-  return (result as Document) || { quantity: 0, wareModelId };
+  return (result as Document) || { quantity: 0 };
 }
 
 export async function getWarehouseDashboard(
@@ -225,9 +257,8 @@ export async function getWarehouseDashboard(
       { warehouseUnit: new ObjectId(warehouseUnitId) },
     ],
   };
-
   if (wareModelId) {
-    match.wareModelId = wareModelId;
+    match["wareModel._id"] = new ObjectId(wareModelId);
   }
 
   const results = await inventory
@@ -246,8 +277,7 @@ export async function getWarehouseDashboard(
         {
           $project: {
             _id: 1,
-            wareModelId: 1,
-            wareModelName: 1,
+            wareModel: 1,
             quantity: 1,
             minQuantity: 1,
             maxQuantity: 1,
@@ -257,12 +287,10 @@ export async function getWarehouseDashboard(
             unitType: "$unitInfo.type",
           },
         },
-        { $sort: { wareModelName: 1 } },
+        { $sort: { "wareModel.name": 1 } },
       ],
       projection: {
         _id: 1,
-        wareModelId: 1,
-        wareModelName: 1,
         quantity: 1,
         minQuantity: 1,
         maxQuantity: 1,

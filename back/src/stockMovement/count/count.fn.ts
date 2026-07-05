@@ -1,4 +1,4 @@
-import type { ActFn, Document } from "lesan";
+import { type ActFn, type Document, ObjectId } from "lesan";
 import { stockMovement } from "../../../mod.ts";
 
 export const countFn: ActFn = async (body) => {
@@ -10,7 +10,7 @@ export const countFn: ActFn = async (body) => {
   const filters: Document = {};
 
   unitId && (filters["unit"] = unitId);
-  wareModelId && (filters["wareModelId"] = wareModelId);
+  wareModelId && (filters["wareModel._id"] = new ObjectId(wareModelId));
   reason && (filters["reason"] = reason);
   referenceType && (filters["referenceType"] = referenceType);
   referenceId && (filters["referenceId"] = referenceId);

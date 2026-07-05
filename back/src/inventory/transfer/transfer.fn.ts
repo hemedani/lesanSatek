@@ -10,9 +10,9 @@ export const transferFn: ActFn = async (body) => {
   const fromInv = await inventory.findOne({
     filters: {
       unit: new ObjectId(fromUnitId as string),
-      wareModelId: wareModelId as string,
+      "wareModel._id": new ObjectId(wareModelId as string),
     },
-    projection: { _id: 1, unit: 1, wareModelId: 1, quantity: 1 } as Document,
+    projection: { _id: 1, unit: 1, quantity: 1 } as Document,
   }) as Document;
 
   if (!fromInv) {
@@ -35,7 +35,7 @@ export const transferFn: ActFn = async (body) => {
   const toInv = await inventory.findOne({
     filters: {
       unit: new ObjectId(toUnitId as string),
-      wareModelId: wareModelId as string,
+      "wareModel._id": new ObjectId(wareModelId as string),
     },
     projection: { _id: 1, quantity: 1 } as Document,
   }) as Document;
@@ -54,7 +54,7 @@ export const transferFn: ActFn = async (body) => {
   return await inventory
     .aggregation({
       pipeline: [
-        { $match: { unit: new ObjectId(fromUnitId as string), wareModelId: wareModelId as string } },
+        { $match: { unit: new ObjectId(fromUnitId as string), "wareModel._id": new ObjectId(wareModelId as string) } },
       ],
       projection: get,
     })

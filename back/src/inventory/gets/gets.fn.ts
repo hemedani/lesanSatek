@@ -19,7 +19,7 @@ export const getsFn: ActFn = async (body) => {
   const pipeline: Document[] = [];
 
   const match: Document = {};
-  wareModelId && (match.wareModelId = wareModelId);
+  wareModelId && (match["wareModel._id"] = new ObjectId(wareModelId));
   unitId && (match.unit = new ObjectId(unitId as string));
   warehouseUnitId && (match.warehouseUnit = new ObjectId(warehouseUnitId as string));
   if (Object.keys(match).length > 0) {

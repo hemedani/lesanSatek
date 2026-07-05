@@ -8,7 +8,7 @@ export const getsValidator = () => {
     set: object({
       ...activeRoleMixin,
       ...pagination,
-      sortBy: optional(enums(["createdAt", "updatedAt", "_id", "quantity", "consumedAt", "wareModelName"])),
+      sortBy: optional(enums(["createdAt", "updatedAt", "_id", "quantity", "consumedAt"])),
       sortOrder: optional(enums(["asc", "desc"])),
       unitId: optional(string()),
       wareModelId: optional(string()),

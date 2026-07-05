@@ -11,7 +11,7 @@ export const getsFn: ActFn = async (body) => {
 
   const match: Document = {};
   unitId && (match.unit = new ObjectId(unitId as string));
-  wareModelId && (match.wareModelId = wareModelId);
+  wareModelId && (match["wareModel._id"] = new ObjectId(wareModelId));
   reason && (match.reason = { $regex: reason, $options: "i" });
   patientId && (match.patientId = { $regex: patientId, $options: "i" });
   if (Object.keys(match).length > 0) {

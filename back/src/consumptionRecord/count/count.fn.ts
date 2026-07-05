@@ -7,7 +7,7 @@ export const countFn: ActFn = async (body) => {
 
   const filters: Document = {};
   unitId && (filters.unit = new ObjectId(unitId as string));
-  wareModelId && (filters.wareModelId = wareModelId);
+  wareModelId && (filters["wareModel._id"] = new ObjectId(wareModelId));
   reason && (filters.reason = { $regex: new RegExp(reason as string, "i") });
   patientId && (filters.patientId = { $regex: new RegExp(patientId as string, "i") });
 

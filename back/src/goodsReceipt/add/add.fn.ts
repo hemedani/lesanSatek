@@ -70,6 +70,18 @@ export const addFn: ActFn = async (body) => {
 
   const userId = receivedById ? (receivedById as string) : `${user._id}`;
 
+  // Get PR's store for inventory traceability
+  let prStoreId: string | undefined;
+  if (purchasingRequestId) {
+    const prDoc = await purchasingRequest.findOne({
+      filters: { _id: new ObjectId(purchasingRequestId as string) },
+      projection: { store: { _id: 1 } },
+    }) as Record<string, unknown> | null;
+    if (prDoc?.store) {
+      prStoreId = ((prDoc.store as Record<string, unknown>)._id as ObjectId).toString();
+    }
+  }
+
   // Gaps 4 & 6: Update PO item status + collect pricing for auto-payment
   let orderTotal = 0;
 
@@ -79,7 +91,6 @@ export const addFn: ActFn = async (body) => {
       await addStock(
         receivingUnitId as string,
         item.wareModelId,
-        item.wareModelName || item.wareModelId,
         item.quantityAccepted,
         "goods_receipt",
         userId,
@@ -89,6 +100,7 @@ export const addFn: ActFn = async (body) => {
           referenceType: "goodsReceipt",
           referenceId: result._id?.toString(),
           description: `Goods receipt for ${item.wareModelName || item.wareModelId}`,
+          storeId: prStoreId,
         },
       );
 

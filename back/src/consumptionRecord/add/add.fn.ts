@@ -1,5 +1,5 @@
-import { type ActFn, ObjectId } from "lesan";
-import { consumptionRecord, purchasingRequest, coreApp } from "../../../mod.ts";
+import { type ActFn, type Document, ObjectId } from "lesan";
+import { consumptionRecord, purchasingRequest, wareModel, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { removeStock } from "../../../utils/inventoryManager.ts";
 
@@ -7,7 +7,7 @@ export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
 
-  const { activeRoleId, unitId, consumedById, inventoryId, purchasingRequestId, ...rest } = set;
+  const { activeRoleId, unitId, consumedById, inventoryId, purchasingRequestId, wareModelId, wareId, ...rest } = set;
 
   const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
 
@@ -26,6 +26,22 @@ export const addFn: ActFn = async (body) => {
       consumptionRecords: true,
     },
   };
+
+  relations.wareModel = {
+    _ids: new ObjectId(wareModelId as string),
+    relatedRelations: {
+      consumptionRecords: true,
+    },
+  };
+
+  if (wareId) {
+    relations.ware = {
+      _ids: new ObjectId(wareId as string),
+      relatedRelations: {
+        consumptionRecords: true,
+      },
+    };
+  }
 
   if (inventoryId) {
     relations.inventory = {
@@ -46,17 +62,27 @@ export const addFn: ActFn = async (body) => {
     throw new Error("Failed to create consumption record");
   }
 
+  // Resolve wareModel name for removeStock (the wareModelName param is no longer stored, but removeStock accepts it)
+  let resolvedWareModelName = "";
+  if (wareModelId) {
+    const wm = await wareModel.findOne({
+      filters: { _id: new ObjectId(wareModelId as string) },
+      projection: { name: 1 },
+    }) as Record<string, unknown> | null;
+    if (wm) {
+      resolvedWareModelName = (wm.name as string) || "";
+    }
+  }
+
   // Remove from inventory
   await removeStock(
     unitId as string,
-    rest.wareModelId as string,
-    rest.wareModelName as string,
+    wareModelId as string,
     rest.quantity as number,
     (rest.reason as string) || "consumption",
     consumedById as string,
     {
-      wareId: rest.wareId as string | undefined,
-      wareName: rest.wareName as string | undefined,
+      wareId: wareId as string | undefined,
       referenceType: "consumptionRecord",
       referenceId: String(result._id),
     },
@@ -83,8 +109,8 @@ export const addFn: ActFn = async (body) => {
             },
             details: {
               consumptionRecordId: result._id?.toString(),
-              wareModelId: rest.wareModelId,
-              wareModelName: rest.wareModelName,
+              wareModelId,
+              wareModelName: resolvedWareModelName,
               quantity: rest.quantity,
             },
           },

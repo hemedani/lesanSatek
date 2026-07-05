@@ -22,7 +22,7 @@ export const getsFn: ActFn = async (body) => {
 
   const match: Document = {};
   unitId && (match.unit = new ObjectId(unitId as string));
-  wareModelId && (match.wareModelId = wareModelId);
+  wareModelId && (match["wareModel._id"] = new ObjectId(wareModelId));
   reason && (match.reason = reason);
   referenceType && (match.referenceType = referenceType);
   referenceId && (match.referenceId = referenceId);
