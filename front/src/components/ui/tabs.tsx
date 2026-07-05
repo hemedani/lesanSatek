@@ -28,7 +28,7 @@ const tabsListVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-graphite-plate",
+        default: "bg-graphite-plate/70 backdrop-blur-sm",
         line: "gap-1 bg-transparent",
       },
     },
