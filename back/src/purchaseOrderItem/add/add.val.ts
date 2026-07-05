@@ -7,10 +7,8 @@ export const addValidator = () => {
   return object({
     set: object({
       ...activeRoleMixin,
-      wareModelId: string(),
-      wareModelName: string(),
-      wareId: optional(string()),
-      wareName: optional(string()),
+      wareModelId: objectIdValidation,
+      wareId: optional(objectIdValidation),
       quantity: number(),
       unitPrice: optional(number()),
       totalPrice: optional(number()),

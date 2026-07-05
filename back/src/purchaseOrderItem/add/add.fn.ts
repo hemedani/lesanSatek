@@ -6,18 +6,31 @@ export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
 
-  const { activeRoleId, purchasingRequestId, assignedFromId, assignedById, ...rest } = set;
+  const { activeRoleId, purchasingRequestId, assignedFromId, assignedById, wareModelId, wareId, ...rest } = set;
 
   const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
 
-  const relations: Record<string, unknown> = {};
-
-  relations.purchasingRequest = {
-    _ids: new ObjectId(purchasingRequestId as string),
-    relatedRelations: {
-      purchaseOrderItems: true,
+  const relations: Record<string, unknown> = {
+    purchasingRequest: {
+      _ids: new ObjectId(purchasingRequestId as string),
+      relatedRelations: {
+        purchaseOrderItems: true,
+      },
+    },
+    wareModel: {
+      _ids: new ObjectId(wareModelId as string),
+      relatedRelations: {
+        purchaseOrderItems: true,
+      },
     },
   };
+
+  if (wareId) {
+    relations.ware = {
+      _ids: new ObjectId(wareId as string),
+      relatedRelations: { purchaseOrderItems: true },
+    };
+  }
 
   if (assignedFromId) {
     relations.assignedFrom = {
@@ -59,8 +72,8 @@ export const addFn: ActFn = async (body) => {
               } : { id: "", name: "" },
             },
             details: {
-              wareModelId: rest.wareModelId,
-              wareModelName: rest.wareModelName,
+              wareModelId: wareModelId,
+              wareId: wareId || undefined,
               quantity: rest.quantity,
               unitPrice: rest.unitPrice,
               status: rest.status,

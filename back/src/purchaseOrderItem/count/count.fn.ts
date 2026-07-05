@@ -12,7 +12,7 @@ export const countFn: ActFn = async (body) => {
   purchasingRequestId &&
     (filters["purchasingRequest"] = purchasingRequestId);
   status && (filters["status"] = status);
-  wareModelId && (filters["wareModelId"] = wareModelId);
+  wareModelId && (filters["wareModel._id"] = wareModelId);
 
   const foundedItemsLength = await purchaseOrderItem.countDocument({
     filter: filters,

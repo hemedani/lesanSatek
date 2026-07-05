@@ -12,8 +12,8 @@ export const addSetup = () =>
       setTokens,
       setUser,
       grantAccess([
-        { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead", "UnitHead", "Employee"] },
+        { roles: ["Manager", "Admin"], features: ["canAssignItemsToOrder"] },
+        { roles: ["OrgHead", "UnitHead", "Employee"], features: ["canAssignItemsToOrder"] },
       ]),
     ],
     validator: addValidator(),

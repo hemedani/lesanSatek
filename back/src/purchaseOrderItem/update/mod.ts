@@ -13,6 +13,7 @@ export const updateSetup = () =>
       setUser,
       grantAccess([
         { roles: ["Manager", "Admin"], features: ["canAssignItemsToOrder"] },
+        { roles: ["OrgHead", "UnitHead", "Employee"], features: ["canAssignItemsToOrder"] },
       ]),
     ],
     validator: updateValidator(),
