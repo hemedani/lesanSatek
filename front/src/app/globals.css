@@ -93,7 +93,7 @@
   --radius-3xl-3: 44px;
   --radius-full: 999px;
 
-  --animate-slow-drift: slow-drift 20s ease-in-out infinite;
+  --animate-conic-spin: conic-spin 4s linear infinite;
   --radius-full-2: 4999.5px;
   --radius-full-3: 9999px;
 
@@ -187,7 +187,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-blueprint-grid text-foreground font-sans;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
   html {
@@ -212,15 +212,8 @@
   background-size: 40px 40px;
 }
 
-/* ── Subtle animated background shift ──── */
-
-@keyframes bg-shift {
-  0% { background-position: 0% 0%; }
-  50% { background-position: 100% 100%; }
-  100% { background-position: 0% 0%; }
-}
-
-/* ── Admin Canvas (midnight ink + light grid + soft glow + animated depth) ── */
+/* ── Admin Canvas (midnight ink + static radial glow + blueprint grid) ──── */
+/* GPU-friendly: only static background layers, no animated repaints */
 
 @utility admin-canvas {
   background-color: var(--color-midnight-ink);
@@ -232,23 +225,6 @@
     auto,
     40px 40px,
     40px 40px;
-}
-
-@utility admin-canvas-animated {
-  background-color: var(--color-midnight-ink);
-  background-image:
-    radial-gradient(ellipse 60% 40% at 20% 20%, rgba(15, 23, 42, 0.6) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 30% at 80% 70%, rgba(30, 41, 59, 0.4) 0%, transparent 50%),
-    radial-gradient(ellipse 40% 50% at 50% 50%, rgba(15, 20, 35, 0.3) 0%, transparent 50%),
-    linear-gradient(rgba(186, 215, 247, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(186, 215, 247, 0.03) 1px, transparent 1px);
-  background-size:
-    200% 200%,
-    200% 200%,
-    200% 200%,
-    40px 40px,
-    40px 40px;
-  animation: bg-shift 45s ease-in-out infinite alternate;
 }
 
 /* ── Blueprint Glow Wash ────────────────────────────────── */
@@ -360,45 +336,6 @@
   }
 }
 
-/* ── Fluid Gradient Blobs ───────────────────────────────── */
-
-@keyframes blob-float {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  25% {
-    transform: translate(2%, -3%) scale(1.05);
-  }
-  50% {
-    transform: translate(-1%, 2%) scale(0.95);
-  }
-  75% {
-    transform: translate(3%, 1%) scale(1.02);
-  }
-  100% {
-    transform: translate(-2%, -1%) scale(1);
-  }
-}
-
-@utility blob {
-  width: 60vw;
-  height: 60vw;
-  filter: blur(100px);
-  animation: blob-float 20s ease-in-out infinite alternate;
-  pointer-events: none;
-}
-
-/* ── Slow Drift (for Digital Aurora moving gradient) ────── */
-
-@keyframes slow-drift {
-  0%, 100% {
-    transform: translate(0px, 0px);
-  }
-  50% {
-    transform: translate(-40px, 30px);
-  }
-}
-
 /* ── Blueprint Shimmer (for skeleton loading) ────────────── */
 
 @keyframes blueprint-shimmer {
@@ -425,4 +362,115 @@
 
 @utility hairline-inset {
   box-shadow: rgba(186, 215, 247, 0.12) 0px 0px 0px 1px inset;
+}
+
+/* ── Conic Spin Keyframes (GPU-accelerated rotation) ────── */
+
+@keyframes conic-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Glass Card Active (conic-gradient animated border) ──── */
+/* Use on active/selected/highlighted cards for a premium spin-border effect.
+   The conic gradient arcs through Electric Iris and Frost Link tones.
+   Full GPU acceleration — only `transform: rotate()` is animated. */
+
+@utility glass-card-active {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from 0deg at 50% 50%,
+      transparent 0deg,
+      rgba(102, 58, 243, 0.35) 30deg,
+      rgba(182, 217, 252, 0.3) 90deg,
+      transparent 150deg,
+      rgba(102, 58, 243, 0.35) 210deg,
+      rgba(182, 217, 252, 0.3) 270deg,
+      transparent 330deg,
+      transparent 360deg
+    );
+    animation: conic-spin 4s linear infinite;
+    will-change: transform;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+/* ── Glass Card Hover (conic border on hover only) ──────────────────── */
+
+@utility glass-card-hover-active {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from 0deg at 50% 50%,
+      transparent 0deg,
+      rgba(102, 58, 243, 0.35) 30deg,
+      rgba(182, 217, 252, 0.3) 90deg,
+      transparent 150deg,
+      rgba(102, 58, 243, 0.35) 210deg,
+      rgba(182, 217, 252, 0.3) 270deg,
+      transparent 330deg,
+      transparent 360deg
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+  }
+
+  &:hover::before {
+    opacity: 1;
+    animation: conic-spin 4s linear infinite;
+    will-change: transform;
+  }
+}
+
+/* ── Glass Card Conic Border (purely decorative top-arc) ────────────── */
+/* Thin 1px conic arc at the top edge — subtle blueprint glow accent. */
+
+@utility glass-card-conic-top {
+  position: relative;
+  isolation: isolate;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    inset-inline: 0;
+    height: 1px;
+    background: conic-gradient(
+      from 180deg at 50% -5%,
+      transparent,
+      rgba(124, 145, 182, 0.3) 25%,
+      transparent 50%,
+      rgba(124, 145, 182, 0.3) 75%,
+      transparent
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
 }
