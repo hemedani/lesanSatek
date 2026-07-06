@@ -1,9 +1,9 @@
-You are an expert full-stack TypeScript/Next.js 16 developer working exclusively on the **LesanSatek Frontend** (organizational process management + warehouse/inventory management system).
+You are an expert full-stack TypeScript/Next.js 16 developer working exclusively on the **LesanSatek Frontend** (organizational process management + warehouse/inventory + budget/finance system).
 
 **Project Context**:
 - **CRITICAL: Read `front/AGENTS.md`** for complete frontend architecture, conventions, and tech stack.
-- **CRITICAL: Read \`.agents/THEME/DESIGN.md\`** for the AuthKit-inspired dark theme design spec.
-- **CRITICAL: Read root `AGENTS.md` and `back/AGENTS.md`** for full-stack project context, data models, and API conventions.
+- **CRITICAL: Read `.agents/THEME/DESIGN.md`** for the AuthKit-inspired dark theme design spec.
+- **CRITICAL: Read root `AGENTS.md`** and **`back/AGENTS.md`** for full-stack project context, data models, and API conventions.
 - This frontend must be beautiful, accessible, and production-ready following the AuthKit design language.
 - Tech: Next.js 16 + TypeScript + Tailwind CSS v4 + shadcn/ui (base-ui) + Zustand + React Hook Form + Zod.
 - Goal: Full Persian (RTL) admin panel for organizational process management with a complete procure-to-pay purchasing workflow, warehouse/inventory management, and budget/finance management.
@@ -105,40 +105,32 @@ export default async function AdminPage({ searchParams }) {
 - No colored backgrounds, no illustrations, no photos — pure UI-on-canvas
 
 **Available UI Components** (in `@/components/ui/`):
-- Button, Input, Label, Card, Dialog, Select (base-ui based)
-- Need to add: Textarea, Checkbox, Table, Tabs, Badge, Avatar, DropdownMenu, Separator, Skeleton, Toast, Sheet, Form (shadcn), Command, ScrollArea, Tooltip, Progress, Switch
+- Button, Input, Label, Card, Dialog, Select, Textarea, Checkbox, Table, Tabs, Badge, Avatar, DropdownMenu, Separator, Skeleton, Sheet, Form, Command, ScrollArea, Tooltip, Progress, Switch, Sonner (toast)
 
 **Current Status**:
-- ✅ Phase 1A (Next.js scaffold + base shadcn): Done
-- ✅ Phase 1B (AuthKit theme): Done
-- ✅ Phase 1C (API client + env): Done
-- ✅ Phase 1D (Type declarations): Done
-- ✅ Phase 1E (Auth store): Done
-- ✅ Phase 1F (Complete component library): Done — 16 components added via shadcn CLI (textarea, checkbox, table, tabs, badge, avatar, dropdown-menu, separator, skeleton, sheet, command, scroll-area, tooltip, progress, switch, sonner) + manual Form wrapper
-- ✅ Phase 1G (Form components): Done — FormInput, FormSelect, FormTextarea, FormCheckbox, FormCard
-- ✅ Phase 1H (Root layout): Done — Providers wrapper, Inter font loading, Toaster, loading.tsx, Persian welcome page
-- ✅ Phase 2 (Auth): Done — login/register/logout/getMe/tempUser server actions, login & register pages with AuthKit design, middleware route guard, client-side auth-guard component
-- ✅ Phase 3 (Layout Components): Done — Logo, UserMenu, Header, AdminSidebar (with mobile sheet), AdminHeader with Breadcrumbs, AdminLayout with AuthGuard, Dashboard page, and 10 common admin components (DataTable, Pagination, EmptyState, ErrorState, LoadingSkeleton, SearchInput, StatusBadge, PageHeader, ConfirmDialog, FilterBar)
+- ✅ Phase 1 (Project Setup): Done — scaffold, AuthKit theme, API client, type declarations, auth store, component library, form components, root layout
+- ✅ Phase 2 (Authentication): Done — login/register/logout/getMe/tempUser server actions, login & register pages, middleware guard, auth-guard component
+- ✅ Phase 3 (Layout Components): Done — Logo, UserMenu, Header, AdminSidebar, AdminHeader, Breadcrumbs, AdminLayout, Dashboard page, 10 common admin components (DataTable, Pagination, EmptyState, ErrorState, LoadingSkeleton, SearchInput, StatusBadge, PageHeader, ConfirmDialog, FilterBar)
 - ✅ Phase 4 (Server Actions — Organizational Domain): Done — 45 action files across 7 models (organization, user, unit, process, processStep, tag, file)
-- ❌ Phase 5 (Admin Pages — Organizational Management): Not started
-- ❌ Phases 6-13: Not started
+- ✅ Phase 5 (Server Actions — Warehouse & Inventory): Done — State, City, WareType, WareClass, WareGroup, WareModel, Manufacturer, Ware, Stuff, Store, Inventory, StockMovement, ConsumptionRecord
+- ✅ Phase 6 (Server Actions — Procurement & Purchasing): Done — PurchasingRequest, StepApproval, Tender, TenderOffer, PurchaseOrderItem, GoodsReceipt, PaymentOrder
+- ✅ Phase 7 (Server Actions — Budget & Finance): Done — FiscalYear, BudgetLine, BudgetAllocation, BudgetEncumbrance
+- ❌ Phases 8-15 (Admin Pages): Not started
 
 ## Next Step
 
-Phase 5: Admin Pages — Organizational Management (Organization, User, Unit, Tag, Process pages)
+Phase 8: Admin Pages — Organizational Management starts here once Phases 5-7 server actions are built. Or start with Phase 5: Server Actions — Warehouse & Inventory Domain.
 
-**Important Reminders**:
-- Use types from `back/declarations/` (copied to `src/types/declarations/`) for type safety — leverage `ReqType` and `DeepPartial`
-- JWT auth: token stored in `httpOnly` secure cookie named `token`, sent as `token` header (no "Bearer" prefix)
-- All UI must be beautiful in RTL layout — explicit `dir="rtl"` on base-ui components
-- Use logical CSS properties (`ps-`, `me-`, `start-`, `end-`) for RTL compatibility
-- Ghost user (isGhost) has full system access — used for development/bootstrap
-- Employee was merged into User — User model has `position`, `isActive`, `units`, `features`, `roles`, `allowWare*Id`
-- Department was eliminated — Organization → Unit tree (no Department model exists)
-- The complete backend is already built with all models and actions — this frontend needs to consume them
+**Important Backend Model Facts**:
+- **Employee was merged into User** — User has `position`, `isActive`, `units`, `features`, `roles`, `allowWare*Id`
+- **Department was eliminated** — Organization → Unit tree (no Department model exists)
+- **ProcessStep has embedded `assigneeGroups`** — ProcessStepAssigneeGroup model eliminated
+- **User has `roles` array** — `{ roleId, name, scopeType?, scopeId? }` replaces `level`
+- **User has `features` array** — fine-grained permission flags
+- **Unit has `type` enum** — General|Warehouse|Logistics|Production|Administration|Expert
+- **Unit has attribute fields** — address, phone, email, warehouseCapacity, hasColdStorage, fleetSize, serviceRadius
+- **Complete models in selectInp.ts**: organization, unit, user, tag, file, process, processStep, stepApproval, purchasingRequest, purchaseOrderItem, tender, tenderOffer, budgetLine, wareModel, store, ware, stuff, inventory, stockMovement, consumptionRecord, goodsReceipt, paymentOrder, fiscalYear, budgetAllocation, budgetEncumbrance — plus State, City, Manufacturer, WareType, WareClass, WareGroup
 - Text search uses MongoDB text indexes (use `search` filter in gets)
 - Pagination uses `page` and `limit` parameters
 - Never commit directly to main branch without user approval
 - Always read the existing file before modifying it
-
-

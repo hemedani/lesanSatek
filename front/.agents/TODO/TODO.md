@@ -1,6 +1,6 @@
 # LesanSatek Frontend TODO.md
 
-**Project**: LesanSatek Frontend – Organizational Process Management + Warehouse/Inventory System
+**Project**: LesanSatek Frontend – Organizational Process Management + Warehouse/Inventory + Budget/Finance System
 **Goal**: Beautiful, functional, Persian (RTL) Next.js 16 frontend with shadcn/ui components, a full admin panel, and the complete procure-to-pay purchasing workflow
 **Tech stack**: Next.js 16 + TypeScript + Tailwind CSS v4 + shadcn/ui (base-ui) + Zustand + React Hook Form + Zod + Lucide icons
 **Design**: AuthKit-inspired dark theme — Midnight Ink canvas, Graphite Plate surfaces, Electric Iris accent, Estedad typography (see ../THEME/DESIGN.md)
@@ -120,7 +120,7 @@
 - [x] Create `src/components/ui/confirm-dialog.tsx` — confirmation dialog for destructive actions
 - [x] Create `src/components/ui/filter-bar.tsx` — reusable filter bar with search, status select, reset
 
-## Phase 4: Server Actions — Organizational Domain
+## Phase 4: Server Actions — Organizational Domain (Done)
 
 ### 4A: Organization Server Actions
 - [x] Create `src/app/actions/organization/add.ts`
@@ -131,7 +131,7 @@
 - [x] Create `src/app/actions/organization/remove.ts`
 - [x] Create `src/app/actions/organization/count.ts`
 
-### 4B: User Server Actions
+### 4B: User Server Actions (Employee merged into User)
 - [x] Create `src/app/actions/user/addUser.ts`
 - [x] Create `src/app/actions/user/getUser.ts`
 - [x] Create `src/app/actions/user/getUsers.ts` (named `getUsers` not `gets` per backend)
@@ -140,7 +140,7 @@
 - [x] Create `src/app/actions/user/removeUser.ts` (named `removeUser` per backend)
 - [x] Create `src/app/actions/user/countUsers.ts` (named `countUsers` per backend)
 
-### 4C: Unit Server Actions
+### 4C: Unit Server Actions (Department eliminated — Unit is the only org node)
 - [x] Create `src/app/actions/unit/add.ts`
 - [x] Create `src/app/actions/unit/get.ts`
 - [x] Create `src/app/actions/unit/gets.ts`
@@ -160,7 +160,7 @@
 - [x] Create `src/app/actions/process/activateProcess.ts`
 - [x] Create `src/app/actions/process/duplicateProcess.ts`
 
-### 4E: ProcessStep Server Actions
+### 4E: ProcessStep Server Actions (assigneeGroups embedded, no ProcessStepAssigneeGroup)
 - [x] Create `src/app/actions/processStep/add.ts`
 - [x] Create `src/app/actions/processStep/get.ts`
 - [x] Create `src/app/actions/processStep/gets.ts`
@@ -184,9 +184,81 @@
 - [x] Create `src/app/actions/file/getFiles.ts` (batch file get)
 - [x] Create `src/app/actions/file/update.ts`
 
-## Phase 5: Admin Pages — Organizational Management
+## Phase 5: Server Actions — Warehouse & Inventory Domain
 
-### 5A: Organization Management
+### 5A: Geographic (State/City)
+- [x] Create `src/app/actions/state/add.ts` (and get, gets, update, remove, count)
+- [x] Create `src/app/actions/city/add.ts` (and get, gets, update, updateRelations, remove, count)
+
+### 5B: Product Classification Hierarchy (WareType → WareClass → WareGroup → WareModel)
+- [x] Create `src/app/actions/wareType/add.ts` (and get, gets, update, remove, count)
+- [x] Create `src/app/actions/wareClass/add.ts` (and get, gets, update, updateRelations, remove, count)
+- [x] Create `src/app/actions/wareGroup/add.ts` (and get, gets, update, updateRelations, remove, count)
+- [x] Create `src/app/actions/wareModel/add.ts` (and get, gets, update, updateRelations, remove, count)
+
+### 5C: Product & Inventory
+- [x] Create `src/app/actions/manufacturer/add.ts` (and get, gets, update, remove, count — no updateRelations in backend)
+- [x] Create `src/app/actions/ware/add.ts` (and get, gets, update, updateRelations, remove, count)
+- [x] Create `src/app/actions/stuff/add.ts` (and get, gets, update, updateRelations, remove, count)
+- [x] Create `src/app/actions/store/add.ts` (and get, gets, update, updateRelations, remove, count)
+- [x] Create `src/app/actions/inventory/add.ts` (and get, gets, update, updateRelations, remove, count — + custom: adjust, transfer)
+- [x] Create `src/app/actions/stockMovement/get.ts` and `gets.ts` (read-only)
+
+### 5D: Consumption
+- [x] Create `src/app/actions/consumptionRecord/add.ts` (and get, gets, count)
+
+## Phase 6: Server Actions — Procurement & Purchasing Domain
+
+### 6A: PurchasingRequest
+- [x] Create `src/app/actions/purchasingRequest/add.ts`
+- [x] Create `src/app/actions/purchasingRequest/get.ts`
+- [x] Create `src/app/actions/purchasingRequest/gets.ts`
+- [x] Create `src/app/actions/purchasingRequest/update.ts`
+- [x] Create `src/app/actions/purchasingRequest/updateRelations.ts`
+- [x] Create `src/app/actions/purchasingRequest/remove.ts`
+- [x] Create `src/app/actions/purchasingRequest/count.ts`
+- [x] Create `src/app/actions/purchasingRequest/submit.ts` — submit PR for approval
+- [x] Create `src/app/actions/purchasingRequest/assignStore.ts` — link store to PR
+- [x] Create `src/app/actions/purchasingRequest/checkStoreAvailability.ts`
+- [x] Create `src/app/actions/purchasingRequest/getHistory.ts`
+- [x] Create `src/app/actions/purchasingRequest/warehouseCheck.ts`
+
+### 6B: StepApproval
+- [x] Create `src/app/actions/stepApproval/add.ts`
+- [x] Create `src/app/actions/stepApproval/get.ts`
+- [x] Create `src/app/actions/stepApproval/gets.ts`
+- [x] Create `src/app/actions/stepApproval/submitDecision.ts` — approve/reject step
+
+### 6C: Tender & TenderOffer
+- [x] Create `src/app/actions/tender/add.ts` (and get, gets, update, updateRelations, remove, count, close, award)
+- [x] Create `src/app/actions/tenderOffer/submit.ts` (and get, gets)
+
+### 6D: PurchaseOrderItem
+- [x] Create `src/app/actions/purchaseOrderItem/add.ts` (and get, gets, update, updateRelations, remove, count)
+
+### 6E: GoodsReceipt
+- [x] Create `src/app/actions/goodsReceipt/add.ts` (and get, gets, update)
+
+### 6F: PaymentOrder
+- [x] Create `src/app/actions/paymentOrder/add.ts` (and get, gets, update, markPaid)
+
+## Phase 7: Server Actions — Budget & Finance Domain
+
+### 7A: FiscalYear
+- [x] Create `src/app/actions/fiscalYear/add.ts` (and get, gets, update, close)
+
+### 7B: BudgetLine
+- [x] Create `src/app/actions/budgetLine/add.ts` (and get, gets, update, count, getBudgetReport, getYearEndReport)
+
+### 7C: BudgetAllocation
+- [x] Create `src/app/actions/budgetAllocation/add.ts` (and get, gets)
+
+### 7D: BudgetEncumbrance
+- [x] Create `src/app/actions/budgetEncumbrance/add.ts` (and get, gets, release, convertToSpend)
+
+## Phase 8: Admin Pages — Organizational Management
+
+### 8A: Organization Management
 - [x] Create `src/app/admin/organizations/page.tsx` — list organizations with data table
 - [x] Create `src/app/admin/organizations/orgs-client.tsx` — client component with search, table, pagination
 - [x] Create `src/app/admin/organizations/add/page.tsx` — add organization form
@@ -194,36 +266,36 @@
 - [x] Create `src/app/admin/organizations/loading.tsx` — skeleton loading state
 - [x] Sidebar link already exists in AdminSidebar
 
-### 5B: User Management
-- [ ] Create `src/app/admin/users/page.tsx` — list users with table, search, filters
-- [ ] Create `src/app/admin/users/add/page.tsx` — add user form with roles, features
-- [ ] Create `src/app/admin/users/[id]/page.tsx` — edit/view user (including role assignment, features)
-- [ ] Add sidebar link for Users
+### 8B: User Management (Employee merged into User)
+- [x] Create `src/app/admin/users/page.tsx` — list users with table, search, filters
+- [x] Create `src/app/admin/users/add/page.tsx` — add user form with roles, features
+- [x] Create `src/app/admin/users/[id]/page.tsx` — edit/view user (including role assignment, features, allowWare*Ids)
+- [x] Sidebar link for Users already exists
 
-### 5C: Unit Management (Tree Structure)
+### 8C: Unit Management (Tree Structure — Department eliminated)
 - [ ] Create `src/app/admin/units/page.tsx` — tree view of all units in organization
 - [ ] Create `src/components/unit/unit-tree.tsx` — recursive tree component
-- [ ] Create `src/app/admin/units/add/page.tsx` — add unit form (with parent selection)
-- [ ] Create `src/app/admin/units/[id]/page.tsx` — edit/view unit (type, attributes, head, features)
+- [ ] Create `src/app/admin/units/add/page.tsx` — add unit form (type, attributes, parent selection)
+- [ ] Create `src/app/admin/units/[id]/page.tsx` — edit/view unit (type, attributes, head, features, allowWare*Ids)
 - [ ] Add sidebar link for Units
 
-### 5D: Tag Management
+### 8D: Tag Management
 - [ ] Create `src/app/admin/tags/page.tsx` — tag list with color/icon display
 - [ ] Create tag add/edit modal
 - [ ] Add sidebar link for Tags
 
-### 5E: Process Builder
+### 8E: Process Builder
 - [ ] Create `src/app/admin/processes/page.tsx` — list all processes (filter by status)
 - [ ] Create `src/app/admin/processes/add/page.tsx` — create process with steps
 - [ ] Create `src/components/process/process-builder.tsx` — step builder with drag-and-drop ordering
-- [ ] Create `src/components/process/process-step-card.tsx` — step configuration card
+- [ ] Create `src/components/process/process-step-card.tsx` — step configuration card (assigneeGroups embedded)
 - [ ] Create `src/components/process/assignee-group-editor.tsx` — OR/AND group editor
 - [ ] Create `src/app/admin/processes/[id]/page.tsx` — view/edit process, activate/duplicate
 - [ ] Add sidebar link for Processes
 
-## Phase 6: Admin Pages — Warehouse & Inventory
+## Phase 9: Admin Pages — Warehouse & Inventory
 
-### 6A: Product Classification Hierarchy
+### 9A: Product Classification Hierarchy
 - [ ] Create `src/app/admin/ware-types/page.tsx` — WareType list
 - [ ] Create `src/app/admin/ware-classes/page.tsx` — WareClass list (filterable by WareType)
 - [ ] Create `src/app/admin/ware-groups/page.tsx` — WareGroup list (M:N with WareClass)
@@ -231,252 +303,158 @@
 - [ ] Create CRUD add/edit forms for each level (wareType → wareClass → wareGroup → wareModel)
 - [ ] Add sidebar links for all hierarchy levels
 
-### 4G: Manufacturer & Ware Server Actions (from warehouse domain)
-- [ ] Create `src/app/actions/manufacturer/add.ts` (and all CRUD)
-- [ ] Create `src/app/actions/wareType/add.ts` (and all CRUD)
-- [ ] Create `src/app/actions/wareClass/add.ts` (and all CRUD)
-- [ ] Create `src/app/actions/wareGroup/add.ts` (and all CRUD)
-- [ ] Create `src/app/actions/wareModel/add.ts` (and all CRUD)
-- [ ] Create `src/app/actions/ware/add.ts` (and all CRUD)
-- [ ] Create `src/app/actions/stuff/add.ts` (and all CRUD)
-- [ ] Create `src/app/actions/store/add.ts` (and all CRUD)
-- [ ] Create `src/app/actions/state/add.ts` (and all CRUD)
-- [ ] Create `src/app/actions/city/add.ts` (and all CRUD)
+### 9B: Manufacturer Management
+- [ ] Create `src/app/admin/manufacturers/page.tsx` — manufacturer list
+- [ ] Create add/edit manufacturer form
+- [ ] Add sidebar link for Manufacturers
 
-### 6B: Ware Product Management
+### 9C: Ware Product Management
 - [ ] Create `src/app/admin/wares/page.tsx` — product list with hierarchy filters
 - [ ] Create add/edit ware form (select hierarchy, manufacturer, set price)
 - [ ] Add sidebar link for Products
 
-### 6C: Store Management (Vendors)
+### 9D: Store Management (Vendors/Sellers)
 - [ ] Create `src/app/admin/stores/page.tsx` — store list with status filters
-- [ ] Create `src/app/admin/stores/add/page.tsx` — add store form (extended fields)
-- [ ] Create `src/app/admin/stores/[id]/page.tsx` — edit store (bank info, certificates, ware types)
+- [ ] Create `src/app/admin/stores/add/page.tsx` — add store form (extended fields: bank, certificates, ware types)
+- [ ] Create `src/app/admin/stores/[id]/page.tsx` — edit store
 - [ ] Add sidebar link for Stores
 
-### 6D: Stuff (Store Inventory)
+### 9E: Stuff (Store Inventory)
 - [ ] Create `src/app/admin/stuff/page.tsx` — list stuff records (filter by store, ware)
-- [ ] Create add/edit stuff form (ware, store, pricing, barcode)
+- [ ] Create add/edit stuff form (ware, store, pricing modes, barcode)
 - [ ] Add sidebar link for Stuff
 
-### 6E: Inventory Management
-- [ ] Create `src/app/admin/inventory/page.tsx` — unit inventory list
-- [ ] Create inventory detail/adjust form
+### 9F: Inventory Management (Per-Unit Stock)
+- [ ] Create `src/app/admin/inventory/page.tsx` — unit inventory list with stock movements
+- [ ] Create inventory detail/adjust/transfer forms
 - [ ] Add sidebar link for Inventory
 
-## Phase 7: Purchasing Request Workflow (Core Feature)
+### 9G: Geographic Reference (State/City)
+- [ ] Create `src/app/admin/states/page.tsx` — state list
+- [ ] Create `src/app/admin/cities/page.tsx` — city list (filterable by state)
+- [ ] Add sidebar links
 
-### 7A: Purchasing Request Server Actions
-- [ ] Create `src/app/actions/purchasingRequest/add.ts`
-- [ ] Create `src/app/actions/purchasingRequest/get.ts`
-- [ ] Create `src/app/actions/purchasingRequest/gets.ts`
-- [ ] Create `src/app/actions/purchasingRequest/update.ts`
-- [ ] Create `src/app/actions/purchasingRequest/updateRelations.ts`
-- [ ] Create `src/app/actions/purchasingRequest/remove.ts`
-- [ ] Create `src/app/actions/purchasingRequest/count.ts`
-- [ ] Create `src/app/actions/purchasingRequest/submit.ts` — submit PR for approval
-- [ ] Create `src/app/actions/purchasingRequest/assignStore.ts` — link store to PR
-- [ ] Create `src/app/actions/purchasingRequest/checkStoreAvailability.ts`
-- [ ] Create `src/app/actions/purchasingRequest/removeFromPurchase.ts`
-- [ ] Create `src/app/actions/purchasingRequest/getHistory.ts`
-- [ ] Create `src/app/actions/purchasingRequest/warehouseCheck.ts`
+## Phase 10: Admin Pages — Purchasing Request Workflow (Core Feature)
 
-### 7B: StepApproval Server Actions
-- [ ] Create `src/app/actions/stepApproval/add.ts`
-- [ ] Create `src/app/actions/stepApproval/get.ts`
-- [ ] Create `src/app/actions/stepApproval/gets.ts`
-- [ ] Create `src/app/actions/stepApproval/submitDecision.ts` — approve/reject step
-
-### 7C: Tender Server Actions
-- [ ] Create `src/app/actions/tender/add.ts`
-- [ ] Create `src/app/actions/tender/get.ts`
-- [ ] Create `src/app/actions/tender/gets.ts`
-- [ ] Create `src/app/actions/tender/update.ts`
-- [ ] Create `src/app/actions/tender/updateRelations.ts`
-- [ ] Create `src/app/actions/tender/close.ts`
-- [ ] Create `src/app/actions/tender/award.ts`
-- [ ] Create `src/app/actions/tender/remove.ts`
-- [ ] Create `src/app/actions/tender/count.ts`
-
-### 7D: TenderOffer Server Actions
-- [ ] Create `src/app/actions/tenderOffer/submit.ts`
-- [ ] Create `src/app/actions/tenderOffer/get.ts`
-- [ ] Create `src/app/actions/tenderOffer/gets.ts`
-
-### 7E: PurchaseOrderItem Server Actions
-- [ ] Create `src/app/actions/purchaseOrderItem/add.ts`
-- [ ] Create `src/app/actions/purchaseOrderItem/get.ts`
-- [ ] Create `src/app/actions/purchaseOrderItem/gets.ts`
-- [ ] Create `src/app/actions/purchaseOrderItem/update.ts`
-- [ ] Create `src/app/actions/purchaseOrderItem/updateRelations.ts`
-- [ ] Create `src/app/actions/purchaseOrderItem/remove.ts`
-- [ ] Create `src/app/actions/purchaseOrderItem/count.ts`
-
-### 7F: Purchasing Request List & Dashboard
+### 10A: Purchasing Request List & Dashboard
 - [ ] Create `src/app/admin/purchasing-requests/page.tsx` — PR list with status filters, search
 - [ ] Add sidebar link for Purchasing Requests
 - [ ] Create `src/components/purchasing/request-status-badge.tsx` — colored status badges
 - [ ] Create `src/components/purchasing/request-card.tsx` — PR summary card
 - [ ] Create `src/components/purchasing/request-filters.tsx` — filter bar
 
-### 7G: Purchasing Request Detail & Workflow View
+### 10B: Create New Purchasing Request
+- [ ] Create `src/app/admin/purchasing-requests/new/page.tsx` — multi-step PR creation form
+  - Step 1: Select process, fill basic info (title, description, estimated amount, budget line)
+  - Step 2: Select wareModel, set quantity
+  - Step 3: Select requesting unit, add attachments
+  - Step 4: Review and submit
+
+### 10C: Purchasing Request Detail & Workflow View
 - [ ] Create `src/app/admin/purchasing-requests/[id]/page.tsx` — PR detail page
 - [ ] Create `src/components/purchasing/workflow-visualizer.tsx` — process step progress visualizer
 - [ ] Create `src/components/purchasing/step-approval-panel.tsx` — current step approval actions
 - [ ] Create `src/components/purchasing/history-timeline.tsx` — audit history timeline
 - [ ] Create `src/components/purchasing/request-info-panel.tsx` — PR metadata sidebar
 
-### 7H: Create New Purchasing Request
-- [ ] Create `src/app/admin/purchasing-requests/new/page.tsx` — multi-step PR creation form
-  - Step 1: Select process, fill basic info (title, description, estimated amount)
-  - Step 2: Select wareModel, set quantity
-  - Step 3: Select requesting unit, add attachments
-  - Step 4: Review and submit
-
-### 7I: Store Assignment Flow (Path A)
+### 10D: Store Assignment Flow (Path A)
 - [ ] Create `src/components/purchasing/store-selector.tsx` — browse stores with availability
 - [ ] Create `src/components/purchasing/check-store-availability.tsx` — show store inventory with prices
 - [ ] Create `src/components/purchasing/assign-store-dialog.tsx` — confirm store assignment
 - [ ] Create `src/components/purchasing/purchase-order-item-list.tsx` — show assigned PO items
-- [ ] Create `src/components/purchasing/replace-store-dialog.tsx` — replace existing store assignment
 
-### 7J: Tender / Auction Flow (Path B)
+### 10E: Tender / Auction Flow (Path B)
 - [ ] Create `src/components/purchasing/tender-list.tsx` — tenders related to PR
 - [ ] Create `src/components/purchasing/tender-create-dialog.tsx` — create tender for PR
 - [ ] Create `src/components/purchasing/tender-offer-list.tsx` — view bids
 - [ ] Create `src/components/purchasing/tender-award-dialog.tsx` — select winning bid
 - [ ] Create `src/components/purchasing/tender-timeline.tsx` — tender lifecycle visualizer
 
-### 7K: Vendor (Store) Tender Response Interface
+### 10F: Vendor (Store) Tender Response Interface
 - [ ] Create `src/app/admin/tenders/page.tsx` — list open tenders for vendor users
 - [ ] Create `src/app/admin/tenders/[id]/page.tsx` — tender detail + submit offer form
 - [ ] Create `src/components/purchasing/submit-offer-form.tsx` — price, delivery time, terms form
 
-## Phase 8: Goods Receipt & Payment
+## Phase 11: Admin Pages — Goods Receipt & Payment
 
-### 8A: Goods Receipt Server Actions
-- [ ] Create `src/app/actions/goodsReceipt/add.ts`
-- [ ] Create `src/app/actions/goodsReceipt/get.ts`
-- [ ] Create `src/app/actions/goodsReceipt/gets.ts`
-- [ ] Create `src/app/actions/goodsReceipt/update.ts`
-
-### 8B: Payment Order Server Actions
-- [ ] Create `src/app/actions/paymentOrder/add.ts`
-- [ ] Create `src/app/actions/paymentOrder/get.ts`
-- [ ] Create `src/app/actions/paymentOrder/gets.ts`
-- [ ] Create `src/app/actions/paymentOrder/update.ts`
-- [ ] Create `src/app/actions/paymentOrder/markPaid.ts`
-
-### 8C: Goods Receipt Interface
+### 11A: Goods Receipt Interface
 - [ ] Create `src/app/admin/goods-receipts/page.tsx` — list goods receipts
 - [ ] Create `src/app/admin/goods-receipts/new/page.tsx` — create goods receipt from PO items
 - [ ] Create `src/components/purchasing/goods-receipt-form.tsx` — accept/reject items form
 - [ ] Add goods receipt link in PR detail page
 
-### 8D: Payment Order Interface
+### 11B: Payment Order Interface
 - [ ] Create `src/app/admin/payment-orders/page.tsx` — list payment orders
 - [ ] Create payment order view/detail page
 - [ ] Create `src/components/purchasing/mark-paid-dialog.tsx` — confirm payment
 - [ ] Add payment order link in PR detail page
 
-## Phase 9: Budget & Finance
+## Phase 12: Admin Pages — Budget & Finance
 
-### 9A: Budget Server Actions
-- [ ] Create `src/app/actions/fiscalYear/add.ts` (and all CRUD + close)
-- [ ] Create `src/app/actions/budgetLine/add.ts` (and all CRUD)
-- [ ] Create `src/app/actions/budgetAllocation/add.ts`
-- [ ] Create `src/app/actions/budgetEncumbrance/add.ts` (and release, convertToSpend)
-
-### 9B: Fiscal Year Management
+### 12A: Fiscal Year Management
 - [ ] Create `src/app/admin/fiscal-years/page.tsx` — list fiscal years
 - [ ] Create add/edit fiscal year form
 - [ ] Create close fiscal year dialog
 - [ ] Add sidebar link for Fiscal Years
 
-### 9C: Budget Line Management
+### 12B: Budget Line Management
 - [ ] Create `src/app/admin/budget-lines/page.tsx` — list budget lines
 - [ ] Create `src/app/admin/budget-lines/[id]/page.tsx` — budget line detail with allocation/encumbrance
 - [ ] Create `src/components/budget/budget-allocation-form.tsx` — add allocation
 - [ ] Create `src/components/budget/budget-encumbrance-view.tsx` — encumbrance tracking
 - [ ] Add sidebar link for Budget Lines
 
-### 9D: Budget Reports
+### 12C: Budget Reports
 - [ ] Create `src/app/admin/budget-reports/page.tsx` — budget vs actual reports
 - [ ] Create `src/components/budget/budget-chart.tsx` — spending visualization
 - [ ] Create `src/components/budget/budget-summary-cards.tsx` — KPI cards (total allocated, spent, remaining)
 - [ ] Add sidebar link for Budget Reports
 
-## Phase 10: Consumption & Inventory
+## Phase 13: Admin Pages — Consumption & Inventory Tracking
 
-### 10A: Consumption Server Actions
-- [ ] Create `src/app/actions/consumptionRecord/add.ts`
-- [ ] Create `src/app/actions/consumptionRecord/get.ts`
-- [ ] Create `src/app/actions/consumptionRecord/gets.ts`
-- [ ] Create `src/app/actions/consumptionRecord/count.ts`
-
-### 10B: Consumption Interface
+### 13A: Consumption Interface
 - [ ] Create `src/app/admin/consumption/page.tsx` — list consumption records
 - [ ] Create `src/components/inventory/consumption-form.tsx` — record goods usage
 - [ ] Add consumption link in PR detail / inventory pages
 
-## Phase 11: Dashboard & Home Page
+## Phase 14: Dashboard & Home Page
 
-### 11A: Public Landing Page
-- [ ] Create `src/app/[locale]/page.tsx` — landing page with AuthKit design
+### 14A: Public Landing Page
+- [ ] Create `src/app/page.tsx` — landing page with AuthKit design
   - Hero section with product description (process management system)
   - Features section
   - Login/Register CTA
-- [ ] Create `src/app/[locale]/layout.tsx` — public layout with header/footer
 
-### 11B: Admin Dashboard
-- [ ] Create `src/app/admin/dashboard/page.tsx` — admin home with stats
+### 14B: Admin Dashboard
+- [ ] Enhance `src/app/admin/page.tsx` — admin home with stats
   - KPI cards: active PRs, pending approvals, total stores, open tenders
   - Recent PRs list
   - Pending approvals summary
   - Budget overview chart
-- [ ] Add redirect from `/admin` to `/admin/dashboard`
 
-### 11C: User Dashboard (PR requester view)
-- [ ] Create `src/app/[locale]/dashboard/page.tsx` — per-user dashboard
-  - My requests list
-  - Pending my approval list
-  - Quick submit PR button
+## Phase 15: Polish, Testing & Deployment
 
-## Phase 12: Internationalization (Persian Translations)
-
-### 12A: Complete fa.json
-- [ ] Add translations for admin panel navigation labels
-- [ ] Add translations for all form labels and validation messages
-- [ ] Add translations for purchasing workflow terms
-- [ ] Add translations for warehouse/inventory terms
-- [ ] Add translations for budget/finance terms
-- [ ] Add translations for status labels (all enums from backend)
-- [ ] Add translations for error messages and notifications
-- [ ] Add translations for dashboard and statistics
-
-## Phase 13: Polish, Testing & Deployment
-
-### 13A: Error Handling & Loading States
+### 15A: Error Handling & Loading States
 - [ ] Add global error boundary `src/app/error.tsx`
 - [ ] Add admin error boundary `src/app/admin/error.tsx`
 - [ ] Add loading skeletons for all list pages (loading.tsx)
 - [ ] Add loading spinners for all async actions
 - [ ] Handle empty states across all pages
 
-### 13B: Responsive Design & RTL Polish
+### 15B: Responsive Design & RTL Polish
 - [ ] Audit all pages for mobile responsiveness (320px+)
 - [ ] Audit all pages for RTL layout correctness
-- [ ] Ensure all Radix/base-ui components receive explicit `dir="rtl"`
+- [ ] Ensure all base-ui components receive explicit `dir="rtl"`
 - [ ] Test touch-friendly interactions on mobile
 
-### 13C: Performance & Security
+### 15C: Performance & Security
 - [ ] Image optimization with next/image
 - [ ] Code splitting with next/dynamic for heavy components
 - [ ] Verify httpOnly cookie settings for JWT
 - [ ] Verify all server actions have proper error handling
 - [ ] Add loading states to prevent form double-submission
 
-### 13D: Final Build & Deployment
+### 15D: Final Build & Deployment
 - [ ] TypeScript strict mode check (`pnpm lint`)
 - [ ] Production build test (`pnpm build`)
 - [ ] Docker configuration (update Dockerfile for frontend)
