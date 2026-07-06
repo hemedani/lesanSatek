@@ -364,11 +364,20 @@
   box-shadow: rgba(186, 215, 247, 0.12) 0px 0px 0px 1px inset;
 }
 
-/* ── Conic Spin Keyframes (GPU-accelerated rotation) ────── */
+/* ── Conic Spin Keyframes (GPU-accelerated rotation via angle) ────── */
+/* Uses @property to animate the conic gradient angle directly,
+   avoiding transform+mask compositing issues that cause the full
+   pseudo-element rectangle to become visible. */
+
+@property --conic-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
 
 @keyframes conic-spin {
   to {
-    transform: rotate(360deg);
+    --conic-angle: 360deg;
   }
 }
 
@@ -384,11 +393,11 @@
   &::before {
     content: '';
     position: absolute;
-    inset: -1px;
+    inset: 0;
     border-radius: inherit;
     padding: 1px;
     background: conic-gradient(
-      from 0deg at 50% 50%,
+      from var(--conic-angle, 0deg) at 50% 50%,
       transparent 0deg,
       rgba(102, 58, 243, 0.35) 30deg,
       rgba(182, 217, 252, 0.3) 90deg,
@@ -399,7 +408,6 @@
       transparent 360deg
     );
     animation: conic-spin 4s linear infinite;
-    will-change: transform;
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -418,11 +426,11 @@
   &::before {
     content: '';
     position: absolute;
-    inset: -1px;
+    inset: 0;
     border-radius: inherit;
     padding: 1px;
     background: conic-gradient(
-      from 0deg at 50% 50%,
+      from var(--conic-angle, 0deg) at 50% 50%,
       transparent 0deg,
       rgba(102, 58, 243, 0.35) 30deg,
       rgba(182, 217, 252, 0.3) 90deg,
@@ -445,7 +453,6 @@
   &:hover::before {
     opacity: 1;
     animation: conic-spin 4s linear infinite;
-    will-change: transform;
   }
 }
 
