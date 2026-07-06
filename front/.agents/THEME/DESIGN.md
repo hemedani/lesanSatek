@@ -178,14 +178,14 @@ Four 12px squares, 2px radius, filled with Electric Iris, Ember, Azure, and Ciph
 
 1px lines in rgba(186, 215, 247, 0.04) forming a ~40px square grid. Plus a radial blue glow at the top center using the Blueprint Glow palette, and thin conic gradient borders around the hero frame. The grid is the 'blueprint' in the north star — it makes the page feel drafted, not designed.
 
-### Digital Aurora (Admin Background — Option A)
-**Role:** Fixed canvas layer behind admin content. Replaces animated blobs for better GPU performance.
+### Static Aurora Canvas (Admin Background)
+**Role:** Fixed canvas layer behind admin content. All layers are static — zero animation repaints, fully GPU-composited.
 
 - Base: `#05060f` (Midnight Ink)
-- Static low-opacity radial gradient at bottom-center: `bg-[#663af3]/5` with `blur-3xl`
-- Moving radial gradient at top-right: `bg-[#3b8bfd]/5` with `blur-3xl` and `animate-slow-drift` (20s translateX)
+- Static low-opacity radial gradient at bottom-center: `bg-[#663af3]/5` with `blur-3xl` and `will-change-transform`
+- Static radial gradient at top-right: `bg-[#3b8bfd]/6` with `blur-3xl` and `will-change-transform`
 - Subtle SVG dot-grid texture at `opacity-40` (60px squares, 3% white dots)
-- No `filter: blur()` on the moving element — uses `blur-3xl` (CSS `filter`) with `will-change-transform` for GPU acceleration
+- **No animated elements** — all layers are static; no `filter` repaints, no `translate` animations on background layers
 
 ### Hero Wordmark Lockup
 **Role:** Centered 'AuthKit' display headline with eyebrow above and subtitle below.
@@ -272,12 +272,14 @@ These `@utility` classes were implemented alongside the theme tokens and are use
 }
 ```
 
-### Background Animation
+### Background (Static — No Animation)
 
 ```css
-@keyframes bg-shift {
-  /* background-position 0%→100%→0% over 45s, ease-in-out, infinite alternate */
-}
+/* No animated background layers. All depth is provided by:
+   - Static `admin-canvas` utility (midnight ink + radial glow + blueprint grid)
+   - Static `glass-card-conic-top` utility (1px conic arc at top edge)
+   - GPU-composited `blur-3xl` radial gradients (no repaints)
+*/
 ```
 
 ### Cards & Glassmorphism
@@ -289,6 +291,24 @@ These `@utility` classes were implemented alongside the theme tokens and are use
 
 @utility glass-card-hover {
   /* &:hover brightens border + intensifies inset glow */
+}
+
+@utility glass-card-active {
+  /* Active/selected card with a rotating conic-gradient border.
+     Electric Iris → Frost Link arcs spin 360deg over 4s.
+     Only `transform: rotate()` is animated — full GPU acceleration.
+     Uses mask:content-box XOR for a clean 1px border-only gradient. */
+}
+
+@utility glass-card-hover-active {
+  /* Same conic-gradient border as glass-card-active, but hidden by default.
+     On hover, the border fades in (opacity 0→1) and begins spinning.
+     Subtle premium hover effect without distracting at rest. */
+}
+
+@utility glass-card-conic-top {
+  /* Thin 1px conic arc at the top edge — subtle blueprint glow accent.
+     Applied via ::after pseudo-element, stays out of content flow. */
 }
 
 @utility glass-dialog {
@@ -315,16 +335,9 @@ These `@utility` classes were implemented alongside the theme tokens and are use
 ### Animations
 
 ```css
-@keyframes blob-float {
-  /* translate(0,0)→(2%,-3%)→(-1%,2%)→(3%,1%)→(-2%,-1%) over 20s, ease-in-out, alternate */
-}
-
-@utility blob {
-  /* 60vw, blur(100px), blob-float — animated gradient orb for background depth */
-}
-
-@keyframes slow-drift {
-  /* translate(0,0)→(-40px,30px)→(0,0) over 20s, ease-in-out, infinite — Digital Aurora moving gradient */
+@keyframes conic-spin {
+  /* transform: rotate(360deg) over 4s, linear, infinite — spinning conic gradient border.
+     Only `transform` is animated (GPU-accelerated); no layout/style recalculations. */
 }
 
 @keyframes blueprint-shimmer {
@@ -364,26 +377,27 @@ The following shadcn/ui components were aligned to AuthKit tokens during the adm
 
 ### Admin Panel Page Patterns
 
-**Page wrapper:** Digital Aurora fixed canvas layer (no animated blobs — replaced for GPU performance):
+**Page wrapper:** Static Aurora canvas — purely GPU-composited, zero animation repaints:
 
 ```tsx
 <div className="relative flex h-screen overflow-hidden bg-[#05060f]">
-  {/* Digital Aurora canvas */}
+  {/* Static canvas — no animation, GPU-composited */}
   <div className="fixed inset-0 -z-10 bg-[#05060f]" aria-hidden="true">
     {/* Static bottom-center Electric Iris glow */}
     <div className="absolute bottom-0 left-1/2 h-[600px] w-[800px] -translate-x-1/2 translate-y-1/3 rounded-full bg-[#663af3]/5 blur-3xl will-change-transform" />
-    {/* Animated top-right blue glow */}
-    <div className="absolute right-0 top-0 h-[400px] w-[600px] animate-slow-drift rounded-full bg-[#3b8bfd]/5 blur-3xl will-change-transform" />
+    {/* Static top-right blue glow (no animate-* class) */}
+    <div className="absolute right-0 top-0 h-[400px] w-[600px] rounded-full bg-[#3b8bfd]/6 blur-3xl will-change-transform" />
     {/* Subtle dot-grid texture */}
-    <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,...')] bg-[length:60px_60px] opacity-40" />
+    {/* Using inline style for the dot-grid background to avoid Tailwind scanning */}
+    <div className="absolute inset-0 opacity-40" style={{ backgroundImage: "url('data:image/svg+xml;base64,...')", backgroundSize: "60px 60px" }} />
   </div>
   ...
 </div>
 ```
 
-Animated gradient uses `translateX` only (no `filter: blur()` on the animated element — `blur-3xl` is baked into the static `bg-*` class), paired with `will-change-transform` for GPU acceleration. The `@keyframes slow-drift` animation shifts the top-right glow 20s ease-in-out infinite.
+**Performance:** All background layers are static. No `filter` or `transform` animations run on background elements. The `blur-3xl` filter is applied once and GPU-composited. No continuous repaints. The `will-change-transform` hints the GPU to composite these layers independently.
 
-**Card styling:** Never use `bg-card shadow-subtle-4` in the admin route. Apply this exact class to card wrappers:
+**Card styling:** Use `<Card variant="glass">` in the admin route. The `variant="glass"` prop applies the premium glassmorphism elevation stack:
 ```
 bg-[rgba(47,52,62,0.55)] backdrop-blur-[16px] border border-white/8
 shadow-[inset_0_0_48px_rgba(186,207,247,0.06),inset_0_1px_0_rgba(199,211,234,0.12),0_32px_64px_-32px_rgba(5,6,15,0.85)]
@@ -545,7 +559,7 @@ hover:shadow-[inset_0_0_48px_rgba(186,207,247,0.10),inset_0_1px_0_rgba(199,211,2
   --shadow-subtle-7: rgba(216, 236, 248, 0.2) 0px 1px 1px 0px inset, rgba(168, 216, 245, 0.06) 0px 24px 48px 0px inset;
 
   /* Animations */
-  --animate-slow-drift: slow-drift 20s ease-in-out infinite;
+  --animate-conic-spin: conic-spin 4s linear infinite;
 
   /* Surfaces */
   --surface-canvas: #05060f;
@@ -634,7 +648,7 @@ hover:shadow-[inset_0_0_48px_rgba(186,207,247,0.10),inset_0_1px_0_rgba(199,211,2
   --radius-full-3: 9999px;
 
   /* Animations */
-  --animate-slow-drift: slow-drift 20s ease-in-out infinite;
+  --animate-conic-spin: conic-spin 4s linear infinite;
 
   /* Shadows */
   --shadow-sm: rgba(186, 207, 247, 0.32) 0px 0px 6px 0px;
