@@ -11,7 +11,7 @@ export default function AdminDashboardLoading() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Card key={i} className="overflow-hidden">
+          <Card key={i} variant="glass">
             <CardHeader className="pb-2">
               <div className="flex items-center gap-2">
                 <Skeleton className="size-5 rounded-sm" />
@@ -27,7 +27,7 @@ export default function AdminDashboardLoading() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
+        <Card variant="glass">
           <CardHeader>
             <Skeleton className="h-3 w-20 mb-2" />
             <Skeleton className="h-4 w-36" />
@@ -41,7 +41,7 @@ export default function AdminDashboardLoading() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card variant="glass">
           <CardHeader>
             <Skeleton className="h-3 w-20 mb-2" />
             <Skeleton className="h-4 w-36" />

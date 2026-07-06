@@ -151,7 +151,7 @@ export function OrganizationsClient({
         onViewToggle={() => setCardView((v) => !v)}
         renderCard={(item) => (
           <Link href={`/admin/organizations/${item._id}`}>
-            <div className="glass-card glass-card-hover rounded-xl p-4 space-y-3 cursor-pointer active:scale-[0.99] transition-all duration-200">
+            <div className="glass-card glass-card-hover-active rounded-xl p-4 space-y-3 cursor-pointer active:scale-[0.99] transition-all duration-200">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="size-9 rounded-lg bg-electric-iris/10 ring-1 ring-inset ring-electric-iris/15 flex items-center justify-center shrink-0">

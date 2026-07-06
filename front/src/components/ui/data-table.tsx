@@ -72,7 +72,7 @@ function DataTable<T>({
   }
 
   const renderTableView = (
-    <div className={cn("rounded-lg glass-card overflow-hidden", className)}>
+    <div className={cn("rounded-lg glass-card glass-card-hover-active", className)}>
       <Table>
         <TableHeader>
           <TableRow className="bg-[#282c35] border-b border-steel-border/30">
@@ -187,7 +187,7 @@ function DataTable<T>({
             {data.map((item) => (
               <div
                 key={keyExtractor(item)}
-                className="glass-card glass-card-hover rounded-xl p-4 space-y-3"
+                className="glass-card glass-card-hover-active rounded-xl p-4 space-y-3"
               >
                 {columns.filter(c => !c.hideOnCard).map((col) => (
                   <div key={col.key} className="flex items-center justify-between gap-2">

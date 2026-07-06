@@ -12,7 +12,7 @@ interface FormCardProps extends React.ComponentProps<typeof Card> {
 
 function FormCard({ title, description, children, className, ...props }: FormCardProps) {
   return (
-    <Card className={cn("w-full glass-card", className)} {...props}>
+    <Card variant="glass" className={cn("w-full", className)} {...props}>
       <CardHeader>
         <CardTitle className="text-glacier">{title}</CardTitle>
         {description && (

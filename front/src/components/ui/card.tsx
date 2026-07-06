@@ -17,11 +17,11 @@ function Card({
       data-size={size}
       data-variant={variant}
       className={cn(
-        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm transition-all duration-200 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+        "group/card flex flex-col gap-(--card-spacing) rounded-xl py-(--card-spacing) text-sm transition-all duration-200 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
         variant === "default" &&
-          "bg-card text-card-foreground shadow-subtle-4 hover:border-[rgba(186,215,247,0.2)]",
+          "overflow-hidden bg-card text-card-foreground shadow-subtle-4 hover:border-[rgba(186,215,247,0.2)]",
         variant === "glass" &&
-          "bg-[rgba(47,52,62,0.55)] text-card-foreground backdrop-blur-[16px] border border-white/8 shadow-[inset_0_0_48px_rgba(186,207,247,0.06),inset_0_1px_0_rgba(199,211,234,0.12),0_32px_64px_-32px_rgba(5,6,15,0.85)] hover:border-white/15 hover:shadow-[inset_0_0_48px_rgba(186,207,247,0.10),inset_0_1px_0_rgba(199,211,234,0.18),0_32px_64px_-32px_rgba(5,6,15,0.9)]",
+          "glass-card-hover-active bg-[rgba(47,52,62,0.55)] text-card-foreground backdrop-blur-[16px] border border-white/8 shadow-[inset_0_0_48px_rgba(186,207,247,0.06),inset_0_1px_0_rgba(199,211,234,0.12),0_32px_64px_-32px_rgba(5,6,15,0.85)] hover:border-white/15 hover:shadow-[inset_0_0_48px_rgba(186,207,247,0.10),inset_0_1px_0_rgba(199,211,234,0.18),0_32px_64px_-32px_rgba(5,6,15,0.9)]",
         className
       )}
       {...props}

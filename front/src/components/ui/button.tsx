@@ -15,7 +15,7 @@ const buttonVariants = cva(
         secondary:
           "bg-graphite-plate text-moonlight hover:bg-[#363b47] hover:text-glacier hover:shadow-subtle aria-expanded:bg-graphite-plate aria-expanded:text-foreground",
         ghost:
-          "shadow-subtle text-moonlight hover:text-glacier hover:bg-white/[0.04] hover:shadow-[inset_0_0_0_1px_rgba(186,215,247,0.12)] aria-expanded:bg-white/[0.03] aria-expanded:text-foreground",
+          "shadow-subtle text-moonlight hover:text-glacier hover:bg-white/[0.04] hover:shadow-[inset_0_0_0_1px_rgba(186,215,247,0.12)] hover:shadow-sm aria-expanded:bg-white/[0.03] aria-expanded:text-foreground",
         destructive:
           "bg-destructive/10 text-destructive border-destructive/10 hover:bg-destructive/20 hover:border-destructive/20 hover:shadow-[inset_0_0_0_1px_rgba(228,109,76,0.15)] focus-visible:border-destructive/40 focus-visible:ring-destructive/20",
         link: "text-frost-link underline-offset-4 hover:underline hover:text-glacier",
