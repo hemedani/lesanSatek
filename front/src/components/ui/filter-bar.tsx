@@ -48,7 +48,7 @@ function FilterBar({
         value={search}
         onChange={onSearchChange}
         placeholder={searchPlaceholder}
-        className="w-full sm:w-56"
+        className="w-full sm:w-80"
       />
       {statusOptions && onStatusChange && (
         <Select
