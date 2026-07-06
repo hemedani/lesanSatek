@@ -7,7 +7,7 @@ import {
   GitBranch,
   Tags,
 } from "lucide-react"
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { Button } from "@/components/ui/button"
@@ -44,15 +44,12 @@ export default function AdminDashboard() {
         description="خلاصه وضعیت سامانه"
       />
 
-      {/* Stat Cards */}
+      {/* Stat Cards — using glass variant for premium glassmorphism */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon
           return (
-            <div
-              key={stat.label}
-              className="group/card relative flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-[rgba(47,52,62,0.55)] py-(--card-spacing) text-sm text-card-foreground backdrop-blur-[16px] border border-white/8 shadow-[inset_0_0_48px_rgba(186,207,247,0.06),inset_0_1px_0_rgba(199,211,234,0.12),0_32px_64px_-32px_rgba(5,6,15,0.85)] transition-all duration-200 [--card-spacing:--spacing(4)] hover:border-white/15 hover:shadow-[inset_0_0_48px_rgba(186,207,247,0.10),inset_0_1px_0_rgba(199,211,234,0.18),0_32px_64px_-32px_rgba(5,6,15,0.9)]"
-            >
+            <Card key={stat.label} variant="glass">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
                   <div className="flex size-10 items-center justify-center rounded-lg bg-electric-iris/10 ring-1 ring-inset ring-electric-iris/15">
@@ -69,14 +66,14 @@ export default function AdminDashboard() {
                 </p>
                 <div className="mt-4 h-px bg-gradient-to-r from-transparent via-frost-link/15 to-transparent" />
               </CardContent>
-            </div>
+            </Card>
           )
         })}
       </div>
 
       {/* Quick Actions & System Status */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="group/card relative flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-[rgba(47,52,62,0.55)] py-(--card-spacing) text-sm text-card-foreground backdrop-blur-[16px] border border-white/8 shadow-[inset_0_0_48px_rgba(186,207,247,0.06),inset_0_1px_0_rgba(199,211,234,0.12),0_32px_64px_-32px_rgba(5,6,15,0.85)] transition-all duration-200 [--card-spacing:--spacing(4)] hover:border-white/15 hover:shadow-[inset_0_0_48px_rgba(186,207,247,0.10),inset_0_1px_0_rgba(199,211,234,0.18),0_32px_64px_-32px_rgba(5,6,15,0.9)]">
+        <Card variant="glass">
           <CardHeader className="pb-3">
             <p className="text-caption font-medium text-fog tracking-wide leading-4">دسترسی سریع</p>
             <CardTitle className="text-base font-medium text-frost-link mt-1 leading-6">
@@ -92,7 +89,7 @@ export default function AdminDashboard() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="gap-2 rounded-full text-moonlight h-9 transition-all duration-200 hover:bg-white/[0.04] hover:text-glacier active:scale-[0.97]"
+                      className="gap-2 rounded-full text-moonlight h-9 transition-all duration-200 hover:bg-white/[0.04] hover:text-glacier active:scale-[0.98]"
                     >
                       <Icon className="size-4" />
                       {action.label}
@@ -102,9 +99,9 @@ export default function AdminDashboard() {
               })}
             </div>
           </CardContent>
-        </div>
+        </Card>
 
-        <div className="group/card relative flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-[rgba(47,52,62,0.55)] py-(--card-spacing) text-sm text-card-foreground backdrop-blur-[16px] border border-white/8 shadow-[inset_0_0_48px_rgba(186,207,247,0.06),inset_0_1px_0_rgba(199,211,234,0.12),0_32px_64px_-32px_rgba(5,6,15,0.85)] transition-all duration-200 [--card-spacing:--spacing(4)] hover:border-white/15 hover:shadow-[inset_0_0_48px_rgba(186,207,247,0.10),inset_0_1px_0_rgba(199,211,234,0.18),0_32px_64px_-32px_rgba(5,6,15,0.9)]">
+        <Card variant="glass">
           <CardHeader className="pb-3">
             <p className="text-caption font-medium text-fog tracking-wide leading-4">وضعیت سامانه</p>
             <CardTitle className="text-base font-medium text-frost-link mt-1 leading-6">
@@ -127,7 +124,7 @@ export default function AdminDashboard() {
               ))}
             </div>
           </CardContent>
-        </div>
+        </Card>
       </div>
     </div>
   )
