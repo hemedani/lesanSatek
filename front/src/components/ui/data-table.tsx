@@ -11,9 +11,8 @@ import {
 import { EmptyState } from "@/components/ui/empty-state"
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton"
 import { cn } from "@/lib/utils"
-import { ArrowUpDown, LayoutGrid, Table2 } from "lucide-react"
+import { ArrowUpDown, LayoutGrid, List } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
 
 interface Column<T> {
   key: string
@@ -39,8 +38,6 @@ interface DataTableProps<T> {
   onViewToggle?: () => void
   renderCard?: (item: T) => React.ReactNode
 }
-
-const TABLE_BREAKPOINT = "lg"
 
 function DataTable<T>({
   columns,
@@ -147,28 +144,24 @@ function DataTable<T>({
   return (
     <div>
       {onViewToggle && (
-        <div className="flex items-center justify-end mb-3 gap-1">
+        <div className="flex items-center justify-end mb-4">
           <Button
-            variant="ghost"
-            size="icon-sm"
+            variant="outline"
+            size="default"
             onClick={onViewToggle}
-            className={cn(
-              "rounded-lg transition-all duration-200",
-              cardView ? "text-fog/50" : "text-frost-link bg-white/[0.03]"
-            )}
+            className="gap-2.5 rounded-lg px-5"
           >
-            <Table2 className="size-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={onViewToggle}
-            className={cn(
-              "rounded-lg transition-all duration-200",
-              cardView ? "text-frost-link bg-white/[0.03]" : "text-fog/50"
+            {cardView ? (
+              <>
+                <List className="size-5" />
+                نمای جدول
+              </>
+            ) : (
+              <>
+                <LayoutGrid className="size-5" />
+                نمای کارت
+              </>
             )}
-          >
-            <LayoutGrid className="size-4" />
           </Button>
         </div>
       )}
