@@ -1,0 +1,29 @@
+"use server";
+
+import { AppApi } from "@/lib/api";
+import { getToken } from "@/lib/auth";
+import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
+
+export const update = async (
+  data: ReqType["main"]["stuff"]["update"]["set"],
+  getSelection?: DeepPartial<ReqType["main"]["stuff"]["update"]["get"]>
+) => {
+  try {
+    const token = await getToken();
+    const result = await AppApi(undefined, token).send({
+      service: "main",
+      model: "stuff",
+      act: "update",
+      details: {
+        set: data,
+        get: getSelection || { _id: 1, inventoryNo: 1 },
+      },
+    });
+    return result;
+  } catch (error: unknown) {
+    return {
+      success: false,
+      body: { message: error instanceof Error ? error.message : "خطا در به‌روزرسانی موجودی فروشگاه" },
+    };
+  }
+};
