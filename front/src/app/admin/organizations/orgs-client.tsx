@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Plus, Pencil, Building2, Calendar } from "lucide-react";
+import { Plus, Pencil, Building2, Calendar, Trash2, GitBranch, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/ui/page-header";
 import { DataTable } from "@/components/ui/data-table";
 import type { Column } from "@/components/ui/data-table";
@@ -11,6 +12,8 @@ import { Pagination } from "@/components/ui/pagination";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { remove } from "@/app/actions/organization/remove";
 
 interface Organization {
   _id: string;
@@ -86,11 +89,13 @@ const columns: Column<Organization>[] = [
     key: "actions",
     label: "",
     render: (item) => (
-      <Link href={`/admin/organizations/${item._id}`}>
-        <Button variant="ghost" size="icon-sm" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200">
-          <Pencil className="size-4" />
-        </Button>
-      </Link>
+      <div className="flex items-center gap-1">
+        <Link href={`/admin/organizations/${item._id}`}>
+          <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200">
+            <Pencil className="size-3.5" />
+          </Button>
+        </Link>
+      </div>
     ),
   },
 ];
@@ -103,7 +108,9 @@ export function OrganizationsClient({
   search = "",
 }: OrganizationsClientProps) {
   const router = useRouter();
-  const [cardView, setCardView] = useState(false);
+  const [cardView, setCardView] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState<Organization | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const handleSearch = (value: string) => {
     if (value.trim()) {
@@ -113,16 +120,22 @@ export function OrganizationsClient({
     }
   };
 
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    const result = await remove({ activeRoleId: "", _id: deleteTarget._id });
+    if (result.success) {
+      toast.success("سازمان با موفقیت حذف شد");
+      router.refresh();
+    } else {
+      toast.error(result.body?.message || "خطا در حذف سازمان");
+    }
+    setDeleting(false);
+    setDeleteTarget(null);
+  };
+
   return (
     <div className="space-y-6 relative">
-      <div
-        className="blob absolute start-[-10%] top-[10%] opacity-10"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)",
-        }}
-        aria-hidden="true"
-      />
       <div className="relative z-[1]">
         <PageHeader
           title="سازمان‌ها"
@@ -150,43 +163,79 @@ export function OrganizationsClient({
         cardView={cardView}
         onViewToggle={() => setCardView((v) => !v)}
         renderCard={(item) => (
-          <Link href={`/admin/organizations/${item._id}`}>
-            <div className="glass-card glass-card-hover-active rounded-xl p-4 space-y-3 cursor-pointer active:scale-[0.99] transition-all duration-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="size-9 rounded-lg bg-electric-iris/10 ring-1 ring-inset ring-electric-iris/15 flex items-center justify-center shrink-0">
-                    <Building2 className="size-4 text-electric-iris" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-moonlight leading-5">{item.name || "—"}</p>
-                    {item.enName && (
-                      <p className="text-xs text-fog/60 leading-4">{item.enName}</p>
-                    )}
-                  </div>
+          <div className="glass-card glass-card-hover-active rounded-xl p-6 transition-all duration-200">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4 min-w-0">
+                <div className="size-14 rounded-xl bg-electric-iris/10 ring-1 ring-inset ring-electric-iris/15 flex items-center justify-center shrink-0 me-2">
+                  <Building2 className="size-7 text-electric-iris" />
                 </div>
-                <div className="flex items-center gap-2">
-                  <StatusBadge
-                    status={item.isActive ? "active" : "inactive"}
-                    label={item.isActive ? "فعال" : "غیرفعال"}
-                  />
-                  <div className="size-7 rounded-lg flex items-center justify-center text-fog/40 hover:text-moonlight transition-colors">
-                    <Pencil className="size-3.5" />
-                  </div>
+                <div className="min-w-0 space-y-1">
+                  <Link
+                    href={`/admin/organizations/${item._id}`}
+                    className="text-base font-semibold text-moonlight hover:text-electric-iris transition-colors leading-6 truncate block"
+                  >
+                    {item.name || "—"}
+                  </Link>
+                  {item.enName && (
+                    <p className="text-sm text-fog/60 leading-5 truncate">{item.enName}</p>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-xs text-fog/60">
-                {item.head && (
-                  <span>{item.head.first_name} {item.head.last_name}</span>
-                )}
+              <div className="flex flex-col items-end gap-1.5 shrink-0">
+                <StatusBadge
+                  status={item.isActive ? "active" : "inactive"}
+                  label={item.isActive ? "فعال" : "غیرفعال"}
+                />
                 {item.createdAt && (
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-1 text-xs text-fog/50 whitespace-nowrap">
                     <Calendar className="size-3" />
                     {new Date(item.createdAt).toLocaleDateString("fa-IR")}
                   </span>
                 )}
               </div>
             </div>
-          </Link>
+
+            {item.head && (
+              <div className="flex items-center gap-2 mt-4 pb-4 border-b border-steel-border/20">
+                <User className="size-4 text-fog/50 shrink-0" />
+                <span className="text-sm text-fog/80">{item.head.first_name} {item.head.last_name}</span>
+              </div>
+            )}
+
+            <div className="flex items-center justify-end mt-4">
+              <div className="flex items-center gap-1">
+                <Link href={`/admin/organizations/${item._id}`}>
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
+                    className="text-fog/60 hover:text-moonlight"
+                    title="ویرایش"
+                  >
+                    <Pencil className="size-3.5" />
+                  </Button>
+                </Link>
+                <Link href={`/admin/organizations/${item._id}`}>
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
+                    className="text-fog/60 hover:text-frost-link"
+                    title="واحدها"
+                  >
+                    <GitBranch className="size-3.5" />
+                  </Button>
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="icon-xs"
+                  className="text-fog/60 hover:text-destructive"
+                  title="حذف"
+                  onClick={() => setDeleteTarget(item)}
+                >
+                  <Trash2 className="size-3.5" />
+                </Button>
+              </div>
+            </div>
+          </div>
         )}
         emptyTitle="سازمانی یافت نشد"
         emptyDescription="هنوز هیچ سازمانی ایجاد نشده است."
@@ -204,6 +253,16 @@ export function OrganizationsClient({
         prevUrl={prevPageUrl}
         nextUrl={nextPageUrl}
         page={page}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        title="حذف سازمان"
+        description={`آیا از حذف "${deleteTarget?.name || 'این سازمان'}" اطمینان دارید؟ این اقدام قابل بازگشت نیست.`}
+        confirmLabel="حذف"
+        onConfirm={handleDelete}
+        loading={deleting}
       />
     </div>
   );
