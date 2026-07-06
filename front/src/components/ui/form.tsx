@@ -143,7 +143,7 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
     <p
       data-slot="form-message"
       id={formMessageId}
-      className={cn("flex items-center gap-1.5 text-sm text-destructive bg-destructive/5 rounded-sm px-2 py-1", className)}
+      className={cn("flex items-center gap-1.5 text-sm text-[#e46d4c] bg-[rgba(228,109,76,0.06)] border border-[rgba(228,109,76,0.1)] rounded-sm px-2 py-1 animate-in slide-in-from-top-1 fade-in duration-200", className)}
       {...props}
     >
       <AlertTriangle className="size-3.5 shrink-0" />
