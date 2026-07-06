@@ -353,14 +353,27 @@ Server actions rely on:
 
 ### Admin Background & Card Conventions
 
-**Background (Digital Aurora):** Replace the old `admin-canvas-animated` + 3 `blob` divs with a fixed canvas layer:
+**Background layers (bottom → top):**
+
+1. **Static canvas** — Midnight Ink (`#05060f`) + 60px dot-grid SVG overlay at 3% opacity. `z-[-10]`, GPU-composited, no animation. This is the fixed base layer.
+
+2. **Faint outline shapes** — 4 large thin-stroke SVG geometric shapes (circle, hexagon, rounded-rect, sweeping arc) using Steel Border / Frost Link hairline tones at 0.06–0.10 opacity. `fill="none"`, `strokeWidth="1"`. Sized to mostly bleed off-screen for an architectural blueprint feel. Fully static — no animation. Rendered before the orbs so orbs paint on top.
+
+3. **Ambient orbs** — `<AmbientBackground />` component renders 3 radial-gradient orbs (55vw/48vw/40vw, `filter: blur(100-130px)`, opacity 0.08–0.18) that drift in figure-eight paths using only `transform: translate() scale()` animation. Each orb is its own GPU composited layer (`will-change: transform`). `z-0`, `pointer-events: none`. Respects `prefers-reduced-motion: reduce` by freezing at static offsets. Mounted once in `admin/layout.tsx` so the animation persists across page navigation without restarting.
+
+4. **Content** — sidebar, header, main content at `z-[1]` and above.
+
 ```tsx
+// admin/layout.tsx — the three-layer stack
 <div className="relative flex h-screen overflow-hidden bg-[#05060f]">
+  {/* Layer 1: static canvas */}
   <div className="fixed inset-0 -z-10 bg-[#05060f]" aria-hidden="true">
-    <div className="absolute bottom-0 left-1/2 h-[600px] w-[800px] -translate-x-1/2 translate-y-1/3 rounded-full bg-[#663af3]/5 blur-3xl will-change-transform" />
-    <div className="absolute right-0 top-0 h-[400px] w-[600px] animate-slow-drift rounded-full bg-[#3b8bfd]/5 blur-3xl will-change-transform" />
-    <div className="absolute inset-0 opacity-40" style={{ backgroundImage: "url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')", backgroundSize: "60px 60px" }} />
+    <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,...')] bg-[length:60px_60px] opacity-40" />
   </div>
+  {/* Layer 2: ambient orbs */}
+  <AmbientBackground />
+  {/* Layer 3: content */}
+  <AdminSidebar />
   ...
 </div>
 ```

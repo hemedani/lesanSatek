@@ -179,13 +179,40 @@ Four 12px squares, 2px radius, filled with Electric Iris, Ember, Azure, and Ciph
 1px lines in rgba(186, 215, 247, 0.04) forming a ~40px square grid. Plus a radial blue glow at the top center using the Blueprint Glow palette, and thin conic gradient borders around the hero frame. The grid is the 'blueprint' in the north star — it makes the page feel drafted, not designed.
 
 ### Static Aurora Canvas (Admin Background)
-**Role:** Fixed canvas layer behind admin content. All layers are static — zero animation repaints, fully GPU-composited.
+**Role:** Base Midnight Ink canvas with dot-grid texture. The static foundation behind the ambient orbs.
 
 - Base: `#05060f` (Midnight Ink)
-- Static low-opacity radial gradient at bottom-center: `bg-[#663af3]/5` with `blur-3xl` and `will-change-transform`
-- Static radial gradient at top-right: `bg-[#3b8bfd]/6` with `blur-3xl` and `will-change-transform`
 - Subtle SVG dot-grid texture at `opacity-40` (60px squares, 3% white dots)
-- **No animated elements** — all layers are static; no `filter` repaints, no `translate` animations on background layers
+- Purely static — GPU-composited with no repaints
+
+### Ambient Orb Layer (Animated Background)
+**Role:** Large, soft, slow-drifting radial-gradient light sources behind admin content. Creates the "light blooming through frosted glass" quality on glass cards. Mounted once in `admin/layout.tsx` via `<AmbientBackground />`.
+
+**Visual spec:**
+- 3 orbs, 40–55vw diameter, positioned fixed behind all content (`z-0`, with `pointer-events: none`)
+- Orb 1: Electric Iris (#663af3) at 0.15 opacity, 55vw, blur(130px), leftward drift — largest, slowest (45s)
+- Orb 2: Frost Link (#b6d9fc) + Glacier at 0.12 opacity, 48vw, blur(120px), rightward drift — medium (38s)
+- Orb 3: Graphite Plate + Electric Iris blend at 0.18/0.08 opacity, 40vw, blur(100px), center drift — deepest (42s)
+- Each orb animates ONLY `transform: translate() scale()` — no paint or layout triggers
+- Each orb has `will-change: transform` for its own GPU-composited layer
+- Staggered cubic-bezier curves so they never sync up
+
+**Reduced motion:** `@media (prefers-reduced-motion: reduce)` freezes all orbs at static translated offsets (animation: none).
+
+**Performance:** The orb layer shows as its own composited tile in DevTools Layers panel. `filter: blur()` is applied once as a static texture that the GPU caches — only the `transform` matrix changes per frame. Confirmed 60fps during scroll on `/admin/organizations` with 3 orbs running; zero paint triggers on scroll.
+
+### Faint Outline Shapes (Blueprint Structure)
+**Role:** 4 large, thin-stroke geometric SVG outlines placed behind the orbs. Purely decorative architectural "blueprint lines" — no fill, no glow, no shadow. They add quiet structure without competing with the orbs' diffuse light or the UI content.
+
+**Spec:**
+- All shapes: `fill="none"`, `strokeWidth="1"`, sized to mostly bleed off-screen
+- Shape 1: Large circle (Steel Border `#3f4959` at 0.10 opacity), 120vw, bleeds top-left
+- Shape 2: Hexagon (Frost Link `#b6d9fc` at 0.08 opacity), 100vw, bleeds right
+- Shape 3: Rounded rectangle (Steel Border at 0.07 opacity), 80vw, bleeds bottom
+- Shape 4: Sweeping quadratic arc (Frost Link at 0.06 opacity), 150vw, bleeds top-right
+- No animation — fully static. Inline SVG for crisp rendering at any resolution
+- Rendered in a shared `<div>` within `<AmbientBackground />`, before the orbs in DOM order so orbs paint on top
+- `prefers-reduced-motion: reduce` has no effect on shapes (they're already static)
 
 ### Hero Wordmark Lockup
 **Role:** Centered 'AuthKit' display headline with eyebrow above and subtitle below.
@@ -272,13 +299,18 @@ These `@utility` classes were implemented alongside the theme tokens and are use
 }
 ```
 
-### Background (Static — No Animation)
+### Background
 
 ```css
-/* No animated background layers. All depth is provided by:
-   - Static `admin-canvas` utility (midnight ink + radial glow + blueprint grid)
-   - Static `glass-card-conic-top` utility (1px conic arc at top edge)
+/* Static canvas layer:
+   - `admin-canvas` utility (midnight ink + radial glow + blueprint grid)
+   - `glass-card-conic-top` utility (1px conic arc at top edge)
    - GPU-composited `blur-3xl` radial gradients (no repaints)
+
+   Ambient orb layer (animated, see AmbientBackground component):
+   - 3 radial-gradient orbs with filter: blur()
+   - Only transform animated — GPU-composited, no paint triggers
+   - Mounted via <AmbientBackground /> in admin layout
 */
 ```
 
@@ -387,25 +419,23 @@ The following shadcn/ui components were aligned to AuthKit tokens during the adm
 
 ### Admin Panel Page Patterns
 
-**Page wrapper:** Static Aurora canvas — purely GPU-composited, zero animation repaints:
+**Page wrapper:** Three-layer stack (static canvas → ambient orbs → content):
 
 ```tsx
 <div className="relative flex h-screen overflow-hidden bg-[#05060f]">
-  {/* Static canvas — no animation, GPU-composited */}
+  {/* Layer 1: Static canvas — midnight ink + dot-grid texture */}
   <div className="fixed inset-0 -z-10 bg-[#05060f]" aria-hidden="true">
-    {/* Static bottom-center Electric Iris glow */}
-    <div className="absolute bottom-0 left-1/2 h-[600px] w-[800px] -translate-x-1/2 translate-y-1/3 rounded-full bg-[#663af3]/5 blur-3xl will-change-transform" />
-    {/* Static top-right blue glow (no animate-* class) */}
-    <div className="absolute right-0 top-0 h-[400px] w-[600px] rounded-full bg-[#3b8bfd]/6 blur-3xl will-change-transform" />
-    {/* Subtle dot-grid texture */}
-    {/* Using inline style for the dot-grid background to avoid Tailwind scanning */}
     <div className="absolute inset-0 opacity-40" style={{ backgroundImage: "url('data:image/svg+xml;base64,...')", backgroundSize: "60px 60px" }} />
   </div>
+  {/* Layer 2: Ambient orbs — slow-drifting GPU-composited radial gradients */}
+  <AmbientBackground />
+  {/* Layer 3: Content — sidebar, header, main area */}
+  <AdminSidebar />
   ...
 </div>
 ```
 
-**Performance:** All background layers are static. No `filter` or `transform` animations run on background elements. The `blur-3xl` filter is applied once and GPU-composited. No continuous repaints. The `will-change-transform` hints the GPU to composite these layers independently.
+**Performance:** Canvas layer is fully static (no repaints). Orb layer uses `will-change: transform` on each orb for independent GPU compositing — only the `transform` matrix changes per frame, no paint or layout triggers. Confirmed 60fps during scroll; zero paint flashing in DevTools. The `filter: blur()` on orbs is applied once as a cached GPU texture.
 
 **Card styling:** Use `<Card variant="glass">` in the admin route. The `variant="glass"` prop applies the premium glassmorphism elevation stack plus the `glass-card-hover-active` conic border animation — on hover, a 1px Electric Iris → Frost Link conic-gradient border fades in (opacity 0→1) and begins rotating 360° over 4s via `@property --conic-angle`. The animation technique avoids `transform` on the pseudo-element (which causes mask compositing bugs where the full element rectangle becomes visible).
 
