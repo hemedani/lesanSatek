@@ -365,17 +365,11 @@ Server actions rely on:
 </div>
 ```
 
-**Card styling in admin:** Never use `bg-card` or `shadow-subtle-4` directly on card wrappers in the admin route. Apply the exact glass-card elevation stack:
-```
-bg-[rgba(47,52,62,0.55)] backdrop-blur-[16px] border border-white/8
-shadow-[inset_0_0_48px_rgba(186,207,247,0.06),inset_0_1px_0_rgba(199,211,234,0.12),0_32px_64px_-32px_rgba(5,6,15,0.85)]
-transition-all duration-200
-hover:border-white/15
-hover:shadow-[inset_0_0_48px_rgba(186,207,247,0.10),inset_0_1px_0_rgba(199,211,234,0.18),0_32px_64px_-32px_rgba(5,6,15,0.9)]
-```
+**Card styling in admin:** Use `<Card variant="glass">` in the admin route. This applies the glass elevation stack AND the `glass-card-hover-active` conic-border animation — on hover, a 1px Electric Iris → Frost Link conic-gradient border fades in (opacity 0→1) and rotates 360° over 4s. Never use `bg-card` or `shadow-subtle-4` directly on card wrappers. For non-Card elements (e.g., card-view divs in DataTable), use `className="glass-card glass-card-hover-active"`.
+
 This ensures the glass backdrop-blur works (parent must have `relative` stacking context) and prevents generic shadcn defaults from overriding the AuthKit elevation.
 
-**Input focus state in admin:** Use `focus:border-[#663af3] focus:ring-1 focus:ring-[#663af3]/20` — 2px Electric Iris border without heavy outer glow ring. The Input component is already configured globally.
+**Input focus state in admin:** The Input component uses `focus:border-ring focus:ring-3 focus:ring-ring/50` — a Frost Link cool-blue glow unified with button `focus-visible` rings. Also adds `hover:border-frost-link/20` for hover brightening. All form controls share the same interaction language: rest `border-steel-border/60`, hover brightens to Frost Link, focus shows Frost Link glow ring.
 
 ### Standard Page Pattern (Server Component)
 
@@ -412,7 +406,7 @@ const [cardView, setCardView] = useState(false);
   cardView={cardView}
   onViewToggle={() => setCardView((v) => !v)}
   renderCard={(item) => (
-    <div className="rounded-xl bg-[rgba(47,52,62,0.55)] backdrop-blur-[16px] border border-white/8 shadow-[inset_0_0_48px_rgba(186,207,247,0.06),inset_0_1px_0_rgba(199,211,234,0.12),0_32px_64px_-32px_rgba(5,6,15,0.85)] transition-all duration-200 hover:border-white/15 hover:shadow-[inset_0_0_48px_rgba(186,207,247,0.10),inset_0_1px_0_rgba(199,211,234,0.18),0_32px_64px_-32px_rgba(5,6,15,0.9)] p-4 space-y-3">
+    <div className="glass-card glass-card-hover-active rounded-xl p-4 space-y-3">
       {/* Card content matching column structure */}
     </div>
   )}

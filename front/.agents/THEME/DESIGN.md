@@ -296,14 +296,16 @@ These `@utility` classes were implemented alongside the theme tokens and are use
 @utility glass-card-active {
   /* Active/selected card with a rotating conic-gradient border.
      Electric Iris → Frost Link arcs spin 360deg over 4s.
-     Only `transform: rotate()` is animated — full GPU acceleration.
+     Uses @property --conic-angle to animate the gradient angle directly
+     (avoids transform+mask compositing bug that renders full rectangle).
      Uses mask:content-box XOR for a clean 1px border-only gradient. */
 }
 
 @utility glass-card-hover-active {
   /* Same conic-gradient border as glass-card-active, but hidden by default.
      On hover, the border fades in (opacity 0→1) and begins spinning.
-     Subtle premium hover effect without distracting at rest. */
+     Subtle premium hover effect without distracting at rest.
+     See glass-card-active for animation technique notes. */
 }
 
 @utility glass-card-conic-top {
@@ -335,9 +337,17 @@ These `@utility` classes were implemented alongside the theme tokens and are use
 ### Animations
 
 ```css
+@property --conic-angle {
+  /* <angle> registered property for animating conic gradient rotation.
+     Avoids transform+mask compositing issues that cause the full
+     pseudo-element rectangle to become visible when rotating. */
+}
+
 @keyframes conic-spin {
-  /* transform: rotate(360deg) over 4s, linear, infinite — spinning conic gradient border.
-     Only `transform` is animated (GPU-accelerated); no layout/style recalculations. */
+  /* Animates --conic-angle from 0deg → 360deg over 4s, linear, infinite.
+     Only the custom property is animated — no layout/style recalculations.
+     The gradient's `from` angle shifts, creating the appearance of light
+     moving along the border without moving the element itself. */
 }
 
 @keyframes blueprint-shimmer {
@@ -357,9 +367,9 @@ The following shadcn/ui components were aligned to AuthKit tokens during the adm
 
 | Component | Key Changes |
 |-----------|-------------|
-| `card.tsx` | `shadow-subtle-4` default elevation; `hover:border-[rgba(186,215,247,0.2)]` for card hover brightening |
-| `button.tsx` | All variants use `rounded-sm` (2px); default: Electric Iris fill + subtle inset highlight + hover glow; ghost: `shadow-subtle` hairline + `hover:bg-white/[0.03]` + enhanced inset; outline: `border-steel-border/60` → `hover:border-frost-link/30`; destructive: matched `border-destructive/10` with clean hover; `active:scale-[0.97]` on all variants; `transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]` |
-| `input.tsx` | `rounded-sm` (2px) for sharp radius |
+| `card.tsx` | `shadow-subtle-4` default elevation; `hover:border-[rgba(186,215,247,0.2)]` for default card hover; `variant="glass"` adds `glass-card-hover-active` — conic-gradient Electric Iris→Frost Link border that fades in + spins on hover via `@property --conic-angle` |
+| `button.tsx` | All variants use `rounded-sm` (2px); default: Electric Iris fill + subtle inset highlight + hover glow; ghost: `shadow-subtle` hairline + `hover:bg-white/[0.04]` + enhanced inset + `hover:shadow-sm` cool-blue glow; outline: `border-steel-border/60` → `hover:border-frost-link/30`; destructive: matched `border-destructive/10` with clean hover; `active:scale-[0.97]` on all variants; `transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]`; all non-primary variants use `focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50` (Frost Link cool-blue glow, unified with input) |
+| `input.tsx` | `rounded-sm` (2px) for sharp radius; rest `border-steel-border/60`; hover `border-frost-link/20`; focus `border-ring ring-3 ring-ring/50` (Frost Link glow, unified with button focus-visible) |
 | `select.tsx` | Trigger uses `rounded-sm` (2px) |
 | `dialog.tsx` | `rounded-lg` (10px) matches card radius |
 | `badge.tsx` | `rounded-md` (6px) per AuthKit badge spec |
@@ -397,14 +407,7 @@ The following shadcn/ui components were aligned to AuthKit tokens during the adm
 
 **Performance:** All background layers are static. No `filter` or `transform` animations run on background elements. The `blur-3xl` filter is applied once and GPU-composited. No continuous repaints. The `will-change-transform` hints the GPU to composite these layers independently.
 
-**Card styling:** Use `<Card variant="glass">` in the admin route. The `variant="glass"` prop applies the premium glassmorphism elevation stack:
-```
-bg-[rgba(47,52,62,0.55)] backdrop-blur-[16px] border border-white/8
-shadow-[inset_0_0_48px_rgba(186,207,247,0.06),inset_0_1px_0_rgba(199,211,234,0.12),0_32px_64px_-32px_rgba(5,6,15,0.85)]
-transition-all duration-200
-hover:border-white/15
-hover:shadow-[inset_0_0_48px_rgba(186,207,247,0.10),inset_0_1px_0_rgba(199,211,234,0.18),0_32px_64px_-32px_rgba(5,6,15,0.9)]
-```
+**Card styling:** Use `<Card variant="glass">` in the admin route. The `variant="glass"` prop applies the premium glassmorphism elevation stack plus the `glass-card-hover-active` conic border animation — on hover, a 1px Electric Iris → Frost Link conic-gradient border fades in (opacity 0→1) and begins rotating 360° over 4s via `@property --conic-angle`. The animation technique avoids `transform` on the pseudo-element (which causes mask compositing bugs where the full element rectangle becomes visible).
 
 **Content fade-in:** `<main className="... animate-in fade-in duration-300">` on the admin layout main element.
 
@@ -561,10 +564,19 @@ hover:shadow-[inset_0_0_48px_rgba(186,207,247,0.10),inset_0_1px_0_rgba(199,211,2
   /* Animations */
   --animate-conic-spin: conic-spin 4s linear infinite;
 
+  /* Conic angle for gradient animation (registered via @property below) */
+  --conic-angle: 0deg;
+
   /* Surfaces */
   --surface-canvas: #05060f;
   --surface-plate: #2f343;
   --surface-iris-lift: #663af3;
+}
+
+@property --conic-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
 }
 
 @keyframes slow-drift {
@@ -660,5 +672,14 @@ hover:shadow-[inset_0_0_48px_rgba(186,207,247,0.10),inset_0_1px_0_rgba(199,211,2
   --shadow-subtle-5: rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
   --shadow-subtle-6: rgba(216, 236, 248, 0.2) 0px 1px 1px 0px inset, rgba(168, 216, 245, 0.06) 0px 24px 48px 0px inset, rgba(0, 0, 0, 0.3) 0px 16px 32px 0px;
   --shadow-subtle-7: rgba(216, 236, 248, 0.2) 0px 1px 1px 0px inset, rgba(168, 216, 245, 0.06) 0px 24px 48px 0px inset;
+}
+
+/* Required for conic-spin animation — registers --conic-angle so the
+   keyframe can interpolate it from 0deg → 360deg. Without this registration,
+   the conic border will still render (via fallback 0deg) but won't animate. */
+@property --conic-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
 }
 ```
