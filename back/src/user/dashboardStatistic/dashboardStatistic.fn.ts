@@ -43,8 +43,9 @@ export const dashboardStatisticFn: ActFn = async (body) => {
     const userFacet: Record<string, unknown[]> = {};
     if (get.userByLevel === 1) {
       userFacet.byLevel = [
-        { $match: { level: { $ne: "Ghost" } } },
-        { $group: { _id: "$level", count: { $sum: 1 } } },
+        { $unwind: "$roles" },
+        { $match: { "roles.name": { $ne: "Ghost" } } },
+        { $group: { _id: "$roles.name", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
       ];
     }

@@ -3,7 +3,7 @@ import { selectStruct } from "../../../mod.ts";
 import { user_pure } from "@model";
 
 export const tempUserValidator = () => {
-  const { isGhost, roles, is_verified, ...rest } = user_pure;
+  const { isGhost, roles, is_verified, createdAt, updatedAt, ...rest } = user_pure;
   return object({
     set: object({ ...rest }),
     get: selectStruct("user", 1),

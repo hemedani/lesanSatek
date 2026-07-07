@@ -8,7 +8,7 @@ export const countUsersSetup = () =>
     schema: "user",
     fn: countUsersFn,
     actName: "countUsers",
-    preValidation: [
+    preAct: [
       setTokens,
       setUser,
       grantAccess([{ roles: ["Manager"] }]),

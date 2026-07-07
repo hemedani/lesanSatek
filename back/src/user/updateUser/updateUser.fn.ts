@@ -1,6 +1,7 @@
 import { type ActFn, Infer, object, ObjectId } from "lesan";
 import { user } from "../../../mod.ts";
 import { user_pure } from "../../../models/user.ts";
+import { hash } from "@da/bcrypt";
 
 export const updateUserFn: ActFn = async (body) => {
   const {
@@ -36,7 +37,7 @@ export const updateUserFn: ActFn = async (body) => {
     ...(mobile !== undefined && { mobile }),
     ...(roles !== undefined && { roles }),
     ...(email !== undefined && { email }),
-    ...(password !== undefined && { password }),
+    ...(password !== undefined && { password: await hash(password) }),
     ...(is_verified !== undefined && { is_verified }),
     ...(position !== undefined && { position }),
     ...(isActive !== undefined && { isActive }),
