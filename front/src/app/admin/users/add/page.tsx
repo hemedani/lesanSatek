@@ -6,16 +6,28 @@ import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Loader2, UserPlus, Shield, X } from "lucide-react";
+import { Loader2, UserPlus, Shield, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/form/form-input";
 import { FormSelect } from "@/components/form/form-select";
 import { FormPasswordInput } from "@/components/form/form-password-input";
 import { FormCheckbox } from "@/components/form/form-checkbox";
 import { FormSection } from "@/components/form/form-section";
+import { FormSearchSelect, SearchSelect } from "@/components/form/form-search-select";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Form } from "@/components/ui/form";
 import { addUser } from "@/app/actions/user/addUser";
+import { gets as getOrganizations } from "@/app/actions/organization/gets";
+import { gets as getUnits } from "@/app/actions/unit/gets";
+import { gets as getStates } from "@/app/actions/state/gets";
+import { gets as getCities } from "@/app/actions/city/gets";
+import {
+  FEATURES_OPTIONS,
+  ROLE_OPTIONS,
+  SCOPE_OPTIONS,
+} from "@/types/permissions";
+import { cn } from "@/lib/utils";
+import type { ReqType } from "@/types/declarations/selectInp";
 import Link from "next/link";
 
 const userSchema = z.object({
@@ -26,25 +38,15 @@ const userSchema = z.object({
   password: z.string().min(6, "رمز عبور باید حداقل ۶ کاراکتر باشد"),
   gender: z.enum(["Male", "Female"]),
   position: z.string().optional(),
+  birth_date: z.string().optional(),
+  organization: z.string().min(1, "انتخاب سازمان الزامی است"),
+  state: z.string().optional(),
+  city: z.string().optional(),
+  isActive: z.boolean(),
   is_verified: z.boolean(),
 });
 
 type UserData = z.input<typeof userSchema>;
-
-const ROLE_OPTIONS = [
-  { value: "Ordinary", label: "عادی" },
-  { value: "Employee", label: "کارمند" },
-  { value: "UnitHead", label: "رئیس واحد" },
-  { value: "OrgHead", label: "رئیس سازمان" },
-  { value: "Admin", label: "ادمین" },
-  { value: "Manager", label: "مدیر" },
-];
-
-const SCOPE_OPTIONS = [
-  { value: "", label: "بدون محدودیت" },
-  { value: "organization", label: "سازمان" },
-  { value: "unit", label: "واحد" },
-];
 
 interface RoleEntry {
   name: string;
@@ -55,6 +57,7 @@ interface RoleEntry {
 export default function AddUserPage() {
   const router = useRouter();
   const [roles, setRoles] = useState<RoleEntry[]>([{ name: "Ordinary" }]);
+  const [features, setFeatures] = useState<string[]>([]);
 
   const form = useForm<UserData>({
     resolver: zodV4Resolver(userSchema),
@@ -66,9 +69,17 @@ export default function AddUserPage() {
       password: "",
       gender: "Male",
       position: "",
+      birth_date: "",
+      organization: "",
+      state: "",
+      city: "",
+      isActive: true,
       is_verified: false,
     },
   });
+
+  const selectedOrganization = form.watch("organization");
+  const selectedState = form.watch("state");
 
   const updateRole = (index: number, field: string, value: string) => {
     setRoles((prev) => {
@@ -86,11 +97,20 @@ export default function AddUserPage() {
     setRoles((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const toggleFeature = (feature: string) => {
+    setFeatures((prev) =>
+      prev.includes(feature)
+        ? prev.filter((f) => f !== feature)
+        : [...prev, feature]
+    );
+  };
+
   const onSubmit = async (data: UserData) => {
     const result = await addUser(
       {
         activeRoleId: "",
         ...data,
+        features: features.map((f) => ({ feature: f as "canRegisterPurchaseRequest" })),
         roles: roles.map((r) => ({
           name: r.name as "Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary",
           ...(r.scopeType ? { scopeType: r.scopeType as "organization" | "unit" } : {}),
@@ -166,10 +186,61 @@ export default function AddUserPage() {
               />
               <FormInput
                 control={form.control}
-                name="position"
-                label="سمت"
-                placeholder="مثال: مدیر مالی"
+                name="birth_date"
+                label="تاریخ تولد"
+                type="date"
                 disabled={isSubmitting}
+              />
+            </div>
+            <FormInput
+              control={form.control}
+              name="position"
+              label="سمت"
+              placeholder="مثال: مدیر مالی"
+              disabled={isSubmitting}
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <FormSearchSelect
+                control={form.control}
+                name="state"
+                label="استان"
+                placeholder="انتخاب استان..."
+                disabled={isSubmitting}
+                fetcher={async (search?: string) => {
+                  const result = await getStates(
+                    { activeRoleId: "", page: 1, limit: 50, search: search || undefined },
+                    { _id: 1, name: 1 }
+                  )
+                  if (!result.success || !result.body) return []
+                  return result.body.map((s: { _id?: string; name?: string }) => ({
+                    _id: s._id || "",
+                    name: s.name || "",
+                  }))
+                }}
+              />
+              <FormSearchSelect
+                control={form.control}
+                name="city"
+                label="شهر"
+                placeholder="انتخاب شهر..."
+                disabled={isSubmitting}
+                fetcher={async (search?: string) => {
+                  const result = await getCities(
+                    {
+                      activeRoleId: "",
+                      page: 1,
+                      limit: 50,
+                      search: search || undefined,
+                      ...(selectedState ? { stateId: selectedState } : {}),
+                    } as unknown as ReqType["main"]["city"]["gets"]["set"],
+                    { _id: 1, name: 1, state: { _id: 1, name: 1 } }
+                  )
+                  if (!result.success || !result.body) return []
+                  return result.body.map((c: { _id?: string; name?: string }) => ({
+                    _id: c._id || "",
+                    name: c.name || "",
+                  }))
+                }}
               />
             </div>
           </FormSection>
@@ -212,16 +283,45 @@ export default function AddUserPage() {
           </FormSection>
 
           <FormSection
-            title="نقش و سطح دسترسی"
-            description="تعیین نقش و محدوده دسترسی کاربر در سازمان"
+            title="سازمان و سطح دسترسی"
+            description="انتساب کاربر به سازمان و تعیین نقش و محدوده دسترسی"
           >
+            <FormSearchSelect
+              control={form.control}
+              name="organization"
+              label="سازمان"
+              placeholder="انتخاب سازمان..."
+              required
+              disabled={isSubmitting}
+              fetcher={async (search?: string) => {
+                const result = await getOrganizations(
+                  {
+                    activeRoleId: "",
+                    page: 1,
+                    limit: 50,
+                    search: search || undefined,
+                  },
+                  { _id: 1, name: 1 }
+                )
+                if (!result.success || !result.body) return []
+                return result.body.map((org: { _id?: string; name?: string }) => ({
+                  _id: org._id || "",
+                  name: org.name || "",
+                }))
+              }}
+            />
             <div className="space-y-3">
               {roles.map((role, index) => (
                 <div
                   key={index}
                   className="flex items-start gap-2 p-3.5 rounded-lg bg-white/[0.02] border border-steel-border/20"
                 >
-                  <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className={cn(
+                    "flex-1 grid gap-3",
+                    role.scopeType
+                      ? "grid-cols-1 sm:grid-cols-3"
+                      : "grid-cols-1 sm:grid-cols-2"
+                  )}>
                     <div className="space-y-1.5">
                       <label className="text-xs text-fog/70 block font-medium">نقش</label>
                       <select
@@ -241,7 +341,10 @@ export default function AddUserPage() {
                       <label className="text-xs text-fog/70 block font-medium">حوزه</label>
                       <select
                         value={role.scopeType || ""}
-                        onChange={(e) => updateRole(index, "scopeType", e.target.value)}
+                        onChange={(e) => {
+                          updateRole(index, "scopeType", e.target.value)
+                          if (!e.target.value) updateRole(index, "scopeId", "")
+                        }}
                         disabled={isSubmitting}
                         className="w-full h-9 rounded-sm bg-white/[0.03] border border-steel-border/60 px-3 text-sm text-moonlight transition-all duration-200 outline-none hover:border-frost-link/20 focus:border-ring focus:ring-3 focus:ring-ring/50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
@@ -252,16 +355,60 @@ export default function AddUserPage() {
                         ))}
                       </select>
                     </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs text-fog/70 block font-medium">شناسه حوزه</label>
-                      <input
-                        value={role.scopeId || ""}
-                        onChange={(e) => updateRole(index, "scopeId", e.target.value)}
-                        placeholder="شناسه..."
-                        disabled={isSubmitting}
-                        className="w-full h-9 rounded-sm bg-white/[0.03] border border-steel-border/60 px-3 text-sm text-moonlight transition-all duration-200 outline-none hover:border-frost-link/20 focus:border-ring focus:ring-3 focus:ring-ring/50 placeholder:text-fog/40 disabled:opacity-50 disabled:cursor-not-allowed"
-                      />
-                    </div>
+                    {role.scopeType && (
+                      <div className="space-y-1.5">
+                        <label className="text-xs text-fog/70 block font-medium">
+                          {role.scopeType === "organization" ? "سازمان" : "واحد"}
+                        </label>
+                        <SearchSelect
+                          value={role.scopeId || ""}
+                          onChange={(v) => updateRole(index, "scopeId", v)}
+                          placeholder={
+                            role.scopeType === "organization"
+                              ? "انتخاب سازمان..."
+                              : "انتخاب واحد..."
+                          }
+                          fetcher={
+                            role.scopeType === "organization"
+                              ? async (search?: string) => {
+                                  const result = await getOrganizations(
+                                    {
+                                      activeRoleId: "",
+                                      page: 1,
+                                      limit: 50,
+                                      search: search || undefined,
+                                    },
+                                    { _id: 1, name: 1 }
+                                  )
+                                  if (!result.success || !result.body) return []
+                                  return result.body.map((o: { _id?: string; name?: string }) => ({
+                                    _id: o._id || "",
+                                    name: o.name || "",
+                                  }))
+                                }
+                              : async (search?: string) => {
+                                  const result = await getUnits(
+                                    {
+                                      activeRoleId: "",
+                                      page: 1,
+                                      limit: 50,
+                                      search: search || undefined,
+                                      organizationId: selectedOrganization || undefined,
+                                    },
+                                    { _id: 1, name: 1 }
+                                  )
+                                  if (!result.success || !result.body) return []
+                                  return result.body.map((u: { _id?: string; name?: string }) => ({
+                                    _id: u._id || "",
+                                    name: u.name || "",
+                                  }))
+                                }
+                          }
+                          label={role.scopeType === "organization" ? "سازمان" : "واحد"}
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                    )}
                   </div>
                   {roles.length > 1 && (
                     <Button
@@ -288,6 +435,36 @@ export default function AddUserPage() {
                 <Shield className="size-3.5" />
                 افزودن نقش
               </Button>
+            </div>
+          </FormSection>
+
+          <FormSection
+            title="دسترسی‌های ویژه"
+            description="تعیین دسترسی‌های خاص کاربر در سامانه"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {FEATURES_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => toggleFeature(opt.value)}
+                  disabled={isSubmitting}
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border ${
+                    features.includes(opt.value)
+                      ? "bg-electric-iris/10 border-electric-iris/25 text-frost-link"
+                      : "bg-white/[0.02] border-steel-border/20 text-fog/70 hover:text-moonlight hover:border-steel-border/40"
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  <div className={`size-4 rounded flex items-center justify-center transition-colors ${
+                    features.includes(opt.value)
+                      ? "bg-electric-iris text-white"
+                      : "bg-white/[0.05] border border-steel-border/30"
+                  }`}>
+                    {features.includes(opt.value) && <Check className="size-3" />}
+                  </div>
+                  <span>{opt.label}</span>
+                </button>
+              ))}
             </div>
           </FormSection>
 
