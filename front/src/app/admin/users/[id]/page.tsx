@@ -20,6 +20,10 @@ import { ErrorState } from "@/components/ui/error-state";
 import { getUser } from "@/app/actions/user/getUser";
 import { updateUser } from "@/app/actions/user/updateUser";
 import { removeUser } from "@/app/actions/user/removeUser";
+import {
+  FEATURES_OPTIONS,
+  ROLE_OPTIONS,
+} from "@/types/permissions";
 import Link from "next/link";
 
 const userSchema = z.object({
@@ -31,35 +35,10 @@ const userSchema = z.object({
   isActive: z.boolean(),
   is_verified: z.boolean(),
   position: z.string().optional(),
+  birth_date: z.string().optional(),
 });
 
 type UserData = z.input<typeof userSchema>;
-
-const FEATURES_OPTIONS = [
-  { value: "canRegisterPurchaseRequest", label: "ثبت درخواست خرید" },
-  { value: "canApprovePurchaseRequest", label: "تایید درخواست خرید" },
-  { value: "canAssignItemsToOrder", label: "اختصاص آیتم به سفارش" },
-  { value: "canCreateTender", label: "ایجاد مناقصه" },
-  { value: "canRespondToTender", label: "پاسخ به مناقصه" },
-  { value: "canViewWarehouse", label: "مشاهده انبار" },
-  { value: "canManageUnitInventory", label: "مدیریت موجودی واحد" },
-  { value: "canCreateConsumptionRecord", label: "ثبت مصرف" },
-  { value: "canManageBudget", label: "مدیریت بودجه" },
-  { value: "canViewBudgetReports", label: "مشاهده گزارش بودجه" },
-  { value: "canManageFeatures", label: "مدیریت دسترسی‌ها" },
-  { value: "canConfirmGoodsReceipt", label: "تایید رسید کالا" },
-  { value: "canIssuePaymentOrder", label: "صدور دستور پرداخت" },
-  { value: "canViewHistory", label: "مشاهده تاریخچه" },
-];
-
-const ROLE_OPTIONS = [
-  { value: "Manager", label: "مدیر" },
-  { value: "Admin", label: "ادمین" },
-  { value: "OrgHead", label: "رئیس سازمان" },
-  { value: "UnitHead", label: "رئیس واحد" },
-  { value: "Employee", label: "کارمند" },
-  { value: "Ordinary", label: "عادی" },
-];
 
 interface RoleEntry {
   roleId?: string;
@@ -90,6 +69,7 @@ export default function EditUserPage({
       isActive: true,
       is_verified: false,
       position: "",
+      birth_date: "",
     },
   });
 
@@ -108,6 +88,7 @@ export default function EditUserPage({
           isActive: 1,
           is_verified: 1,
           position: 1,
+          birth_date: 1,
           roles: 1,
           features: 1,
           organization: { _id: 1, name: 1 },
@@ -124,6 +105,7 @@ export default function EditUserPage({
           isActive: user.isActive ?? true,
           is_verified: user.is_verified ?? false,
           position: user.position || "",
+          birth_date: user.birth_date || "",
         });
         setFeatures(user.features?.map((f: { feature: string }) => f.feature) || []);
         setRoles(user.roles || [{ name: "Ordinary" }]);
@@ -221,7 +203,7 @@ export default function EditUserPage({
   }
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-8 max-w-2xl mx-auto">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link
@@ -275,15 +257,23 @@ export default function EditUserPage({
               label="شماره موبایل"
               required
             />
-            <FormSelect
-              control={form.control}
-              name="gender"
-              label="جنسیت"
-              options={[
-                { value: "Male", label: "مرد" },
-                { value: "Female", label: "زن" },
-              ]}
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <FormSelect
+                control={form.control}
+                name="gender"
+                label="جنسیت"
+                options={[
+                  { value: "Male", label: "مرد" },
+                  { value: "Female", label: "زن" },
+                ]}
+              />
+              <FormInput
+                control={form.control}
+                name="birth_date"
+                label="تاریخ تولد"
+                type="date"
+              />
+            </div>
             <FormInput
               control={form.control}
               name="position"
