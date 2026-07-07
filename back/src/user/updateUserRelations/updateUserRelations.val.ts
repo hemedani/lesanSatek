@@ -9,6 +9,8 @@ export const updateUserRelationsValidator = () => {
       _id: objectIdValidation,
       avatar: optional(objectIdValidation),
       organization: optional(objectIdValidation),
+      state: optional(objectIdValidation),
+      city: optional(objectIdValidation),
       units: optional(array(objectIdValidation)),
     }),
     get: selectStruct("user", 1),

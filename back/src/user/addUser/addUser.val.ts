@@ -27,6 +27,8 @@ export const addUserValidator = () => {
       last_name: string(),
       gender: user_genders,
       birth_date: optional(string()),
+      position: optional(string()),
+      isActive: defaulted(boolean(), true),
       roles: array(object({
         roleId: optional(string()),
         name: role_emums,
@@ -44,6 +46,8 @@ export const addUserValidator = () => {
       allowWareModelIds: optional(array(string())),
       avatar: optional(objectIdValidation),
       organization: optional(objectIdValidation),
+      state: optional(objectIdValidation),
+      city: optional(objectIdValidation),
     }),
     get: selectStruct("user", 1),
   });

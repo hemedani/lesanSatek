@@ -74,7 +74,7 @@ import {
   string,
 } from "lesan";
 import { createUpdateAt } from "@lib";
-import { file_excludes, organization_excludes, unit_excludes } from "./excludes.ts";
+import { city_excludes, file_excludes, organization_excludes, state_excludes, unit_excludes } from "./excludes.ts";
 import { feature_enums } from "./featureConstants.ts";
 
 export const role_array = [
@@ -148,6 +148,38 @@ export const user_relations = {
     type: "single" as RelationDataType,
     optional: true,
     excludes: organization_excludes,
+    relatedRelations: {
+      users: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  state: {
+    schemaName: "state",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: state_excludes,
+    relatedRelations: {
+      users: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  city: {
+    schemaName: "city",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: city_excludes,
     relatedRelations: {
       users: {
         type: "multiple" as RelationDataType,
