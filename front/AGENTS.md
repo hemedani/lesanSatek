@@ -145,7 +145,8 @@ src/app/actions/
 │   ├── add.ts           # Create a single record
 │   ├── get.ts           # Retrieve a single record by ID
 │   ├── gets.ts          # Retrieve multiple records (with pagination/filtering)
-│   ├── update.ts        # Update an existing record
+│   ├── update.ts        # Update an existing record (pure fields only)
+│   ├── updateRelations.ts # Update relations separately (replace semantics)
 │   ├── remove.ts        # Delete a record
 │   └── count.ts         # Get count of records
 ├── auth/                # Authentication-specific actions
@@ -210,13 +211,50 @@ const orgs = await gets(
 );
 ```
 
-#### update - Modify a Record
+#### update - Modify a Record (Pure Fields Only)
 ```ts
 const updated = await update(
   { _id: "...", name: "Updated Name" },
   { _id: 1, name: 1 },
 );
 ```
+
+#### updateRelations — Modify Relations Separately
+
+**Use `updateRelations` for models that have dedicated relation-update actions** (e.g., `organization.updateRelations`, `user.updateUserRelations`, `unit.updateRelations`). This action uses `replace: true` semantics — all fields in the set are replaced; omitting a field leaves it unchanged.
+
+**Remove flags** — some models support explicit removal via boolean flags:
+```ts
+// Examples:
+await updateRelations(
+  {
+    activeRoleId: "",
+    _id: orgId,
+    state: "STATE_ID",
+    city: "CITY_ID",
+    removeLogo: true,
+    removeHead: true,
+  },
+  { _id: 1, name: 1 }
+);
+
+await updateUserRelations(
+  {
+    activeRoleId: "",
+    _id: userId,
+    organization: "ORG_ID",
+    state: "STATE_ID",
+    city: "CITY_ID",
+  },
+  { _id: 1, first_name: 1 }
+);
+```
+
+**Separate Relations Pages** — Each model's relations are managed on a standalone `/admin/<entity>/:id/relations` page accessible from:
+- The list view (Share2 icon button per row in DataTable)
+- The edit view (centered "ویرایش روابط" button below the pure-fields form)
+
+The relations page lives at `src/app/admin/<entity>/[id]/relations/page.tsx`, shares no form context with the pure-fields edit page, and uses the standalone `SearchSelect` component (not `FormSearchSelect`) since it manages state outside react-hook-form.
 
 #### remove - Delete a Record
 ```ts
@@ -283,13 +321,8 @@ const newDept = await add(
 ```
 
 #### 3. Update Relations Separately
-```ts
-// Update basic fields
-await update({ _id: deptId, name: "New Name" }, { _id: 1 });
 
-// Update relations separately
-await updateRelations({ _id: deptId, organization: newOrgId }, { _id: 1 });
-```
+See the full `updateRelations` documentation under [Action Types](#updaterelations--modify-relations-separately).
 
 ### Response Structure
 

@@ -273,25 +273,36 @@
 - [x] Sidebar link for Users already exists
 
 ### 8C: Unit Management (Tree Structure — Department eliminated)
-- [ ] Create `src/app/admin/units/page.tsx` — tree view of all units in organization
-- [ ] Create `src/components/unit/unit-tree.tsx` — recursive tree component
-- [ ] Create `src/app/admin/units/add/page.tsx` — add unit form (type, attributes, parent selection)
-- [ ] Create `src/app/admin/units/[id]/page.tsx` — edit/view unit (type, attributes, head, features, allowWare*Ids)
-- [ ] Add sidebar link for Units
+- [x] Create `src/app/admin/units/page.tsx` — tree view of all units in organization
+- [x] Create `src/components/unit/unit-tree.tsx` — recursive tree component
+- [x] Create `src/app/admin/units/add/page.tsx` — add unit form (type, attributes, parent selection)
+- [x] Create `src/app/admin/units/[id]/page.tsx` — edit/view unit (type, attributes, head)
+- [x] Add sidebar link for Units (already existed)
+- [x] Create `src/app/admin/units/[id]/relations/page.tsx` — unit relations management
 
 ### 8D: Tag Management
-- [ ] Create `src/app/admin/tags/page.tsx` — tag list with color/icon display
-- [ ] Create tag add/edit modal
-- [ ] Add sidebar link for Tags
+- [x] Create `src/app/admin/tags/page.tsx` — tag list with color/icon display
+- [x] Create tag add/edit modal (inline dialog)
+- [x] Add sidebar link for Tags (already existed)
 
 ### 8E: Process Builder
-- [ ] Create `src/app/admin/processes/page.tsx` — list all processes (filter by status)
-- [ ] Create `src/app/admin/processes/add/page.tsx` — create process with steps
-- [ ] Create `src/components/process/process-builder.tsx` — step builder with drag-and-drop ordering
-- [ ] Create `src/components/process/process-step-card.tsx` — step configuration card (assigneeGroups embedded)
-- [ ] Create `src/components/process/assignee-group-editor.tsx` — OR/AND group editor
-- [ ] Create `src/app/admin/processes/[id]/page.tsx` — view/edit process, activate/duplicate
-- [ ] Add sidebar link for Processes
+- [x] Create `src/app/admin/processes/page.tsx` — list all processes
+- [x] Create `src/app/admin/processes/add/page.tsx` — create process with steps
+- [x] Create `src/components/process/process-builder.tsx` — step builder with reordering
+- [x] Create `src/components/process/process-step-card.tsx` — step configuration card (assigneeGroups embedded)
+- [x] Create `src/components/process/assignee-group-editor.tsx` — OR/AND group editor (inline in step card)
+- [x] Create `src/app/admin/processes/[id]/page.tsx` — view/edit process, activate/duplicate
+- [x] Add sidebar link for Processes (already existed)
+- [x] Create `src/app/admin/processes/[id]/relations/page.tsx` — process relations
+
+### 8F: Geographic Reference (State/City) — Prerequisite for Organization, User, Unit forms
+- [x] Create `src/app/admin/states/page.tsx` — state list with add/edit inline dialog
+- [x] Create `src/app/admin/states/states-client.tsx` — DataTable, dialog, cards, delete confirm
+- [x] Create `src/app/admin/states/loading.tsx` — skeleton loader
+- [x] Create `src/app/admin/cities/page.tsx` — city list (fetch states for filter dropdown)
+- [x] Create `src/app/admin/cities/cities-client.tsx` — DataTable with state filter, FormSearchSelect for state
+- [x] Create `src/app/admin/cities/loading.tsx` — skeleton loader
+- [x] Add sidebar links for States (`Map` icon) and Cities (`MapPin` icon)
 
 ## Phase 9: Admin Pages — Warehouse & Inventory
 
@@ -328,11 +339,6 @@
 - [ ] Create `src/app/admin/inventory/page.tsx` — unit inventory list with stock movements
 - [ ] Create inventory detail/adjust/transfer forms
 - [ ] Add sidebar link for Inventory
-
-### 9G: Geographic Reference (State/City)
-- [ ] Create `src/app/admin/states/page.tsx` — state list
-- [ ] Create `src/app/admin/cities/page.tsx` — city list (filterable by state)
-- [ ] Add sidebar links
 
 ## Phase 10: Admin Pages — Purchasing Request Workflow (Core Feature)
 

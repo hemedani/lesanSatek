@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
+import { useState, useCallback } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Building2,
@@ -28,22 +28,24 @@ import {
   FileSpreadsheet,
   PanelLeftClose,
   PanelLeft,
-} from "lucide-react"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Button } from "@/components/ui/button"
-import { Logo } from "@/components/layout/logo"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+  Map,
+  MapPin,
+} from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/layout/logo";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface NavItem {
-  label: string
-  href: string
-  icon: React.ElementType
+  label: string;
+  href: string;
+  icon: React.ElementType;
 }
 
 interface NavSection {
-  label: string
-  items: NavItem[]
+  label: string;
+  items: NavItem[];
 }
 
 const navSections: NavSection[] = [
@@ -56,6 +58,8 @@ const navSections: NavSection[] = [
       { label: "واحدها", href: "/admin/units", icon: GitBranch },
       { label: "برچسب‌ها", href: "/admin/tags", icon: Tags },
       { label: "فرآیندها", href: "/admin/processes", icon: Workflow },
+      { label: "استان‌ها", href: "/admin/states", icon: Map },
+      { label: "شهرها", href: "/admin/cities", icon: MapPin },
     ],
   },
   {
@@ -88,20 +92,20 @@ const navSections: NavSection[] = [
       { label: "گزارش بودجه", href: "/admin/budget-reports", icon: FileSpreadsheet },
     ],
   },
-]
+];
 
 function NavItemLink({
   item,
   collapsed,
   onNavigate,
 }: {
-  item: NavItem
-  collapsed: boolean
-  onNavigate?: () => void
+  item: NavItem;
+  collapsed: boolean;
+  onNavigate?: () => void;
 }) {
-  const pathname = usePathname()
-  const Icon = item.icon
-  const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+  const pathname = usePathname();
+  const Icon = item.icon;
+  const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
 
   const link = (
     <Link
@@ -133,9 +137,7 @@ function NavItemLink({
         className={cn(
           "size-5 shrink-0 transition-all duration-300 ease-out",
           !collapsed && "ms-0.5",
-          isActive
-            ? "text-electric-iris"
-            : "text-fog/70 group-hover:text-glacier",
+          isActive ? "text-electric-iris" : "text-fog/70 group-hover:text-glacier",
         )}
       />
 
@@ -150,9 +152,9 @@ function NavItemLink({
         </span>
       )}
     </Link>
-  )
+  );
 
-  if (!collapsed) return link
+  if (!collapsed) return link;
 
   return (
     <Tooltip>
@@ -164,19 +166,19 @@ function NavItemLink({
         {item.label}
       </TooltipContent>
     </Tooltip>
-  )
+  );
 }
 
-const COLLAPSED_WIDTH = 68
+const COLLAPSED_WIDTH = 68;
 
 function SidebarContent({
   collapsed,
   onToggle,
   onNavigate,
 }: {
-  collapsed: boolean
-  onToggle: () => void
-  onNavigate?: () => void
+  collapsed: boolean;
+  onToggle: () => void;
+  onNavigate?: () => void;
 }) {
   return (
     <div className="flex min-h-0 h-full flex-col">
@@ -216,11 +218,7 @@ function SidebarContent({
               : "opacity-0 group-hover/sidebar:opacity-100",
           )}
         >
-          {collapsed ? (
-            <PanelLeft className="size-3" />
-          ) : (
-            <PanelLeftClose className="size-4" />
-          )}
+          {collapsed ? <PanelLeft className="size-3" /> : <PanelLeftClose className="size-4" />}
         </Button>
       </div>
 
@@ -229,7 +227,12 @@ function SidebarContent({
 
       {/* Navigation */}
       <ScrollArea className="flex-1 min-h-0">
-        <nav className={cn("transition-all duration-300 ease-out", collapsed ? "px-3 pt-5 pb-5" : "px-3 pt-5 pb-5")}>
+        <nav
+          className={cn(
+            "transition-all duration-300 ease-out",
+            collapsed ? "px-3 pt-5 pb-5" : "px-3 pt-5 pb-5",
+          )}
+        >
           {navSections.map((section, sectionIdx) => (
             <div
               key={section.label}
@@ -252,12 +255,12 @@ function SidebarContent({
                 </div>
               )}
 
-              <div className={cn(
-                "transition-all duration-300 ease-out",
-                collapsed
-                  ? "flex flex-col items-center gap-1"
-                  : "space-y-0.5",
-              )}>
+              <div
+                className={cn(
+                  "transition-all duration-300 ease-out",
+                  collapsed ? "flex flex-col items-center gap-1" : "space-y-0.5",
+                )}
+              >
                 {section.items.map((item) => (
                   <NavItemLink
                     key={item.href}
@@ -288,24 +291,24 @@ function SidebarContent({
         )}
       </div>
     </div>
-  )
+  );
 }
 
 function AdminSidebar() {
   const [collapsed, setCollapsed] = useState(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("admin-sidebar-collapsed") === "true"
+      return localStorage.getItem("admin-sidebar-collapsed") === "true";
     }
-    return false
-  })
+    return false;
+  });
 
   const handleToggle = useCallback(() => {
     setCollapsed((prev) => {
-      const next = !prev
-      localStorage.setItem("admin-sidebar-collapsed", String(next))
-      return next
-    })
-  }, [])
+      const next = !prev;
+      localStorage.setItem("admin-sidebar-collapsed", String(next));
+      return next;
+    });
+  }, []);
 
   return (
     <aside
@@ -314,17 +317,21 @@ function AdminSidebar() {
     >
       <SidebarContent collapsed={collapsed} onToggle={handleToggle} />
     </aside>
-  )
+  );
 }
 
 function AdminMobileNav() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
         render={
-          <Button variant="ghost" size="icon-sm" className="lg:hidden rounded-lg text-fog hover:text-glacier hover:bg-white/[0.04] transition-all duration-200" />
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="lg:hidden rounded-lg text-fog hover:text-glacier hover:bg-white/[0.04] transition-all duration-200"
+          />
         }
       >
         <PanelLeft className="size-5" />
@@ -336,7 +343,7 @@ function AdminMobileNav() {
         <SidebarContent collapsed={false} onToggle={() => {}} onNavigate={() => setOpen(false)} />
       </SheetContent>
     </Sheet>
-  )
+  );
 }
 
-export { AdminSidebar, AdminMobileNav }
+export { AdminSidebar, AdminMobileNav };
