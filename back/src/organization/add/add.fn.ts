@@ -7,7 +7,7 @@ export const addFn: ActFn = async (body) => {
 	const { user }: MyContext = coreApp.contextFns
 		.getContextModel() as MyContext;
 
-	const { activeRoleId, logoId, headId, ...rest } = set;
+	const { activeRoleId, logoId, headId, state, city, ...rest } = set;
 
 	const relations: Record<string, unknown> = {
 		creator: {
@@ -26,6 +26,24 @@ export const addFn: ActFn = async (body) => {
 			_ids: new ObjectId(headId as string),
 			relatedRelations: {
 				headedOrganization: true,
+			},
+		};
+	}
+
+	if (state) {
+		relations.state = {
+			_ids: new ObjectId(state as string),
+			relatedRelations: {
+				organizations: true,
+			},
+		};
+	}
+
+	if (city) {
+		relations.city = {
+			_ids: new ObjectId(city as string),
+			relatedRelations: {
+				organizations: true,
 			},
 		};
 	}

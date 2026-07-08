@@ -1,9 +1,10 @@
 import type { ActFn, Document } from "lesan";
+import { ObjectId } from "lesan";
 import { city } from "../../../mod.ts";
 
 export const getsFn: ActFn = async (body) => {
 	const {
-		set: { page, limit, skip, search, sortBy, sortOrder },
+		set: { page, limit, skip, search, stateId, sortBy, sortOrder },
 		get,
 	} = body.details;
 
@@ -12,6 +13,11 @@ export const getsFn: ActFn = async (body) => {
 	search &&
 		pipeline.push({
 			$match: { $text: { $search: search } },
+		});
+
+	stateId &&
+		pipeline.push({
+			$match: { "state._id": new ObjectId(stateId) },
 		});
 
 	if (search && (!sortBy || sortBy === "relevance")) {

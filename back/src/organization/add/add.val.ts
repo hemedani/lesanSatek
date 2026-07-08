@@ -10,6 +10,8 @@ export const addValidator = () => {
 			...organization_pure,
 			logoId: optional(objectIdValidation),
 			headId: optional(objectIdValidation),
+			state: optional(objectIdValidation),
+			city: optional(objectIdValidation),
 		}),
 		get: selectStruct("organization", 1),
 	});

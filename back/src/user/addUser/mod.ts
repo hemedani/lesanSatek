@@ -8,7 +8,6 @@ import {
 import { coreApp } from "../../../mod.ts";
 import { addUserFn } from "./addUser.fn.ts";
 import { addUserValidator } from "./addUser.val.ts";
-import { role_array } from "@model";
 
 export const checkGhostUser = () => {
   const { user, body }: MyContext = coreApp.contextFns

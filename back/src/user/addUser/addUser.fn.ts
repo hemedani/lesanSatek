@@ -6,12 +6,27 @@ import { hash } from "@da/bcrypt";
 export const addUserFn: ActFn = async (body) => {
   const { set, get } = body.details;
 
-  const { activeRoleId, avatar, organization, state, city, password, roles, ...rest } = set;
+  const {
+    activeRoleId,
+    avatar,
+    organization,
+    state,
+    city,
+    password,
+    roles,
+    ...rest
+  } = set;
 
-  const rolesWithIds = (roles as { name: string; scopeType?: "organization" | "unit"; scopeId?: string; roleId?: string }[] | undefined)?.map((r) => ({
-    ...r,
-    roleId: r.roleId || crypto.randomUUID(),
-  }));
+  const rolesWithIds =
+    (roles as {
+      name: string;
+      scopeType?: "organization" | "unit";
+      scopeId?: string;
+      roleId?: string;
+    }[] | undefined)?.map((r) => ({
+      ...r,
+      roleId: r.roleId || crypto.randomUUID(),
+    }));
 
   const relations: TInsertRelations<typeof user_relations> = {};
 
@@ -22,7 +37,7 @@ export const addUserFn: ActFn = async (body) => {
 
   organization &&
     (relations.organization = {
-      _ids: [new ObjectId(organization as string)],
+      _ids: new ObjectId(organization as string),
       relatedRelations: {
         users: true,
       },
@@ -49,7 +64,9 @@ export const addUserFn: ActFn = async (body) => {
       ...rest,
       ...(rolesWithIds && { roles: rolesWithIds }),
       password: password ? await hash(password as string) : undefined,
-      birth_date: rest.birth_date ? new Date(rest.birth_date as string) : undefined,
+      birth_date: rest.birth_date
+        ? new Date(rest.birth_date as string)
+        : undefined,
     },
     relations,
     projection: get,

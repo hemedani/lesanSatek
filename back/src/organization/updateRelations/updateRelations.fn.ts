@@ -3,7 +3,7 @@ import { organization } from "../../../mod.ts";
 
 export const updateRelationsFn: ActFn = async (body) => {
 	const {
-		set: { _id, logo, removeLogo, head, removeHead },
+		set: { _id, logo, removeLogo, head, removeHead, state, removeState, city, removeCity },
 		get,
 	} = body.details;
 
@@ -59,6 +59,68 @@ export const updateRelationsFn: ActFn = async (body) => {
 					_ids: new ObjectId(head),
 					relatedRelations: {
 						headedOrganization: true,
+					},
+				},
+			},
+			projection: get,
+			replace: true,
+		});
+	}
+
+	if (removeState) {
+		await organization.removeRelation({
+			filters: { _id: orgId },
+			relations: {
+				state: {
+					_ids: orgId,
+					relatedRelations: {
+						organizations: true,
+					},
+				},
+			},
+			projection: get,
+		});
+	}
+
+	if (state) {
+		await organization.addRelation({
+			filters: { _id: orgId },
+			relations: {
+				state: {
+					_ids: new ObjectId(state),
+					relatedRelations: {
+						organizations: true,
+					},
+				},
+			},
+			projection: get,
+			replace: true,
+		});
+	}
+
+	if (removeCity) {
+		await organization.removeRelation({
+			filters: { _id: orgId },
+			relations: {
+				city: {
+					_ids: orgId,
+					relatedRelations: {
+						organizations: true,
+					},
+				},
+			},
+			projection: get,
+		});
+	}
+
+	if (city) {
+		await organization.addRelation({
+			filters: { _id: orgId },
+			relations: {
+				city: {
+					_ids: new ObjectId(city),
+					relatedRelations: {
+						organizations: true,
 					},
 				},
 			},

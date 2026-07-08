@@ -33,7 +33,7 @@ export const getsFn: ActFn = async (body) => {
 
   if (organizationId) {
     pipeline.push({
-      $match: { organization: new ObjectId(organizationId as string) },
+      $match: { "organization._id": new ObjectId(organizationId as string) },
     });
   }
 

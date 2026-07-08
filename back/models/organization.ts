@@ -34,7 +34,7 @@ import {
   string,
 } from "lesan";
 import { createUpdateAt } from "@lib";
-import { file_excludes, user_excludes } from "./excludes.ts";
+import { city_excludes, file_excludes, state_excludes, user_excludes } from "./excludes.ts";
 
 export const organization_pure = {
   name: string(),
@@ -77,6 +77,38 @@ export const organization_relations = {
       headedOrganization: {
         type: "single" as RelationDataType,
         excludes: ["createdAt", "updatedAt"],
+      },
+    },
+  },
+  state: {
+    schemaName: "state",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: state_excludes,
+    relatedRelations: {
+      organizations: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  city: {
+    schemaName: "city",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: city_excludes,
+    relatedRelations: {
+      organizations: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
       },
     },
   },
