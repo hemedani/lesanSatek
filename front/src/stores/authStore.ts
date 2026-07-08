@@ -20,7 +20,9 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  activeRoleId: string;
   setUser: (user: User | null) => void;
+  setActiveRoleId: (roleId: string) => void;
   setLoading: (loading: boolean) => void;
   logout: () => void;
 }
@@ -29,7 +31,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
   isLoading: true,
+  activeRoleId: "",
   setUser: (user) => set({ user, isAuthenticated: !!user, isLoading: false }),
+  setActiveRoleId: (activeRoleId) => set({ activeRoleId }),
   setLoading: (isLoading) => set({ isLoading }),
-  logout: () => set({ user: null, isAuthenticated: false, isLoading: false }),
+  logout: () => set({ user: null, isAuthenticated: false, isLoading: false, activeRoleId: "" }),
 }));

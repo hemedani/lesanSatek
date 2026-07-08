@@ -7,9 +7,13 @@ import { Loader2 } from "lucide-react"
 import { getMe } from "@/app/actions/auth/getMe"
 import { useAuthStore } from "@/stores/authStore"
 
+function setActiveRoleCookie(roleId: string) {
+  document.cookie = `activeRoleId=${encodeURIComponent(roleId)}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`
+}
+
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const { user, isAuthenticated, isLoading, setUser, setLoading } = useAuthStore()
+  const { user, isAuthenticated, isLoading, setUser, setActiveRoleId, setLoading } = useAuthStore()
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
@@ -20,6 +24,11 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
       const result = await getMe()
       if (result.success && result.body) {
         setUser(result.body)
+        const firstRole = result.body.roles?.[0]
+        if (firstRole && !useAuthStore.getState().activeRoleId) {
+          setActiveRoleId(firstRole.roleId)
+          setActiveRoleCookie(firstRole.roleId)
+        }
       } else {
         setUser(null)
         router.push("/login")
@@ -28,7 +37,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     }
 
     check()
-  }, [user, checked, setUser, setLoading, router])
+  }, [user, checked, setUser, setActiveRoleId, setLoading, router])
 
   if (isLoading && !user) {
     return (

@@ -20,10 +20,14 @@ const loginSchema = z.object({
 
 type LoginData = z.infer<typeof loginSchema>
 
+function setActiveRoleCookie(roleId: string) {
+  document.cookie = `activeRoleId=${encodeURIComponent(roleId)}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`
+}
+
 function LoginForm() {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
-  const setUser = useAuthStore((s) => s.setUser)
+  const { setUser, setActiveRoleId } = useAuthStore()
 
   const form = useForm<LoginData>({
     resolver: zodV4Resolver(loginSchema),
@@ -36,6 +40,11 @@ function LoginForm() {
 
     if (result.success && result.body?.user) {
       setUser(result.body.user)
+      const firstRole = result.body.user.roles?.[0]
+      if (firstRole) {
+        setActiveRoleId(firstRole.roleId)
+        setActiveRoleCookie(firstRole.roleId)
+      }
       router.push("/admin")
     } else {
       setError(result.body?.message || "ایمیل یا رمز عبور اشتباه است")

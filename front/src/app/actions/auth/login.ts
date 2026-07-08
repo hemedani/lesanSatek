@@ -46,6 +46,18 @@ export const login = async (
         path: "/",
         maxAge: 60 * 60 * 24 * 7,
       });
+
+      if (result.body.user?.roles?.length > 0) {
+        const currentActiveRoleId = cookieStore.get("activeRoleId")?.value;
+        const roleId = currentActiveRoleId || result.body.user.roles[0].roleId;
+        cookieStore.set("activeRoleId", roleId, {
+          httpOnly: false,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 7,
+        });
+      }
     }
 
     return result;
