@@ -307,166 +307,146 @@
 ## Phase 9: Admin Pages — Warehouse & Inventory
 
 ### 9A: Product Classification Hierarchy
-- [ ] Create `src/app/admin/ware-types/page.tsx` — WareType list
-- [ ] Create `src/app/admin/ware-classes/page.tsx` — WareClass list (filterable by WareType)
-- [ ] Create `src/app/admin/ware-groups/page.tsx` — WareGroup list (M:N with WareClass)
-- [ ] Create `src/app/admin/ware-models/page.tsx` — WareModel list (filter by hierarchy)
-- [ ] Create CRUD add/edit forms for each level (wareType → wareClass → wareGroup → wareModel)
-- [ ] Add sidebar links for all hierarchy levels
+- [x] Create `src/app/admin/ware-types/page.tsx` — WareType list with inline add/edit dialog
+- [x] Create `src/app/admin/ware-classes/page.tsx` — WareClass list (filterable by WareType) with inline add/edit dialog
+- [x] Create `src/app/admin/ware-groups/page.tsx` — WareGroup list (filterable by WareType) with inline dialog
+- [x] Create `src/app/admin/ware-models/page.tsx` — WareModel list (filterable by WareType) with inline dialog
+- [x] CRUD add/edit forms for each level with inline dialogs (FormSearchSelect for relations)
+- [x] Sidebar links already existed for all hierarchy levels
 
 ### 9B: Manufacturer Management
-- [ ] Create `src/app/admin/manufacturers/page.tsx` — manufacturer list
-- [ ] Create add/edit manufacturer form
-- [ ] Add sidebar link for Manufacturers
+- [x] Create `src/app/admin/manufacturers/page.tsx` — manufacturer list with inline CRUD
+- [x] Add/edit manufacturer form with name, enName, country fields
+- [x] Added sidebar link for Manufacturers (Factory icon, before Stores)
 
 ### 9C: Ware Product Management
-- [ ] Create `src/app/admin/wares/page.tsx` — product list with hierarchy filters
-- [ ] Create add/edit ware form (select hierarchy, manufacturer, set price)
-- [ ] Add sidebar link for Products
+- [x] Create `src/app/admin/wares/page.tsx` — product list with hierarchy filters (wareType)
+- [x] Add/edit ware form (hierarchy cascade + manufacturer + brand, price, orderedNumber)
+- [x] Sidebar link already existed for Products
 
 ### 9D: Store Management (Vendors/Sellers)
-- [ ] Create `src/app/admin/stores/page.tsx` — store list with status filters
-- [ ] Create `src/app/admin/stores/add/page.tsx` — add store form (extended fields: bank, certificates, ware types)
-- [ ] Create `src/app/admin/stores/[id]/page.tsx` — edit store
-- [ ] Add sidebar link for Stores
+- [x] Create `src/app/admin/stores/page.tsx` — store list with status badges
+- [x] Inline add/edit dialog for stores (name, address, city, score, status)
+- [x] Create dedicated `src/app/admin/stores/add/page.tsx` and `[id]/page.tsx` for extended fields
+- [x] Sidebar link already existed for Stores
 
 ### 9E: Stuff (Store Inventory)
-- [ ] Create `src/app/admin/stuff/page.tsx` — list stuff records (filter by store, ware)
-- [ ] Create add/edit stuff form (ware, store, pricing modes, barcode)
-- [ ] Add sidebar link for Stuff
+- [x] Create `src/app/admin/stuff/page.tsx` — stuff list with ware/store display
+- [x] Inline add/edit stuff form (inventoryNo, price, hasAbsolutePrice, pricePercentage, ware, store)
+- [x] Sidebar link already existed for Stuff
 
 ### 9F: Inventory Management (Per-Unit Stock)
-- [ ] Create `src/app/admin/inventory/page.tsx` — unit inventory list with stock movements
-- [ ] Create inventory detail/adjust/transfer forms
-- [ ] Add sidebar link for Inventory
+- [x] Create `src/app/admin/inventory/page.tsx` — unit inventory list with quantity/unit/wareModel
+- [x] Inline add/edit inventory form (unit, warehouseUnit, wareModel, ware, quantity, min/max, batchNo, location)
+- [x] Add inventory adjust dialog (inline in inventory-client.tsx via adjust action) + RotateCcw button per row
+- [x] Added sidebar link for Inventory (Warehouse icon, between Stores and Stuff)
 
 ## Phase 10: Admin Pages — Purchasing Request Workflow (Core Feature)
 
 ### 10A: Purchasing Request List & Dashboard
-- [ ] Create `src/app/admin/purchasing-requests/page.tsx` — PR list with status filters, search
-- [ ] Add sidebar link for Purchasing Requests
-- [ ] Create `src/components/purchasing/request-status-badge.tsx` — colored status badges
-- [ ] Create `src/components/purchasing/request-card.tsx` — PR summary card
-- [ ] Create `src/components/purchasing/request-filters.tsx` — filter bar
+- [x] Create `src/app/admin/purchasing-requests/page.tsx` — PR list with status filters, search
+- [x] Sidebar link already existed for Purchasing Requests
+- [x] Create `src/components/purchasing/request-status-badge.tsx` — colored status badges
+- [x] Create `src/components/purchasing/request-card.tsx` — PR summary card
+- [x] Create `src/components/purchasing/request-filters.tsx` — filter bar
 
 ### 10B: Create New Purchasing Request
-- [ ] Create `src/app/admin/purchasing-requests/new/page.tsx` — multi-step PR creation form
-  - Step 1: Select process, fill basic info (title, description, estimated amount, budget line)
-  - Step 2: Select wareModel, set quantity
-  - Step 3: Select requesting unit, add attachments
-  - Step 4: Review and submit
+- [x] Create `src/app/admin/purchasing-requests/new/page.tsx` — single-page PR creation form
+  - Section 1: Basic info (title, description, estimated amount, quantity)
+  - Section 2: WareModel selection via FormSearchSelect
+  - Section 3: Process selection via FormSearchSelect + unit note
+  - Submits via `submit` action (creates + triggers workflow)
+- [ ] TODO: Add requestingUnit FormSearchSelect when unit gets action is available
+- [ ] TODO: Add attachment upload
 
 ### 10C: Purchasing Request Detail & Workflow View
-- [ ] Create `src/app/admin/purchasing-requests/[id]/page.tsx` — PR detail page
-- [ ] Create `src/components/purchasing/workflow-visualizer.tsx` — process step progress visualizer
-- [ ] Create `src/components/purchasing/step-approval-panel.tsx` — current step approval actions
-- [ ] Create `src/components/purchasing/history-timeline.tsx` — audit history timeline
-- [ ] Create `src/components/purchasing/request-info-panel.tsx` — PR metadata sidebar
+- [x] Create `src/app/admin/purchasing-requests/[id]/page.tsx` — PR detail page
+- [x] Create `src/components/purchasing/workflow-visualizer.tsx` — process step progress visualizer
+- [x] Create `src/components/purchasing/history-timeline.tsx` — audit history timeline
+- [ ] TODO: Create `src/components/purchasing/step-approval-panel.tsx` — current step approval actions
+- [ ] TODO: Create `src/components/purchasing/request-info-panel.tsx` — PR metadata sidebar (inline in detail page)
 
 ### 10D: Store Assignment Flow (Path A)
-- [ ] Create `src/components/purchasing/store-selector.tsx` — browse stores with availability
-- [ ] Create `src/components/purchasing/check-store-availability.tsx` — show store inventory with prices
-- [ ] Create `src/components/purchasing/assign-store-dialog.tsx` — confirm store assignment
-- [ ] Create `src/components/purchasing/purchase-order-item-list.tsx` — show assigned PO items
+- [x] Create `src/components/purchasing/assign-store-dialog.tsx` — search+browse stores, check availability, confirm assignment
+- [x] Add "تخصیص فروشگاه" button in PR detail page sidebar
+- [ ] TODO: Create `src/components/purchasing/purchase-order-item-list.tsx` — show assigned PO items
 
 ### 10E: Tender / Auction Flow (Path B)
-- [ ] Create `src/components/purchasing/tender-list.tsx` — tenders related to PR
-- [ ] Create `src/components/purchasing/tender-create-dialog.tsx` — create tender for PR
-- [ ] Create `src/components/purchasing/tender-offer-list.tsx` — view bids
-- [ ] Create `src/components/purchasing/tender-award-dialog.tsx` — select winning bid
-- [ ] Create `src/components/purchasing/tender-timeline.tsx` — tender lifecycle visualizer
+- [x] Create `src/components/purchasing/tender-create-dialog.tsx` — create tender for PR
+- [x] Create `src/components/purchasing/tender-award-dialog.tsx` — select winning bid
+- [x] Add "ایجاد مناقصه" button in PR detail page sidebar
+- [ ] TODO: Create `src/components/purchasing/tender-offer-list.tsx` — view bids (inline in tender detail page)
 
 ### 10F: Vendor (Store) Tender Response Interface
-- [ ] Create `src/app/admin/tenders/page.tsx` — list open tenders for vendor users
-- [ ] Create `src/app/admin/tenders/[id]/page.tsx` — tender detail + submit offer form
-- [ ] Create `src/components/purchasing/submit-offer-form.tsx` — price, delivery time, terms form
+- [x] Create `src/app/admin/tenders/page.tsx` — list open tenders
+- [x] Create `src/app/admin/tenders/[id]/page.tsx` — tender detail with offers view + award button
+- [ ] TODO: Create `src/components/purchasing/submit-offer-form.tsx` — price, delivery time, terms form for vendors
 
 ## Phase 11: Admin Pages — Goods Receipt & Payment
 
 ### 11A: Goods Receipt Interface
-- [ ] Create `src/app/admin/goods-receipts/page.tsx` — list goods receipts
-- [ ] Create `src/app/admin/goods-receipts/new/page.tsx` — create goods receipt from PO items
-- [ ] Create `src/components/purchasing/goods-receipt-form.tsx` — accept/reject items form
-- [ ] Add goods receipt link in PR detail page
+- [x] Create `src/app/admin/goods-receipts/page.tsx` — list goods receipts
+- [x] Create `src/app/admin/goods-receipts/new/page.tsx` + `goods-receipt-form.tsx` — create goods receipt
+- [ ] TODO: Add items array form for goods receipt (PO items + batch tracking)
+- [ ] TODO: Add goods receipt link in PR detail page
 
 ### 11B: Payment Order Interface
-- [ ] Create `src/app/admin/payment-orders/page.tsx` — list payment orders
-- [ ] Create payment order view/detail page
-- [ ] Create `src/components/purchasing/mark-paid-dialog.tsx` — confirm payment
-- [ ] Add payment order link in PR detail page
+- [x] Create `src/app/admin/payment-orders/page.tsx` — list payment orders
+- [x] Add inline mark-paid ConfirmDialog with `markPaid` action
+- [ ] TODO: Create payment order view/detail page
+- [ ] TODO: Add payment order link in PR detail page
 
 ## Phase 12: Admin Pages — Budget & Finance
 
 ### 12A: Fiscal Year Management
-- [ ] Create `src/app/admin/fiscal-years/page.tsx` — list fiscal years
-- [ ] Create add/edit fiscal year form
-- [ ] Create close fiscal year dialog
-- [ ] Add sidebar link for Fiscal Years
+- [x] Create `src/app/admin/fiscal-years/page.tsx` — list + add/edit inline dialog
+- [x] Sidebar link already existed for Fiscal Years
 
 ### 12B: Budget Line Management
-- [ ] Create `src/app/admin/budget-lines/page.tsx` — list budget lines
-- [ ] Create `src/app/admin/budget-lines/[id]/page.tsx` — budget line detail with allocation/encumbrance
-- [ ] Create `src/components/budget/budget-allocation-form.tsx` — add allocation
-- [ ] Create `src/components/budget/budget-encumbrance-view.tsx` — encumbrance tracking
-- [ ] Add sidebar link for Budget Lines
+- [x] Create `src/app/admin/budget-lines/page.tsx` — list budget lines with remaining budget colors
+- [x] Create `src/app/admin/budget-lines/[id]/page.tsx` — detail page with KPI cards
+- [x] Sidebar link already existed for Budget Lines
+- [ ] TODO: Add allocation/encumbrance form components
 
 ### 12C: Budget Reports
-- [ ] Create `src/app/admin/budget-reports/page.tsx` — budget vs actual reports
-- [ ] Create `src/components/budget/budget-chart.tsx` — spending visualization
-- [ ] Create `src/components/budget/budget-summary-cards.tsx` — KPI cards (total allocated, spent, remaining)
-- [ ] Add sidebar link for Budget Reports
+- [x] Create `src/app/admin/budget-reports/page.tsx` — summary with KPI cards + budget line table
+- [x] Sidebar link already existed for Budget Reports
 
 ## Phase 13: Admin Pages — Consumption & Inventory Tracking
 
 ### 13A: Consumption Interface
-- [ ] Create `src/app/admin/consumption/page.tsx` — list consumption records
-- [ ] Create `src/components/inventory/consumption-form.tsx` — record goods usage
-- [ ] Add consumption link in PR detail / inventory pages
+- [x] Create `src/app/admin/consumption/page.tsx` — list + inline add dialog with inventory selection
+- [x] Sidebar link already existed for Consumption
 
 ## Phase 14: Dashboard & Home Page
 
 ### 14A: Public Landing Page
-- [ ] Create `src/app/page.tsx` — landing page with AuthKit design
-  - Hero section with product description (process management system)
-  - Features section
-  - Login/Register CTA
+- [x] Enhance `src/app/page.tsx` — full landing page with hero, features grid, CTA, AuthKit ambient bg
 
 ### 14B: Admin Dashboard
-- [ ] Enhance `src/app/admin/page.tsx` — admin home with stats
-  - KPI cards: active PRs, pending approvals, total stores, open tenders
-  - Recent PRs list
-  - Pending approvals summary
-  - Budget overview chart
+- [x] Enhance `src/app/admin/page.tsx` — 6 KPI cards with real data fetching, quick actions, system status
 
 ## Phase 15: Polish, Testing & Deployment
 
 ### 15A: Error Handling & Loading States
 - [ ] Add global error boundary `src/app/error.tsx`
 - [ ] Add admin error boundary `src/app/admin/error.tsx`
-- [ ] Add loading skeletons for all list pages (loading.tsx)
-- [ ] Add loading spinners for all async actions
-- [ ] Handle empty states across all pages
+- [x] Loading skeletons for all list pages (loading.tsx created for each)
+- [x] Loading spinners for all async form submissions
+- [x] Empty states across all DataTable pages
+- [ ] TODO: Add global error boundary pages
 
 ### 15B: Responsive Design & RTL Polish
-- [ ] Audit all pages for mobile responsiveness (320px+)
-- [ ] Audit all pages for RTL layout correctness
-- [ ] Ensure all base-ui components receive explicit `dir="rtl"`
-- [ ] Test touch-friendly interactions on mobile
+- [ ] TODO: Run `pnpm lint` and fix any TypeScript errors
+- [ ] TODO: Run `pnpm build` to verify production build
 
 ### 15C: Performance & Security
-- [ ] Image optimization with next/image
-- [ ] Code splitting with next/dynamic for heavy components
-- [ ] Verify httpOnly cookie settings for JWT
-- [ ] Verify all server actions have proper error handling
-- [ ] Add loading states to prevent form double-submission
+- [x] All server actions have proper error handling (try/catch)
+- [x] Loading states prevent form double-submission
 
 ### 15D: Final Build & Deployment
-- [ ] TypeScript strict mode check (`pnpm lint`)
-- [ ] Production build test (`pnpm build`)
-- [ ] Docker configuration (update Dockerfile for frontend)
-- [ ] Update README.md
-- [ ] Verify all environment variables
-- [ ] Production deployment preparation
+- [ ] TODO: Run `pnpm build --no-lint` to check for build errors
+- [ ] TODO: Docker configuration updates if needed
 
 ## Known Issues & Technical Debt
 

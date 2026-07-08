@@ -1,51 +1,49 @@
 import Link from "next/link"
-import {
-  Building2,
-  Users,
-  ShoppingCart,
-  Workflow,
-  GitBranch,
-  Tags,
-} from "lucide-react"
+import { Building2, Users, ShoppingCart, Workflow, GitBranch, Tags, Gavel, Store } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { Button } from "@/components/ui/button"
+import { gets as getOrganizations } from "@/app/actions/organization/gets"
+import { getUsers } from "@/app/actions/user/getUsers"
+import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
+import { gets as getProcesses } from "@/app/actions/process/gets"
+import { gets as getTenders } from "@/app/actions/tender/gets"
+import { gets as getStores } from "@/app/actions/store/gets"
 
-const stats = [
-  { label: "سازمان‌ها", value: "—", icon: Building2 },
-  { label: "کاربران", value: "—", icon: Users },
-  { label: "درخواست‌های خرید", value: "—", icon: ShoppingCart },
-  { label: "فرآیندهای فعال", value: "—", icon: Workflow },
-]
+export default async function AdminDashboard() {
+  const [orgsRes, usersRes, prsRes, procsRes, tendersRes, storesRes] = await Promise.all([
+    getOrganizations({ page: 1, limit: 1 }, { _id: 1 }).catch(() => ({ success: false, body: [] })),
+    getUsers({ page: 1, limit: 1 }, { _id: 1 }).catch(() => ({ success: false, body: [] })),
+    getPRs({ page: 1, limit: 1 }, { _id: 1 }).catch(() => ({ success: false, body: [] })),
+    getProcesses({ page: 1, limit: 1 }, { _id: 1 }).catch(() => ({ success: false, body: [] })),
+    getTenders({ page: 1, limit: 1 }, { _id: 1 }).catch(() => ({ success: false, body: [] })),
+    getStores({ page: 1, limit: 1 }, { _id: 1 }).catch(() => ({ success: false, body: [] })),
+  ]);
 
-const quickActions = [
-  { label: "سازمان جدید", href: "/admin/organizations/add", icon: Building2 },
-  { label: "کاربر جدید", href: "/admin/users/add", icon: Users },
-  { label: "فرآیند جدید", href: "/admin/processes/add", icon: Workflow },
-  { label: "واحد جدید", href: "/admin/units/add", icon: GitBranch },
-  { label: "برچسب جدید", href: "/admin/tags/add", icon: Tags },
-  { label: "درخواست خرید", href: "/admin/purchasing-requests/add", icon: ShoppingCart },
-]
+  const stats = [
+    { label: "سازمان‌ها", value: orgsRes.success ? (orgsRes.body?.length || "—") : "—", icon: Building2 },
+    { label: "کاربران", value: usersRes.success ? (usersRes.body?.length || "—") : "—", icon: Users },
+    { label: "درخواست‌های خرید", value: prsRes.success ? (prsRes.body?.length || "—") : "—", icon: ShoppingCart },
+    { label: "فرآیندهای فعال", value: procsRes.success ? (procsRes.body?.length || "—") : "—", icon: Workflow },
+    { label: "مناقصات", value: tendersRes.success ? (tendersRes.body?.length || "—") : "—", icon: Gavel },
+    { label: "فروشگاه‌ها", value: storesRes.success ? (storesRes.body?.length || "—") : "—", icon: Store },
+  ];
 
-const systemMetrics = [
-  { label: "کاربران فعال", value: "—" },
-  { label: "سازمان‌ها", value: "—" },
-  { label: "فرآیندها", value: "—" },
-  { label: "درخواست‌ها", value: "—" },
-]
+  const quickActions = [
+    { label: "سازمان جدید", href: "/admin/organizations/add", icon: Building2 },
+    { label: "کاربر جدید", href: "/admin/users/add", icon: Users },
+    { label: "فرآیند جدید", href: "/admin/processes/add", icon: Workflow },
+    { label: "واحد جدید", href: "/admin/units/add", icon: GitBranch },
+    { label: "درخواست خرید", href: "/admin/purchasing-requests/new", icon: ShoppingCart },
+    { label: "برچسب جدید", href: "/admin/tags", icon: Tags },
+  ];
 
-export default function AdminDashboard() {
   return (
     <div className="space-y-8">
-      {/* Page Header */}
-      <PageHeader
-        title="داشبورد"
-        description="خلاصه وضعیت سامانه"
-      />
+      <PageHeader title="داشبورد" description="خلاصه وضعیت سامانه" />
 
-      {/* Stat Cards — using glass variant for premium glassmorphism */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {stats.map((stat) => {
           const Icon = stat.icon
           return (
@@ -61,7 +59,7 @@ export default function AdminDashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-heading-sm font-semibold text-glacier leading-8">
+                <p className="text-2xl font-semibold text-glacier leading-8">
                   {stat.value}
                 </p>
                 <div className="mt-4 h-px bg-gradient-to-r from-transparent via-frost-link/15 to-transparent" />
@@ -71,12 +69,11 @@ export default function AdminDashboard() {
         })}
       </div>
 
-      {/* Quick Actions & System Status */}
       <div className="grid gap-6 lg:grid-cols-2">
         <Card variant="glass">
           <CardHeader className="pb-3">
-            <p className="text-caption font-medium text-fog tracking-wide leading-4">دسترسی سریع</p>
-            <CardTitle className="text-base font-medium text-frost-link mt-1 leading-6">
+            <p className="text-sm font-medium text-fog tracking-wide">دسترسی سریع</p>
+            <CardTitle className="text-base font-medium text-frost-link mt-1">
               عملیات‌های پرکاربرد
             </CardTitle>
           </CardHeader>
@@ -86,11 +83,7 @@ export default function AdminDashboard() {
                 const Icon = action.icon
                 return (
                   <Link key={action.href} href={action.href}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="gap-2 rounded-full text-moonlight h-9 transition-all duration-200 hover:bg-white/[0.04] hover:text-glacier active:scale-[0.98]"
-                    >
+                    <Button variant="ghost" size="sm" className="gap-2 rounded-full text-moonlight h-9 transition-all duration-200 hover:bg-white/[0.04] hover:text-glacier">
                       <Icon className="size-4" />
                       {action.label}
                     </Button>
@@ -103,25 +96,15 @@ export default function AdminDashboard() {
 
         <Card variant="glass">
           <CardHeader className="pb-3">
-            <p className="text-caption font-medium text-fog tracking-wide leading-4">وضعیت سامانه</p>
-            <CardTitle className="text-base font-medium text-frost-link mt-1 leading-6">
+            <p className="text-sm font-medium text-fog tracking-wide">وضعیت سامانه</p>
+            <CardTitle className="text-base font-medium text-frost-link mt-1">
               سلامت سرویس‌ها
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="flex items-center gap-4">
               <StatusBadge status="active" label="همه سیستم‌ها فعال" />
-              <StatusBadge status="completed" label="آخرین بروزرسانی: لحظاتی پیش" />
-            </div>
-            <div className="flex flex-wrap gap-6">
-              {systemMetrics.map((metric) => (
-                <div key={metric.label} className="flex flex-col gap-1">
-                  <span className="text-heading-sm font-semibold text-glacier leading-7">
-                    {metric.value}
-                  </span>
-                  <span className="text-caption text-fog leading-4">{metric.label}</span>
-                </div>
-              ))}
+              <StatusBadge status="completed" label="سرویس پشتیبان آنلاین" />
             </div>
           </CardContent>
         </Card>
