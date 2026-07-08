@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Plus, Pencil, Building2, Calendar, Trash2, GitBranch, User } from "lucide-react";
+import { Plus, Pencil, Building2, Calendar, Trash2, GitBranch, User, Share2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/ui/page-header";
@@ -14,6 +14,7 @@ import { FilterBar } from "@/components/ui/filter-bar";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { remove } from "@/app/actions/organization/remove";
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 
 interface Organization {
   _id: string;
@@ -95,6 +96,11 @@ const columns: Column<Organization>[] = [
             <Pencil className="size-3.5" />
           </Button>
         </Link>
+        <Link href={`/admin/organizations/${item._id}/relations`}>
+          <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200" title="روابط">
+            <Share2 className="size-3.5" />
+          </Button>
+        </Link>
       </div>
     ),
   },
@@ -123,7 +129,7 @@ export function OrganizationsClient({
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
-    const result = await remove({ activeRoleId: "", _id: deleteTarget._id });
+    const result = await remove({ activeRoleId: getActiveRoleIdFromStore(), _id: deleteTarget._id });
     if (result.success) {
       toast.success("سازمان با موفقیت حذف شد");
       router.refresh();
@@ -222,6 +228,16 @@ export function OrganizationsClient({
                     title="واحدها"
                   >
                     <GitBranch className="size-3.5" />
+                  </Button>
+                </Link>
+                <Link href={`/admin/organizations/${item._id}/relations`}>
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
+                    className="text-fog/60 hover:text-frost-link"
+                    title="روابط"
+                  >
+                    <Share2 className="size-3.5" />
                   </Button>
                 </Link>
                 <Button

@@ -11,15 +11,22 @@ import { FormInput } from "@/components/form/form-input";
 import { FormTextarea } from "@/components/form/form-textarea";
 import { FormCheckbox } from "@/components/form/form-checkbox";
 import { FormSection } from "@/components/form/form-section";
+import { FormSearchSelect } from "@/components/form/form-search-select";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Form } from "@/components/ui/form";
 import { add } from "@/app/actions/organization/add";
+import { gets as getStates } from "@/app/actions/state/gets";
+import { gets as getCities } from "@/app/actions/city/gets";
+import type { ReqType } from "@/types/declarations/selectInp";
 import Link from "next/link";
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 
 const orgSchema = z.object({
   name: z.string().min(1, "نام سازمان الزامی است"),
   enName: z.string().optional(),
   description: z.string().optional(),
+  state: z.string().optional(),
+  city: z.string().optional(),
   isActive: z.boolean(),
 });
 
@@ -33,19 +40,22 @@ export default function AddOrganizationPage() {
       name: "",
       enName: "",
       description: "",
+      state: "",
+      city: "",
       isActive: true,
     },
   });
 
+  const selectedState = form.watch("state");
+
   const onSubmit = async (data: OrgData) => {
     const result = await add(
-      { activeRoleId: "", ...data, isActive: data.isActive },
+      { activeRoleId: getActiveRoleIdFromStore(), ...data, isActive: data.isActive },
       { _id: 1, name: 1 }
     );
     if (result.success) {
       toast.success("سازمان با موفقیت ایجاد شد");
       router.push("/admin/organizations");
-      router.refresh();
     } else {
       toast.error(result.body?.message || "خطا در ایجاد سازمان");
     }
@@ -91,6 +101,50 @@ export default function AddOrganizationPage() {
               placeholder="Example: Sample Inc."
               disabled={form.formState.isSubmitting}
             />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <FormSearchSelect
+                control={form.control}
+                name="state"
+                label="استان"
+                placeholder="انتخاب استان..."
+                disabled={form.formState.isSubmitting}
+                fetcher={async (search?: string) => {
+                  const result = await getStates(
+                    { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
+                    { _id: 1, name: 1 }
+                  )
+                  if (!result.success || !result.body) return []
+                  return result.body.map((s: { _id?: string; name?: string }) => ({
+                    _id: s._id || "",
+                    name: s.name || "",
+                  }))
+                }}
+              />
+              <FormSearchSelect
+                control={form.control}
+                name="city"
+                label="شهر"
+                placeholder="انتخاب شهر..."
+                disabled={form.formState.isSubmitting}
+                fetcher={async (search?: string) => {
+                  const result = await getCities(
+                    {
+                      activeRoleId: getActiveRoleIdFromStore(),
+                      page: 1,
+                      limit: 50,
+                      search: search || undefined,
+                      ...(selectedState ? { stateId: selectedState } : {}),
+                    } as unknown as ReqType["main"]["city"]["gets"]["set"],
+                    { _id: 1, name: 1 }
+                  )
+                  if (!result.success || !result.body) return []
+                  return result.body.map((c: { _id?: string; name?: string }) => ({
+                    _id: c._id || "",
+                    name: c.name || "",
+                  }))
+                }}
+              />
+            </div>
           </FormSection>
 
           <FormSection

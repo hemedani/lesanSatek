@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Plus, Pencil, User, Trash2, Mail, Phone, Shield } from "lucide-react";
+import { Plus, Pencil, User, Trash2, Mail, Phone, Shield, Share2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/ui/page-header";
@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { removeUser } from "@/app/actions/user/removeUser";
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 
 interface UserItem {
   _id: string;
@@ -102,6 +103,11 @@ const columns: Column<UserItem>[] = [
             <Pencil className="size-3.5" />
           </Button>
         </Link>
+        <Link href={`/admin/users/${item._id}/relations`}>
+          <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200" title="روابط">
+            <Share2 className="size-3.5" />
+          </Button>
+        </Link>
       </div>
     ),
   },
@@ -141,7 +147,7 @@ export function UsersClient({
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
-    const result = await removeUser({ activeRoleId: "", _id: deleteTarget._id });
+    const result = await removeUser({ activeRoleId: getActiveRoleIdFromStore(), _id: deleteTarget._id });
     if (result.success) {
       toast.success("کاربر با موفقیت حذف شد");
       router.refresh();
@@ -241,6 +247,16 @@ export function UsersClient({
                     title="ویرایش"
                   >
                     <Pencil className="size-3.5" />
+                  </Button>
+                </Link>
+                <Link href={`/admin/users/${item._id}/relations`}>
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
+                    className="text-fog/60 hover:text-frost-link"
+                    title="روابط"
+                  >
+                    <Share2 className="size-3.5" />
                   </Button>
                 </Link>
                 <Button

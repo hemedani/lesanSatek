@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ArrowRight, Loader2, Trash2 } from "lucide-react";
+import { ArrowRight, Loader2, Trash2, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/form/form-input";
 import { FormTextarea } from "@/components/form/form-textarea";
@@ -21,6 +21,7 @@ import { get as getOrg } from "@/app/actions/organization/get";
 import { update } from "@/app/actions/organization/update";
 import { remove } from "@/app/actions/organization/remove";
 import Link from "next/link";
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 
 const orgSchema = z.object({
   name: z.string().min(1, "نام سازمان الزامی است"),
@@ -37,6 +38,7 @@ export default function EditOrganizationPage({
   params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
+  const { id } = use(params);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
@@ -53,9 +55,8 @@ export default function EditOrganizationPage({
 
   useEffect(() => {
     const load = async () => {
-      const { id } = await params;
       const result = await getOrg(
-        { activeRoleId: "", _id: id },
+        { activeRoleId: getActiveRoleIdFromStore(), _id: id },
         { _id: 1, name: 1, enName: 1, description: 1, isActive: 1 }
       );
       if (result.success && result.body?.[0]) {
@@ -72,12 +73,11 @@ export default function EditOrganizationPage({
       setLoading(false);
     };
     load();
-  }, [params, form]);
+  }, [form]);
 
   const onSubmit = async (data: OrgData) => {
-    const { id } = await params;
     const result = await update(
-      { activeRoleId: "", _id: id, ...data },
+      { activeRoleId: getActiveRoleIdFromStore(), _id: id, ...data },
       { _id: 1, name: 1 }
     );
     if (result.success) {
@@ -89,12 +89,10 @@ export default function EditOrganizationPage({
   };
 
   const handleDelete = async () => {
-    const { id } = await params;
-    const result = await remove({ activeRoleId: "", _id: id });
+    const result = await remove({ activeRoleId: getActiveRoleIdFromStore(), _id: id });
     if (result.success) {
       toast.success("سازمان با موفقیت حذف شد");
       router.push("/admin/organizations");
-      router.refresh();
     } else {
       toast.error(result.body?.message || "خطا در حذف سازمان");
     }
@@ -193,6 +191,15 @@ export default function EditOrganizationPage({
           </div>
         </form>
       </Form>
+
+      <div className="flex justify-center">
+        <Link href={`/admin/organizations/${id}/relations`}>
+          <Button type="button" variant="outline" className="gap-2">
+            <Share2 className="size-4" />
+            ویرایش روابط
+          </Button>
+        </Link>
+      </div>
 
       <ConfirmDialog
         open={showDelete}

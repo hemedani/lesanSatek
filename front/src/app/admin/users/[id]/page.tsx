@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ArrowRight, Loader2, Trash2, Shield, Check, X } from "lucide-react";
+import { ArrowRight, Loader2, Trash2, Shield, Check, X, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/form/form-input";
 import { FormSelect } from "@/components/form/form-select";
@@ -25,6 +25,7 @@ import {
   ROLE_OPTIONS,
 } from "@/types/permissions";
 import Link from "next/link";
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 
 const userSchema = z.object({
   first_name: z.string().min(1, "نام الزامی است"),
@@ -56,6 +57,7 @@ export default function EditUserPage({
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const { id } = use(params);
   const [features, setFeatures] = useState<string[]>([]);
   const [roles, setRoles] = useState<RoleEntry[]>([{ name: "Ordinary" }]);
   const form = useForm<UserData>({
@@ -75,9 +77,8 @@ export default function EditUserPage({
 
   useEffect(() => {
     const load = async () => {
-      const { id } = await params;
       const result = await getUser(
-        { activeRoleId: "", _id: id },
+        { activeRoleId: getActiveRoleIdFromStore(), _id: id },
         {
           _id: 1,
           first_name: 1,
@@ -115,7 +116,7 @@ export default function EditUserPage({
       setLoading(false);
     };
     load();
-  }, [params, form]);
+  }, [form]);
 
   const toggleFeature = (feature: string) => {
     setFeatures((prev) =>
@@ -142,10 +143,9 @@ export default function EditUserPage({
   };
 
   const onSubmit = async (data: UserData) => {
-    const { id } = await params;
     const result = await updateUser(
       {
-        activeRoleId: "",
+        activeRoleId: getActiveRoleIdFromStore(),
         _id: id,
         ...data,
         features: features.map((f) => ({ feature: f as "canRegisterPurchaseRequest" })),
@@ -167,12 +167,10 @@ export default function EditUserPage({
   };
 
   const handleDelete = async () => {
-    const { id } = await params;
-    const result = await removeUser({ activeRoleId: "", _id: id });
+    const result = await removeUser({ activeRoleId: getActiveRoleIdFromStore(), _id: id });
     if (result.success) {
       toast.success("کاربر با موفقیت حذف شد");
       router.push("/admin/users");
-      router.refresh();
     } else {
       toast.error(result.body?.message || "خطا در حذف کاربر");
     }
@@ -398,6 +396,15 @@ export default function EditUserPage({
           </div>
         </form>
       </Form>
+
+      <div className="flex justify-center">
+        <Link href={`/admin/users/${id}/relations`}>
+          <Button type="button" variant="outline" className="gap-2">
+            <Share2 className="size-4" />
+            ویرایش روابط
+          </Button>
+        </Link>
+      </div>
 
       <ConfirmDialog
         open={showDelete}

@@ -29,6 +29,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { ReqType } from "@/types/declarations/selectInp";
 import Link from "next/link";
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 
 const userSchema = z.object({
   first_name: z.string().min(1, "نام الزامی است"),
@@ -108,7 +109,7 @@ export default function AddUserPage() {
   const onSubmit = async (data: UserData) => {
     const result = await addUser(
       {
-        activeRoleId: "",
+        activeRoleId: getActiveRoleIdFromStore(),
         ...data,
         features: features.map((f) => ({ feature: f as "canRegisterPurchaseRequest" })),
         roles: roles.map((r) => ({
@@ -122,7 +123,6 @@ export default function AddUserPage() {
     if (result.success) {
       toast.success("کاربر با موفقیت ایجاد شد");
       router.push("/admin/users");
-      router.refresh();
     } else {
       toast.error(result.body?.message || "خطا در ایجاد کاربر");
     }
@@ -208,7 +208,7 @@ export default function AddUserPage() {
                 disabled={isSubmitting}
                 fetcher={async (search?: string) => {
                   const result = await getStates(
-                    { activeRoleId: "", page: 1, limit: 50, search: search || undefined },
+                    { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
                     { _id: 1, name: 1 }
                   )
                   if (!result.success || !result.body) return []
@@ -227,7 +227,7 @@ export default function AddUserPage() {
                 fetcher={async (search?: string) => {
                   const result = await getCities(
                     {
-                      activeRoleId: "",
+                      activeRoleId: getActiveRoleIdFromStore(),
                       page: 1,
                       limit: 50,
                       search: search || undefined,
@@ -296,7 +296,7 @@ export default function AddUserPage() {
               fetcher={async (search?: string) => {
                 const result = await getOrganizations(
                   {
-                    activeRoleId: "",
+                    activeRoleId: getActiveRoleIdFromStore(),
                     page: 1,
                     limit: 50,
                     search: search || undefined,
@@ -373,7 +373,7 @@ export default function AddUserPage() {
                               ? async (search?: string) => {
                                   const result = await getOrganizations(
                                     {
-                                      activeRoleId: "",
+                                      activeRoleId: getActiveRoleIdFromStore(),
                                       page: 1,
                                       limit: 50,
                                       search: search || undefined,
@@ -389,7 +389,7 @@ export default function AddUserPage() {
                               : async (search?: string) => {
                                   const result = await getUnits(
                                     {
-                                      activeRoleId: "",
+                                      activeRoleId: getActiveRoleIdFromStore(),
                                       page: 1,
                                       limit: 50,
                                       search: search || undefined,
