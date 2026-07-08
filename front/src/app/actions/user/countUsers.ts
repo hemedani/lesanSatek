@@ -1,7 +1,7 @@
 "use server";
 
 import { AppApi } from "@/lib/api";
-import { getToken } from "@/lib/auth";
+import { getToken, getActiveRoleId } from "@/lib/auth";
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 
 export const countUsers = async (
@@ -10,12 +10,13 @@ export const countUsers = async (
 ) => {
   try {
     const token = await getToken();
+    const activeRoleId = await getActiveRoleId();
     const result = await AppApi(undefined, token).send({
       service: "main",
       model: "user",
       act: "countUsers",
       details: {
-        set: data,
+        set: { ...data, activeRoleId },
         get: getSelection || { qty: 1 },
       },
     });

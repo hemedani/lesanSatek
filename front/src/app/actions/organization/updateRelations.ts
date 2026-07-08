@@ -1,27 +1,22 @@
 "use server";
 
 import { AppApi } from "@/lib/api";
-import { getToken } from "@/lib/auth";
+import { getToken, getActiveRoleId } from "@/lib/auth";
+import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 
 export const updateRelations = async (
-  data: {
-    activeRoleId: string;
-    _id: string;
-    logo?: string;
-    removeLogo?: boolean;
-    head?: string;
-    removeHead?: boolean;
-  },
-  getSelection?: Record<string, unknown>
+  data: ReqType["main"]["organization"]["updateRelations"]["set"],
+  getSelection?: DeepPartial<ReqType["main"]["organization"]["updateRelations"]["get"]>
 ) => {
   try {
     const token = await getToken();
+    const activeRoleId = await getActiveRoleId();
     const result = await AppApi(undefined, token).send({
       service: "main",
       model: "organization",
       act: "updateRelations",
       details: {
-        set: data,
+        set: { ...data, activeRoleId },
         get: getSelection || { _id: 1, name: 1 },
       },
     });

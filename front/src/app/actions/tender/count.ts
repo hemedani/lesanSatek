@@ -1,7 +1,7 @@
 "use server";
 
 import { AppApi } from "@/lib/api";
-import { getToken } from "@/lib/auth";
+import { getToken, getActiveRoleId } from "@/lib/auth";
 
 export const count = async (
   data: {
@@ -11,12 +11,13 @@ export const count = async (
 ) => {
   try {
     const token = await getToken();
+    const activeRoleId = await getActiveRoleId();
     const result = await AppApi(undefined, token).send({
       service: "main",
       model: "tender",
       act: "count",
       details: {
-        set: data,
+        set: { ...data, activeRoleId },
         get: { qty: 1 as const },
       },
     });
