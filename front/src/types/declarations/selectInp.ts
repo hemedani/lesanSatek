@@ -50,6 +50,8 @@ scopeId?: string;
       logo?: number | fileInp
 creator?: number | userInp
 head?: number | userInp
+state?: number | stateInp
+city?: number | cityInp
       units?: number | unitInp
 users?: number | userInp
 processes?: number | processInp
@@ -121,6 +123,16 @@ name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary" );
 scopeType?: ("organization" | "unit" );
 scopeId?: string;
 }[];
+};
+state?: {
+_id?: string;
+name: string;
+enName?: string;
+};
+city?: {
+_id?: string;
+name: string;
+enName?: string;
 };
 units: {
 _id?: string;
@@ -202,7 +214,8 @@ updatedAt?: Date;
 
     export type stateInp = {
       
-      cities?: number | cityInp
+      organizations?: number | organizationInp
+cities?: number | cityInp
 users?: number | userInp
     }
 
@@ -213,6 +226,15 @@ name: string;
 enName?: string;
 createdAt?: Date;
 updatedAt?: Date;
+organizations: {
+_id?: string;
+name: string;
+enName?: string;
+description?: string;
+isActive: boolean;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
 cities: {
 _id?: string;
 name: string;
@@ -254,7 +276,8 @@ updatedAt?: Date;
 
     export type cityInp = {
       state?: number | stateInp
-      users?: number | userInp
+      organizations?: number | organizationInp
+users?: number | userInp
 stores?: number | storeInp
     }
 
@@ -270,6 +293,15 @@ _id?: string;
 name: string;
 enName?: string;
 };
+organizations: {
+_id?: string;
+name: string;
+enName?: string;
+description?: string;
+isActive: boolean;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
 users: {
 _id?: string;
 first_name: string;
@@ -4345,6 +4377,16 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 units?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -4415,6 +4457,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 cities?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -4452,6 +4503,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+};
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 users?: {
 _id?: (0 | 1 );
@@ -4818,6 +4878,16 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 units?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -4932,6 +5002,16 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 units?: {
 _id?: (0 | 1 );
@@ -6519,6 +6599,16 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 units?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -6589,6 +6679,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 cities?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -6626,6 +6725,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+};
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 users?: {
 _id?: (0 | 1 );
@@ -6992,6 +7100,16 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 units?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -7106,6 +7224,16 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 units?: {
 _id?: (0 | 1 );
@@ -9783,6 +9911,16 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 units?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -9853,6 +9991,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 cities?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -9890,6 +10037,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+};
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 users?: {
 _id?: (0 | 1 );
@@ -10256,6 +10412,16 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 units?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -10370,6 +10536,16 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 units?: {
 _id?: (0 | 1 );
@@ -13700,6 +13876,8 @@ createdAt?: Date;
 updatedAt?: Date;
 logoId?: string;
 headId?: string;
+state?: string;
+city?: string;
 };
 get: {
 _id?: (0 | 1 );
@@ -13751,6 +13929,16 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 units?: {
 _id?: (0 | 1 );
@@ -14347,6 +14535,127 @@ consumedAt?: (0 | 1 );
 reason?: (0 | 1 );
 patientId?: (0 | 1 );
 notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+cities?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stores?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+address?: (0 | 1 );
+location?: (0 | 1 );
+contact?: (0 | 1 );
+logoUrl?: (0 | 1 );
+ceoname?: (0 | 1 );
+workingHours?: (0 | 1 );
+cityDeliveryTime?: (0 | 1 );
+stateDeliveryTime?: (0 | 1 );
+selectedStateDeliveryTime?: (0 | 1 );
+countryDeliveryTime?: (0 | 1 );
+availableFastDeliveryTime?: (0 | 1 );
+fastDelivery?: (0 | 1 );
+isAvailableInHolidays?: (0 | 1 );
+status?: (0 | 1 );
+updateStatusDescription?: (0 | 1 );
+score?: (0 | 1 );
+totalSoldAmount?: (0 | 1 );
+totalSoldNum?: (0 | 1 );
+email?: (0 | 1 );
+storeType?: (0 | 1 );
+economicCode?: (0 | 1 );
+postalCode?: (0 | 1 );
+lastNewspaperUrl?: (0 | 1 );
+certificateUrl?: (0 | 1 );
+bankCardNumber?: (0 | 1 );
+shebaNumber?: (0 | 1 );
+nameOfAccountHolder?: (0 | 1 );
+bankName?: (0 | 1 );
+certificateNumber?: (0 | 1 );
+registerNumber?: (0 | 1 );
+certificateExpireDate?: (0 | 1 );
+legalPerson?: (0 | 1 );
+nationalId?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -15511,6 +15820,127 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+cities?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stores?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+address?: (0 | 1 );
+location?: (0 | 1 );
+contact?: (0 | 1 );
+logoUrl?: (0 | 1 );
+ceoname?: (0 | 1 );
+workingHours?: (0 | 1 );
+cityDeliveryTime?: (0 | 1 );
+stateDeliveryTime?: (0 | 1 );
+selectedStateDeliveryTime?: (0 | 1 );
+countryDeliveryTime?: (0 | 1 );
+availableFastDeliveryTime?: (0 | 1 );
+fastDelivery?: (0 | 1 );
+isAvailableInHolidays?: (0 | 1 );
+status?: (0 | 1 );
+updateStatusDescription?: (0 | 1 );
+score?: (0 | 1 );
+totalSoldAmount?: (0 | 1 );
+totalSoldNum?: (0 | 1 );
+email?: (0 | 1 );
+storeType?: (0 | 1 );
+economicCode?: (0 | 1 );
+postalCode?: (0 | 1 );
+lastNewspaperUrl?: (0 | 1 );
+certificateUrl?: (0 | 1 );
+bankCardNumber?: (0 | 1 );
+shebaNumber?: (0 | 1 );
+nameOfAccountHolder?: (0 | 1 );
+bankName?: (0 | 1 );
+certificateNumber?: (0 | 1 );
+registerNumber?: (0 | 1 );
+certificateExpireDate?: (0 | 1 );
+legalPerson?: (0 | 1 );
+nationalId?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
 units?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -16196,6 +16626,16 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 units?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -16273,6 +16713,10 @@ logo?: string;
 removeLogo?: boolean;
 head?: string;
 removeHead?: boolean;
+state?: string;
+removeState?: boolean;
+city?: string;
+removeCity?: boolean;
 };
 get: {
 _id?: (0 | 1 );
@@ -16795,6 +17239,127 @@ consumedAt?: (0 | 1 );
 reason?: (0 | 1 );
 patientId?: (0 | 1 );
 notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+cities?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stores?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+address?: (0 | 1 );
+location?: (0 | 1 );
+contact?: (0 | 1 );
+logoUrl?: (0 | 1 );
+ceoname?: (0 | 1 );
+workingHours?: (0 | 1 );
+cityDeliveryTime?: (0 | 1 );
+stateDeliveryTime?: (0 | 1 );
+selectedStateDeliveryTime?: (0 | 1 );
+countryDeliveryTime?: (0 | 1 );
+availableFastDeliveryTime?: (0 | 1 );
+fastDelivery?: (0 | 1 );
+isAvailableInHolidays?: (0 | 1 );
+status?: (0 | 1 );
+updateStatusDescription?: (0 | 1 );
+score?: (0 | 1 );
+totalSoldAmount?: (0 | 1 );
+totalSoldNum?: (0 | 1 );
+email?: (0 | 1 );
+storeType?: (0 | 1 );
+economicCode?: (0 | 1 );
+postalCode?: (0 | 1 );
+lastNewspaperUrl?: (0 | 1 );
+certificateUrl?: (0 | 1 );
+bankCardNumber?: (0 | 1 );
+shebaNumber?: (0 | 1 );
+nameOfAccountHolder?: (0 | 1 );
+bankName?: (0 | 1 );
+certificateNumber?: (0 | 1 );
+registerNumber?: (0 | 1 );
+certificateExpireDate?: (0 | 1 );
+legalPerson?: (0 | 1 );
+nationalId?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -18043,6 +18608,16 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 units?: {
 _id?: (0 | 1 );
@@ -20223,6 +20798,16 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 units?: {
 _id?: (0 | 1 );
@@ -22410,6 +22995,16 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 units?: {
 _id?: (0 | 1 );
@@ -24763,6 +25358,16 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 units?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -25354,6 +25959,16 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 units?: {
 _id?: (0 | 1 );
@@ -25952,6 +26567,16 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 units?: {
 _id?: (0 | 1 );
@@ -26569,6 +27194,16 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 units?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -27161,6 +27796,16 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 units?: {
 _id?: (0 | 1 );
@@ -44054,6 +44699,15 @@ name?: (0 | 1 );
 enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 cities?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -44097,6 +44751,133 @@ name?: (0 | 1 );
 enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+logo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+units?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+processes?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
 cities?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -44107,6 +44888,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+};
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 users?: {
 _id?: (0 | 1 );
@@ -44438,6 +45228,133 @@ name?: (0 | 1 );
 enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+logo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+units?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+processes?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
 cities?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -44448,6 +45365,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+};
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 users?: {
 _id?: (0 | 1 );
@@ -44776,6 +45702,133 @@ name?: (0 | 1 );
 enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+logo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+units?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+processes?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
 cities?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -44786,6 +45839,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+};
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 users?: {
 _id?: (0 | 1 );
@@ -45150,6 +46212,15 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 users?: {
 _id?: (0 | 1 );
 first_name?: (0 | 1 );
@@ -45229,6 +46300,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 cities?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -45254,6 +46334,133 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+logo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+units?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+processes?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -45713,6 +46920,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 cities?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -45738,6 +46954,133 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+logo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+units?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+processes?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -46194,6 +47537,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 cities?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -46219,6 +47571,133 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+logo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+units?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+processes?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -46673,6 +48152,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 cities?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -46698,6 +48186,133 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+logo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+units?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+processes?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -77126,6 +78741,15 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 users?: {
 _id?: (0 | 1 );
 first_name?: (0 | 1 );
@@ -77191,6 +78815,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 cities?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -78423,6 +80056,15 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 users?: {
 _id?: (0 | 1 );
 first_name?: (0 | 1 );
@@ -78488,6 +80130,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 cities?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -79749,6 +81400,15 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 users?: {
 _id?: (0 | 1 );
 first_name?: (0 | 1 );
@@ -79814,6 +81474,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 cities?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -81041,6 +82710,15 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 users?: {
 _id?: (0 | 1 );
 first_name?: (0 | 1 );
@@ -81106,6 +82784,15 @@ state?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 cities?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -108168,6 +109855,16 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 units?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -108946,6 +110643,16 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 units?: {
 _id?: (0 | 1 );
@@ -109727,6 +111434,16 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 units?: {
 _id?: (0 | 1 );
