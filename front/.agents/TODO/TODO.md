@@ -456,3 +456,228 @@
 - [ ] Verify all Lucide icons render correctly in RTL
 
 **How to proceed**: Open `CONTINUE.md`, tell the AI agent: "Continue with next unchecked step from TODO.md". After each step the agent must wait for you to review the changes before proceeding.
+
+## Phase 16: Role-Based Panel Architecture (CRITICAL)
+
+**Overview:** Currently only an `/admin` panel exists. The system must route users to role-appropriate panels based on their active role and features. This phase creates 4 new route groups (`/unit-head`, `/requests`, `/finance`, `/vendor`) plus core infrastructure for role-based routing, panel switching, and feature-gated UI.
+
+**Role → Panel mapping:**
+| Role | Panel Route | Purpose |
+|------|-------------|---------|
+| Manager, Admin, OrgHead | `/admin` | Full system management (existing) |
+| UnitHead | `/unit-head` | Approve/reject purchasing requests for their unit |
+| Employee, Ordinary | `/requests` | Create and track purchasing requests |
+| Finance (users with `canManageBudget`) | `/finance` | Budget lines, payment orders, reports |
+| Vendor/Store (users with `canRespondToTender`) | `/vendor` | View open tenders, submit offers |
+
+### 16A: Core Infrastructure — Roles, Routing, Panels
+
+- [ ] Create `src/lib/roles.ts` — Role-to-route mapping, role/feature-based panel resolution:
+  - `PanelDef` interface: `{ id, path, label, icon, description }`
+  - `getPanelForRole(roleName, features): string | null`
+  - `getAccessiblePanels(user): PanelDef[]`
+  - `getDefaultPanel(user): string`
+  - Map: UnitHead → `/unit-head`, Employee/Ordinary → `/requests`, canManageBudget → `/finance`, canRespondToTender → `/vendor`
+  - Export panel definitions as a config array with role/feature requirements
+
+- [ ] Create `src/components/layout/role-router.tsx` — Client component that reads `activeRoleId` from cookie/store, maps to panel via `getDefaultPanel()`, and redirects. Used after login and role switch.
+
+- [ ] Create `src/components/layout/panel-selector.tsx` — DropdownButton in header showing all accessible panels. Click switches `activeRoleId` cookie + redirects to target panel. Replaces hardcoded "پنل مدیریت" menu item.
+
+- [ ] Create `src/components/feature-guard.tsx` — Wrapper that conditionally renders children based on user features:
+  ```tsx
+  <FeatureGuard feature="canApprovePurchaseRequest" fallback={<AccessDenied />}>
+    <ApproveButton />
+  </FeatureGuard>
+  ```
+
+- [ ] Update `src/stores/authStore.ts` — Add:
+  - `accessiblePanels: PanelDef[]` (derived from user roles/features)
+  - `activePanel: string` (current panel path like `/admin`)
+  - `isFeatureEnabled(feature: string): boolean`
+  - `getActiveRoleName(): string | undefined`
+  - `getActiveScope(): { type, id } | undefined`
+
+- [ ] Update `src/middleware.ts` — Protect new route groups by reading `activeRoleId` cookie:
+  - `/admin` → requires Manager/Admin/OrgHead role
+  - `/unit-head` → requires UnitHead role
+  - `/requests` → requires Employee/Ordinary role
+  - `/finance` → requires `canManageBudget` feature
+  - `/vendor` → requires `canRespondToTender` feature
+  - If unauthorized, redirect to `/login` or default accessible panel
+  - Fetch user data server-side via `getMe` if needed for feature checks
+
+- [ ] Update `src/components/auth/login-form.tsx` — After login, redirect to `getDefaultPanel(user)` instead of hardcoded `/admin`.
+
+- [ ] Update `src/components/auth/auth-guard.tsx` — After auth check, validate panel access and redirect to default panel if current route is unauthorized for the active role.
+
+- [ ] Update `src/app/actions/auth/setActiveRole.ts` — Return target panel path so client can redirect after role switch.
+
+### 16B: Panel Layouts & Navigation
+
+- [ ] Create `src/components/layout/panel-layout.tsx` — Shared layout for all non-admin panels:
+  - Same midnight-ink canvas + ambient bg as admin (reuse `AmbientBackground`)
+  - Simple top header: logo/brand on right, page title center, `PanelSelector` + `UserMenu` on left
+  - No sidebar — clean, focused UI for non-admin users
+  - Props: `title`, `description?`, `children`, `actions?`
+  - RTL, AuthKit design tokens
+
+- [ ] Create `src/app/unit-head/layout.tsx` — Wraps `PanelLayout` with `"پنل واحد"` context, `PanelGuard` for UnitHead role.
+
+- [ ] Create `src/app/requests/layout.tsx` — Wraps `PanelLayout` with `"درخواست‌های خرید"` context, `PanelGuard` for Employee/Ordinary roles.
+
+- [ ] Create `src/app/finance/layout.tsx` — Wraps `PanelLayout` with `"پنل مالی"` context, `PanelGuard` for `canManageBudget` feature.
+
+- [ ] Create `src/app/vendor/layout.tsx` — Wraps `PanelLayout` with `"پنل فروشندگان"` context, `PanelGuard` for `canRespondToTender` feature.
+
+- [ ] Update `src/components/layout/admin-header.tsx` — Add `<PanelSelector />` between breadcrumbs and UserMenu so admin users can switch panels.
+
+- [ ] Update `src/components/layout/user-menu.tsx` — Replace hardcoded "پنل مدیریت" with dynamic list of accessible panels from `useAuthStore`.
+
+### 16C: UnitHead Panel Pages (`/unit-head/`)
+
+- [ ] Create `src/app/unit-head/page.tsx` — Dashboard:
+  - KPI cards: pending approvals count, total active PRs, recently decided
+  - Quick action link: "درخواست‌های نیازمند تایید"
+  - Recent step approvals activity feed
+
+- [ ] Create `src/app/unit-head/requests/page.tsx` — PR list filtered by unit:
+  - Fetch via `purchasingRequest.gets({ unitId: "<unit-id>" })` server action
+  - DataTable: title, status badge, estimated amount, requester, current step, date
+  - Search, pagination, empty state with Persian message
+
+- [ ] Create `src/app/unit-head/requests/[id]/page.tsx` — PR detail with approve/reject:
+  - PR info panel: title, description, amounts, wareModel, requester, timeline
+  - Workflow visualizer (`WorkflowVisualizer`) with current step highlighted
+  - History timeline (`HistoryTimeline`)
+  - Step approval panel with: step name, description, assignee groups, comment textarea
+  - "تایید" (iris/green) and "رد" (ember/red) buttons
+  - Calls `stepApproval.submitDecision()`, shows toast, refreshes
+  - Read-only after decision
+
+- [ ] Create `src/components/purchasing/step-approval-panel.tsx` — Reusable approval component:
+  - Props: `purchasingRequest`, `processStep`, `unitId`, `onDecision` callback
+  - Shows step info, existing approvals from other units in same step group
+  - Approve/reject with confirm dialog, loading state during submission
+
+- [ ] Create `src/app/unit-head/loading.tsx` — Skeleton loading
+- [ ] Create `src/app/unit-head/requests/loading.tsx` — Skeleton loading
+
+### 16D: Employee/Requester Panel Pages (`/requests/`)
+
+- [ ] Create `src/app/requests/page.tsx` — Dashboard:
+  - KPI cards: total PRs, pending, approved, rejected
+  - Quick action: "ثبت درخواست خرید جدید"
+  - Recent PRs list (last 5)
+
+- [ ] Create `src/app/requests/new/page.tsx` — Create new PR (simplified):
+  - Basic info: title, description, estimated amount, quantity
+  - WareModel search-select (`FormSearchSelect`)
+  - Process selection (only active processes)
+  - Requesting unit auto-filled or selectable from user's units
+  - Submit via `purchasingRequest.submit()`, redirect on success
+
+- [ ] Create `src/app/requests/my-requests/page.tsx` — My PRs list:
+  - Fetch PRs where `requester._id` matches current user
+  - DataTable: status, amount, wareModel, current step, date
+  - Filter tabs: all / pending / approved / rejected
+
+- [ ] Create `src/app/requests/[id]/page.tsx` — PR detail (read-only):
+  - PR info, workflow visualizer, history timeline
+  - No edit/approve/reject — requester view only
+  - Status badge prominent at top
+
+- [ ] Create `src/app/requests/loading.tsx` — Skeleton loading
+
+### 16E: Finance Panel Pages (`/finance/`)
+
+- [ ] Create `src/app/finance/page.tsx` — Dashboard:
+  - KPI cards: total budget (current FY), remaining budget, pending payment orders, PRs awaiting finance step
+  - Quick actions: "ردیف‌های بودجه", "دستورات پرداخت", "گزارش بودجه"
+
+- [ ] Create `src/app/finance/budget-lines/page.tsx` — Budget lines list (read-only):
+  - Fetch via `budgetLine.gets()` with fiscal year filter
+  - DataTable: fiscal year, total amount, remaining (color-coded), status
+
+- [ ] Create `src/app/finance/payment-orders/page.tsx` — Payment orders list:
+  - Fetch via `paymentOrder.gets()`
+  - DataTable: PR ref, amount, status badge, date
+
+- [ ] Create `src/app/finance/budget-reports/page.tsx` — Budget report summary:
+  - KPI summary cards + budget line breakdown table
+
+- [ ] Create `src/app/finance/loading.tsx` — Skeleton loading
+
+### 16F: Vendor Panel Pages (`/vendor/`)
+
+- [ ] Create `src/app/vendor/page.tsx` — Dashboard:
+  - KPI cards: open tenders, my offers count, awarded tenders
+  - Quick action: "مناقصات باز"
+
+- [ ] Create `src/app/vendor/tenders/page.tsx` — Open tenders list:
+  - Fetch via `tender.gets()` filtered by status=open
+  - DataTable: title, deadline, PR reference, "ثبت پیشنهاد" button
+
+- [ ] Create `src/app/vendor/tenders/[id]/offer/page.tsx` — Submit offer:
+  - Form: price, delivery time, terms, notes, optional attachment
+  - Submit via `tenderOffer.submit()`, redirect on success
+
+- [ ] Create `src/app/vendor/my-offers/page.tsx` — My offers list:
+  - Fetch via `tenderOffer.gets()` filtered by this store/vendor
+  - DataTable: tender, price, status badge, date
+
+- [ ] Create `src/app/vendor/loading.tsx` — Skeleton loading
+
+### 16G: Admin Sidebar & Navigation (Role-Aware)
+
+- [ ] Update `src/components/layout/admin-sidebar.tsx` — Conditional sections based on features:
+  - Hide "بودجه" section if user lacks `canManageBudget`
+  - Hide "انبار" section if user lacks `canViewWarehouse`
+  - Manager/Admin always see all sections
+  - Add feature-based tooltips on hidden/collapsed sections
+
+- [ ] Update `src/app/admin/page.tsx` — Add role-aware banner:
+  - If user has multiple roles: "شما نقش‌های متعددی دارید. برای دسترسی به پنل‌های دیگر از منوی کاربری استفاده کنید."
+  - Quick-switch links to other accessible panels
+
+## Phase 17: Error Handling, Polish & Final Steps
+
+### 17A: Error Boundaries
+
+- [ ] Create `src/app/error.tsx` — Global error boundary with retry button (Persian)
+- [ ] Create `src/app/admin/error.tsx` — Admin-specific error boundary
+- [ ] Create error boundaries for each new panel (`/unit-head/error.tsx`, `/requests/error.tsx`, `/finance/error.tsx`, `/vendor/error.tsx`)
+
+### 17B: PanelGuard & Access Denied
+
+- [ ] Create `src/components/auth/panel-guard.tsx` — Wraps AuthGuard + validates role/feature access for the panel; redirects to default panel if unauthorized
+- [ ] Create `src/components/auth/access-denied.tsx` — Styled Persian access denied page: "شما دسترسی به این بخش را ندارید" with link to default panel
+
+### 17C: Final Build & Verification
+
+- [ ] Run `pnpm lint` and fix all TypeScript errors
+- [ ] Run `pnpm build --no-lint` to verify production build
+- [ ] Verify all Persian text — no English strings remain in new panels
+- [ ] Verify RTL rendering in all new panels
+- [ ] Verify role-based routing: login as different role types, confirm correct redirect
+
+## Known Issues & Technical Debt
+
+- [ ] Backend type declarations (`declarations/`) need to be regenerated after model changes
+- [ ] Some base-ui components may need custom RTL styling for Persian
+- [ ] Server action error responses need consistent format
+- [ ] Verify all Lucide icons render correctly in RTL
+- [ ] `activeRoleId` cookie is non-httpOnly — middleware reads it client-side; consider server-side session validation for security
+- [ ] Some panel pages share form logic with admin equivalents — consider extracting shared form components (e.g., PR creation form reused in `/requests/new` and `/admin/purchasing-requests/new`)
+
+## Quick-Reference: Panel → Route Mapping
+
+| Role / Feature | Route | Layout | Guard |
+|---|---|---|---|
+| Manager, Admin, OrgHead | `/admin/*` | Sidebar + Header | AuthGuard |
+| UnitHead | `/unit-head/*` | PanelLayout (simple header) | PanelGuard(UnitHead) |
+| Employee, Ordinary | `/requests/*` | PanelLayout (simple header) | PanelGuard(Employee, Ordinary) |
+| canManageBudget | `/finance/*` | PanelLayout (simple header) | PanelGuard(canManageBudget) |
+| canRespondToTender | `/vendor/*` | PanelLayout (simple header) | PanelGuard(canRespondToTender) |
+
+**How to proceed**: Open `CONTINUE.md`, tell the AI agent: "Continue with next unchecked step from TODO.md". After each step the agent must wait for you to review the changes before proceeding.

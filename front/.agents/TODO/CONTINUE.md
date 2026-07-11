@@ -108,18 +108,28 @@ export default async function AdminPage({ searchParams }) {
 - Button, Input, Label, Card, Dialog, Select, Textarea, Checkbox, Table, Tabs, Badge, Avatar, DropdownMenu, Separator, Skeleton, Sheet, Form, Command, ScrollArea, Tooltip, Progress, Switch, Sonner (toast)
 
 **Current Status**:
-- ✅ Phase 1 (Project Setup): Done — scaffold, AuthKit theme, API client, type declarations, auth store, component library, form components, root layout
-- ✅ Phase 2 (Authentication): Done — login/register/logout/getMe/tempUser server actions, login & register pages, middleware guard, auth-guard component
-- ✅ Phase 3 (Layout Components): Done — Logo, UserMenu, Header, AdminSidebar, AdminHeader, Breadcrumbs, AdminLayout, Dashboard page, 10 common admin components (DataTable, Pagination, EmptyState, ErrorState, LoadingSkeleton, SearchInput, StatusBadge, PageHeader, ConfirmDialog, FilterBar)
-- ✅ Phase 4 (Server Actions — Organizational Domain): Done — 45 action files across 7 models (organization, user, unit, process, processStep, tag, file)
-- ✅ Phase 5 (Server Actions — Warehouse & Inventory): Done — State, City, WareType, WareClass, WareGroup, WareModel, Manufacturer, Ware, Stuff, Store, Inventory, StockMovement, ConsumptionRecord
-- ✅ Phase 6 (Server Actions — Procurement & Purchasing): Done — PurchasingRequest, StepApproval, Tender, TenderOffer, PurchaseOrderItem, GoodsReceipt, PaymentOrder
-- ✅ Phase 7 (Server Actions — Budget & Finance): Done — FiscalYear, BudgetLine, BudgetAllocation, BudgetEncumbrance
-- ❌ Phases 8-15 (Admin Pages): Not started
+- ✅ Phase 1 (Project Setup): Done
+- ✅ Phase 2 (Authentication): Done
+- ✅ Phase 3 (Layout Components): Done
+- ✅ Phase 4 (Server Actions — Organizational Domain): Done
+- ✅ Phase 5 (Server Actions — Warehouse & Inventory): Done
+- ✅ Phase 6 (Server Actions — Procurement & Purchasing): Done
+- ✅ Phase 7 (Server Actions — Budget & Finance): Done
+- ✅ Phase 8 (Admin Pages — Organizational Management): Done — full CRUD for organizations, users, units, tags, processes, process steps, states, cities
+- ✅ Phase 9 (Admin Pages — Warehouse & Inventory): Done — product hierarchy, manufacturers, wares, stores, stuff, inventory
+- ✅ Phase 10 (Admin Pages — Purchasing Request Workflow): Done — PR list, create, detail, workflow visualizer, tender flows, store assignment
+- ✅ Phase 11 (Admin Pages — Goods Receipt & Payment): Done — goods receipt CRUD, payment order list/mark-paid
+- ✅ Phase 12 (Admin Pages — Budget & Finance): Done — fiscal years, budget lines, budget reports
+- ✅ Phase 13 (Admin Pages — Consumption): Done
+- ✅ Phase 14 (Dashboard & Home Page): Done — landing page, admin dashboard with KPI cards
+- ✅ Phase 15 (Polish & Deployment): Partially done — error/loading states, skeletons for lists; error boundaries and final build remain
+- ⬜ **Phase 16 (Role-Based Panel Architecture): NEXT — NOT STARTED** — The core remaining work: create role-specific panels (UnitHead, Employee/Requester, Finance, Vendor) so users are routed to appropriate interfaces based on their active role and features
+- ⬜ Phase 17 (Error Handling, Polish & Final Steps): Not started — depends on Phase 16
 
 ## Next Step
 
-Phase 8: Admin Pages — Organizational Management starts here once Phases 5-7 server actions are built. Or start with Phase 5: Server Actions — Warehouse & Inventory Domain.
+**Phase 16A: Core Infrastructure — Roles, Routing, Panels**
+Start with `src/lib/roles.ts` — the role-to-route mapping module. Then create `role-router.tsx`, `panel-selector.tsx`, `feature-guard.tsx`, update `authStore.ts`, `middleware.ts`, `login-form.tsx`, `auth-guard.tsx`, and `setActiveRole.ts`.
 
 **Important Backend Model Facts**:
 - **Employee was merged into User** — User has `position`, `isActive`, `units`, `features`, `roles`, `allowWare*Id`

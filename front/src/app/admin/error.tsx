@@ -1,32 +1,32 @@
-"use client";
+"use client"
 
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle } from "lucide-react";
+import { useEffect } from "react"
+import { AlertTriangle } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function AdminError({
   error,
   reset,
 }: {
-  error: Error & { digest?: string };
-  reset: () => void;
+  error: Error & { digest?: string }
+  reset: () => void
 }) {
   useEffect(() => {
-    console.error(error);
-  }, [error]);
+    console.error(error)
+  }, [error])
 
   return (
-    <div className="flex flex-col items-center text-center py-20 max-w-sm mx-auto">
-      <div className="size-14 rounded-2xl bg-rose-500/10 flex items-center justify-center mb-4">
-        <AlertTriangle className="size-7 text-rose-400" />
+    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
+      <div className="flex size-16 items-center justify-center rounded-full bg-ember/10">
+        <AlertTriangle className="size-8 text-ember" />
       </div>
-      <h1 className="text-xl font-semibold text-glacier">خطا در بارگذاری</h1>
-      <p className="text-sm text-fog/60 mt-2 leading-relaxed">
-        خطایی در بارگذاری این بخش رخ داده است.
+      <h1 className="text-xl font-semibold text-glacier">خطا در پنل مدیریت</h1>
+      <p className="max-w-md text-sm text-fog">
+        خطایی در بخش مدیریت رخ داده است. لطفاً مجدداً تلاش کنید.
       </p>
-      <Button className="mt-6" onClick={reset}>
+      <Button onClick={reset} variant="default" className="mt-2">
         تلاش مجدد
       </Button>
     </div>
-  );
+  )
 }

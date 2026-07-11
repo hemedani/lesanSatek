@@ -39,13 +39,18 @@ function LoginForm() {
     const result = await login({ email: data.email, password: data.password })
 
     if (result.success && result.body?.user) {
-      setUser(result.body.user)
-      const firstRole = result.body.user.roles?.[0]
+      const user = result.body.user
+      const { getDefaultPanel, getAccessiblePanels } = await import("@/lib/roles")
+      const panels = getAccessiblePanels(user)
+      setUser(user, panels)
+      const firstRole = user.roles?.[0]
       if (firstRole) {
         setActiveRoleId(firstRole.roleId)
         setActiveRoleCookie(firstRole.roleId)
       }
-      router.push("/admin")
+      const defaultPanel = getDefaultPanel(user)
+      const redirect = new URLSearchParams(window.location.search).get("redirect")
+      router.push(redirect || defaultPanel)
     } else {
       setError(result.body?.message || "ایمیل یا رمز عبور اشتباه است")
     }

@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { logout } from "@/app/actions/auth/logout"
 import { setActiveRole } from "@/app/actions/auth/setActiveRole"
 import { useAuthStore } from "@/stores/authStore"
+import { cn } from "@/lib/utils"
 import { LogOut, User, Shield } from "lucide-react"
 
 function UserMenu() {
@@ -80,11 +81,40 @@ function UserMenu() {
           </>
         )}
 
-        <DropdownMenuSeparator />
-        <DropdownMenuItem dir="rtl" onClick={() => router.push("/admin")} className="focus:bg-electric-iris/5 focus:text-foreground">
-          <User className="size-4" />
-          پنل مدیریت
-        </DropdownMenuItem>
+        {useAuthStore.getState().accessiblePanels.length > 1 && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>
+                <div className="flex items-center gap-2 text-xs text-fog">
+                  <User className="size-3.5" />
+                  پنل‌ها
+                </div>
+              </DropdownMenuLabel>
+              {useAuthStore.getState().accessiblePanels.map((panel) => {
+                const Icon = panel.icon
+                const isActive = typeof window !== "undefined" && window.location.pathname.startsWith(panel.path)
+                return (
+                  <DropdownMenuItem
+                    key={panel.id}
+                    dir="rtl"
+                    onClick={() => router.push(panel.path)}
+                    className={cn(
+                      "gap-3 focus:bg-electric-iris/5 focus:text-foreground",
+                      isActive && "bg-electric-iris/10 text-frost-link",
+                    )}
+                  >
+                    <Icon className="size-4" />
+                    <div className="flex flex-col">
+                      <span className="text-sm">{panel.label}</span>
+                      <span className="text-xs text-fog">{panel.description}</span>
+                    </div>
+                  </DropdownMenuItem>
+                )
+              })}
+            </DropdownMenuGroup>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem dir="rtl" onClick={handleLogout} variant="destructive" className="focus:bg-ember/10">
           <LogOut className="size-4" />

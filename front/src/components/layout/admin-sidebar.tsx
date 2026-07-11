@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/stores/authStore";
 import {
   LayoutDashboard,
   Building2,
@@ -179,10 +180,12 @@ function SidebarContent({
   collapsed,
   onToggle,
   onNavigate,
+  sections,
 }: {
   collapsed: boolean;
   onToggle: () => void;
   onNavigate?: () => void;
+  sections: NavSection[];
 }) {
   return (
     <div className="flex min-h-0 h-full flex-col">
@@ -237,7 +240,7 @@ function SidebarContent({
             collapsed ? "px-3 pt-5 pb-5" : "px-3 pt-5 pb-5",
           )}
         >
-          {navSections.map((section, sectionIdx) => (
+          {sections.map((section, sectionIdx) => (
             <div
               key={section.label}
               className={cn(
@@ -306,6 +309,25 @@ function AdminSidebar() {
     return false;
   });
 
+  const { user } = useAuthStore()
+
+  const roleNames = user?.roles?.map((r) => r.name) ?? []
+  const featureNames = user?.features?.map((f) => f.feature) ?? []
+  const isSuper = roleNames.some((r) => ["Manager", "Admin", "OrgHead"].includes(r))
+
+  const filteredSections = useMemo(() => {
+    if (isSuper) return navSections
+    return navSections.filter((section) => {
+      if (section.label === "بودجه") {
+        return featureNames.includes("canManageBudget")
+      }
+      if (section.label === "انبار") {
+        return featureNames.includes("canViewWarehouse")
+      }
+      return true
+    })
+  }, [isSuper, featureNames.join(",")])
+
   const handleToggle = useCallback(() => {
     setCollapsed((prev) => {
       const next = !prev;
@@ -319,13 +341,31 @@ function AdminSidebar() {
       className="group/sidebar hidden lg:flex lg:flex-col glass-sidebar transition-all duration-300 ease-out relative z-20 max-h-screen"
       style={{ width: collapsed ? COLLAPSED_WIDTH : 288 }}
     >
-      <SidebarContent collapsed={collapsed} onToggle={handleToggle} />
+      <SidebarContent collapsed={collapsed} onToggle={handleToggle} sections={filteredSections} />
     </aside>
   );
 }
 
 function AdminMobileNav() {
   const [open, setOpen] = useState(false);
+  const { user } = useAuthStore()
+
+  const roleNames = user?.roles?.map((r) => r.name) ?? []
+  const featureNames = user?.features?.map((f) => f.feature) ?? []
+  const isSuper = roleNames.some((r) => ["Manager", "Admin", "OrgHead"].includes(r))
+
+  const filteredSections = useMemo(() => {
+    if (isSuper) return navSections
+    return navSections.filter((section) => {
+      if (section.label === "بودجه") {
+        return featureNames.includes("canManageBudget")
+      }
+      if (section.label === "انبار") {
+        return featureNames.includes("canViewWarehouse")
+      }
+      return true
+    })
+  }, [isSuper, featureNames.join(",")])
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -344,7 +384,7 @@ function AdminMobileNav() {
         side="right"
         className="w-72 p-0 bg-[rgba(5,6,15,0.92)] backdrop-blur-2xl border-s border-steel-border/30 shadow-2xl"
       >
-        <SidebarContent collapsed={false} onToggle={() => {}} onNavigate={() => setOpen(false)} />
+        <SidebarContent collapsed={false} onToggle={() => {}} onNavigate={() => setOpen(false)} sections={filteredSections} />
       </SheetContent>
     </Sheet>
   );

@@ -34836,6 +34836,7 @@ wareId?: string;
 wareTypeId?: string;
 wareClassId?: string;
 wareGroupId?: string;
+unitId?: string;
 };
 get: {
 _id?: (0 | 1 );
@@ -46907,6 +46908,7 @@ page?: number;
 limit?: number;
 skip?: number;
 search?: string;
+stateId?: string;
 sortBy?: ("createdAt" | "updatedAt" | "name" );
 sortOrder?: ("asc" | "desc" );
 };

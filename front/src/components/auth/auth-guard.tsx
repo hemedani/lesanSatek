@@ -23,7 +23,9 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
       setLoading(true)
       const result = await getMe()
       if (result.success && result.body) {
-        setUser(result.body)
+        const { getAccessiblePanels } = await import("@/lib/roles")
+        const panels = getAccessiblePanels(result.body)
+        setUser(result.body, panels)
         const firstRole = result.body.roles?.[0]
         if (firstRole && !useAuthStore.getState().activeRoleId) {
           setActiveRoleId(firstRole.roleId)
@@ -41,7 +43,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (isLoading && !user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-midnight-ink">
+      <div className="flex min-h-screen items-center justify-center bg-[#05060f]">
         <Loader2 className="size-6 animate-spin text-moonlight" />
       </div>
     )
