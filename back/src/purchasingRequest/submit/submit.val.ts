@@ -10,7 +10,6 @@ export const submitValidator = () => {
       description: optional(string()),
       estimatedAmount: optional(number()),
       quantity: number(),
-      processId: objectIdValidation,
       wareModelId: objectIdValidation,
       requestingUnitId: optional(objectIdValidation),
       attachmentIds: optional(array(objectIdValidation)),

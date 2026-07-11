@@ -1,6 +1,8 @@
 import { type ActFn, ObjectId } from "lesan";
-import { purchasingRequest, wareModel, coreApp } from "../../../mod.ts";
+import { purchasingRequest, wareModel, unit, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
+import { throwError } from "../../../utils/throwError.ts";
+import { resolveProcessForPR } from "../../../utils/resolveProcess.ts";
 
 export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
@@ -9,7 +11,6 @@ export const addFn: ActFn = async (body) => {
 
   const {
     activeRoleId,
-    processId,
     wareModelId,
     requestingUnitId,
     attachmentIds,
@@ -23,9 +24,42 @@ export const addFn: ActFn = async (body) => {
 
   const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
 
+  let organizationId: string | undefined;
+  const userAny = user as Record<string, unknown>;
+  const userOrg = userAny.organization as Record<string, unknown> | undefined;
+  if (userOrg?._id) {
+    organizationId = (userOrg._id as ObjectId).toString();
+  }
+  if (!organizationId && requestingUnitId) {
+    const unitDoc = await unit.findOne({
+      filters: { _id: new ObjectId(requestingUnitId as string) },
+      projection: { organization: { _id: 1 } },
+    }) as Record<string, unknown> | undefined;
+    if (unitDoc?.organization) {
+      const org = unitDoc.organization as Record<string, unknown>;
+      if (org._id) {
+        organizationId = org._id.toString();
+      }
+    }
+  }
+  if (!organizationId) {
+    throwError("Could not determine organization. Please ensure you belong to an organization.");
+    return;
+  }
+
+  const resolvedProcessId = await resolveProcessForPR({
+    organizationId,
+    requestingUnitId: requestingUnitId as string | undefined,
+    wareModelId: wareModelId as string,
+    wareId: wareId as string | undefined,
+    wareTypeId: wareTypeId as string | undefined,
+    wareClassId: wareClassId as string | undefined,
+    wareGroupId: wareGroupId as string | undefined,
+  });
+
   const relations: Record<string, unknown> = {
     process: {
-      _ids: new ObjectId(processId as string),
+      _ids: new ObjectId(resolvedProcessId),
       relatedRelations: { requests: true },
     },
     requester: {

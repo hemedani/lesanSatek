@@ -15,8 +15,6 @@ export const addValidator = () => {
       currentStep: optional(number()),
       requestedAt: optional(string()),
       completedAt: optional(string()),
-      organizationId: optional(objectIdValidation),
-      processId: objectIdValidation,
       wareModelId: objectIdValidation,
       requestingUnitId: optional(objectIdValidation),
       attachmentIds: optional(array(objectIdValidation)),
