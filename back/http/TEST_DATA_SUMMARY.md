@@ -164,36 +164,125 @@ Pricing: Absolute (not percentage) — `hasAbsolutePrice: true`, actual price = 
 
 ---
 
-## 6. Process & Steps
+## 6. Process & Steps — 8 Scoped Processes
 
-### Process
+The E2E suite creates **8 processes** covering every scope form. PR creation auto-resolves the correct process via `resolveProcessForPR()` (see `back/utils/resolveProcess.ts`).
+
+**Resolution priority** (first match wins):
+1. Unit-scoped (`process.unit._id === requestingUnitId`)
+2. Ware-scoped (`process.ware._id === wareId`)
+3. WareModel-scoped → WareGroup → WareClass → WareType
+4. Org-wide general (unscoped) — fallback
+
+### Process #1: General (Org-Wide) — `{processGeneralId}`
 
 | Field | Value |
 |-------|-------|
-| `name` | فرآیند خرید نمونه |
-| `description` | Standard procurement workflow |
+| `name` | فرآیند خرید عمومی سازمان |
+| `description` | General org-wide procurement workflow |
+| **Scope** | None (unscoped — applies to all PRs with no more specific match) |
 
-### Steps (3-step approval workflow)
+| Step | `name` | `order` | Assignee Unit |
+|------|--------|---------|---------------|
+| 1 | تأیید درخواست | 1 | Procurement Unit (`{unitId}`) |
+| 2 | تأیید انبار | 2 | Central Warehouse (`{warehouseUnitId}`) |
+| 3 | تأیید مالی | 3 | Finance Unit (`{financeUnitId}`) |
 
-| Step | `name` | `description` | `stepType` | `order` | `required` | `groupsOperator` | Assignee Groups |
-|------|--------|---------------|-----------|---------|------------|-----------------|-----------------|
-| **Step 1** | تأیید درخواست | Request is reviewed by procurement unit | Approval | 1 | true | AND | `[{operator: "AND", unitIds: ["{unitId}"]}]` |
-| **Step 2** | تأیید انبار | Warehouse confirms stock level | Approval | 2 | true | AND | `[{operator: "AND", unitIds: ["{warehouseUnitId}"]}]` |
-| **Step 3** | تأیید مالی | Finance approves budget | Approval | 3 | true | AND | `[{operator: "AND", unitIds: ["{financeUnitId}"]}]` |
+### Process #2: Unit-Scoped (Procurement) — `{processUnitId}`
 
-**Assignee logic:** Each step has a single group with `operator: "AND"` — the single unit in each group must approve. `groupsOperator: "AND"` combines groups (only 1 group here).
+| Field | Value |
+|-------|-------|
+| `name` | فرآیند خرید واحد خرید |
+| **Scope** | `unitId: {unitId}` (Procurement Unit) |
 
-- Step 1 → Procurement Unit (واحد خرید)
-- Step 2 → Central Warehouse (انبار مرکزی)
-- Step 3 → Finance Unit (واحد مالی)
+| Step | `name` | `order` | Assignee Unit |
+|------|--------|---------|---------------|
+| 1 | تأیید درخواست | 1 | Procurement Unit |
+| 2 | تأیید انبار | 2 | Central Warehouse |
+| 3 | تأیید مالی | 3 | Finance Unit |
+
+### Process #3: Unit-Scoped (Warehouse) — `{processWarehouseId}`
+
+| Field | Value |
+|-------|-------|
+| `name` | فرآیند خرید انبار مرکزی |
+| **Scope** | `unitId: {warehouseUnitId}` (Central Warehouse) |
+
+| Step | `name` | `order` | Assignee Unit |
+|------|--------|---------|---------------|
+| 1 | تأیید انبار | 1 | Central Warehouse |
+| 2 | تأیید مالی | 2 | Finance Unit |
+
+### Process #4: Unit-Scoped (Finance) — `{processFinanceId}`
+
+| Field | Value |
+|-------|-------|
+| `name` | فرآیند خرید واحد مالی |
+| **Scope** | `unitId: {financeUnitId}` (Finance Unit) |
+
+| Step | `name` | `order` | Assignee Unit |
+|------|--------|---------|---------------|
+| 1 | تأیید مالی | 1 | Finance Unit |
+
+### Process #5: WareType-Scoped — `{processWaretypeId}`
+
+| Field | Value |
+|-------|-------|
+| `name` | فرآیند خرید تجهیزات آزمایشگاهی |
+| **Scope** | `wareTypeId: {wareTypeId}` (تجهیزات آزمایشگاهی) |
+
+| Step | `name` | `order` | Assignee Unit |
+|------|--------|---------|---------------|
+| 1 | تأیید درخواست | 1 | Procurement Unit |
+| 2 | تأیید مالی | 2 | Finance Unit |
+
+### Process #6: WareClass-Scoped — `{processWareclassId}`
+
+| Field | Value |
+|-------|-------|
+| `name` | فرآیند خرید هماتولوژی |
+| **Scope** | `wareClassId: {wareClassId}` (هماتولوژی) |
+
+| Step | `name` | `order` | Assignee Unit |
+|------|--------|---------|---------------|
+| 1 | تأیید درخواست | 1 | Procurement Unit |
+
+### Process #7: WareGroup-Scoped — `{processWaregroupId}`
+
+| Field | Value |
+|-------|-------|
+| `name` | فرآیند خرید کیت |
+| **Scope** | `wareGroupId: {wareGroupId}` (کیت) |
+
+| Step | `name` | `order` | Assignee Unit |
+|------|--------|---------|---------------|
+| 1 | تأیید درخواست | 1 | Procurement Unit |
+| 2 | تأیید انبار | 2 | Central Warehouse |
+| 3 | تأیید مالی | 3 | Finance Unit |
+
+### Process #8: WareModel-Scoped — `{processWaremodelId}`
+
+| Field | Value |
+|-------|-------|
+| `name` | فرآیند خرید کیت TSH |
+| **Scope** | `wareModelId: {wareModelId}` (کیت TSH) |
+
+| Step | `name` | `order` | Assignee Unit |
+|------|--------|---------|---------------|
+| 1 | تأیید درخواست | 1 | Procurement Unit |
+| 2 | تأیید مالی | 2 | Finance Unit |
+
+### Assignee Logic (All Processes)
+
+Each step has a single group with `operator: "AND"` — the single unit in the group must approve. `groupsOperator: "AND"` (only 1 group per step).
 
 ### Activation
 
-The process is activated via `activateProcess` action (validates steps, auto-increments version, sets `status: Active`, `isActive: true`).
+Every process is activated via `activateProcess` (validates consecutive step order, auto-increments version, sets `status: Active`, `isActive: true`).
 
 ### Duplicate
 
-The process is duplicated via `duplicateProcess` action (creates a Draft copy with name "فرآیند خرید نمونه (Copy)").
+The general process is duplicated via `duplicateProcess` (creates Draft copy named "فرآیند خرید عمومی سازمان (Copy)", captured as `{dupProcessId}`).
 
 ---
 
@@ -240,7 +329,7 @@ Status defaults to `"open"`.
 
 ## 9. Purchasing Requests
 
-### PR #1 — Direct Store Purchase
+### PR #1 — Direct Store Purchase (via Process #2: Unit-Scoped Procurement)
 
 | Field | Value |
 |-------|-------|
@@ -249,11 +338,13 @@ Status defaults to `"open"`.
 | `estimatedAmount` | 50,000,000 |
 | `quantity` | 10 |
 
-**Relations:** `processId`, `wareModelId`, `requestingUnitId` → Procurement Unit, `budgetLineId`
+**Relations (no processId — auto-resolved):** `wareModelId`, `requestingUnitId` → Procurement Unit, `budgetLineId`
 
-**Flow:** Submit → Check Store Availability → Assign Store → Step 1 Decision (approved) → Warehouse Check → Step 2 Decision (approved) → Step 3 Decision (approved) → Goods Receipt → Auto Payment
+**Auto-resolve:** requestingUnit=`{unitId}` → matches Process #2 (unit-scoped, Procurement) → resolves `{processUnitId}`
 
-### PR #2 — Tender-Based Purchase
+**Flow:** Submit (auto-resolves process) → Check Store Availability → Assign Store → Step 1 Decision (approved) → Warehouse Check → Step 2 Decision (approved) → Step 3 Decision (approved) → Goods Receipt → Auto Payment
+
+### PR #2 — Tender-Based Purchase (via Process #2: Unit-Scoped Procurement)
 
 | Field | Value |
 |-------|-------|
@@ -261,7 +352,9 @@ Status defaults to `"open"`.
 | `description` | Tender-based procurement |
 | `quantity` | 20 |
 
-**Relations:** `processId`, `wareModelId`, `requestingUnitId` → Procurement Unit, `budgetLineId`
+**Relations (no processId — auto-resolved):** `wareModelId`, `requestingUnitId` → Procurement Unit, `budgetLineId`
+
+**Auto-resolve:** requestingUnit=`{unitId}` → matches Process #2 (unit-scoped, Procurement) → resolves `{processUnitId}`
 
 ---
 
@@ -351,24 +444,26 @@ Setup Phase:
   tempUser (Admin/System) → login → capture token
   state (Tehran) → city (Tehran) → org (Sample Organization)
   ↓
-  3 units (Procurement, Warehouse, Finance)
+  15 units (7 type=General, 2 Warehouse, Administrative, 5 Expert-labs)
+  8 unit heads + 3 panel users
   Manufacturer → WareType → WareClass → WareGroup → WareModel → Ware → Stuff
   Store → link to city/state
   ↓
-  Process (3 steps: Procurement → Warehouse → Finance approval)
-  Activate Process
+  8 Processes (1 general + 3 unit-scoped + 4 hierarchy-scoped)
+  All activated with consecutive steps
   ↓
   Budget:
     FiscalYear (1405) → BudgetLine (BUD-001) → Allocation (100,000,000)
   ↓
 
-E2E Flow #1 — Direct Store Purchase:
-  PR Submit (TSH Kit, qty=10, est=50M) → Pending
+E2E Flow #1 — Direct Store Purchase (auto-resolved → Process #2, unit-scoped):
+  PR Submit (TSH Kit, qty=10, est=50M, requestingUnit=Procurement) → Pending
+    Auto-resolve: requestingUnit matches Process #2 (unit-scoped, Procurement)
   Check Store Availability → Assign Store → PO Item created
   Step 1 (Procurement Unit): approve → advances to step 2
   Warehouse Check → Step 2 (Warehouse): approve → advances to step 3
   Step 3 (Finance): approve → Completed
-  Goods Receipt (GR-001, qty=10 accepted) → auto-inventory update, auto-payment
+  Goods Receipt (GR-001, qty=10 accepted) → auto-inventory, auto-payment
   Payment Order: gets existing PO → markPaid
   ↓
 
@@ -380,8 +475,8 @@ E2E Flow #2 — Inventory Management:
   Inventory Transfer (10 units, Warehouse → Procurement)
   ↓
 
-E2E Flow #3 — Tender Purchase:
-  PR Submit (TSH Kit, qty=20, tender-based)
+E2E Flow #3 — Tender Purchase (auto-resolved → Process #2, unit-scoped):
+  PR Submit (TSH Kit, qty=20, requestingUnit=Procurement) → Pending
   Tender add (deadline: 2026-05-01)
   Assign vendor (Store) to tender via updateRelations
   Vendor submits Offer (price=2,500,000, 7 day delivery)
@@ -390,7 +485,7 @@ E2E Flow #3 — Tender Purchase:
 
 Utility:
   Tag (فوری, red)
-  Duplicate process
+  Duplicate general process
   Budget report (gets budget line report)
   ↓
 
@@ -402,8 +497,7 @@ E2E Flow #4 — Role Management (New Batch 1):
   ↓
 
 E2E Flow #5 — Extended Coverage (New Batch 2):
-  getMe (profile check) → Unit child (Hematology Lab under Procurement)
-  → Store score update (4.5, 15M sales)
+  getMe (profile check) → Store score update (4.5, 15M sales)
   → StepApproval gets (3 records for PR #1)
   → BudgetLine gets (filtered by fiscal year)
   → TenderOffer gets (winning offer details)
