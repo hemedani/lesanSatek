@@ -4,13 +4,17 @@ import type { MyContext } from "@lib";
 import { throwError } from "./throwError.ts";
 
 export const setUser = async () => {
-  const { user: { _id } }: MyContext = coreApp.contextFns
-    .getContextModel() as MyContext;
+  const ctx = coreApp.contextFns.getContextModel() as MyContext;
+  const tokenUser = ctx.user;
+
+  if (!tokenUser || !tokenUser._id) {
+    throwError("Invalid or missing token data");
+  }
 
   const userPureProjection = coreApp.schemas.createProjection("user", "Pure");
 
   const foundedUser = await user.findOne({
-    filters: { _id: new ObjectId(_id) },
+    filters: { _id: new ObjectId(tokenUser._id) },
     projection: userPureProjection,
   });
 
