@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { FormSearchSelect } from "@/components/form/form-search-select"
+import { SearchSelect } from "@/components/form/form-search-select"
 import { submit as submitPR } from "@/app/actions/purchasingRequest/submit"
 import { gets as getProcesses } from "@/app/actions/process/gets"
 import { gets as getWareModels } from "@/app/actions/wareModel/gets"
@@ -175,11 +175,12 @@ export default function NewRequestPage() {
                   <FormItem>
                     <FormLabel>مدل کالا</FormLabel>
                     <FormControl>
-                      <FormSearchSelect
-                        placeholder="جستجوی مدل کالا..."
+                      <SearchSelect
                         value={field.value}
                         onChange={field.onChange}
-                        loadOptions={loadWareModels}
+                        placeholder="جستجوی مدل کالا..."
+                        fetcher={loadWareModels}
+                        label="مدل کالا"
                       />
                     </FormControl>
                     <FormMessage />
@@ -194,11 +195,12 @@ export default function NewRequestPage() {
                   <FormItem>
                     <FormLabel>فرآیند</FormLabel>
                     <FormControl>
-                      <FormSearchSelect
-                        placeholder="انتخاب فرآیند..."
+                      <SearchSelect
                         value={field.value}
                         onChange={field.onChange}
-                        loadOptions={loadProcesses}
+                        placeholder="انتخاب فرآیند..."
+                        fetcher={loadProcesses}
+                        label="فرآیند"
                       />
                     </FormControl>
                     <FormMessage />

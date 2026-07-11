@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { get } from "@/app/actions/tender/get";
+import { gets as getOffers } from "@/app/actions/tenderOffer/gets";
 import { TenderAwardDialog } from "@/components/purchasing/tender-award-dialog";
 
 interface TenderOffer {
@@ -31,7 +32,6 @@ interface TenderData {
   deadline?: string;
   createdAt?: string;
   purchasingRequest?: { _id: string; title?: string };
-  offers?: TenderOffer[];
 }
 
 export default function TenderDetailPage() {
@@ -39,6 +39,7 @@ export default function TenderDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const [tender, setTender] = useState<TenderData | null>(null);
+  const [offers, setOffers] = useState<TenderOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAward, setShowAward] = useState(false);
 
@@ -49,9 +50,6 @@ export default function TenderDetailPage() {
         {
           _id: 1, title: 1, description: 1, status: 1, deadline: 1, createdAt: 1,
           purchasingRequest: { _id: 1, title: 1 },
-          offers: { _id: 1, price: 1, deliveryTime: 1, paymentTerms: 1, status: 1, description: 1, submittedAt: 1,
-            vendor: { _id: 1, name: 1 }
-          }
         }
       );
       if (result.success && result.body?.[0]) {
@@ -63,6 +61,20 @@ export default function TenderDetailPage() {
       setLoading(false);
     })();
   }, [id, router]);
+
+  useEffect(() => {
+    if (!id) return;
+    (async () => {
+      const result = await getOffers(
+        { filter: { tenderId: id }, page: 1, limit: 100 },
+        { _id: 1, price: 1, deliveryTime: 1, paymentTerms: 1, status: 1, description: 1, submittedAt: 1,
+          vendor: { _id: 1, name: 1 } }
+      );
+      if (result.success && Array.isArray(result.body)) {
+        setOffers(result.body);
+      }
+    })();
+  }, [id]);
 
   if (loading) {
     return <div className="space-y-6">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-40 rounded-xl" />)}</div>;
@@ -95,7 +107,7 @@ export default function TenderDetailPage() {
               </div>
             </div>
           </div>
-          {isOpen && tender.offers && tender.offers.length > 0 && (
+          {isOpen && offers.length > 0 && (
             <Button size="sm" className="gap-1.5" onClick={() => setShowAward(true)}>
               <Award className="size-4" /> اعطای مناقصه
             </Button>
@@ -124,15 +136,15 @@ export default function TenderDetailPage() {
                 </div>
                 <div>
                   <CardTitle>پیشنهادات دریافت شده</CardTitle>
-                  <CardDescription>{tender.offers?.length || 0} پیشنهاد</CardDescription>
+                  <CardDescription>{offers.length} پیشنهاد</CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
-              {(!tender.offers || tender.offers.length === 0) ? (
+              {offers.length === 0 ? (
                 <p className="text-sm text-fog/50 text-center py-4">هنوز پیشنهادی ثبت نشده است.</p>
               ) : (
-                tender.offers.map((offer) => (
+                offers.map((offer) => (
                   <div key={offer._id} className="p-4 rounded-lg border border-steel-border/20 space-y-2">
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-medium text-moonlight">{offer.vendor?.name || "فروشنده"}</p>
@@ -184,7 +196,7 @@ export default function TenderDetailPage() {
               <div className="flex items-center gap-2 text-fog/50">
                 <Store className="size-4" />
                 <span>پیشنهادات: </span>
-                <span className="text-moonlight">{tender.offers?.length || 0}</span>
+                <span className="text-moonlight">{offers.length}</span>
               </div>
             </CardContent>
           </Card>
@@ -195,7 +207,7 @@ export default function TenderDetailPage() {
         open={showAward}
         onOpenChange={setShowAward}
         tenderId={tender._id}
-        offers={tender.offers || []}
+        offers={offers}
       />
     </div>
   );

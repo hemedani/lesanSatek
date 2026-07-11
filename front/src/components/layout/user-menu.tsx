@@ -70,13 +70,15 @@ function UserMenu() {
                   نقش فعال
                 </div>
               </DropdownMenuLabel>
-              <DropdownMenuRadioGroup value={activeRoleId} onValueChange={handleRoleChange}>
-                {user.roles.map((role) => (
-                  <DropdownMenuRadioItem key={role.roleId} value={role.roleId} dir="rtl" className="pe-8">
-                    {role.name}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
+              {activeRoleId && (
+                <DropdownMenuRadioGroup value={activeRoleId} onValueChange={handleRoleChange}>
+                  {user.roles.map((role, index) => (
+                    <DropdownMenuRadioItem key={role.roleId || `role-${index}`} value={role.roleId} dir="rtl" className="pe-8">
+                      {role.name}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              )}
             </DropdownMenuGroup>
           </>
         )}

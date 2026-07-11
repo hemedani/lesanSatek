@@ -17,7 +17,7 @@ export const getHistory = async (
       act: "getHistory",
       details: {
         set: { ...data, activeRoleId },
-        get: getSelection || { _id: 1, action: 1, performer: 1, createdAt: 1 },
+        get: getSelection || { _id: 1, action: 1, performed: 1, unit: 1, details: 1 },
       },
     });
     return result;
