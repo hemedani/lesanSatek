@@ -1,6 +1,5 @@
 import { number, object, objectIdValidation, optional, string } from "lesan";
 import { activeRoleMixin } from "@lib";
-import { selectStruct } from "../../../mod.ts";
 
 export const transferValidator = () => {
   return object({
@@ -12,6 +11,10 @@ export const transferValidator = () => {
       quantity: number(),
       description: optional(string()),
     }),
-    get: selectStruct("inventory", 2),
+    get: object({
+      fromUnit: optional(object({ _id: optional(number()) })),
+      toUnit: optional(object({ _id: optional(number()) })),
+      quantity: optional(number()),
+    }),
   });
 };

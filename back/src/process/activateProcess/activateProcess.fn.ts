@@ -26,7 +26,7 @@ export const activateProcessFn: ActFn = async (body) => {
 
   // Count steps
   const stepCount = await processStep.countDocument({
-    filter: { process: new ObjectId(_id as string) },
+    filter: { "process._id": new ObjectId(_id as string) },
   });
 
   if (stepCount === 0) {
@@ -37,7 +37,7 @@ export const activateProcessFn: ActFn = async (body) => {
   // Load all steps ordered
   const steps = await processStep.aggregation({
     pipeline: [
-      { $match: { process: new ObjectId(_id as string) } },
+        { $match: { "process._id": new ObjectId(_id as string) } },
       { $sort: { order: 1 } },
     ],
     projection: { _id: 1, name: 1, order: 1, assigneeGroups: 1, stepType: 1 },

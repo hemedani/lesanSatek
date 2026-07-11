@@ -9,18 +9,18 @@ export const transferFn: ActFn = async (body) => {
 
   const fromInv = await inventory.findOne({
     filters: {
-      unit: new ObjectId(fromUnitId as string),
+      "unit._id": new ObjectId(fromUnitId as string),
       "wareModel._id": new ObjectId(wareModelId as string),
     },
     projection: { _id: 1, unit: 1, quantity: 1 } as Document,
   }) as Document;
 
   if (!fromInv) {
-    throw { error: "Source inventory not found" };
+    throw new Error("Source inventory not found");
   }
 
   if ((fromInv.quantity as number) < (quantity as number)) {
-    throw { error: "Insufficient quantity in source inventory" };
+    throw new Error("Insufficient quantity in source inventory");
   }
 
   await inventory.findOneAndUpdate({
@@ -34,7 +34,7 @@ export const transferFn: ActFn = async (body) => {
 
   const toInv = await inventory.findOne({
     filters: {
-      unit: new ObjectId(toUnitId as string),
+      "unit._id": new ObjectId(toUnitId as string),
       "wareModel._id": new ObjectId(wareModelId as string),
     },
     projection: { _id: 1, quantity: 1 } as Document,
@@ -51,12 +51,15 @@ export const transferFn: ActFn = async (body) => {
     });
   }
 
-  return await inventory
-    .aggregation({
-      pipeline: [
-        { $match: { unit: new ObjectId(fromUnitId as string), "wareModel._id": new ObjectId(wareModelId as string) } },
-      ],
-      projection: get,
-    })
-    .toArray();
+  return {
+    fromUnit: await inventory.findOne({
+      filters: { _id: fromInv._id as ObjectId },
+      projection: get?.fromUnit || { _id: 1 },
+    }),
+    toUnit: toInv ? await inventory.findOne({
+      filters: { _id: toInv._id as ObjectId },
+      projection: get?.toUnit || { _id: 1 },
+    }) : null,
+    quantity,
+  };
 };

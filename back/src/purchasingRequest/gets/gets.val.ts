@@ -39,6 +39,7 @@ export const getsValidator = () => {
       wareTypeId: optional(objectIdValidation),
       wareClassId: optional(objectIdValidation),
       wareGroupId: optional(objectIdValidation),
+      unitId: optional(objectIdValidation),
     }),
     get: selectStruct("purchasingRequest", 2),
   });

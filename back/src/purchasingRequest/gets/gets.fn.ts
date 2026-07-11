@@ -1,6 +1,8 @@
 import type { ActFn, Document } from "lesan";
 import { ObjectId } from "lesan";
-import { purchasingRequest } from "../../../mod.ts";
+import { purchasingRequest, unit, coreApp } from "../../../mod.ts";
+import type { MyContext } from "@lib";
+import { throwError } from "../../../utils/throwError.ts";
 
 export const getsFn: ActFn = async (body) => {
   const {
@@ -20,6 +22,8 @@ export const getsFn: ActFn = async (body) => {
       wareTypeId,
       wareClassId,
       wareGroupId,
+      unitId,
+      activeRoleId,
     },
     get,
   } = body.details;
@@ -76,6 +80,57 @@ export const getsFn: ActFn = async (body) => {
       $match: { "wareGroup._id": new ObjectId(wareGroupId as string) },
     });
 
+  if (unitId) {
+    const { user }: MyContext = coreApp.contextFns
+      .getContextModel() as MyContext;
+
+    const activeRole = (user.roles || []).find(
+      (r: { roleId: string }) => r.roleId === activeRoleId,
+    );
+
+    if (!activeRole || !["Manager", "Admin", "OrgHead"].includes(activeRole.name)) {
+      const uId = new ObjectId(unitId as string);
+      const unitDoc = await unit.aggregation({
+        pipeline: [{ $match: { _id: uId } }],
+        projection: { head: { _id: 1 } },
+      }).toArray();
+
+      if (
+        unitDoc.length === 0 || !unitDoc[0].head ||
+        unitDoc[0].head._id.toString() !== user._id.toString()
+      ) {
+        throwError("You can only view requests for your own unit");
+      }
+    }
+
+    const unitObjId = new ObjectId(unitId as string);
+    pipeline.push(
+      {
+        $lookup: {
+          from: "stepApproval",
+          let: { prId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$purchasingRequest._id", "$$prId"] },
+                    { $eq: ["$unit._id", unitObjId] },
+                    { $eq: ["$status", "pending"] },
+                  ],
+                },
+              },
+            },
+            { $limit: 1 },
+          ],
+          as: "_unitPendingApprovals",
+        },
+      },
+      { $match: { _unitPendingApprovals: { $ne: [] } } },
+      { $project: { _unitPendingApprovals: 0 } },
+    );
+  }
+
   if (search && (!sortBy || sortBy === "relevance")) {
     pipeline.push({
       $addFields: {
@@ -88,9 +143,9 @@ export const getsFn: ActFn = async (body) => {
   const sortDirection = sortOrder === "asc" ? 1 : -1;
   pipeline.push({ $sort: { [sortField]: sortDirection } });
 
-  const calculatedSkip = skip ?? limit * (page - 1);
+  const calculatedSkip = skip ?? (limit || 50) * ((page || 1) - 1);
   pipeline.push({ $skip: calculatedSkip });
-  pipeline.push({ $limit: limit });
+  pipeline.push({ $limit: limit || 50 });
 
   return await purchasingRequest
     .aggregation({

@@ -7,7 +7,7 @@ export const getYearEndReportFn: ActFn = async (body) => {
   } = body.details;
 
   const match: Document = {
-    fiscalYear: new ObjectId(fiscalYearId as string),
+    "fiscalYear._id": new ObjectId(fiscalYearId as string),
   };
   organizationId && (match.organization = new ObjectId(organizationId as string));
 

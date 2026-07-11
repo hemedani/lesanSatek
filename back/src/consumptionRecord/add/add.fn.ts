@@ -85,6 +85,7 @@ export const addFn: ActFn = async (body) => {
       wareId: wareId as string | undefined,
       referenceType: "consumptionRecord",
       referenceId: String(result._id),
+      ...(inventoryId && { inventoryId: inventoryId as string }),
     },
   );
 

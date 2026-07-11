@@ -7,9 +7,9 @@ export const getBudgetReportFn: ActFn = async (body) => {
   } = body.details;
 
   const match: Document = {
-    fiscalYear: new ObjectId(fiscalYearId as string),
+    "fiscalYear._id": new ObjectId(fiscalYearId as string),
   };
-  organizationId && (match.organization = new ObjectId(organizationId as string));
+  organizationId && (match["organization._id"] = new ObjectId(organizationId as string));
 
   const pipeline: Document[] = [
     { $match: match },

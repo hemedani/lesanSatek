@@ -1,4 +1,4 @@
-import type { ActFn, Document } from "lesan";
+import type { ActFn, Document, ObjectId } from "lesan";
 import { processStep } from "../../../mod.ts";
 
 export const getsFn: ActFn = async (body) => {
@@ -10,6 +10,7 @@ export const getsFn: ActFn = async (body) => {
       search,
       sortBy,
       sortOrder,
+      processId,
     },
     get,
   } = body.details;
@@ -19,6 +20,11 @@ export const getsFn: ActFn = async (body) => {
   search &&
     pipeline.push({
       $match: { $text: { $search: search } },
+    });
+
+  processId &&
+    pipeline.push({
+      $match: { "process._id": new ObjectId(processId as string) },
     });
 
   if (search && (!sortBy || sortBy === "relevance")) {
@@ -33,9 +39,9 @@ export const getsFn: ActFn = async (body) => {
   const sortDirection = sortOrder === "asc" ? 1 : -1;
   pipeline.push({ $sort: { [sortField]: sortDirection } });
 
-  const calculatedSkip = skip ?? limit * (page - 1);
+  const calculatedSkip = skip ?? (limit || 50) * ((page || 1) - 1);
   pipeline.push({ $skip: calculatedSkip });
-  pipeline.push({ $limit: limit });
+  pipeline.push({ $limit: limit || 50 });
 
   return await processStep
     .aggregation({
