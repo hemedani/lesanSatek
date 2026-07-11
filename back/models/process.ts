@@ -42,7 +42,16 @@ import {
   string,
 } from "lesan";
 import { createUpdateAt } from "@lib";
-import { organization_excludes, user_excludes } from "./excludes.ts";
+import {
+  organization_excludes,
+  unit_excludes,
+  user_excludes,
+  ware_excludes,
+  wareClass_excludes,
+  wareGroup_excludes,
+  wareModel_excludes,
+  wareType_excludes,
+} from "./excludes.ts";
 
 export const process_status_array = ["Draft", "Active", "Archived"];
 export const process_status_emums = enums(process_status_array);
@@ -95,6 +104,48 @@ export const process_relations = {
         },
       },
     },
+  },
+  unit: {
+    schemaName: "unit",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: unit_excludes,
+    relatedRelations: {},
+  },
+  ware: {
+    schemaName: "ware",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: ware_excludes,
+    relatedRelations: {},
+  },
+  wareModel: {
+    schemaName: "wareModel",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: wareModel_excludes,
+    relatedRelations: {},
+  },
+  wareGroup: {
+    schemaName: "wareGroup",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: wareGroup_excludes,
+    relatedRelations: {},
+  },
+  wareClass: {
+    schemaName: "wareClass",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: wareClass_excludes,
+    relatedRelations: {},
+  },
+  wareType: {
+    schemaName: "wareType",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: wareType_excludes,
+    relatedRelations: {},
   },
 };
 

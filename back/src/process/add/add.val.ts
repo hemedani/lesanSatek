@@ -9,6 +9,12 @@ export const addValidator = () => {
 			...activeRoleMixin,
 			...process_pure,
 			organizationId: objectIdValidation,
+			unitId: optional(objectIdValidation),
+			wareId: optional(objectIdValidation),
+			wareModelId: optional(objectIdValidation),
+			wareGroupId: optional(objectIdValidation),
+			wareClassId: optional(objectIdValidation),
+			wareTypeId: optional(objectIdValidation),
 		}),
 		get: selectStruct("process", 1),
 	});
