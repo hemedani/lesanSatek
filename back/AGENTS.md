@@ -474,6 +474,59 @@ Lesan **embeds** single-type relations directly in the parent document as an inl
 
 Use Lesan relations by default for single-model references. Only resort to pure-field IDs/names when the referenced model may be deleted and you need the reference to survive (orphan resilience), or when the data must be an immutable snapshot that should not track source-of-truth updates.
 
+### `hardCascade` in Lesan `deleteOne`
+
+Lesan's `deleteOne` method accepts an optional `hardCascade` boolean. Understanding its behavior is critical for correct deletion order in E2E tests and production code.
+
+**Without `hardCascade` (default — safe):**
+- Deleting a **child** removes it from the parent's embedded reverse array **automatically**. No manual cleanup needed.
+- Deleting a **parent** is **blocked** if children still reference it via a reverse relation. Lesan returns an error telling you to handle children first.
+- This ensures data integrity — you can always delete children safely, but you cannot accidentally orphan them.
+
+**With `hardCascade: true` (dangerous):**
+- Deleting a **parent** **cascade-deletes all children** that reference it via the reverse relation.
+- Use only when you are certain you want to delete entire trees of data.
+- Inadvisable for routine use — a wrong `hardCascade` can silently wipe large amounts of related data.
+
+**Practical example — Country → City:**
+
+```typescript
+// models/city.ts (child defines the relation)
+city_relations = {
+  country: {
+    schemaName: "country",
+    type: "single",
+    optional: false,
+    relatedRelations: {
+      // Lesan auto-creates country.cities from this
+      cities: { type: "multiple", limit: 999, sort: { field: "_id", order: "desc" } },
+    },
+  },
+};
+
+// models/country.ts (pure fields only — no cities relation here)
+country_pure = { name: string(), code: string(), ...createUpdateAt };
+```
+
+| Action | `hardCascade` | Result |
+|--------|---------------|--------|
+| `city.deleteOne({ filter })` | not passed / `false` | ✅ City deleted. Country's embedded `cities` array auto-cleaned. |
+| `country.deleteOne({ filter })` | not passed / `false` | ❌ Blocked: "please clear cities relation before deletion" |
+| `country.deleteOne({ filter, hardCascade: true })` | `true` | ✅ Country deleted. **All its cities cascade-deleted**. |
+
+**Pattern in remove functions (this codebase):**
+```typescript
+// Every remove.fn.ts follows this exact pattern:
+return await modelName.deleteOne({
+  filter: { _id: new ObjectId(_id as string) },
+  hardCascade: hardCascade || false,  // default: no cascade
+});
+```
+
+Setting `hardCascade: false` explicitly means "use default safe behavior" — child deletion auto-cleanup works, parent deletion is blocked. Do NOT change this to a conditional (only pass `hardCascade` when true), because `hardCascade: false` and omitting `hardCascade` are semantically identical in Lesan — both mean "default safe mode."
+
+**Bottom line:** Always delete children first, never rely on `hardCascade` for routine cleanup. The E2E remove order MUST delete from leaf nodes upward (children before parents).
+
 ### Denormalized Hierarchy Pattern
 Ware and Stuff models use denormalized relations to WareType, WareClass, WareGroup, and WareModel. Unit.organization is also denormalized. This enables:
 - Filtering by any level of the hierarchy without joins

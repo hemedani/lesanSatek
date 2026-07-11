@@ -1,0 +1,30 @@
+[
+  {
+    "id": "gen-tag",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"Authorization\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"tag\", \"act\": \"add\", \"details\": {\"get\": {\"_id\": 1, \"name\": 1}, \"set\": {\"name\": \"\\u0641\\u0648\\u0631\\u06cc\", \"color\": \"#FF0000\", \"description\": \"Urgent items\", \"activeRoleId\": \"\"}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "tagId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-duplicate-process",
+    "bodyHeaders": "{\n  \"headers\": {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": \"{token}\"\n  },\n  \"body\": {\n    \"service\": \"main\",\n    \"model\": \"process\",\n    \"act\": \"duplicateProcess\",\n    \"details\": {\n      \"get\": {\n        \"_id\": 1,\n        \"name\": 1,\n        \"status\": 1,\n        \"version\": 1,\n        \"steps\": { \"_id\": 1, \"name\": 1, \"order\": 1 }\n      },\n      \"set\": {\n        \"_id\": \"{processId}\",\n        \"activeRoleId\": \"\"\n      }\n    }\n  }\n}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "dupProcessId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-budget-report",
+    "bodyHeaders": "{\n  \"headers\": {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": \"{token}\"\n  },\n  \"body\": {\n    \"service\": \"main\",\n    \"model\": \"budgetLine\",\n    \"act\": \"getBudgetReport\",\n    \"details\": {\n      \"get\": {},\n      \"set\": {\n        \"fiscalYearId\": \"{fiscalYearId}\",\n        \"activeRoleId\": \"\"\n      }\n    }\n  }\n}",
+    "repeat": 1,
+    "captures": []
+  }
+]

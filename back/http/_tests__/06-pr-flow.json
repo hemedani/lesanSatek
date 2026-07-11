@@ -1,0 +1,88 @@
+[
+  {
+    "id": "gen-pr-submit",
+    "bodyHeaders": "{\n  \"headers\": {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": \"{token}\"\n  },\n  \"body\": {\n    \"service\": \"main\",\n    \"model\": \"purchasingRequest\",\n    \"act\": \"submit\",\n    \"details\": {\n      \"get\": {\n        \"_id\": 1,\n        \"title\": 1,\n        \"status\": 1,\n        \"currentStep\": 1,\n        \"stepApprovals\": {\n          \"_id\": 1,\n          \"status\": 1,\n          \"processStep\": { \"_id\": 1 },\n          \"unit\": { \"_id\": 1 }\n        }\n      },\n      \"set\": {\n        \"title\": \"\u062e\u0631\u06cc\u062f \u06a9\u06cc\u062a TSH\",\n        \"description\": \"Urgent request for TSH kits\",\n        \"estimatedAmount\": 50000000,\n        \"quantity\": 10,\n        \"processId\": \"{processId}\",\n        \"wareModelId\": \"{wareModelId}\",\n        \"requestingUnitId\": \"{unitId}\",\n        \"budgetLineId\": \"{budgetLineId}\",\n        \"activeRoleId\": \"\"\n      }\n    }\n  }\n}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "prId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-check-store",
+    "bodyHeaders": "{\n  \"headers\": {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": \"{token}\"\n  },\n  \"body\": {\n    \"service\": \"main\",\n    \"model\": \"purchasingRequest\",\n    \"act\": \"checkStoreAvailability\",\n    \"details\": {\n      \"get\": {\n        \"_id\": 1,\n        \"price\": 1,\n        \"store\": { \"_id\": 1, \"name\": 1 }\n      },\n      \"set\": {\n        \"purchasingRequestId\": \"{prId}\",\n        \"activeRoleId\": \"\"\n      }\n    }\n  }\n}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-assign-store",
+    "bodyHeaders": "{\n  \"headers\": {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": \"{token}\"\n  },\n  \"body\": {\n    \"service\": \"main\",\n    \"model\": \"purchasingRequest\",\n    \"act\": \"assignStore\",\n    \"details\": {\n      \"get\": {\n        \"_id\": 1,\n        \"purchaseOrderItems\": {\n          \"_id\": 1,\n          \"status\": 1,\n          \"quantity\": 1,\n          \"unitPrice\": 1\n        }\n      },\n      \"set\": {\n        \"_id\": \"{prId}\",\n        \"assignedFromId\": \"{storeId}\",\n        \"activeRoleId\": \"\"\n      }\n    }\n  }\n}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "poItemId",
+        "value": "[body][purchaseOrderItems][0][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-decision-step1",
+    "bodyHeaders": "{\n  \"headers\": {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": \"{token}\"\n  },\n  \"body\": {\n    \"service\": \"main\",\n    \"model\": \"stepApproval\",\n    \"act\": \"submitDecision\",\n    \"details\": {\n      \"get\": {\n        \"_id\": 1,\n        \"status\": 1\n      },\n      \"set\": {\n        \"purchasingRequestId\": \"{prId}\",\n        \"processStepId\": \"{step1Id}\",\n        \"unitId\": \"{unitId}\",\n        \"status\": \"approved\",\n        \"activeRoleId\": \"\"\n      }\n    }\n  }\n}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-warehouse-check",
+    "bodyHeaders": "{\n  \"headers\": {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": \"{token}\"\n  },\n  \"body\": {\n    \"service\": \"main\",\n    \"model\": \"purchasingRequest\",\n    \"act\": \"warehouseCheck\",\n    \"details\": {\n      \"get\": {\n        \"_id\": 1,\n        \"status\": 1,\n        \"currentStep\": 1\n      },\n      \"set\": {\n        \"purchasingRequestId\": \"{prId}\",\n        \"warehouseUnitId\": \"{warehouseUnitId}\",\n        \"activeRoleId\": \"\"\n      }\n    }\n  }\n}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-decision-step2",
+    "bodyHeaders": "{\n  \"headers\": {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": \"{token}\"\n  },\n  \"body\": {\n    \"service\": \"main\",\n    \"model\": \"stepApproval\",\n    \"act\": \"submitDecision\",\n    \"details\": {\n      \"get\": {\n        \"_id\": 1,\n        \"status\": 1\n      },\n      \"set\": {\n        \"purchasingRequestId\": \"{prId}\",\n        \"processStepId\": \"{step2Id}\",\n        \"unitId\": \"{warehouseUnitId}\",\n        \"status\": \"approved\",\n        \"activeRoleId\": \"\"\n      }\n    }\n  }\n}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-decision-step3",
+    "bodyHeaders": "{\n  \"headers\": {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": \"{token}\"\n  },\n  \"body\": {\n    \"service\": \"main\",\n    \"model\": \"stepApproval\",\n    \"act\": \"submitDecision\",\n    \"details\": {\n      \"get\": {\n        \"_id\": 1,\n        \"status\": 1\n      },\n      \"set\": {\n        \"purchasingRequestId\": \"{prId}\",\n        \"processStepId\": \"{step3Id}\",\n        \"unitId\": \"{financeUnitId}\",\n        \"status\": \"approved\",\n        \"activeRoleId\": \"\"\n      }\n    }\n  }\n}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-history",
+    "bodyHeaders": "{\n  \"headers\": {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": \"{token}\"\n  },\n  \"body\": {\n    \"service\": \"main\",\n    \"model\": \"purchasingRequest\",\n    \"act\": \"getHistory\",\n    \"details\": {\n      \"get\": {},\n      \"set\": {\n        \"_id\": \"{prId}\",\n        \"activeRoleId\": \"\"\n      }\n    }\n  }\n}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-goods-receipt",
+    "bodyHeaders": "{\n  \"headers\": {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": \"{token}\"\n  },\n  \"body\": {\n    \"service\": \"main\",\n    \"model\": \"goodsReceipt\",\n    \"act\": \"add\",\n    \"details\": {\n      \"get\": {\n        \"_id\": 1,\n        \"receiptNumber\": 1,\n        \"status\": 1\n      },\n      \"set\": {\n        \"receiptNumber\": \"GR-001\",\n        \"description\": \"First goods receipt\",\n        \"receivedAt\": \"2026-04-01\",\n        \"items\": [{\n          \"purchaseOrderItemId\": \"{poItemId}\",\n          \"wareModelId\": \"{wareModelId}\",\n          \"quantityReceived\": 10,\n          \"quantityAccepted\": 10,\n          \"quantityRejected\": 0\n        }],\n        \"purchasingRequestId\": \"{prId}\",\n        \"receivedById\": \"{userId}\",\n        \"receivingUnitId\": \"{warehouseUnitId}\",\n        \"activeRoleId\": \"\"\n      }\n    }\n  }\n}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "goodsReceiptId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-payment-gets",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"Authorization\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"paymentOrder\", \"act\": \"gets\", \"details\": {\"get\": {\"_id\": 1, \"title\": 1, \"status\": 1, \"amount\": 1}, \"set\": {\"activeRoleId\": \"\"}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "paymentOrderId",
+        "value": "[body][0][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-payment-mark-paid",
+    "bodyHeaders": "{\n  \"headers\": {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": \"{token}\"\n  },\n  \"body\": {\n    \"service\": \"main\",\n    \"model\": \"paymentOrder\",\n    \"act\": \"markPaid\",\n    \"details\": {\n      \"get\": {\n        \"_id\": 1,\n        \"status\": 1,\n        \"paidAt\": 1\n      },\n      \"set\": {\n        \"_id\": \"{paymentOrderId}\",\n        \"activeRoleId\": \"\"\n      }\n    }\n  }\n}",
+    "repeat": 1,
+    "captures": []
+  }
+]

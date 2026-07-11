@@ -1,0 +1,182 @@
+[
+  {
+    "id": "rm-purchaseOrderItem",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchaseOrderItem\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{poItemId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-tender",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"tender\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{tenderId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-pr-completed",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{prId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-pr-tender",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{prTenderId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-pr-pending",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{prPendingId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step1",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{step1Id}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step2",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{step2Id}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step3",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{step3Id}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-process",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{processId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-duplicate-process",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{dupProcessId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-stuff",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{stuffId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-ware",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"ware\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{wareId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-wareModel",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareModel\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{wareModelId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-wareGroup",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareGroup\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{wareGroupId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-wareClass",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareClass\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{wareClassId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-wareType",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareType\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{wareTypeId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-store",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"store\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{storeId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-manufacturer",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"manufacturer\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{mfrId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-child",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{subUnitId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-procurement",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{unitId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-warehouse",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{warehouseUnitId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-finance",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{financeUnitId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-tag",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"tag\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{tagId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-user-vendor",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{vendorUserId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-user-finance",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{financeUserId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-user-unithead",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{unitheadUserId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-city",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"city\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{cityId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-state",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"state\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{stateId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-organization",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"organization\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{orgId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-ghost-user",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"remove\", \"details\": {\"get\": {\"success\": 1}, \"set\": {\"_id\": \"{ghostId}\", \"activeRoleId\": \"{roleId}\"}}}}",
+    "repeat": 1,
+    "captures": []
+  }
+]

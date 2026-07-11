@@ -1,0 +1,52 @@
+[
+  {
+    "id": "gen-process",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"Authorization\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"add\", \"details\": {\"get\": {\"_id\": 1, \"name\": 1, \"status\": 1, \"version\": 1}, \"set\": {\"name\": \"\\u0641\\u0631\\u0622\\u06cc\\u0646\\u062f \\u062e\\u0631\\u06cc\\u062f \\u0646\\u0645\\u0648\\u0646\\u0647\", \"enName\": \"Sample Purchase Process\", \"description\": \"Standard procurement workflow\", \"organizationId\": \"{orgId}\", \"createdById\": \"{userId}\", \"activeRoleId\": \"\"}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "processId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-step1",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"Authorization\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"get\": {\"_id\": 1, \"name\": 1}, \"set\": {\"name\": \"\\u062a\\u0623\\u06cc\\u06cc\\u062f \\u062f\\u0631\\u062e\\u0648\\u0627\\u0633\\u062a\", \"description\": \"Request is reviewed by procurement unit\", \"stepType\": \"Approval\", \"order\": 1, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{unitId}\"]}], \"processId\": \"{processId}\", \"activeRoleId\": \"\"}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "step1Id",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-step2",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"Authorization\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"get\": {\"_id\": 1, \"name\": 1}, \"set\": {\"name\": \"\\u062a\\u0623\\u06cc\\u06cc\\u062f \\u0627\\u0646\\u0628\\u0627\\u0631\", \"description\": \"Warehouse confirms stock level\", \"stepType\": \"Approval\", \"order\": 2, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{warehouseUnitId}\"]}], \"processId\": \"{processId}\", \"activeRoleId\": \"\"}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "step2Id",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-step3",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"Authorization\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"get\": {\"_id\": 1, \"name\": 1}, \"set\": {\"name\": \"\\u062a\\u0623\\u06cc\\u06cc\\u062f \\u0645\\u0627\\u0644\\u06cc\", \"description\": \"Finance approves budget\", \"stepType\": \"Approval\", \"order\": 3, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{financeUnitId}\"]}], \"processId\": \"{processId}\", \"activeRoleId\": \"\"}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "step3Id",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-activate",
+    "bodyHeaders": "{\n  \"headers\": {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": \"{token}\"\n  },\n  \"body\": {\n    \"service\": \"main\",\n    \"model\": \"process\",\n    \"act\": \"activateProcess\",\n    \"details\": {\n      \"get\": {\n        \"_id\": 1,\n        \"status\": 1,\n        \"version\": 1,\n        \"isActive\": 1\n      },\n      \"set\": {\n        \"_id\": \"{processId}\",\n        \"activeRoleId\": \"\"\n      }\n    }\n  }\n}",
+    "repeat": 1,
+    "captures": []
+  }
+]

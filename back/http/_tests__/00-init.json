@@ -1,0 +1,32 @@
+[
+  {
+    "id": "setup-tempuser",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"Authorization\": \"\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"registerUser\", \"details\": {\"get\": {\"_id\": 1, \"email\": 1, \"mobile\": 1}, \"set\": {\"first_name\": \"Admin\", \"last_name\": \"System\", \"email\": \"admin@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000000\", \"gender\": \"Male\"}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "ghostId",
+        "value": "[body][_id]"
+      },
+      {
+        "key": "ghostEmail",
+        "value": "[body][email]"
+      }
+    ]
+  },
+  {
+    "id": "gen-login",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"login\", \"details\": {\"get\": {\"token\": 1, \"user\": {\"_id\": 1, \"email\": 1, \"roles\": 1}}, \"set\": {\"email\": \"admin@lesansatek.com\", \"password\": \"password123\"}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "token",
+        "value": "[body][token]"
+      },
+      {
+        "key": "userId",
+        "value": "[body][user][_id]"
+      }
+    ]
+  }
+]

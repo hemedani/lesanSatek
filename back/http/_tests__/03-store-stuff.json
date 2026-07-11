@@ -1,0 +1,28 @@
+[
+  {
+    "id": "gen-store",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"Authorization\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"store\", \"act\": \"add\", \"details\": {\"get\": {\"_id\": 1, \"name\": 1}, \"set\": {\"name\": \"\\u0641\\u0631\\u0648\\u0634\\u06af\\u0627\\u0647 \\u0646\\u0645\\u0648\\u0646\\u0647\", \"address\": \"Tehran, Iran\", \"cityId\": \"{cityId}\", \"stateId\": \"{stateId}\", \"storeHeadId\": \"{userId}\", \"economicCode\": \"123456789\", \"postalCode\": \"1234567890\", \"activeRoleId\": \"\"}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "storeId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-stuff",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"Authorization\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"add\", \"details\": {\"get\": {\"_id\": 1, \"price\": 1}, \"set\": {\"inventoryNo\": 1001, \"price\": 2800000, \"hasAbsolutePrice\": true, \"wareId\": \"{wareId}\", \"storeId\": \"{storeId}\", \"wareTypeId\": \"{wareTypeId}\", \"wareClassId\": \"{wareClassId}\", \"wareGroupId\": \"{wareGroupId}\", \"wareModelId\": \"{wareModelId}\", \"activeRoleId\": \"\"}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "stuffId",
+        "value": "[body][_id]"
+      },
+      {
+        "key": "stuffPrice",
+        "value": "[body][price]"
+      }
+    ]
+  }
+]
