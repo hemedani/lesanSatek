@@ -13,7 +13,7 @@ export const submitDecisionSetup = () =>
       setUser,
       grantAccess([
         { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead", "UnitHead", "Employee"] },
+        { roles: ["OrgHead", "UnitHead"] },
       ]),
     ],
     validator: submitDecisionValidator(),

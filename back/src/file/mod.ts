@@ -3,6 +3,7 @@ import { getSetup } from "./get/mod.ts";
 import { getsSetup } from "./gets/mod.ts";
 import { getFilesSetup } from "./getFiles/mod.ts";
 import { updateSetup } from "./update/mod.ts";
+import { removeSetup } from "./remove/mod.ts";
 
 export const fileSetup = () => {
   uploadFileSetup();
@@ -10,4 +11,5 @@ export const fileSetup = () => {
   getsSetup();
   getFilesSetup();
   updateSetup();
+  removeSetup();
 };

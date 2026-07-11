@@ -11,7 +11,7 @@ export const removeFn: ActFn = async (body) => {
   }) as Record<string, unknown>;
 
   if (!step) {
-    throw { error: "Step not found" };
+    throw new Error("Step not found");
   }
 
   const removedOrder = step.order as number;

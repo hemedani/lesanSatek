@@ -18,11 +18,11 @@ export const removeFromPurchaseFn: ActFn = async (body) => {
   }) as Record<string, unknown>;
 
   if (!pr) {
-    throw { error: "Purchasing request not found" };
+    throw new Error("Purchasing request not found");
   }
 
   if (!["Pending", "InProgress", "Approved"].includes(pr.status as string)) {
-    throw { error: "Cannot remove items from a completed, rejected, or draft request" };
+    throw new Error("Cannot remove items from a completed, rejected, or draft request");
   }
 
   const item = await purchaseOrderItem.findOne({
@@ -31,11 +31,11 @@ export const removeFromPurchaseFn: ActFn = async (body) => {
   }) as Record<string, unknown>;
 
   if (!item) {
-    throw { error: "Purchase order item not found" };
+    throw new Error("Purchase order item not found");
   }
 
   if ((item.status as string) === "cancelled") {
-    throw { error: "Item is already cancelled" };
+    throw new Error("Item is already cancelled");
   }
 
   const itemWareModel = item?.wareModel as Record<string, unknown> | undefined;
