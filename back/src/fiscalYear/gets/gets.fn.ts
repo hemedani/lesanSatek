@@ -30,9 +30,9 @@ export const getsFn: ActFn = async (body) => {
   const sortDirection = sortOrder === "asc" ? 1 : -1;
   pipeline.push({ $sort: { [sortField]: sortDirection } });
 
-  const calculatedSkip = skip ?? limit * (page - 1);
+  const calculatedSkip = skip ?? (limit || 50) * ((page || 1) - 1);
   pipeline.push({ $skip: calculatedSkip });
-  pipeline.push({ $limit: limit });
+  pipeline.push({ $limit: limit || 50 });
 
   return await fiscalYear
     .aggregation({
