@@ -41,7 +41,7 @@ export const getHistoryFn: ActFn = async (body) => {
   const result = await purchasingRequest
     .aggregation({
       pipeline,
-      projection: {},
+      projection: { action: 1, performed: 1, unit: 1, details: 1 },
     })
     .toArray();
 

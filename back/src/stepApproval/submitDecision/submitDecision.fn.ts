@@ -3,6 +3,7 @@ import {
   stepApproval,
   purchasingRequest,
   processStep,
+  unit,
   coreApp,
 } from "../../../mod.ts";
 import type { MyContext } from "@lib";
@@ -73,13 +74,27 @@ export const submitDecisionFn: ActFn = async (body) => {
     throwError("Unit is not assigned to this step");
   }
 
+  if (!activeRole || !["Manager", "Admin"].includes(activeRole.name)) {
+    const unitDoc = await unit.aggregation({
+      pipeline: [{ $match: { _id: uId } }],
+      projection: { head: { _id: 1 } },
+    }).toArray();
+
+    if (
+      unitDoc.length === 0 || !unitDoc[0].head ||
+      unitDoc[0].head._id.toString() !== user._id.toString()
+    ) {
+      throwError("Only the unit head can submit a decision for this unit");
+    }
+  }
+
   const existingApprovals = await stepApproval.aggregation({
     pipeline: [
       {
         $match: {
-          purchasingRequest: prId,
-          processStep: psId,
-          unit: uId,
+          "purchasingRequest._id": prId,
+          "processStep._id": psId,
+          "unit._id": uId,
         },
       },
     ],
@@ -134,8 +149,8 @@ export const submitDecisionFn: ActFn = async (body) => {
     pipeline: [
       {
         $match: {
-          purchasingRequest: prId,
-          processStep: psId,
+          "purchasingRequest._id": prId,
+          "processStep._id": psId,
         },
       },
     ],

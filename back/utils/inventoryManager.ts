@@ -8,6 +8,7 @@ type StockOptions = {
   referenceId?: string;
   description?: string;
   storeId?: string;
+  inventoryId?: string; // If provided, look up inventory by _id instead of (unit, wareModel)
 };
 
 export async function addStock(
@@ -20,7 +21,7 @@ export async function addStock(
 ): Promise<Document> {
   const existing = await inventory.findOne({
     filters: {
-      unit: new ObjectId(unitId),
+      "unit._id": new ObjectId(unitId),
       "wareModel._id": new ObjectId(wareModelId),
     },
     projection: { _id: 1, quantity: 1 },
@@ -120,22 +121,31 @@ export async function removeStock(
   createdByUserId: string,
   options?: StockOptions,
 ): Promise<Document> {
-  const existing = await inventory.findOne({
-    filters: {
-      unit: new ObjectId(unitId),
-      "wareModel._id": new ObjectId(wareModelId),
-    },
-    projection: { _id: 1, quantity: 1 },
-  }) as Document;
+  let existing: Document;
+
+  if (options?.inventoryId) {
+    existing = await inventory.findOne({
+      filters: { _id: new ObjectId(options.inventoryId) },
+      projection: { _id: 1, quantity: 1 },
+    }) as Document;
+  } else {
+    existing = await inventory.findOne({
+      filters: {
+        "unit._id": new ObjectId(unitId),
+        "wareModel._id": new ObjectId(wareModelId),
+      },
+      projection: { _id: 1, quantity: 1 },
+    }) as Document;
+  }
 
   if (!existing) {
-    throw { error: "Inventory not found for this unit and wareModel" };
+    throw new Error("Inventory not found for this unit and wareModel");
   }
 
   const balanceBefore = (existing.quantity as number) || 0;
 
   if (balanceBefore < quantity) {
-    throw { error: "Insufficient inventory quantity" };
+    throw new Error("Insufficient inventory quantity");
   }
 
   const negQuantity = -Math.abs(quantity);
@@ -228,7 +238,7 @@ export async function getStockLevel(
 ): Promise<Document> {
   const result = await inventory.findOne({
     filters: {
-      unit: new ObjectId(unitId),
+      "unit._id": new ObjectId(unitId),
       "wareModel._id": new ObjectId(wareModelId),
     },
     projection: {
@@ -253,8 +263,8 @@ export async function getWarehouseDashboard(
 ): Promise<Document[]> {
   const match: Document = {
     $or: [
-      { unit: new ObjectId(warehouseUnitId) },
-      { warehouseUnit: new ObjectId(warehouseUnitId) },
+      { "unit._id": new ObjectId(warehouseUnitId) },
+      { "warehouseUnit._id": new ObjectId(warehouseUnitId) },
     ],
   };
   if (wareModelId) {

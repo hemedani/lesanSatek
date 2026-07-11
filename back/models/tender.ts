@@ -119,23 +119,6 @@ export const tender_relations = {
       },
     },
   },
-  offers: {
-    schemaName: "tenderOffer",
-    type: "multiple" as RelationDataType,
-    optional: true,
-    excludes: [],
-    limit: 50,
-    sort: {
-      field: "_id",
-      order: "desc" as RelationSortOrderType,
-    },
-    relatedRelations: {
-      tender: {
-        type: "single" as RelationDataType,
-        excludes: [],
-      },
-    },
-  },
 };
 
 export const tenders = () =>

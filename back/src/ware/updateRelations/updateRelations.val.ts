@@ -7,6 +7,11 @@ export const updateRelationsValidator = () => {
 		set: object({
 			...activeRoleMixin,
 			_id: objectIdValidation,
+			manufacturerId: optional(objectIdValidation),
+			wareTypeId: optional(objectIdValidation),
+			wareClassId: optional(objectIdValidation),
+			wareGroupId: optional(objectIdValidation),
+			wareModelId: optional(objectIdValidation),
 		}),
 		get: selectStruct("ware", 2),
 	});

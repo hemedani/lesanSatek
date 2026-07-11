@@ -1,12 +1,20 @@
 import { type ActFn, ObjectId } from "lesan";
-import { purchasingRequest, coreApp } from "../../../mod.ts";
+import {
+  purchasingRequest,
+  tender,
+  purchaseOrderItem,
+  stepApproval,
+  goodsReceipt,
+  paymentOrder,
+  coreApp,
+} from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
 import { hasFeature } from "../../../utils/checkFeature.ts";
 
 export const updateRelationsFn: ActFn = async (body) => {
   const {
-    set: { _id, requestingUnitId, attachmentIds, tenderId, purchaseOrderItemIds, storeId, wareId, wareTypeId, wareClassId, wareGroupId },
+    set: { _id, requestingUnitId, attachmentIds, tenderId, purchaseOrderItemIds, stepApprovalIds, goodsReceiptIds, paymentOrderIds, budgetLineId, storeId, wareId, wareTypeId, wareClassId, wareGroupId },
     get,
   } = body.details;
 
@@ -46,17 +54,31 @@ export const updateRelationsFn: ActFn = async (body) => {
   }
 
   if (tenderId !== undefined) {
-    await purchasingRequest.addRelation({
-      filters: { _id: requestId },
-      relations: {
-        tender: {
-          _ids: new ObjectId(tenderId as string),
-          relatedRelations: { purchasingRequest: true },
+    if (tenderId) {
+      await tender.addRelation({
+        filters: { _id: new ObjectId(tenderId as string) },
+        relations: {
+          purchasingRequest: {
+            _ids: requestId,
+            relatedRelations: { tender: true },
+          },
         },
-      },
-      projection: get,
-      replace: true,
-    });
+        projection: get,
+        replace: true,
+      });
+    } else {
+      const currentTender = await tender.findOne({
+        filters: { "purchasingRequest._id": requestId },
+        projection: { _id: 1 },
+      });
+      if (currentTender) {
+        await tender.findOneAndUpdate({
+          filter: { _id: currentTender._id },
+          update: { $unset: { purchasingRequest: "" } },
+          projection: get,
+        });
+      }
+    }
   }
 
   if (purchaseOrderItemIds !== undefined) {
@@ -65,15 +87,16 @@ export const updateRelationsFn: ActFn = async (body) => {
     }
     const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === body.details.set.activeRoleId);
 
-    await purchasingRequest.addRelation({
-      filters: { _id: requestId },
+    const poiIds = (purchaseOrderItemIds as string[]).map((id: string) => new ObjectId(id));
+    await purchaseOrderItem.addRelation({
+      filters: { _id: { $in: poiIds } },
       relations: {
-        purchaseOrderItems: {
-          _ids: (purchaseOrderItemIds as string[]).map((id: string) => new ObjectId(id)),
-          relatedRelations: { purchasingRequest: true },
+        purchasingRequest: {
+          _ids: requestId,
+          relatedRelations: { purchaseOrderItems: true },
         },
       },
-      projection: get,
+      projection: { _id: 1 },
       replace: true,
     });
 
@@ -97,6 +120,101 @@ export const updateRelationsFn: ActFn = async (body) => {
       },
       projection: { _id: 1 },
     });
+  }
+
+  if (stepApprovalIds !== undefined) {
+    const saIds = (stepApprovalIds as string[]).map((id: string) => new ObjectId(id));
+    await stepApproval.addRelation({
+      filters: { _id: { $in: saIds } },
+      relations: {
+        purchasingRequest: {
+          _ids: requestId,
+          relatedRelations: { stepApprovals: true },
+        },
+      },
+      projection: get,
+      replace: true,
+    });
+  }
+
+  if (goodsReceiptIds !== undefined) {
+    if ((goodsReceiptIds as string[]).length > 0) {
+      const grIds = (goodsReceiptIds as string[]).map((id: string) => new ObjectId(id));
+      await goodsReceipt.addRelation({
+        filters: { _id: { $in: grIds } },
+        relations: {
+          purchasingRequest: {
+            _ids: requestId,
+            relatedRelations: { goodsReceipts: true },
+          },
+        },
+        projection: get,
+        replace: true,
+      });
+    } else {
+      const linkedGRs = await goodsReceipt.aggregation({
+        pipeline: [{ $match: { "purchasingRequest._id": requestId } }],
+        projection: { _id: 1 },
+      }).toArray();
+      for (const gr of linkedGRs) {
+        await goodsReceipt.findOneAndUpdate({
+          filter: { _id: gr._id as ObjectId },
+          update: { $unset: { purchasingRequest: "" } },
+          projection: { _id: 1 },
+        });
+      }
+    }
+  }
+
+  if (paymentOrderIds !== undefined) {
+    if ((paymentOrderIds as string[]).length > 0) {
+      const poIds = (paymentOrderIds as string[]).map((id: string) => new ObjectId(id));
+      await paymentOrder.addRelation({
+        filters: { _id: { $in: poIds } },
+        relations: {
+          purchasingRequest: {
+            _ids: requestId,
+            relatedRelations: { paymentOrders: true },
+          },
+        },
+        projection: get,
+        replace: true,
+      });
+    } else {
+      const linkedPOs = await paymentOrder.aggregation({
+        pipeline: [{ $match: { "purchasingRequest._id": requestId } }],
+        projection: { _id: 1 },
+      }).toArray();
+      for (const po of linkedPOs) {
+        await paymentOrder.findOneAndUpdate({
+          filter: { _id: po._id as ObjectId },
+          update: { $unset: { purchasingRequest: "" } },
+          projection: { _id: 1 },
+        });
+      }
+    }
+  }
+
+  if (budgetLineId !== undefined) {
+    if (budgetLineId) {
+      await purchasingRequest.addRelation({
+        filters: { _id: requestId },
+        relations: {
+          budgetLine: {
+            _ids: new ObjectId(budgetLineId as string),
+            relatedRelations: { purchasingRequests: true },
+          },
+        },
+        projection: get,
+        replace: true,
+      });
+    } else {
+      await purchasingRequest.findOneAndUpdate({
+        filter: { _id: requestId },
+        update: { $unset: { budgetLine: "" } },
+        projection: get,
+      });
+    }
   }
 
   if (storeId !== undefined) {

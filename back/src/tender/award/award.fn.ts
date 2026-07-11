@@ -15,12 +15,12 @@ export const awardFn: ActFn = async (body) => {
   }) as Record<string, unknown>;
 
   if (!tenderDoc || (tenderDoc.status as string) !== "closed") {
-    throw { error: "Tender not found or not closed" };
+    throw new Error("Tender not found or not closed");
   }
 
   const prRef = (tenderDoc.purchasingRequest as Record<string, unknown>)?._id as string;
   if (!prRef) {
-    throw { error: "Tender has no linked purchasing request" };
+    throw new Error("Tender has no linked purchasing request");
   }
 
   const winningOffer = await tenderOffer.findOne({
@@ -29,7 +29,7 @@ export const awardFn: ActFn = async (body) => {
   }) as Record<string, unknown>;
 
   if (!winningOffer) {
-    throw { error: "Winning offer not found" };
+    throw new Error("Winning offer not found");
   }
 
   const winningStoreId = (winningOffer.store as Record<string, unknown>)?._id as string;

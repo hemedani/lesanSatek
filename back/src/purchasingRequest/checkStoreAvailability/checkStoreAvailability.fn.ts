@@ -10,13 +10,13 @@ export const checkStoreAvailabilityFn: ActFn = async (body) => {
   }) as Record<string, unknown>;
 
   if (!pr) {
-    throw { error: "Purchasing request not found" };
+    throw new Error("Purchasing request not found");
   }
 
   const wareModel = pr.wareModel as Record<string, unknown> | undefined;
   const wareModelId = wareModel?._id?.toString();
   if (!wareModelId) {
-    throw { error: "Purchasing request has no ware model" };
+    throw new Error("Purchasing request has no ware model");
   }
 
   const match: Record<string, unknown> = { "wareModel._id": new ObjectId(wareModelId) };

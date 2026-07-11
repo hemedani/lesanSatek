@@ -68,10 +68,7 @@ import {
   user_excludes,
   unit_excludes,
   file_excludes,
-  stepApproval_excludes,
-  purchaseOrderItem_excludes,
   purchasingRequest_excludes,
-  tender_excludes,
   wareModel_excludes,
   store_excludes,
   ware_excludes,
@@ -193,52 +190,7 @@ export const purchasingRequest_relations = {
     },
     relatedRelations: {},
   },
-  stepApprovals: {
-    schemaName: "stepApproval",
-    type: "multiple" as RelationDataType,
-    optional: true,
-    excludes: stepApproval_excludes,
-    limit: 50,
-    sort: {
-      field: "_id",
-      order: "desc" as RelationSortOrderType,
-    },
-    relatedRelations: {
-      purchasingRequest: {
-        type: "single" as RelationDataType,
-        excludes: purchasingRequest_excludes,
-      },
-    },
-  },
-  purchaseOrderItems: {
-    schemaName: "purchaseOrderItem",
-    type: "multiple" as RelationDataType,
-    optional: true,
-    excludes: purchaseOrderItem_excludes,
-    limit: 50,
-    sort: {
-      field: "_id",
-      order: "desc" as RelationSortOrderType,
-    },
-    relatedRelations: {
-      purchasingRequest: {
-        type: "single" as RelationDataType,
-        excludes: purchasingRequest_excludes,
-      },
-    },
-  },
-  tender: {
-    schemaName: "tender",
-    type: "single" as RelationDataType,
-    optional: true,
-    excludes: tender_excludes,
-    relatedRelations: {
-      purchasingRequest: {
-        type: "single" as RelationDataType,
-        excludes: purchasingRequest_excludes,
-      },
-    },
-  },
+
   budgetLine: {
     schemaName: "budgetLine",
     type: "single" as RelationDataType,

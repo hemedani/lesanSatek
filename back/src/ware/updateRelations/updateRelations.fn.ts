@@ -3,7 +3,7 @@ import { ware } from "../../../mod.ts";
 
 export const updateRelationsFn: ActFn = async (body) => {
 	const {
-		set: { _id, ...relations },
+		set: { _id, activeRoleId, ...relations },
 		get,
 	} = body.details;
 
@@ -11,10 +11,11 @@ export const updateRelationsFn: ActFn = async (body) => {
 
 	for (const [key, value] of Object.entries(relations)) {
 		if (value) {
+			const relationKey = key.endsWith("Id") ? key.slice(0, -2) : key;
 			await ware.addRelation({
 				filters: { _id: modelId },
 				relations: {
-					[key]: {
+					[relationKey]: {
 						_ids: new ObjectId(value as string),
 						relatedRelations: {},
 					},

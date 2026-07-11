@@ -1,4 +1,4 @@
-import { array, object, objectIdValidation, optional } from "lesan";
+import { array, object, objectIdValidation, optional, string } from "lesan";
 import { activeRoleMixin } from "@lib";
 import { selectStruct } from "../../../mod.ts";
 
@@ -7,9 +7,10 @@ export const updateRelationsValidator = () => {
     set: object({
       ...activeRoleMixin,
       _id: objectIdValidation,
-      purchasingRequestId: optional(objectIdValidation),
+      purchasingRequestId: optional(string()),
       createdById: optional(objectIdValidation),
       assignedVendors: optional(array(objectIdValidation)),
+      assignedVendorsId: optional(objectIdValidation),
       offers: optional(array(objectIdValidation)),
     }),
     get: selectStruct("tender", 2),

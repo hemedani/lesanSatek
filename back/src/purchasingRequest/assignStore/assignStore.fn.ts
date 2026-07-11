@@ -23,11 +23,11 @@ export const assignStoreFn: ActFn = async (body) => {
   }) as Record<string, unknown>;
 
   if (!pr) {
-    throw { error: "Purchasing request not found" };
+    throw new Error("Purchasing request not found");
   }
 
   if (!["Pending", "InProgress"].includes(pr.status as string)) {
-    throw { error: "Can only assign store items to an active purchasing request (Pending/InProgress)" };
+    throw new Error("Can only assign store items to an active purchasing request (Pending/InProgress)");
   }
 
   const wareModel = pr.wareModel as Record<string, unknown> | undefined;

@@ -40,7 +40,7 @@ export const warehouseCheckFn: ActFn = async (body) => {
   }).toArray();
 
   if (requests.length === 0) {
-    throw { error: "Purchasing request not found" };
+    throw new Error("Purchasing request not found");
   }
 
   const req = requests[0] as Document;

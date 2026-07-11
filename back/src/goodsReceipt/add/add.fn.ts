@@ -54,7 +54,7 @@ export const addFn: ActFn = async (body) => {
   });
 
   if (!result) {
-    throw { error: "Failed to create goods receipt" };
+    throw new Error("Failed to create goods receipt");
   }
 
   const items = (rest.items as Array<{
@@ -225,7 +225,7 @@ export const addFn: ActFn = async (body) => {
 
               // Evaluate step status
               const allApprovals = await stepApproval.aggregation({
-                pipeline: [{ $match: { purchasingRequest: prId, processStep: step._id } }],
+                pipeline: [{ $match: { "purchasingRequest._id": prId, "processStep._id": step._id } }],
                 projection: { unit: { _id: 1 }, status: 1 },
               }).toArray();
 
@@ -343,6 +343,44 @@ export const addFn: ActFn = async (body) => {
   if (orderTotal > 0 && purchasingRequestId) {
     const poTitle = `Payment for goods receipt ${rest.receiptNumber || ""}`;
 
+    // Find the store from the first purchase order item that has assignedFrom
+    let payToStoreId: string | undefined;
+    for (const item of items) {
+      if (item.purchaseOrderItemId) {
+        const poItem = await purchaseOrderItem.findOne({
+          filters: { _id: new ObjectId(item.purchaseOrderItemId) },
+          projection: { assignedFrom: { _id: 1 } },
+        }) as Record<string, unknown> | null;
+        if (poItem?.assignedFrom) {
+          payToStoreId = ((poItem.assignedFrom as Record<string, unknown>)._id as ObjectId).toString();
+          break;
+        }
+      }
+    }
+
+    const paymentRelations: Record<string, unknown> = {
+      purchasingRequest: {
+        _ids: new ObjectId(purchasingRequestId as string),
+        relatedRelations: { paymentOrders: true },
+      },
+      issuedBy: {
+        _ids: new ObjectId(userId),
+        relatedRelations: { issuedPaymentOrders: true },
+      },
+    };
+
+    if (payToStoreId) {
+      paymentRelations.payTo = {
+        _ids: new ObjectId(payToStoreId),
+        relatedRelations: { paymentOrders: true },
+      };
+    }
+
+    paymentRelations.financialUnit = {
+      _ids: new ObjectId(receivingUnitId as string),
+      relatedRelations: { paymentOrders: true },
+    };
+
     await paymentOrder.insertOne({
       doc: {
         title: poTitle,
@@ -351,16 +389,7 @@ export const addFn: ActFn = async (body) => {
         description: `Auto-created from goods receipt ${result._id?.toString()}`,
       },
       projection: { _id: 1 },
-      relations: {
-        purchasingRequest: {
-          _ids: new ObjectId(purchasingRequestId as string),
-          relatedRelations: { paymentOrders: true },
-        },
-        issuedBy: {
-          _ids: new ObjectId(userId),
-          relatedRelations: { issuedPaymentOrders: true },
-        },
-      },
+      relations: paymentRelations,
     });
   }
 
