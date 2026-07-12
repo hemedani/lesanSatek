@@ -300,6 +300,15 @@ lesanSatek/back/
 └── utils/                  # Utility functions (context, grantAccess, activeRole, setToken, setUser, stepEvaluator, checkFeature, checkWareModelAccess, inventoryManager, etc.)
 ```
 
+## E2E Testing with JSON Files
+
+The `http/e2e.json` and `http/e2e-with-remove.json` files are E2E test suites that get run **manually** via the Lesan playground (`/playground`) — there is no local runner script. To test: start the dev server (`deno task bc-dev`), open `/playground` in a browser, paste the JSON contents into the collection runner or execute entries one by one.
+
+**When you encounter failures:**
+- Do NOT try to run the JSON files locally — there is no runner in the repo
+- The user will run the file manually and report any failures back
+- Fix the issues reported by the user (field name mismatches, missing captures, wrong action names, missing `get` fields, etc.) and update the JSON file accordingly
+
 ## Building and Running
 
 ### Development Environment
