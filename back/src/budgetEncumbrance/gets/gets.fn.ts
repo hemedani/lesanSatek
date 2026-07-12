@@ -17,7 +17,7 @@ export const getsFn: ActFn = async (body) => {
   const pipeline: Document[] = [];
 
   const match: Document = {};
-  budgetLineId && (match.budgetLine = new ObjectId(budgetLineId as string));
+  budgetLineId && (match["budgetLine._id"] = new ObjectId(budgetLineId as string));
   if (Object.keys(match).length > 0) {
     pipeline.push({ $match: match });
   }
