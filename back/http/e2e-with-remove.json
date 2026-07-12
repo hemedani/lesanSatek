@@ -1034,6 +1034,18 @@
       {
         "key": "dupProcessId",
         "value": "[body][_id]"
+      },
+      {
+        "key": "stepDup1Id",
+        "value": "[body][steps][0][_id]"
+      },
+      {
+        "key": "stepDup2Id",
+        "value": "[body][steps][1][_id]"
+      },
+      {
+        "key": "stepDup3Id",
+        "value": "[body][steps][2][_id]"
       }
     ]
   },
@@ -1172,6 +1184,574 @@
   {
     "id": "rm-consumption",
     "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"consumptionRecord\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{consumptionId1}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "get-consumption-remaining",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"consumptionRecord\",\"act\":\"gets\",\"details\":{\"set\":{\"activeRoleId\":\"{roleId}\"},\"get\":{\"_id\":1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "consumptionId2",
+        "value": "[body][0][_id]"
+      }
+    ]
+  },
+  {
+    "id": "rm-consumption-2",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"consumptionRecord\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{consumptionId2}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-inventory",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"inventory\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{inventoryId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "get-tender-po-items",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"purchaseOrderItem\",\"act\":\"gets\",\"details\":{\"set\":{\"purchasingRequestId\":\"{prTenderId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"_id\":1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "tenderPoItemId",
+        "value": "[body][0][_id]"
+      }
+    ]
+  },
+  {
+    "id": "rm-tender-po-item",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"purchaseOrderItem\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{tenderPoItemId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-tender-offer",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"tenderOffer\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{offerId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-tender",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"tender\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{tenderId}\",\"activeRoleId\":\"{roleId}\",\"hardCascade\":true},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "get-sa-tender",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"stepApproval\",\"act\":\"gets\",\"details\":{\"set\":{\"purchasingRequestId\":\"{prTenderId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"_id\":1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "saTenderId",
+        "value": "[body][0][_id]"
+      }
+    ]
+  },
+  {
+    "id": "rm-sa-tender",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"stepApproval\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{saTenderId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-pr-tender",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"purchasingRequest\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{prTenderId}\",\"activeRoleId\":\"{roleId}\",\"hardCascade\":true},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-pr",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"purchasingRequest\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{prId}\",\"activeRoleId\":\"{roleId}\",\"hardCascade\":true},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-budget-allocation",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"budgetAllocation\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{allocationId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "get-budget-encumbrances",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"budgetEncumbrance\",\"act\":\"gets\",\"details\":{\"set\":{\"budgetLineId\":\"{budgetLineId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"_id\":1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "encumbranceId",
+        "value": "[body][0][_id]"
+      }
+    ]
+  },
+  {
+    "id": "rm-budget-encumbrance",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"budgetEncumbrance\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{encumbranceId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-budget-line",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"budgetLine\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{budgetLineId}\",\"activeRoleId\":\"{roleId}\",\"hardCascade\":true},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-fiscal-year",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"fiscalYear\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{fiscalYearId}\",\"activeRoleId\":\"{roleId}\",\"hardCascade\":true},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-stuff",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"stuff\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{stuffId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-general-1",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepGeneral1Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-general-2",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepGeneral2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-general-3",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepGeneral3Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-process-general",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{processGeneralId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-unit-1",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepUnit1Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-unit-2",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepUnit2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-unit-3",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepUnit3Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-process-unit",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{processUnitId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-warehouse-1",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"processStep\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{stepWarehouse1Id}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-warehouse-2",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"processStep\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{stepWarehouse2Id}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-process-warehouse",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{processWarehouseId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-finance-1",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"processStep\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{stepFinance1Id}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-process-finance",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{processFinanceId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-waretype-1",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepWaretype1Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-waretype-2",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepWaretype2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-process-waretype",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{processWaretypeId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-wareclass-1",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepWareclass1Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-process-wareclass",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{processWareclassId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-waregroup-1",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepWaregroup1Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-waregroup-2",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepWaregroup2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-waregroup-3",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepWaregroup3Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-process-waregroup",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{processWaregroupId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-waremodel-1",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepWaremodel1Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-waremodel-2",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepWaremodel2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-process-waremodel",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{processWaremodelId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-dup-1",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepDup1Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-dup-2",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepDup2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-step-dup-3",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{stepDup3Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-process-dup",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{dupProcessId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "get-sm-goods-receipt",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stockMovement\", \"act\": \"gets\", \"details\": {\"set\": {\"reason\": \"goods_receipt\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "smGoodsReceiptId",
+        "value": "[body][0][_id]"
+      }
+    ]
+  },
+  {
+    "id": "rm-sm-goods-receipt",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stockMovement\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{smGoodsReceiptId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "get-sm-consumption",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stockMovement\", \"act\": \"gets\", \"details\": {\"set\": {\"sortBy\": \"_id\", \"sortOrder\": \"asc\", \"activeRoleId\": \"{roleId}\", \"referenceType\": \"consumptionRecord\"}, \"get\": {\"_id\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "smConsumption1Id",
+        "value": "[body][0][_id]"
+      },
+      {
+        "key": "smConsumption2Id",
+        "value": "[body][1][_id]"
+      }
+    ]
+  },
+  {
+    "id": "rm-sm-consumption-1",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"stockMovement\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{smConsumption1Id}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-sm-consumption-2",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"stockMovement\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{smConsumption2Id}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-ware",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"ware\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{wareId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-ware-model",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareModel\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{wareModelId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-ware-group",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareGroup\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{wareGroupId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-ware-class",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareClass\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{wareClassId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-ware-type",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareType\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{wareTypeId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-mfr",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"manufacturer\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{mfrId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-tag",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"tag\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{tagId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-hematolab",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{hematolabUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-microlab",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{microlabUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-patholab",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{patholabUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-coldstore",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{coldstoreUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-internalproc",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{internalprocUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-qa",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{qaUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-techsupport",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{techsupportUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-internalaudit",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{internalauditUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-logistics",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{logisticsUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-rd",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{rdUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-legal",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{legalUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-hr",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{hrUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-it",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{itUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-finance",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{financeUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-warehouse",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{warehouseUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-procurement",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{unitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-unit-production",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"unit\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{prodUnitId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-user-vendor",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"user\",\"act\":\"removeUser\",\"details\":{\"set\":{\"_id\":\"{vendorUserId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-user-finance",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"user\",\"act\":\"removeUser\",\"details\":{\"set\":{\"_id\":\"{financeUserId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-user-fin-head",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"user\",\"act\":\"removeUser\",\"details\":{\"set\":{\"_id\":\"{finHeadId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-user-warehouse-head",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"user\",\"act\":\"removeUser\",\"details\":{\"set\":{\"_id\":\"{warehouseHeadId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-user-unithead",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"user\",\"act\":\"removeUser\",\"details\":{\"set\":{\"_id\":\"{unitheadUserId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-user-rd-head",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"user\",\"act\":\"removeUser\",\"details\":{\"set\":{\"_id\":\"{rdHeadId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-user-legal-head",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"user\",\"act\":\"removeUser\",\"details\":{\"set\":{\"_id\":\"{legalHeadId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-user-hr-head",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"user\",\"act\":\"removeUser\",\"details\":{\"set\":{\"_id\":\"{hrHeadId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-user-it-head",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"user\",\"act\":\"removeUser\",\"details\":{\"set\":{\"_id\":\"{itHeadId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-user-log-head",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"user\",\"act\":\"removeUser\",\"details\":{\"set\":{\"_id\":\"{logHeadId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-user-prod-head",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"user\",\"act\":\"removeUser\",\"details\":{\"set\":{\"_id\":\"{prodHeadId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-org",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"organization\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{orgId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-store",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"store\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{storeId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-city",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"city\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{cityId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
     "repeat": 1,
     "captures": []
   }
