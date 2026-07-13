@@ -1738,20 +1738,32 @@
     "captures": []
   },
   {
-    "id": "rm-org",
-    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"organization\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{orgId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
-    "repeat": 1,
-    "captures": []
-  },
-  {
     "id": "rm-store",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"store\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{storeId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
   {
+    "id": "org-clear-city",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"organization\",\"act\":\"updateRelations\",\"details\":{\"set\":{\"_id\":\"{orgId}\",\"activeRoleId\":\"{roleId}\",\"removeCity\":true},\"get\":{\"_id\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "org-clear-state",
+    "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"organization\",\"act\":\"updateRelations\",\"details\":{\"set\":{\"_id\":\"{orgId}\",\"activeRoleId\":\"{roleId}\",\"removeState\":true},\"get\":{\"_id\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
     "id": "rm-city",
     "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"city\",\"act\":\"remove\",\"details\":{\"set\":{\"_id\":\"{cityId}\",\"activeRoleId\":\"{roleId}\"},\"get\":{\"success\":1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "rm-org",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"organization\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{orgId}\", \"activeRoleId\": \"{roleId}\", \"hardCascade\": true}, \"get\": {\"success\": 1}}}}",
     "repeat": 1,
     "captures": []
   }
