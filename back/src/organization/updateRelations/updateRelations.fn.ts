@@ -68,18 +68,25 @@ export const updateRelationsFn: ActFn = async (body) => {
 	}
 
 	if (removeState) {
-		await organization.removeRelation({
+		const currentOrg = await organization.findOne({
 			filters: { _id: orgId },
-			relations: {
-				state: {
-					_ids: orgId,
-					relatedRelations: {
-						organizations: true,
+			projection: { state: { _id: 1 } },
+		});
+		const stateId = currentOrg?.state?._id;
+		if (stateId) {
+			await organization.removeRelation({
+				filters: { _id: orgId },
+				relations: {
+					state: {
+						_ids: stateId,
+						relatedRelations: {
+							organizations: true,
+						},
 					},
 				},
-			},
-			projection: get,
-		});
+				projection: get,
+			});
+		}
 	}
 
 	if (state) {
@@ -99,18 +106,25 @@ export const updateRelationsFn: ActFn = async (body) => {
 	}
 
 	if (removeCity) {
-		await organization.removeRelation({
+		const currentOrg = await organization.findOne({
 			filters: { _id: orgId },
-			relations: {
-				city: {
-					_ids: orgId,
-					relatedRelations: {
-						organizations: true,
+			projection: { city: { _id: 1 } },
+		});
+		const cityId = currentOrg?.city?._id;
+		if (cityId) {
+			await organization.removeRelation({
+				filters: { _id: orgId },
+				relations: {
+					city: {
+						_ids: cityId,
+						relatedRelations: {
+							organizations: true,
+						},
 					},
 				},
-			},
-			projection: get,
-		});
+				projection: get,
+			});
+		}
 	}
 
 	if (city) {
