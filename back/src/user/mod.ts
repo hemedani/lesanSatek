@@ -10,6 +10,7 @@ import { removeUserSetup } from "./removeUser/mod.ts";
 import { countUsersSetup } from "./countUsers/mod.ts";
 import { updateUserRelationsSetup } from "./updateUserRelations/mod.ts";
 import { dashboardStatisticSetup } from "./dashboardStatistic/mod.ts";
+import { addOrRemoveRolesSetup } from "./addOrRemoveRoles/mod.ts";
 
 export const userSetup = () => {
   addUserSetup();
@@ -24,4 +25,5 @@ export const userSetup = () => {
   countUsersSetup();
   updateUserRelationsSetup();
   dashboardStatisticSetup();
+  addOrRemoveRolesSetup();
 };
