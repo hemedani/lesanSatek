@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ArrowRight, Loader2, Trash2, Workflow, Copy, CheckCircle2, Share2, BarChart3 } from "lucide-react";
+import { ArrowRight, Loader2, Trash2, Workflow, Copy, CheckCircle2, Share2, BarChart3, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/form/form-input";
 import { FormTextarea } from "@/components/form/form-textarea";
@@ -83,6 +83,12 @@ export default function EditProcessPage({
           createdAt: 1,
           organization: { _id: 1, name: 1 },
           createdBy: { _id: 1, first_name: 1, last_name: 1 },
+          unit: { _id: 1, name: 1 },
+          wareType: { _id: 1, name: 1 },
+          wareClass: { _id: 1, name: 1 },
+          wareGroup: { _id: 1, name: 1 },
+          wareModel: { _id: 1, name: 1 },
+          ware: { _id: 1, name: 1 },
           steps: { _id: 1, name: 1, description: 1, stepType: 1, order: 1, required: 1, groupsOperator: 1 },
         }
       );
@@ -221,7 +227,7 @@ export default function EditProcessPage({
         </div>
       </div>
 
-      <div className="flex items-center gap-4 px-1">
+      <div className="flex items-center gap-4 px-1 flex-wrap">
         <div className="flex items-center gap-2">
           <span className="text-xs text-fog/60">وضعیت:</span>
           {process?.status && (
@@ -240,6 +246,50 @@ export default function EditProcessPage({
         </div>
         {process?.organization && (
           <span className="text-xs text-fog/50">{process.organization.name}</span>
+        )}
+      </div>
+
+      {/* Scope Info */}
+      <div className="rounded-xl border border-steel-border/20 bg-white/[0.02] p-4 max-w-2xl mx-auto">
+        <div className="flex items-center gap-2 mb-2">
+          <Target className="size-4 text-electric-iris" />
+          <span className="text-xs font-medium text-fog/70">حوزه کاربرد</span>
+        </div>
+        {(process?.unit || process?.wareType || process?.wareClass || process?.wareGroup || process?.wareModel || process?.ware) ? (
+          <div className="flex flex-wrap gap-2">
+            {process?.unit && (
+              <span className="text-[11px] px-2 py-1 rounded-full bg-electric-iris/8 text-electric-iris/80 border border-electric-iris/15">
+                واحد: {process.unit.name}
+              </span>
+            )}
+            {process?.wareType && (
+              <span className="text-[11px] px-2 py-1 rounded-full bg-frost-link/8 text-frost-link/80 border border-frost-link/15">
+                نوع کالا: {process.wareType.name}
+              </span>
+            )}
+            {process?.wareClass && (
+              <span className="text-[11px] px-2 py-1 rounded-full bg-amber-400/8 text-amber-400/80 border border-amber-400/15">
+                رده کالا: {process.wareClass.name}
+              </span>
+            )}
+            {process?.wareGroup && (
+              <span className="text-[11px] px-2 py-1 rounded-full bg-emerald-400/8 text-emerald-400/80 border border-emerald-400/15">
+                گروه کالا: {process.wareGroup.name}
+              </span>
+            )}
+            {process?.wareModel && (
+              <span className="text-[11px] px-2 py-1 rounded-full bg-fog/8 text-fog/80 border border-fog/15">
+                مدل کالا: {process.wareModel.name}
+              </span>
+            )}
+            {process?.ware && (
+              <span className="text-[11px] px-2 py-1 rounded-full bg-fog/8 text-fog/80 border border-fog/15">
+                کالا: {process.ware.name}
+              </span>
+            )}
+          </div>
+        ) : (
+          <p className="text-xs text-fog/50">فرآیند عمومی سازمان — محدود به حوزه خاصی نیست</p>
         )}
       </div>
 

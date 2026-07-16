@@ -13,8 +13,30 @@ import { SearchSelect } from "@/components/form/form-search-select";
 import { get } from "@/app/actions/process/get";
 import { updateRelations } from "@/app/actions/process/updateRelations";
 import { gets as getOrgs } from "@/app/actions/organization/gets";
+import { gets as getUnits } from "@/app/actions/unit/gets";
+import { gets as getWareTypes } from "@/app/actions/wareType/gets";
+import { gets as getWareClasses } from "@/app/actions/wareClass/gets";
+import { gets as getWareGroups } from "@/app/actions/wareGroup/gets";
+import { gets as getWareModels } from "@/app/actions/wareModel/gets";
+import { gets as getWares } from "@/app/actions/ware/gets";
 import Link from "next/link";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
+
+const scopeFetcher = <T extends { _id?: string; name?: string }>(
+  action: (data: { activeRoleId: string; page: number; limit: number; search?: string }, sel: Record<string, unknown>) => Promise<{ success: boolean; body?: T[] }>
+) => {
+  return async (search?: string) => {
+    const result = await action(
+      { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
+      { _id: 1, name: 1 }
+    );
+    if (!result.success || !result.body) return [];
+    return result.body.map((item) => ({
+      _id: item._id || "",
+      name: item.name || "",
+    }));
+  };
+};
 
 export default function ProcessRelationsPage({
   params,
@@ -27,6 +49,12 @@ export default function ProcessRelationsPage({
   const [notFound, setNotFound] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [orgId, setOrgId] = useState("");
+  const [unitId, setUnitId] = useState("");
+  const [wareTypeId, setWareTypeId] = useState("");
+  const [wareClassId, setWareClassId] = useState("");
+  const [wareGroupId, setWareGroupId] = useState("");
+  const [wareModelId, setWareModelId] = useState("");
+  const [wareId, setWareId] = useState("");
 
   useEffect(() => {
     const load = async () => {
@@ -36,11 +64,23 @@ export default function ProcessRelationsPage({
           _id: 1,
           name: 1,
           organization: { _id: 1, name: 1 },
+          unit: { _id: 1, name: 1 },
+          wareType: { _id: 1, name: 1 },
+          wareClass: { _id: 1, name: 1 },
+          wareGroup: { _id: 1, name: 1 },
+          wareModel: { _id: 1, name: 1 },
+          ware: { _id: 1, name: 1 },
         }
       );
       if (result.success && result.body?.[0]) {
         const p = result.body[0];
         setOrgId(p.organization?._id || "");
+        setUnitId(p.unit?._id || "");
+        setWareTypeId(p.wareType?._id || "");
+        setWareClassId(p.wareClass?._id || "");
+        setWareGroupId(p.wareGroup?._id || "");
+        setWareModelId(p.wareModel?._id || "");
+        setWareId(p.ware?._id || "");
       } else {
         setNotFound(true);
       }
@@ -57,6 +97,12 @@ export default function ProcessRelationsPage({
         activeRoleId: getActiveRoleIdFromStore(),
         _id: id,
         ...(orgId ? { organizationId: orgId } : {}),
+        ...(unitId ? { unitId } : {}),
+        ...(wareTypeId ? { wareTypeId } : {}),
+        ...(wareClassId ? { wareClassId } : {}),
+        ...(wareGroupId ? { wareGroupId } : {}),
+        ...(wareModelId ? { wareModelId } : {}),
+        ...(wareId ? { wareId } : {}),
       },
       { _id: 1, name: 1 }
     );
@@ -103,7 +149,7 @@ export default function ProcessRelationsPage({
               ویرایش روابط فرآیند
             </h1>
             <p className="text-body-sm text-fog/70 leading-relaxed">
-              سازمان مرتبط با فرآیند را تعیین کنید.
+              سازمان و حوزه کاربرد فرآیند را تعیین کنید.
             </p>
           </div>
         </div>
@@ -117,20 +163,84 @@ export default function ProcessRelationsPage({
               value={orgId}
               onChange={setOrgId}
               placeholder="انتخاب سازمان..."
-              fetcher={async (search?: string) => {
-                const result = await getOrgs(
-                  { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-                  { _id: 1, name: 1 }
-                );
-                if (!result.success || !result.body) return [];
-                return result.body.map((o: { _id?: string; name?: string }) => ({
-                  _id: o._id || "",
-                  name: o.name || "",
-                }));
-              }}
+              fetcher={scopeFetcher(getOrgs)}
               label="سازمان"
               disabled={submitting}
             />
+          </div>
+        </FormCard>
+
+        <FormCard
+          title="حوزه کاربرد"
+          description="فرآیند را به واحد یا سلسله‌مراتب کالا محدود کنید. در صورت عدم انتخاب، فرآیند عمومی خواهد بود."
+        >
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-xs text-fog/70 block font-medium">واحد</label>
+              <SearchSelect
+                value={unitId}
+                onChange={setUnitId}
+                placeholder="انتخاب واحد..."
+                fetcher={scopeFetcher(getUnits)}
+                label="واحد"
+                disabled={submitting}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs text-fog/70 block font-medium">نوع کالا</label>
+              <SearchSelect
+                value={wareTypeId}
+                onChange={setWareTypeId}
+                placeholder="انتخاب نوع کالا..."
+                fetcher={scopeFetcher(getWareTypes)}
+                label="نوع کالا"
+                disabled={submitting}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs text-fog/70 block font-medium">رده کالا</label>
+              <SearchSelect
+                value={wareClassId}
+                onChange={setWareClassId}
+                placeholder="انتخاب رده کالا..."
+                fetcher={scopeFetcher(getWareClasses)}
+                label="رده کالا"
+                disabled={submitting}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs text-fog/70 block font-medium">گروه کالا</label>
+              <SearchSelect
+                value={wareGroupId}
+                onChange={setWareGroupId}
+                placeholder="انتخاب گروه کالا..."
+                fetcher={scopeFetcher(getWareGroups)}
+                label="گروه کالا"
+                disabled={submitting}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs text-fog/70 block font-medium">مدل کالا</label>
+              <SearchSelect
+                value={wareModelId}
+                onChange={setWareModelId}
+                placeholder="انتخاب مدل کالا..."
+                fetcher={scopeFetcher(getWareModels)}
+                label="مدل کالا"
+                disabled={submitting}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs text-fog/70 block font-medium">کالا</label>
+              <SearchSelect
+                value={wareId}
+                onChange={setWareId}
+                placeholder="انتخاب کالا..."
+                fetcher={scopeFetcher(getWares)}
+                label="کالا"
+                disabled={submitting}
+              />
+            </div>
           </div>
         </FormCard>
 

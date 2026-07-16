@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Workflow, Copy, CheckCircle2, XCircle, Trash2, Clock, FileText, Share2, List, BarChart3 } from "lucide-react";
+import { Plus, Pencil, Workflow, Copy, CheckCircle2, XCircle, Trash2, Clock, FileText, Share2, List, BarChart3, Target } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/ui/page-header";
 import { DataTable } from "@/components/ui/data-table";
@@ -28,6 +28,12 @@ interface Process {
   createdAt?: string;
   organization?: { _id: string; name?: string };
   createdBy?: { _id: string; first_name?: string; last_name?: string };
+  unit?: { _id: string; name?: string };
+  wareType?: { _id: string; name?: string };
+  wareClass?: { _id: string; name?: string };
+  wareGroup?: { _id: string; name?: string };
+  wareModel?: { _id: string; name?: string };
+  ware?: { _id: string; name?: string };
 }
 
 interface ProcessesClientProps {
@@ -36,6 +42,20 @@ interface ProcessesClientProps {
   nextPageUrl: string;
   page: number;
   search?: string;
+}
+
+function hasScope(item: Process): boolean {
+  return !!(item.unit || item.wareType || item.wareClass || item.wareGroup || item.wareModel || item.ware);
+}
+
+function getScopeLabel(item: Process): string {
+  if (item.unit?.name) return `واحد: ${item.unit.name}`;
+  if (item.ware?.name) return `کالا: ${item.ware.name}`;
+  if (item.wareModel?.name) return `مدل: ${item.wareModel.name}`;
+  if (item.wareGroup?.name) return `گروه: ${item.wareGroup.name}`;
+  if (item.wareClass?.name) return `رده: ${item.wareClass.name}`;
+  if (item.wareType?.name) return `نوع: ${item.wareType.name}`;
+  return "عمومی";
 }
 
 const statusLabels: Record<string, { label: string; variant: "active" | "inactive" | "pending" | "info" }> = {
@@ -152,6 +172,20 @@ export function ProcessesClient({
       render: (item) => (
         <span className="text-fog text-sm">{item.organization?.name || "—"}</span>
       ),
+      hideOnCard: true,
+    },
+    {
+      key: "scope",
+      label: "حوزه کاربرد",
+      render: (item) => {
+        const scope = getScopeLabel(item);
+        return (
+          <div className="flex items-center gap-1.5">
+            <Target className="size-3 text-fog/40" />
+            <span className="text-fog text-sm">{scope}</span>
+          </div>
+        );
+      },
       hideOnCard: true,
     },
     {
@@ -289,6 +323,9 @@ export function ProcessesClient({
                 />
                 {item.organization && (
                   <span className="text-[10px] text-fog/40">{item.organization.name}</span>
+                )}
+                {hasScope(item) && (
+                  <span className="text-[10px] text-electric-iris/60">{getScopeLabel(item)}</span>
                 )}
               </div>
             </div>
