@@ -115,7 +115,7 @@ export default async function FinanceBudgetLinesPage({
               <DataTable columns={columns} data={items} keyExtractor={(item: BudgetLineItem) => item._id} />
             </CardContent>
           </Card>
-          <Pagination prevPageUrl={prevPageUrl} nextPageUrl={nextPageUrl} currentPage={page} />
+          <Pagination prevUrl={prevPageUrl} nextUrl={nextPageUrl} page={page} />
         </>
       )}
     </div>

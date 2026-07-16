@@ -1037,9 +1037,904 @@ scopeId?: string;
 ;
 
 
+    export type wareInp = {
+      creator?: number | userInp
+manufacturer?: number | manufacturerInp
+wareType?: number | wareTypeInp
+wareClass?: number | wareClassInp
+wareGroup?: number | wareGroupInp
+wareModel?: number | wareModelInp
+      purchasingRequests?: number | purchasingRequestInp
+stuffs?: number | stuffInp
+purchaseOrderItems?: number | purchaseOrderItemInp
+inventories?: number | inventoryInp
+stockMovements?: number | stockMovementInp
+consumptionRecords?: number | consumptionRecordInp
+    }
+
+
+    export type wareSchema = {
+_id?: string;
+name: string;
+enName?: string;
+brand?: string;
+price: number;
+orderedNumber: number;
+irc?: string;
+umdns?: number;
+gtin?: number;
+photoUrl?: string;
+createdAt?: Date;
+updatedAt?: Date;
+creator: {
+_id?: string;
+first_name: string;
+last_name: string;
+gender: ("Male" | "Female" );
+mobile: string;
+email: string;
+is_verified: boolean;
+position?: string;
+isActive: boolean;
+isGhost: boolean;
+features: {
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+}[];
+allowWareTypeIds?: string[];
+allowWareClassIds?: string[];
+allowWareGroupIds?: string[];
+allowWareModelIds?: string[];
+roles: {
+roleId: string;
+name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary" );
+scopeType?: ("organization" | "unit" );
+scopeId?: string;
+}[];
+};
+manufacturer?: {
+_id?: string;
+name: string;
+enName?: string;
+country?: string;
+};
+wareType: {
+_id?: string;
+name: string;
+enName?: string;
+};
+wareClass: {
+_id?: string;
+name: string;
+enName?: string;
+};
+wareGroup: {
+_id?: string;
+name: string;
+enName?: string;
+};
+wareModel: {
+_id?: string;
+name: string;
+enName?: string;
+};
+purchasingRequests: {
+_id?: string;
+title: string;
+description?: string;
+estimatedAmount?: number;
+status: ("Draft" | "Pending" | "InProgress" | "Approved" | "Rejected" | "Completed" | "Cancelled" );
+currentStep: number;
+requestedAt?: Date;
+completedAt?: Date;
+quantity: number;
+history: {
+action: string;
+performed: {
+by: string;
+name: string;
+at: Date;
+role: {
+id: string;
+name: string;
+scopeType?: string;
+scopeId?: string;
+};
+};
+unit?: {
+_id: string;
+name: string;
+};
+details?: {
+};
+}[];
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+stuffs: {
+_id?: string;
+inventoryNo: number;
+price: number;
+hasAbsolutePrice: boolean;
+pricePercentage?: number;
+expiration?: Date;
+barcode?: number;
+qrc?: string;
+isBarcodeSet: boolean;
+isQrcSet: boolean;
+isExpirationNear?: boolean;
+photoUrl?: string;
+apiId?: string;
+apiLink?: string;
+availableLongPayment?: string;
+twoMonthPricePercent?: number;
+threeMonthPricePercent?: number;
+fourMonthPricePercent?: number;
+fiveMonthPricePercent?: number;
+sixMonthPricePercent?: number;
+sevenMonthPricePercent?: number;
+eightMonthPricePercent?: number;
+nineMonthPricePercent?: number;
+tenMonthPricePercent?: number;
+elevenMonthPricePercent?: number;
+twelveMonthPricePercent?: number;
+eighteenMonthPricePercent?: number;
+twentyFourMonthPricePercent?: number;
+twoMonth?: number;
+threeMonth?: number;
+fourMonth?: number;
+fiveMonth?: number;
+sixMonth?: number;
+sevenMonth?: number;
+eightMonth?: number;
+nineMonth?: number;
+tenMonth?: number;
+elevenMonth?: number;
+twelveMonth?: number;
+eighteenMonth?: number;
+twentyFourMonth?: number;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+purchaseOrderItems: {
+_id?: string;
+quantity: number;
+unitPrice?: number;
+totalPrice?: number;
+status: ("pending" | "assigned" | "ordered" | "received" | "cancelled" );
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+inventories: {
+_id?: string;
+quantity: number;
+minQuantity?: number;
+maxQuantity?: number;
+batchNo?: string;
+expirationDate?: Date;
+location?: string;
+lastCountedAt?: Date;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+stockMovements: {
+_id?: string;
+quantity: number;
+balanceBefore: number;
+balanceAfter: number;
+reason: ("goods_receipt" | "goods_issue" | "transfer_in" | "transfer_out" | "consumption" | "adjustment" | "return" | "write_off" );
+referenceType?: string;
+referenceId?: string;
+description?: string;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+consumptionRecords: {
+_id?: string;
+quantity: number;
+consumedAt: Date;
+reason?: string;
+patientId?: string;
+notes?: string;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+};
+;
+
+
+    export type wareModelInp = {
+      creator?: number | userInp
+wareType?: number | wareTypeInp
+wareClass?: number | wareClassInp
+wareGroup?: number | wareGroupInp
+      wares?: number | wareInp
+purchasingRequests?: number | purchasingRequestInp
+stuffs?: number | stuffInp
+purchaseOrderItems?: number | purchaseOrderItemInp
+inventories?: number | inventoryInp
+stockMovements?: number | stockMovementInp
+consumptionRecords?: number | consumptionRecordInp
+    }
+
+
+    export type wareModelSchema = {
+_id?: string;
+name: string;
+enName?: string;
+createdAt?: Date;
+updatedAt?: Date;
+creator: {
+_id?: string;
+first_name: string;
+last_name: string;
+gender: ("Male" | "Female" );
+mobile: string;
+email: string;
+is_verified: boolean;
+position?: string;
+isActive: boolean;
+isGhost: boolean;
+features: {
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+}[];
+allowWareTypeIds?: string[];
+allowWareClassIds?: string[];
+allowWareGroupIds?: string[];
+allowWareModelIds?: string[];
+roles: {
+roleId: string;
+name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary" );
+scopeType?: ("organization" | "unit" );
+scopeId?: string;
+}[];
+};
+wareType: {
+_id?: string;
+name: string;
+enName?: string;
+};
+wareClass: {
+_id?: string;
+name: string;
+enName?: string;
+};
+wareGroup: {
+_id?: string;
+name: string;
+enName?: string;
+};
+wares: {
+_id?: string;
+name: string;
+enName?: string;
+brand?: string;
+price: number;
+orderedNumber: number;
+irc?: string;
+umdns?: number;
+gtin?: number;
+photoUrl?: string;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+purchasingRequests: {
+_id?: string;
+title: string;
+description?: string;
+estimatedAmount?: number;
+status: ("Draft" | "Pending" | "InProgress" | "Approved" | "Rejected" | "Completed" | "Cancelled" );
+currentStep: number;
+requestedAt?: Date;
+completedAt?: Date;
+quantity: number;
+history: {
+action: string;
+performed: {
+by: string;
+name: string;
+at: Date;
+role: {
+id: string;
+name: string;
+scopeType?: string;
+scopeId?: string;
+};
+};
+unit?: {
+_id: string;
+name: string;
+};
+details?: {
+};
+}[];
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+stuffs: {
+_id?: string;
+inventoryNo: number;
+price: number;
+hasAbsolutePrice: boolean;
+pricePercentage?: number;
+expiration?: Date;
+barcode?: number;
+qrc?: string;
+isBarcodeSet: boolean;
+isQrcSet: boolean;
+isExpirationNear?: boolean;
+photoUrl?: string;
+apiId?: string;
+apiLink?: string;
+availableLongPayment?: string;
+twoMonthPricePercent?: number;
+threeMonthPricePercent?: number;
+fourMonthPricePercent?: number;
+fiveMonthPricePercent?: number;
+sixMonthPricePercent?: number;
+sevenMonthPricePercent?: number;
+eightMonthPricePercent?: number;
+nineMonthPricePercent?: number;
+tenMonthPricePercent?: number;
+elevenMonthPricePercent?: number;
+twelveMonthPricePercent?: number;
+eighteenMonthPricePercent?: number;
+twentyFourMonthPricePercent?: number;
+twoMonth?: number;
+threeMonth?: number;
+fourMonth?: number;
+fiveMonth?: number;
+sixMonth?: number;
+sevenMonth?: number;
+eightMonth?: number;
+nineMonth?: number;
+tenMonth?: number;
+elevenMonth?: number;
+twelveMonth?: number;
+eighteenMonth?: number;
+twentyFourMonth?: number;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+purchaseOrderItems: {
+_id?: string;
+quantity: number;
+unitPrice?: number;
+totalPrice?: number;
+status: ("pending" | "assigned" | "ordered" | "received" | "cancelled" );
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+inventories: {
+_id?: string;
+quantity: number;
+minQuantity?: number;
+maxQuantity?: number;
+batchNo?: string;
+expirationDate?: Date;
+location?: string;
+lastCountedAt?: Date;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+stockMovements: {
+_id?: string;
+quantity: number;
+balanceBefore: number;
+balanceAfter: number;
+reason: ("goods_receipt" | "goods_issue" | "transfer_in" | "transfer_out" | "consumption" | "adjustment" | "return" | "write_off" );
+referenceType?: string;
+referenceId?: string;
+description?: string;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+consumptionRecords: {
+_id?: string;
+quantity: number;
+consumedAt: Date;
+reason?: string;
+patientId?: string;
+notes?: string;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+};
+;
+
+
+    export type wareGroupInp = {
+      creator?: number | userInp
+wareType?: number | wareTypeInp
+wareClasses?: number | wareClassInp
+      wares?: number | wareInp
+wareModels?: number | wareModelInp
+purchasingRequests?: number | purchasingRequestInp
+stuffs?: number | stuffInp
+    }
+
+
+    export type wareGroupSchema = {
+_id?: string;
+name: string;
+enName?: string;
+createdAt?: Date;
+updatedAt?: Date;
+creator: {
+_id?: string;
+first_name: string;
+last_name: string;
+gender: ("Male" | "Female" );
+mobile: string;
+email: string;
+is_verified: boolean;
+position?: string;
+isActive: boolean;
+isGhost: boolean;
+features: {
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+}[];
+allowWareTypeIds?: string[];
+allowWareClassIds?: string[];
+allowWareGroupIds?: string[];
+allowWareModelIds?: string[];
+roles: {
+roleId: string;
+name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary" );
+scopeType?: ("organization" | "unit" );
+scopeId?: string;
+}[];
+};
+wareType: {
+_id?: string;
+name: string;
+enName?: string;
+};
+wareClasses?: {
+_id?: string;
+name: string;
+enName?: string;
+}[];
+wares: {
+_id?: string;
+name: string;
+enName?: string;
+brand?: string;
+price: number;
+orderedNumber: number;
+irc?: string;
+umdns?: number;
+gtin?: number;
+photoUrl?: string;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+wareModels: {
+_id?: string;
+name: string;
+enName?: string;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+purchasingRequests: {
+_id?: string;
+title: string;
+description?: string;
+estimatedAmount?: number;
+status: ("Draft" | "Pending" | "InProgress" | "Approved" | "Rejected" | "Completed" | "Cancelled" );
+currentStep: number;
+requestedAt?: Date;
+completedAt?: Date;
+quantity: number;
+history: {
+action: string;
+performed: {
+by: string;
+name: string;
+at: Date;
+role: {
+id: string;
+name: string;
+scopeType?: string;
+scopeId?: string;
+};
+};
+unit?: {
+_id: string;
+name: string;
+};
+details?: {
+};
+}[];
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+stuffs: {
+_id?: string;
+inventoryNo: number;
+price: number;
+hasAbsolutePrice: boolean;
+pricePercentage?: number;
+expiration?: Date;
+barcode?: number;
+qrc?: string;
+isBarcodeSet: boolean;
+isQrcSet: boolean;
+isExpirationNear?: boolean;
+photoUrl?: string;
+apiId?: string;
+apiLink?: string;
+availableLongPayment?: string;
+twoMonthPricePercent?: number;
+threeMonthPricePercent?: number;
+fourMonthPricePercent?: number;
+fiveMonthPricePercent?: number;
+sixMonthPricePercent?: number;
+sevenMonthPricePercent?: number;
+eightMonthPricePercent?: number;
+nineMonthPricePercent?: number;
+tenMonthPricePercent?: number;
+elevenMonthPricePercent?: number;
+twelveMonthPricePercent?: number;
+eighteenMonthPricePercent?: number;
+twentyFourMonthPricePercent?: number;
+twoMonth?: number;
+threeMonth?: number;
+fourMonth?: number;
+fiveMonth?: number;
+sixMonth?: number;
+sevenMonth?: number;
+eightMonth?: number;
+nineMonth?: number;
+tenMonth?: number;
+elevenMonth?: number;
+twelveMonth?: number;
+eighteenMonth?: number;
+twentyFourMonth?: number;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+};
+;
+
+
+    export type wareClassInp = {
+      creator?: number | userInp
+wareType?: number | wareTypeInp
+      wares?: number | wareInp
+wareModels?: number | wareModelInp
+wareGroups?: number | wareGroupInp
+purchasingRequests?: number | purchasingRequestInp
+stuffs?: number | stuffInp
+    }
+
+
+    export type wareClassSchema = {
+_id?: string;
+name: string;
+enName?: string;
+createdAt?: Date;
+updatedAt?: Date;
+creator: {
+_id?: string;
+first_name: string;
+last_name: string;
+gender: ("Male" | "Female" );
+mobile: string;
+email: string;
+is_verified: boolean;
+position?: string;
+isActive: boolean;
+isGhost: boolean;
+features: {
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+}[];
+allowWareTypeIds?: string[];
+allowWareClassIds?: string[];
+allowWareGroupIds?: string[];
+allowWareModelIds?: string[];
+roles: {
+roleId: string;
+name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary" );
+scopeType?: ("organization" | "unit" );
+scopeId?: string;
+}[];
+};
+wareType: {
+_id?: string;
+name: string;
+enName?: string;
+};
+wares: {
+_id?: string;
+name: string;
+enName?: string;
+brand?: string;
+price: number;
+orderedNumber: number;
+irc?: string;
+umdns?: number;
+gtin?: number;
+photoUrl?: string;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+wareModels: {
+_id?: string;
+name: string;
+enName?: string;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+wareGroups: {
+_id?: string;
+name: string;
+enName?: string;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+purchasingRequests: {
+_id?: string;
+title: string;
+description?: string;
+estimatedAmount?: number;
+status: ("Draft" | "Pending" | "InProgress" | "Approved" | "Rejected" | "Completed" | "Cancelled" );
+currentStep: number;
+requestedAt?: Date;
+completedAt?: Date;
+quantity: number;
+history: {
+action: string;
+performed: {
+by: string;
+name: string;
+at: Date;
+role: {
+id: string;
+name: string;
+scopeType?: string;
+scopeId?: string;
+};
+};
+unit?: {
+_id: string;
+name: string;
+};
+details?: {
+};
+}[];
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+stuffs: {
+_id?: string;
+inventoryNo: number;
+price: number;
+hasAbsolutePrice: boolean;
+pricePercentage?: number;
+expiration?: Date;
+barcode?: number;
+qrc?: string;
+isBarcodeSet: boolean;
+isQrcSet: boolean;
+isExpirationNear?: boolean;
+photoUrl?: string;
+apiId?: string;
+apiLink?: string;
+availableLongPayment?: string;
+twoMonthPricePercent?: number;
+threeMonthPricePercent?: number;
+fourMonthPricePercent?: number;
+fiveMonthPricePercent?: number;
+sixMonthPricePercent?: number;
+sevenMonthPricePercent?: number;
+eightMonthPricePercent?: number;
+nineMonthPricePercent?: number;
+tenMonthPricePercent?: number;
+elevenMonthPricePercent?: number;
+twelveMonthPricePercent?: number;
+eighteenMonthPricePercent?: number;
+twentyFourMonthPricePercent?: number;
+twoMonth?: number;
+threeMonth?: number;
+fourMonth?: number;
+fiveMonth?: number;
+sixMonth?: number;
+sevenMonth?: number;
+eightMonth?: number;
+nineMonth?: number;
+tenMonth?: number;
+elevenMonth?: number;
+twelveMonth?: number;
+eighteenMonth?: number;
+twentyFourMonth?: number;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+};
+;
+
+
+    export type wareTypeInp = {
+      creator?: number | userInp
+      wares?: number | wareInp
+wareModels?: number | wareModelInp
+wareGroups?: number | wareGroupInp
+wareClasses?: number | wareClassInp
+budgetLines?: number | budgetLineInp
+purchasingRequests?: number | purchasingRequestInp
+stuffs?: number | stuffInp
+    }
+
+
+    export type wareTypeSchema = {
+_id?: string;
+name: string;
+enName?: string;
+createdAt?: Date;
+updatedAt?: Date;
+creator: {
+_id?: string;
+first_name: string;
+last_name: string;
+gender: ("Male" | "Female" );
+mobile: string;
+email: string;
+is_verified: boolean;
+position?: string;
+isActive: boolean;
+isGhost: boolean;
+features: {
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+}[];
+allowWareTypeIds?: string[];
+allowWareClassIds?: string[];
+allowWareGroupIds?: string[];
+allowWareModelIds?: string[];
+roles: {
+roleId: string;
+name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary" );
+scopeType?: ("organization" | "unit" );
+scopeId?: string;
+}[];
+};
+wares: {
+_id?: string;
+name: string;
+enName?: string;
+brand?: string;
+price: number;
+orderedNumber: number;
+irc?: string;
+umdns?: number;
+gtin?: number;
+photoUrl?: string;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+wareModels: {
+_id?: string;
+name: string;
+enName?: string;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+wareGroups: {
+_id?: string;
+name: string;
+enName?: string;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+wareClasses: {
+_id?: string;
+name: string;
+enName?: string;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+budgetLines: {
+_id?: string;
+code: string;
+title: string;
+description?: string;
+totalAllocated: number;
+totalEncumbered: number;
+totalSpent: number;
+remainingBudget: number;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+purchasingRequests: {
+_id?: string;
+title: string;
+description?: string;
+estimatedAmount?: number;
+status: ("Draft" | "Pending" | "InProgress" | "Approved" | "Rejected" | "Completed" | "Cancelled" );
+currentStep: number;
+requestedAt?: Date;
+completedAt?: Date;
+quantity: number;
+history: {
+action: string;
+performed: {
+by: string;
+name: string;
+at: Date;
+role: {
+id: string;
+name: string;
+scopeType?: string;
+scopeId?: string;
+};
+};
+unit?: {
+_id: string;
+name: string;
+};
+details?: {
+};
+}[];
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+stuffs: {
+_id?: string;
+inventoryNo: number;
+price: number;
+hasAbsolutePrice: boolean;
+pricePercentage?: number;
+expiration?: Date;
+barcode?: number;
+qrc?: string;
+isBarcodeSet: boolean;
+isQrcSet: boolean;
+isExpirationNear?: boolean;
+photoUrl?: string;
+apiId?: string;
+apiLink?: string;
+availableLongPayment?: string;
+twoMonthPricePercent?: number;
+threeMonthPricePercent?: number;
+fourMonthPricePercent?: number;
+fiveMonthPricePercent?: number;
+sixMonthPricePercent?: number;
+sevenMonthPricePercent?: number;
+eightMonthPricePercent?: number;
+nineMonthPricePercent?: number;
+tenMonthPricePercent?: number;
+elevenMonthPricePercent?: number;
+twelveMonthPricePercent?: number;
+eighteenMonthPricePercent?: number;
+twentyFourMonthPricePercent?: number;
+twoMonth?: number;
+threeMonth?: number;
+fourMonth?: number;
+fiveMonth?: number;
+sixMonth?: number;
+sevenMonth?: number;
+eightMonth?: number;
+nineMonth?: number;
+tenMonth?: number;
+elevenMonth?: number;
+twelveMonth?: number;
+eighteenMonth?: number;
+twentyFourMonth?: number;
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+};
+;
+
+
     export type processInp = {
       organization?: number | organizationInp
 createdBy?: number | userInp
+unit?: number | unitInp
+ware?: number | wareInp
+wareModel?: number | wareModelInp
+wareGroup?: number | wareGroupInp
+wareClass?: number | wareClassInp
+wareType?: number | wareTypeInp
       steps?: number | processStepInp
 requests?: number | purchasingRequestInp
     }
@@ -1085,6 +1980,58 @@ name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary" );
 scopeType?: ("organization" | "unit" );
 scopeId?: string;
 }[];
+};
+unit?: {
+_id?: string;
+name: string;
+enName?: string;
+description?: string;
+isActive: boolean;
+type: ("General" | "Warehouse" | "Logistics" | "Production" | "Administration" | "Expert" );
+address?: string;
+phone?: string;
+email?: string;
+warehouseCapacity?: number;
+hasColdStorage?: boolean;
+fleetSize?: number;
+serviceRadius?: number;
+features: {
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+}[];
+allowWareTypeIds?: string[];
+allowWareClassIds?: string[];
+allowWareGroupIds?: string[];
+allowWareModelIds?: string[];
+};
+ware?: {
+_id?: string;
+name: string;
+enName?: string;
+brand?: string;
+irc?: string;
+umdns?: number;
+gtin?: number;
+photoUrl?: string;
+};
+wareModel?: {
+_id?: string;
+name: string;
+enName?: string;
+};
+wareGroup?: {
+_id?: string;
+name: string;
+enName?: string;
+};
+wareClass?: {
+_id?: string;
+name: string;
+enName?: string;
+};
+wareType?: {
+_id?: string;
+name: string;
+enName?: string;
 };
 steps: {
 _id?: string;
@@ -1288,206 +2235,6 @@ status: ("reserved" | "spent" | "released" );
 referenceType: string;
 referenceId: string;
 description?: string;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-};
-;
-
-
-    export type wareModelInp = {
-      creator?: number | userInp
-wareType?: number | wareTypeInp
-wareClass?: number | wareClassInp
-wareGroup?: number | wareGroupInp
-      wares?: number | wareInp
-purchasingRequests?: number | purchasingRequestInp
-stuffs?: number | stuffInp
-purchaseOrderItems?: number | purchaseOrderItemInp
-inventories?: number | inventoryInp
-stockMovements?: number | stockMovementInp
-consumptionRecords?: number | consumptionRecordInp
-    }
-
-
-    export type wareModelSchema = {
-_id?: string;
-name: string;
-enName?: string;
-createdAt?: Date;
-updatedAt?: Date;
-creator: {
-_id?: string;
-first_name: string;
-last_name: string;
-gender: ("Male" | "Female" );
-mobile: string;
-email: string;
-is_verified: boolean;
-position?: string;
-isActive: boolean;
-isGhost: boolean;
-features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
-}[];
-allowWareTypeIds?: string[];
-allowWareClassIds?: string[];
-allowWareGroupIds?: string[];
-allowWareModelIds?: string[];
-roles: {
-roleId: string;
-name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary" );
-scopeType?: ("organization" | "unit" );
-scopeId?: string;
-}[];
-};
-wareType: {
-_id?: string;
-name: string;
-enName?: string;
-};
-wareClass: {
-_id?: string;
-name: string;
-enName?: string;
-};
-wareGroup: {
-_id?: string;
-name: string;
-enName?: string;
-};
-wares: {
-_id?: string;
-name: string;
-enName?: string;
-brand?: string;
-price: number;
-orderedNumber: number;
-irc?: string;
-umdns?: number;
-gtin?: number;
-photoUrl?: string;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-purchasingRequests: {
-_id?: string;
-title: string;
-description?: string;
-estimatedAmount?: number;
-status: ("Draft" | "Pending" | "InProgress" | "Approved" | "Rejected" | "Completed" | "Cancelled" );
-currentStep: number;
-requestedAt?: Date;
-completedAt?: Date;
-quantity: number;
-history: {
-action: string;
-performed: {
-by: string;
-name: string;
-at: Date;
-role: {
-id: string;
-name: string;
-scopeType?: string;
-scopeId?: string;
-};
-};
-unit?: {
-_id: string;
-name: string;
-};
-details?: {
-};
-}[];
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-stuffs: {
-_id?: string;
-inventoryNo: number;
-price: number;
-hasAbsolutePrice: boolean;
-pricePercentage?: number;
-expiration?: Date;
-barcode?: number;
-qrc?: string;
-isBarcodeSet: boolean;
-isQrcSet: boolean;
-isExpirationNear?: boolean;
-photoUrl?: string;
-apiId?: string;
-apiLink?: string;
-availableLongPayment?: string;
-twoMonthPricePercent?: number;
-threeMonthPricePercent?: number;
-fourMonthPricePercent?: number;
-fiveMonthPricePercent?: number;
-sixMonthPricePercent?: number;
-sevenMonthPricePercent?: number;
-eightMonthPricePercent?: number;
-nineMonthPricePercent?: number;
-tenMonthPricePercent?: number;
-elevenMonthPricePercent?: number;
-twelveMonthPricePercent?: number;
-eighteenMonthPricePercent?: number;
-twentyFourMonthPricePercent?: number;
-twoMonth?: number;
-threeMonth?: number;
-fourMonth?: number;
-fiveMonth?: number;
-sixMonth?: number;
-sevenMonth?: number;
-eightMonth?: number;
-nineMonth?: number;
-tenMonth?: number;
-elevenMonth?: number;
-twelveMonth?: number;
-eighteenMonth?: number;
-twentyFourMonth?: number;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-purchaseOrderItems: {
-_id?: string;
-quantity: number;
-unitPrice?: number;
-totalPrice?: number;
-status: ("pending" | "assigned" | "ordered" | "received" | "cancelled" );
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-inventories: {
-_id?: string;
-quantity: number;
-minQuantity?: number;
-maxQuantity?: number;
-batchNo?: string;
-expirationDate?: Date;
-location?: string;
-lastCountedAt?: Date;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-stockMovements: {
-_id?: string;
-quantity: number;
-balanceBefore: number;
-balanceAfter: number;
-reason: ("goods_receipt" | "goods_issue" | "transfer_in" | "transfer_out" | "consumption" | "adjustment" | "return" | "write_off" );
-referenceType?: string;
-referenceId?: string;
-description?: string;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-consumptionRecords: {
-_id?: string;
-quantity: number;
-consumedAt: Date;
-reason?: string;
-patientId?: string;
-notes?: string;
 createdAt?: Date;
 updatedAt?: Date;
 }[];
@@ -1714,695 +2461,6 @@ amount: number;
 description?: string;
 status: ("draft" | "sent_to_finance" | "paid" | "cancelled" );
 paidAt?: Date;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-};
-;
-
-
-    export type wareInp = {
-      creator?: number | userInp
-manufacturer?: number | manufacturerInp
-wareType?: number | wareTypeInp
-wareClass?: number | wareClassInp
-wareGroup?: number | wareGroupInp
-wareModel?: number | wareModelInp
-      purchasingRequests?: number | purchasingRequestInp
-stuffs?: number | stuffInp
-purchaseOrderItems?: number | purchaseOrderItemInp
-inventories?: number | inventoryInp
-stockMovements?: number | stockMovementInp
-consumptionRecords?: number | consumptionRecordInp
-    }
-
-
-    export type wareSchema = {
-_id?: string;
-name: string;
-enName?: string;
-brand?: string;
-price: number;
-orderedNumber: number;
-irc?: string;
-umdns?: number;
-gtin?: number;
-photoUrl?: string;
-createdAt?: Date;
-updatedAt?: Date;
-creator: {
-_id?: string;
-first_name: string;
-last_name: string;
-gender: ("Male" | "Female" );
-mobile: string;
-email: string;
-is_verified: boolean;
-position?: string;
-isActive: boolean;
-isGhost: boolean;
-features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
-}[];
-allowWareTypeIds?: string[];
-allowWareClassIds?: string[];
-allowWareGroupIds?: string[];
-allowWareModelIds?: string[];
-roles: {
-roleId: string;
-name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary" );
-scopeType?: ("organization" | "unit" );
-scopeId?: string;
-}[];
-};
-manufacturer?: {
-_id?: string;
-name: string;
-enName?: string;
-country?: string;
-};
-wareType: {
-_id?: string;
-name: string;
-enName?: string;
-};
-wareClass: {
-_id?: string;
-name: string;
-enName?: string;
-};
-wareGroup: {
-_id?: string;
-name: string;
-enName?: string;
-};
-wareModel: {
-_id?: string;
-name: string;
-enName?: string;
-};
-purchasingRequests: {
-_id?: string;
-title: string;
-description?: string;
-estimatedAmount?: number;
-status: ("Draft" | "Pending" | "InProgress" | "Approved" | "Rejected" | "Completed" | "Cancelled" );
-currentStep: number;
-requestedAt?: Date;
-completedAt?: Date;
-quantity: number;
-history: {
-action: string;
-performed: {
-by: string;
-name: string;
-at: Date;
-role: {
-id: string;
-name: string;
-scopeType?: string;
-scopeId?: string;
-};
-};
-unit?: {
-_id: string;
-name: string;
-};
-details?: {
-};
-}[];
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-stuffs: {
-_id?: string;
-inventoryNo: number;
-price: number;
-hasAbsolutePrice: boolean;
-pricePercentage?: number;
-expiration?: Date;
-barcode?: number;
-qrc?: string;
-isBarcodeSet: boolean;
-isQrcSet: boolean;
-isExpirationNear?: boolean;
-photoUrl?: string;
-apiId?: string;
-apiLink?: string;
-availableLongPayment?: string;
-twoMonthPricePercent?: number;
-threeMonthPricePercent?: number;
-fourMonthPricePercent?: number;
-fiveMonthPricePercent?: number;
-sixMonthPricePercent?: number;
-sevenMonthPricePercent?: number;
-eightMonthPricePercent?: number;
-nineMonthPricePercent?: number;
-tenMonthPricePercent?: number;
-elevenMonthPricePercent?: number;
-twelveMonthPricePercent?: number;
-eighteenMonthPricePercent?: number;
-twentyFourMonthPricePercent?: number;
-twoMonth?: number;
-threeMonth?: number;
-fourMonth?: number;
-fiveMonth?: number;
-sixMonth?: number;
-sevenMonth?: number;
-eightMonth?: number;
-nineMonth?: number;
-tenMonth?: number;
-elevenMonth?: number;
-twelveMonth?: number;
-eighteenMonth?: number;
-twentyFourMonth?: number;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-purchaseOrderItems: {
-_id?: string;
-quantity: number;
-unitPrice?: number;
-totalPrice?: number;
-status: ("pending" | "assigned" | "ordered" | "received" | "cancelled" );
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-inventories: {
-_id?: string;
-quantity: number;
-minQuantity?: number;
-maxQuantity?: number;
-batchNo?: string;
-expirationDate?: Date;
-location?: string;
-lastCountedAt?: Date;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-stockMovements: {
-_id?: string;
-quantity: number;
-balanceBefore: number;
-balanceAfter: number;
-reason: ("goods_receipt" | "goods_issue" | "transfer_in" | "transfer_out" | "consumption" | "adjustment" | "return" | "write_off" );
-referenceType?: string;
-referenceId?: string;
-description?: string;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-consumptionRecords: {
-_id?: string;
-quantity: number;
-consumedAt: Date;
-reason?: string;
-patientId?: string;
-notes?: string;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-};
-;
-
-
-    export type wareTypeInp = {
-      creator?: number | userInp
-      budgetLines?: number | budgetLineInp
-wareModels?: number | wareModelInp
-wares?: number | wareInp
-wareClasses?: number | wareClassInp
-wareGroups?: number | wareGroupInp
-purchasingRequests?: number | purchasingRequestInp
-stuffs?: number | stuffInp
-    }
-
-
-    export type wareTypeSchema = {
-_id?: string;
-name: string;
-enName?: string;
-createdAt?: Date;
-updatedAt?: Date;
-creator: {
-_id?: string;
-first_name: string;
-last_name: string;
-gender: ("Male" | "Female" );
-mobile: string;
-email: string;
-is_verified: boolean;
-position?: string;
-isActive: boolean;
-isGhost: boolean;
-features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
-}[];
-allowWareTypeIds?: string[];
-allowWareClassIds?: string[];
-allowWareGroupIds?: string[];
-allowWareModelIds?: string[];
-roles: {
-roleId: string;
-name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary" );
-scopeType?: ("organization" | "unit" );
-scopeId?: string;
-}[];
-};
-budgetLines: {
-_id?: string;
-code: string;
-title: string;
-description?: string;
-totalAllocated: number;
-totalEncumbered: number;
-totalSpent: number;
-remainingBudget: number;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-wareModels: {
-_id?: string;
-name: string;
-enName?: string;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-wares: {
-_id?: string;
-name: string;
-enName?: string;
-brand?: string;
-price: number;
-orderedNumber: number;
-irc?: string;
-umdns?: number;
-gtin?: number;
-photoUrl?: string;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-wareClasses: {
-_id?: string;
-name: string;
-enName?: string;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-wareGroups: {
-_id?: string;
-name: string;
-enName?: string;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-purchasingRequests: {
-_id?: string;
-title: string;
-description?: string;
-estimatedAmount?: number;
-status: ("Draft" | "Pending" | "InProgress" | "Approved" | "Rejected" | "Completed" | "Cancelled" );
-currentStep: number;
-requestedAt?: Date;
-completedAt?: Date;
-quantity: number;
-history: {
-action: string;
-performed: {
-by: string;
-name: string;
-at: Date;
-role: {
-id: string;
-name: string;
-scopeType?: string;
-scopeId?: string;
-};
-};
-unit?: {
-_id: string;
-name: string;
-};
-details?: {
-};
-}[];
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-stuffs: {
-_id?: string;
-inventoryNo: number;
-price: number;
-hasAbsolutePrice: boolean;
-pricePercentage?: number;
-expiration?: Date;
-barcode?: number;
-qrc?: string;
-isBarcodeSet: boolean;
-isQrcSet: boolean;
-isExpirationNear?: boolean;
-photoUrl?: string;
-apiId?: string;
-apiLink?: string;
-availableLongPayment?: string;
-twoMonthPricePercent?: number;
-threeMonthPricePercent?: number;
-fourMonthPricePercent?: number;
-fiveMonthPricePercent?: number;
-sixMonthPricePercent?: number;
-sevenMonthPricePercent?: number;
-eightMonthPricePercent?: number;
-nineMonthPricePercent?: number;
-tenMonthPricePercent?: number;
-elevenMonthPricePercent?: number;
-twelveMonthPricePercent?: number;
-eighteenMonthPricePercent?: number;
-twentyFourMonthPricePercent?: number;
-twoMonth?: number;
-threeMonth?: number;
-fourMonth?: number;
-fiveMonth?: number;
-sixMonth?: number;
-sevenMonth?: number;
-eightMonth?: number;
-nineMonth?: number;
-tenMonth?: number;
-elevenMonth?: number;
-twelveMonth?: number;
-eighteenMonth?: number;
-twentyFourMonth?: number;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-};
-;
-
-
-    export type wareClassInp = {
-      creator?: number | userInp
-wareType?: number | wareTypeInp
-      wareModels?: number | wareModelInp
-wares?: number | wareInp
-wareGroups?: number | wareGroupInp
-purchasingRequests?: number | purchasingRequestInp
-stuffs?: number | stuffInp
-    }
-
-
-    export type wareClassSchema = {
-_id?: string;
-name: string;
-enName?: string;
-createdAt?: Date;
-updatedAt?: Date;
-creator: {
-_id?: string;
-first_name: string;
-last_name: string;
-gender: ("Male" | "Female" );
-mobile: string;
-email: string;
-is_verified: boolean;
-position?: string;
-isActive: boolean;
-isGhost: boolean;
-features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
-}[];
-allowWareTypeIds?: string[];
-allowWareClassIds?: string[];
-allowWareGroupIds?: string[];
-allowWareModelIds?: string[];
-roles: {
-roleId: string;
-name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary" );
-scopeType?: ("organization" | "unit" );
-scopeId?: string;
-}[];
-};
-wareType: {
-_id?: string;
-name: string;
-enName?: string;
-};
-wareModels: {
-_id?: string;
-name: string;
-enName?: string;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-wares: {
-_id?: string;
-name: string;
-enName?: string;
-brand?: string;
-price: number;
-orderedNumber: number;
-irc?: string;
-umdns?: number;
-gtin?: number;
-photoUrl?: string;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-wareGroups: {
-_id?: string;
-name: string;
-enName?: string;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-purchasingRequests: {
-_id?: string;
-title: string;
-description?: string;
-estimatedAmount?: number;
-status: ("Draft" | "Pending" | "InProgress" | "Approved" | "Rejected" | "Completed" | "Cancelled" );
-currentStep: number;
-requestedAt?: Date;
-completedAt?: Date;
-quantity: number;
-history: {
-action: string;
-performed: {
-by: string;
-name: string;
-at: Date;
-role: {
-id: string;
-name: string;
-scopeType?: string;
-scopeId?: string;
-};
-};
-unit?: {
-_id: string;
-name: string;
-};
-details?: {
-};
-}[];
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-stuffs: {
-_id?: string;
-inventoryNo: number;
-price: number;
-hasAbsolutePrice: boolean;
-pricePercentage?: number;
-expiration?: Date;
-barcode?: number;
-qrc?: string;
-isBarcodeSet: boolean;
-isQrcSet: boolean;
-isExpirationNear?: boolean;
-photoUrl?: string;
-apiId?: string;
-apiLink?: string;
-availableLongPayment?: string;
-twoMonthPricePercent?: number;
-threeMonthPricePercent?: number;
-fourMonthPricePercent?: number;
-fiveMonthPricePercent?: number;
-sixMonthPricePercent?: number;
-sevenMonthPricePercent?: number;
-eightMonthPricePercent?: number;
-nineMonthPricePercent?: number;
-tenMonthPricePercent?: number;
-elevenMonthPricePercent?: number;
-twelveMonthPricePercent?: number;
-eighteenMonthPricePercent?: number;
-twentyFourMonthPricePercent?: number;
-twoMonth?: number;
-threeMonth?: number;
-fourMonth?: number;
-fiveMonth?: number;
-sixMonth?: number;
-sevenMonth?: number;
-eightMonth?: number;
-nineMonth?: number;
-tenMonth?: number;
-elevenMonth?: number;
-twelveMonth?: number;
-eighteenMonth?: number;
-twentyFourMonth?: number;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-};
-;
-
-
-    export type wareGroupInp = {
-      creator?: number | userInp
-wareType?: number | wareTypeInp
-wareClasses?: number | wareClassInp
-      wareModels?: number | wareModelInp
-wares?: number | wareInp
-purchasingRequests?: number | purchasingRequestInp
-stuffs?: number | stuffInp
-    }
-
-
-    export type wareGroupSchema = {
-_id?: string;
-name: string;
-enName?: string;
-createdAt?: Date;
-updatedAt?: Date;
-creator: {
-_id?: string;
-first_name: string;
-last_name: string;
-gender: ("Male" | "Female" );
-mobile: string;
-email: string;
-is_verified: boolean;
-position?: string;
-isActive: boolean;
-isGhost: boolean;
-features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
-}[];
-allowWareTypeIds?: string[];
-allowWareClassIds?: string[];
-allowWareGroupIds?: string[];
-allowWareModelIds?: string[];
-roles: {
-roleId: string;
-name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary" );
-scopeType?: ("organization" | "unit" );
-scopeId?: string;
-}[];
-};
-wareType: {
-_id?: string;
-name: string;
-enName?: string;
-};
-wareClasses?: {
-_id?: string;
-name: string;
-enName?: string;
-}[];
-wareModels: {
-_id?: string;
-name: string;
-enName?: string;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-wares: {
-_id?: string;
-name: string;
-enName?: string;
-brand?: string;
-price: number;
-orderedNumber: number;
-irc?: string;
-umdns?: number;
-gtin?: number;
-photoUrl?: string;
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-purchasingRequests: {
-_id?: string;
-title: string;
-description?: string;
-estimatedAmount?: number;
-status: ("Draft" | "Pending" | "InProgress" | "Approved" | "Rejected" | "Completed" | "Cancelled" );
-currentStep: number;
-requestedAt?: Date;
-completedAt?: Date;
-quantity: number;
-history: {
-action: string;
-performed: {
-by: string;
-name: string;
-at: Date;
-role: {
-id: string;
-name: string;
-scopeType?: string;
-scopeId?: string;
-};
-};
-unit?: {
-_id: string;
-name: string;
-};
-details?: {
-};
-}[];
-createdAt?: Date;
-updatedAt?: Date;
-}[];
-stuffs: {
-_id?: string;
-inventoryNo: number;
-price: number;
-hasAbsolutePrice: boolean;
-pricePercentage?: number;
-expiration?: Date;
-barcode?: number;
-qrc?: string;
-isBarcodeSet: boolean;
-isQrcSet: boolean;
-isExpirationNear?: boolean;
-photoUrl?: string;
-apiId?: string;
-apiLink?: string;
-availableLongPayment?: string;
-twoMonthPricePercent?: number;
-threeMonthPricePercent?: number;
-fourMonthPricePercent?: number;
-fiveMonthPricePercent?: number;
-sixMonthPricePercent?: number;
-sevenMonthPricePercent?: number;
-eightMonthPricePercent?: number;
-nineMonthPricePercent?: number;
-tenMonthPricePercent?: number;
-elevenMonthPricePercent?: number;
-twelveMonthPricePercent?: number;
-eighteenMonthPricePercent?: number;
-twentyFourMonthPricePercent?: number;
-twoMonth?: number;
-threeMonth?: number;
-fourMonth?: number;
-fiveMonth?: number;
-sixMonth?: number;
-sevenMonth?: number;
-eightMonth?: number;
-nineMonth?: number;
-tenMonth?: number;
-elevenMonth?: number;
-twelveMonth?: number;
-eighteenMonth?: number;
-twentyFourMonth?: number;
 createdAt?: Date;
 updatedAt?: Date;
 }[];
@@ -5581,6 +5639,56 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 steps?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -7802,6 +7910,56 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 steps?: {
 _id?: (0 | 1 );
@@ -11114,6 +11272,56 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 steps?: {
 _id?: (0 | 1 );
@@ -15174,6 +15382,56 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 steps?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -16454,6 +16712,56 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 steps?: {
 _id?: (0 | 1 );
@@ -17877,6 +18185,56 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 steps?: {
 _id?: (0 | 1 );
@@ -25159,6 +25517,12 @@ isActive: boolean;
 createdAt?: Date;
 updatedAt?: Date;
 organizationId: string;
+unitId?: string;
+wareId?: string;
+wareModelId?: string;
+wareGroupId?: string;
+wareClassId?: string;
+wareTypeId?: string;
 };
 get: {
 _id?: (0 | 1 );
@@ -25193,6 +25557,56 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 steps?: {
 _id?: (0 | 1 );
@@ -25268,6 +25682,56 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 steps?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -25303,6 +25767,12 @@ set: {
 activeRoleId: string;
 _id: string;
 organizationId?: string;
+unitId?: string;
+wareId?: string;
+wareModelId?: string;
+wareGroupId?: string;
+wareClassId?: string;
+wareTypeId?: string;
 };
 get: {
 _id?: (0 | 1 );
@@ -25680,6 +26150,898 @@ consumedAt?: (0 | 1 );
 reason?: (0 | 1 );
 patientId?: (0 | 1 );
 notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+};
+parentUnit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+subUnits?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+members?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stepApprovals?: {
+_id?: (0 | 1 );
+status?: (0 | 1 );
+comment?: (0 | 1 );
+decidedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+warehouseInventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+goodsReceipts?: {
+_id?: (0 | 1 );
+receiptNumber?: (0 | 1 );
+description?: (0 | 1 );
+receivedAt?: (0 | 1 );
+status?: (0 | 1 );
+notes?: (0 | 1 );
+items?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+paymentOrders?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+paidAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+manufacturer?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+country?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -26282,6 +27644,898 @@ consumedAt?: (0 | 1 );
 reason?: (0 | 1 );
 patientId?: (0 | 1 );
 notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+};
+parentUnit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+subUnits?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+members?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stepApprovals?: {
+_id?: (0 | 1 );
+status?: (0 | 1 );
+comment?: (0 | 1 );
+decidedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+warehouseInventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+goodsReceipts?: {
+_id?: (0 | 1 );
+receiptNumber?: (0 | 1 );
+description?: (0 | 1 );
+receivedAt?: (0 | 1 );
+status?: (0 | 1 );
+notes?: (0 | 1 );
+items?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+paymentOrders?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+paidAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+manufacturer?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+country?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -26890,6 +29144,898 @@ consumedAt?: (0 | 1 );
 reason?: (0 | 1 );
 patientId?: (0 | 1 );
 notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+};
+parentUnit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+subUnits?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+members?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stepApprovals?: {
+_id?: (0 | 1 );
+status?: (0 | 1 );
+comment?: (0 | 1 );
+decidedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+warehouseInventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+goodsReceipts?: {
+_id?: (0 | 1 );
+receiptNumber?: (0 | 1 );
+description?: (0 | 1 );
+receivedAt?: (0 | 1 );
+status?: (0 | 1 );
+notes?: (0 | 1 );
+items?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+paymentOrders?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+paidAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+manufacturer?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+country?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -27520,6 +30666,898 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+};
+parentUnit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+subUnits?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+members?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stepApprovals?: {
+_id?: (0 | 1 );
+status?: (0 | 1 );
+comment?: (0 | 1 );
+decidedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+warehouseInventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+goodsReceipts?: {
+_id?: (0 | 1 );
+receiptNumber?: (0 | 1 );
+description?: (0 | 1 );
+receivedAt?: (0 | 1 );
+status?: (0 | 1 );
+notes?: (0 | 1 );
+items?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+paymentOrders?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+paidAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+manufacturer?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+country?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
 steps?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -28123,6 +32161,898 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+};
+parentUnit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+subUnits?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+members?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stepApprovals?: {
+_id?: (0 | 1 );
+status?: (0 | 1 );
+comment?: (0 | 1 );
+decidedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+warehouseInventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+goodsReceipts?: {
+_id?: (0 | 1 );
+receiptNumber?: (0 | 1 );
+description?: (0 | 1 );
+receivedAt?: (0 | 1 );
+status?: (0 | 1 );
+notes?: (0 | 1 );
+items?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+paymentOrders?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+paidAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+manufacturer?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+country?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
 steps?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -28516,6 +33446,56 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 steps?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -28667,6 +33647,56 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 steps?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -28805,8 +33835,6 @@ status?: ("Draft" | "Pending" | "InProgress" | "Approved" | "Rejected" | "Comple
 currentStep?: number;
 requestedAt?: string;
 completedAt?: string;
-organizationId?: string;
-processId: string;
 wareModelId: string;
 requestingUnitId?: string;
 attachmentIds?: string[];
@@ -28860,6 +33888,56 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 steps?: {
 _id?: (0 | 1 );
@@ -29978,25 +35056,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -30011,7 +35070,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -30022,6 +35081,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -30112,13 +35190,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -30130,6 +35201,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -30232,13 +35310,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -30250,6 +35321,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -31011,6 +36089,56 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 steps?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -32128,25 +37256,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -32161,7 +37270,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -32172,6 +37281,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -32262,13 +37390,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -32280,6 +37401,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -32382,13 +37510,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -32400,6 +37521,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -32944,6 +38072,56 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 steps?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -32955,6 +38133,68 @@ groupsOperator?: (0 | 1 );
 assigneeGroups?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
+approvals?: {
+_id?: (0 | 1 );
+status?: (0 | 1 );
+comment?: (0 | 1 );
+decidedAt?: (0 | 1 );
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+};
+decidedBy?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+};
 };
 requests?: {
 _id?: (0 | 1 );
@@ -32988,234 +38228,6 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
-avatar?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-mimeType?: (0 | 1 );
-type?: (0 | 1 );
-alt_text?: (0 | 1 );
-};
-organization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
-state?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-city?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-units?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-};
-files?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-mimeType?: (0 | 1 );
-size?: (0 | 1 );
-type?: (0 | 1 );
-alt_text?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-createdOrganizations?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
-createdUnits?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-};
-tags?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-color?: (0 | 1 );
-icon?: (0 | 1 );
-};
-createdProcesses?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-version?: (0 | 1 );
-isActive?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-requests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stepDecisions?: {
-_id?: (0 | 1 );
-status?: (0 | 1 );
-comment?: (0 | 1 );
-decidedAt?: (0 | 1 );
-};
-createdTenders?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-deadline?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-createdStockMovements?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-balanceBefore?: (0 | 1 );
-balanceAfter?: (0 | 1 );
-reason?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-receivedGoods?: {
-_id?: (0 | 1 );
-receiptNumber?: (0 | 1 );
-description?: (0 | 1 );
-receivedAt?: (0 | 1 );
-status?: (0 | 1 );
-notes?: (0 | 1 );
-items?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-issuedPaymentOrders?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-amount?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-paidAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-approvedPaymentOrders?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-amount?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-paidAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-budgetAllocations?: {
-_id?: (0 | 1 );
-amount?: (0 | 1 );
-description?: (0 | 1 );
-allocatedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-budgetEncumbrances?: {
-_id?: (0 | 1 );
-amount?: (0 | 1 );
-status?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-consumptionRecords?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-consumedAt?: (0 | 1 );
-reason?: (0 | 1 );
-patientId?: (0 | 1 );
-notes?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 };
 requestingUnit?: {
 _id?: (0 | 1 );
@@ -33236,211 +38248,6 @@ allowWareTypeIds?: (0 | 1 );
 allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
-organization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
-parentUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-};
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-head?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-subUnits?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-members?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-birth_date?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchaseRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stepApprovals?: {
-_id?: (0 | 1 );
-status?: (0 | 1 );
-comment?: (0 | 1 );
-decidedAt?: (0 | 1 );
-};
-inventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-warehouseInventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stockMovements?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-balanceBefore?: (0 | 1 );
-balanceAfter?: (0 | 1 );
-reason?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-goodsReceipts?: {
-_id?: (0 | 1 );
-receiptNumber?: (0 | 1 );
-description?: (0 | 1 );
-receivedAt?: (0 | 1 );
-status?: (0 | 1 );
-notes?: (0 | 1 );
-items?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-paymentOrders?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-amount?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-paidAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-consumptionRecords?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-consumedAt?: (0 | 1 );
-reason?: (0 | 1 );
-patientId?: (0 | 1 );
-notes?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 };
 attachments?: {
 _id?: (0 | 1 );
@@ -33448,24 +38255,6 @@ name?: (0 | 1 );
 mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
-uploader?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
 };
 budgetLine?: {
 _id?: (0 | 1 );
@@ -33476,232 +38265,11 @@ totalAllocated?: (0 | 1 );
 totalEncumbered?: (0 | 1 );
 totalSpent?: (0 | 1 );
 remainingBudget?: (0 | 1 );
-fiscalYear?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-startDate?: (0 | 1 );
-endDate?: (0 | 1 );
-isActive?: (0 | 1 );
-status?: (0 | 1 );
-};
-organization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
-unit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-};
-wareType?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-allocations?: {
-_id?: (0 | 1 );
-amount?: (0 | 1 );
-description?: (0 | 1 );
-allocatedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-encumbrances?: {
-_id?: (0 | 1 );
-amount?: (0 | 1 );
-status?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 };
 wareModel?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-wareType?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareClass?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareGroup?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wares?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchaseOrderItems?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-unitPrice?: (0 | 1 );
-totalPrice?: (0 | 1 );
-status?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-inventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stockMovements?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-balanceBefore?: (0 | 1 );
-balanceAfter?: (0 | 1 );
-reason?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-consumptionRecords?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-consumedAt?: (0 | 1 );
-reason?: (0 | 1 );
-patientId?: (0 | 1 );
-notes?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 };
 store?: {
 _id?: (0 | 1 );
@@ -33739,149 +38307,6 @@ registerNumber?: (0 | 1 );
 certificateExpireDate?: (0 | 1 );
 legalPerson?: (0 | 1 );
 nationalId?: (0 | 1 );
-storeHead?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-city?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-state?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareTypes?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-tenderOffers?: {
-_id?: (0 | 1 );
-price?: (0 | 1 );
-deliveryTime?: (0 | 1 );
-paymentTerms?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-submittedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchaseOrderItems?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-unitPrice?: (0 | 1 );
-totalPrice?: (0 | 1 );
-status?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-tenders?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-deadline?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stockMovements?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-balanceBefore?: (0 | 1 );
-balanceAfter?: (0 | 1 );
-reason?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-paymentOrders?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-amount?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-paidAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 };
 ware?: {
 _id?: (0 | 1 );
@@ -33892,29 +38317,6 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-manufacturer?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-country?: (0 | 1 );
 };
 wareType?: {
 _id?: (0 | 1 );
@@ -33930,537 +38332,12 @@ wareGroup?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
-};
-wareModel?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchaseOrderItems?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-unitPrice?: (0 | 1 );
-totalPrice?: (0 | 1 );
-status?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-inventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stockMovements?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-balanceBefore?: (0 | 1 );
-balanceAfter?: (0 | 1 );
-reason?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-consumptionRecords?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-consumedAt?: (0 | 1 );
-reason?: (0 | 1 );
-patientId?: (0 | 1 );
-notes?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-wareType?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wares?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareClasses?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareGroups?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-wareClass?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-wareType?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wares?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareGroups?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-wareGroup?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-wareType?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareClasses?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wares?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 };
 stepApprovals?: {
 _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
-purchasingRequest?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-};
-processStep?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-description?: (0 | 1 );
-stepType?: (0 | 1 );
-order?: (0 | 1 );
-required?: (0 | 1 );
-groupsOperator?: (0 | 1 );
-assigneeGroups?: (0 | 1 );
-};
-unit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-};
-decidedBy?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
 };
 purchaseOrderItems?: {
 _id?: (0 | 1 );
@@ -34470,97 +38347,6 @@ totalPrice?: (0 | 1 );
 status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-purchasingRequest?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-};
-assignedFrom?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-address?: (0 | 1 );
-location?: (0 | 1 );
-contact?: (0 | 1 );
-logoUrl?: (0 | 1 );
-ceoname?: (0 | 1 );
-workingHours?: (0 | 1 );
-cityDeliveryTime?: (0 | 1 );
-stateDeliveryTime?: (0 | 1 );
-selectedStateDeliveryTime?: (0 | 1 );
-countryDeliveryTime?: (0 | 1 );
-availableFastDeliveryTime?: (0 | 1 );
-fastDelivery?: (0 | 1 );
-isAvailableInHolidays?: (0 | 1 );
-status?: (0 | 1 );
-updateStatusDescription?: (0 | 1 );
-score?: (0 | 1 );
-totalSoldAmount?: (0 | 1 );
-totalSoldNum?: (0 | 1 );
-email?: (0 | 1 );
-storeType?: (0 | 1 );
-economicCode?: (0 | 1 );
-postalCode?: (0 | 1 );
-lastNewspaperUrl?: (0 | 1 );
-certificateUrl?: (0 | 1 );
-bankCardNumber?: (0 | 1 );
-shebaNumber?: (0 | 1 );
-nameOfAccountHolder?: (0 | 1 );
-bankName?: (0 | 1 );
-certificateNumber?: (0 | 1 );
-registerNumber?: (0 | 1 );
-certificateExpireDate?: (0 | 1 );
-legalPerson?: (0 | 1 );
-nationalId?: (0 | 1 );
-};
-assignedBy?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-tenderOffer?: {
-_id?: (0 | 1 );
-price?: (0 | 1 );
-deliveryTime?: (0 | 1 );
-paymentTerms?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-submittedAt?: (0 | 1 );
-};
-wareModel?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-ware?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-brand?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
-};
 };
 tender?: {
 _id?: (0 | 1 );
@@ -34568,84 +38354,6 @@ title?: (0 | 1 );
 description?: (0 | 1 );
 status?: (0 | 1 );
 deadline?: (0 | 1 );
-purchasingRequest?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-};
-createdBy?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-assignedVendors?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-address?: (0 | 1 );
-location?: (0 | 1 );
-contact?: (0 | 1 );
-logoUrl?: (0 | 1 );
-ceoname?: (0 | 1 );
-workingHours?: (0 | 1 );
-cityDeliveryTime?: (0 | 1 );
-stateDeliveryTime?: (0 | 1 );
-selectedStateDeliveryTime?: (0 | 1 );
-countryDeliveryTime?: (0 | 1 );
-availableFastDeliveryTime?: (0 | 1 );
-fastDelivery?: (0 | 1 );
-isAvailableInHolidays?: (0 | 1 );
-status?: (0 | 1 );
-updateStatusDescription?: (0 | 1 );
-score?: (0 | 1 );
-totalSoldAmount?: (0 | 1 );
-totalSoldNum?: (0 | 1 );
-email?: (0 | 1 );
-storeType?: (0 | 1 );
-economicCode?: (0 | 1 );
-postalCode?: (0 | 1 );
-lastNewspaperUrl?: (0 | 1 );
-certificateUrl?: (0 | 1 );
-bankCardNumber?: (0 | 1 );
-shebaNumber?: (0 | 1 );
-nameOfAccountHolder?: (0 | 1 );
-bankName?: (0 | 1 );
-certificateNumber?: (0 | 1 );
-registerNumber?: (0 | 1 );
-certificateExpireDate?: (0 | 1 );
-legalPerson?: (0 | 1 );
-nationalId?: (0 | 1 );
-};
-offers?: {
-_id?: (0 | 1 );
-price?: (0 | 1 );
-deliveryTime?: (0 | 1 );
-paymentTerms?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-submittedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 };
 goodsReceipts?: {
 _id?: (0 | 1 );
@@ -34657,56 +38365,6 @@ notes?: (0 | 1 );
 items?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-purchasingRequest?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-};
-receivedBy?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-receivingUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-};
 };
 paymentOrders?: {
 _id?: (0 | 1 );
@@ -34717,111 +38375,6 @@ status?: (0 | 1 );
 paidAt?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-purchasingRequest?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-};
-issuedBy?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-approvedBy?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-payTo?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-address?: (0 | 1 );
-location?: (0 | 1 );
-contact?: (0 | 1 );
-logoUrl?: (0 | 1 );
-ceoname?: (0 | 1 );
-workingHours?: (0 | 1 );
-cityDeliveryTime?: (0 | 1 );
-stateDeliveryTime?: (0 | 1 );
-selectedStateDeliveryTime?: (0 | 1 );
-countryDeliveryTime?: (0 | 1 );
-availableFastDeliveryTime?: (0 | 1 );
-fastDelivery?: (0 | 1 );
-isAvailableInHolidays?: (0 | 1 );
-status?: (0 | 1 );
-updateStatusDescription?: (0 | 1 );
-score?: (0 | 1 );
-totalSoldAmount?: (0 | 1 );
-totalSoldNum?: (0 | 1 );
-email?: (0 | 1 );
-storeType?: (0 | 1 );
-economicCode?: (0 | 1 );
-postalCode?: (0 | 1 );
-lastNewspaperUrl?: (0 | 1 );
-certificateUrl?: (0 | 1 );
-bankCardNumber?: (0 | 1 );
-shebaNumber?: (0 | 1 );
-nameOfAccountHolder?: (0 | 1 );
-bankName?: (0 | 1 );
-certificateNumber?: (0 | 1 );
-registerNumber?: (0 | 1 );
-certificateExpireDate?: (0 | 1 );
-legalPerson?: (0 | 1 );
-nationalId?: (0 | 1 );
-};
-financialUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-};
 };
 };
 };
@@ -34892,6 +38445,56 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 steps?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -36009,25 +39612,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -36042,7 +39626,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -36053,6 +39637,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -36143,13 +39746,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -36161,6 +39757,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -36263,13 +39866,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -36281,6 +39877,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -36812,7 +40415,6 @@ title: string;
 description?: string;
 estimatedAmount?: number;
 quantity: number;
-processId: string;
 wareModelId: string;
 requestingUnitId?: string;
 attachmentIds?: string[];
@@ -36867,6 +40469,56 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 };
 steps?: {
 _id?: (0 | 1 );
@@ -37985,25 +41637,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -38018,7 +41651,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -38029,6 +41662,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -38119,13 +41771,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -38137,6 +41782,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -38239,13 +41891,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -38257,6 +41902,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -38802,6 +42454,56 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 steps?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -39919,25 +43621,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -39952,7 +43635,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -39963,6 +43646,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -40053,13 +43755,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -40071,6 +43766,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -40173,13 +43875,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -40191,6 +43886,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -40751,6 +44453,56 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 steps?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -41868,25 +45620,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -41901,7 +45634,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -41912,6 +45645,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -42002,13 +45754,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -42020,6 +45765,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -42122,13 +45874,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -42140,6 +45885,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -42806,6 +46558,56 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
 steps?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -43923,25 +47725,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -43956,7 +47739,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -43967,6 +47750,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -44057,13 +47859,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -44075,6 +47870,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -44177,13 +47979,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -44195,6 +47990,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -49423,25 +53225,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -49456,7 +53239,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -49467,6 +53250,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -49790,246 +53592,6 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-fiscalYear?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-startDate?: (0 | 1 );
-endDate?: (0 | 1 );
-isActive?: (0 | 1 );
-status?: (0 | 1 );
-};
-organization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
-unit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-};
-wareType?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-allocations?: {
-_id?: (0 | 1 );
-amount?: (0 | 1 );
-description?: (0 | 1 );
-allocatedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-encumbrances?: {
-_id?: (0 | 1 );
-amount?: (0 | 1 );
-status?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-wareType?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareClass?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareGroup?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wares?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchaseOrderItems?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-unitPrice?: (0 | 1 );
-totalPrice?: (0 | 1 );
-status?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-inventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stockMovements?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-balanceBefore?: (0 | 1 );
-balanceAfter?: (0 | 1 );
-reason?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-consumptionRecords?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-consumedAt?: (0 | 1 );
-reason?: (0 | 1 );
-patientId?: (0 | 1 );
-notes?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -50190,7 +53752,7 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -50219,134 +53781,15 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wares?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareGroups?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-wareGroups?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-wareType?: {
+wareClass?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareClasses?: {
+wareGroup?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
 };
 wares?: {
 _id?: (0 | 1 );
@@ -50418,6 +53861,365 @@ elevenMonth?: (0 | 1 );
 twelveMonth?: (0 | 1 );
 eighteenMonth?: (0 | 1 );
 twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+fiscalYear?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+};
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+allocations?: {
+_id?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+allocatedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+encumbrances?: {
+_id?: (0 | 1 );
+amount?: (0 | 1 );
+status?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -50987,246 +54789,6 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-fiscalYear?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-startDate?: (0 | 1 );
-endDate?: (0 | 1 );
-isActive?: (0 | 1 );
-status?: (0 | 1 );
-};
-organization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
-unit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-};
-wareType?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-allocations?: {
-_id?: (0 | 1 );
-amount?: (0 | 1 );
-description?: (0 | 1 );
-allocatedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-encumbrances?: {
-_id?: (0 | 1 );
-amount?: (0 | 1 );
-status?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-wareType?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareClass?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareGroup?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wares?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchaseOrderItems?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-unitPrice?: (0 | 1 );
-totalPrice?: (0 | 1 );
-status?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-inventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stockMovements?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-balanceBefore?: (0 | 1 );
-balanceAfter?: (0 | 1 );
-reason?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-consumptionRecords?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-consumedAt?: (0 | 1 );
-reason?: (0 | 1 );
-patientId?: (0 | 1 );
-notes?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -51387,7 +54949,7 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -51416,134 +54978,15 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wares?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareGroups?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-wareGroups?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-wareType?: {
+wareClass?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareClasses?: {
+wareGroup?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
 };
 wares?: {
 _id?: (0 | 1 );
@@ -51615,6 +55058,365 @@ elevenMonth?: (0 | 1 );
 twelveMonth?: (0 | 1 );
 eighteenMonth?: (0 | 1 );
 twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+fiscalYear?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+};
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+allocations?: {
+_id?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+allocatedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+encumbrances?: {
+_id?: (0 | 1 );
+amount?: (0 | 1 );
+status?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -52181,246 +55983,6 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-fiscalYear?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-startDate?: (0 | 1 );
-endDate?: (0 | 1 );
-isActive?: (0 | 1 );
-status?: (0 | 1 );
-};
-organization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
-unit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-};
-wareType?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-allocations?: {
-_id?: (0 | 1 );
-amount?: (0 | 1 );
-description?: (0 | 1 );
-allocatedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-encumbrances?: {
-_id?: (0 | 1 );
-amount?: (0 | 1 );
-status?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-wareType?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareClass?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareGroup?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wares?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchaseOrderItems?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-unitPrice?: (0 | 1 );
-totalPrice?: (0 | 1 );
-status?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-inventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stockMovements?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-balanceBefore?: (0 | 1 );
-balanceAfter?: (0 | 1 );
-reason?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-consumptionRecords?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-consumedAt?: (0 | 1 );
-reason?: (0 | 1 );
-patientId?: (0 | 1 );
-notes?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -52581,7 +56143,7 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -52610,134 +56172,15 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wares?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareGroups?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchasingRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-wareGroups?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-wareType?: {
+wareClass?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareClasses?: {
+wareGroup?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
 };
 wares?: {
 _id?: (0 | 1 );
@@ -52809,6 +56252,365 @@ elevenMonth?: (0 | 1 );
 twelveMonth?: (0 | 1 );
 eighteenMonth?: (0 | 1 );
 twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareGroups?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+fiscalYear?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+};
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+allocations?: {
+_id?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+allocatedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+encumbrances?: {
+_id?: (0 | 1 );
+amount?: (0 | 1 );
+status?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -53183,13 +56985,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -53201,6 +56996,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -53553,25 +57355,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -53586,7 +57369,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -53600,116 +57383,22 @@ enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-purchasingRequests?: {
+wareClasses?: {
 _id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
 title?: (0 | 1 );
 description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-wareType?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareClass?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareGroup?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wares?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -53769,49 +57458,6 @@ elevenMonth?: (0 | 1 );
 twelveMonth?: (0 | 1 );
 eighteenMonth?: (0 | 1 );
 twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchaseOrderItems?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-unitPrice?: (0 | 1 );
-totalPrice?: (0 | 1 );
-status?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-inventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stockMovements?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-balanceBefore?: (0 | 1 );
-balanceAfter?: (0 | 1 );
-reason?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-consumptionRecords?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-consumedAt?: (0 | 1 );
-reason?: (0 | 1 );
-patientId?: (0 | 1 );
-notes?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -53976,6 +57622,162 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
 wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -54010,13 +57812,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -54028,6 +57823,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -54678,25 +58480,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -54711,7 +58494,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -54725,116 +58508,22 @@ enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-purchasingRequests?: {
+wareClasses?: {
 _id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
 title?: (0 | 1 );
 description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-wareType?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareClass?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareGroup?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wares?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -54894,49 +58583,6 @@ elevenMonth?: (0 | 1 );
 twelveMonth?: (0 | 1 );
 eighteenMonth?: (0 | 1 );
 twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchaseOrderItems?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-unitPrice?: (0 | 1 );
-totalPrice?: (0 | 1 );
-status?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-inventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stockMovements?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-balanceBefore?: (0 | 1 );
-balanceAfter?: (0 | 1 );
-reason?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-consumptionRecords?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-consumedAt?: (0 | 1 );
-reason?: (0 | 1 );
-patientId?: (0 | 1 );
-notes?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -55101,6 +58747,162 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
 wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -55135,13 +58937,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -55153,6 +58948,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -55800,25 +59602,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -55833,7 +59616,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -55847,116 +59630,22 @@ enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-purchasingRequests?: {
+wareClasses?: {
 _id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
 title?: (0 | 1 );
 description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-wareType?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareClass?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareGroup?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wares?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -56016,49 +59705,6 @@ elevenMonth?: (0 | 1 );
 twelveMonth?: (0 | 1 );
 eighteenMonth?: (0 | 1 );
 twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchaseOrderItems?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-unitPrice?: (0 | 1 );
-totalPrice?: (0 | 1 );
-status?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-inventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stockMovements?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-balanceBefore?: (0 | 1 );
-balanceAfter?: (0 | 1 );
-reason?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-consumptionRecords?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-consumedAt?: (0 | 1 );
-reason?: (0 | 1 );
-patientId?: (0 | 1 );
-notes?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -56223,6 +59869,162 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
 wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -56257,13 +60059,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -56275,6 +60070,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -56920,25 +60722,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -56953,7 +60736,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -56967,116 +60750,22 @@ enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-purchasingRequests?: {
+wareClasses?: {
 _id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
 title?: (0 | 1 );
 description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stuffs?: {
-_id?: (0 | 1 );
-inventoryNo?: (0 | 1 );
-price?: (0 | 1 );
-hasAbsolutePrice?: (0 | 1 );
-pricePercentage?: (0 | 1 );
-expiration?: (0 | 1 );
-barcode?: (0 | 1 );
-qrc?: (0 | 1 );
-isBarcodeSet?: (0 | 1 );
-isQrcSet?: (0 | 1 );
-isExpirationNear?: (0 | 1 );
-photoUrl?: (0 | 1 );
-apiId?: (0 | 1 );
-apiLink?: (0 | 1 );
-availableLongPayment?: (0 | 1 );
-twoMonthPricePercent?: (0 | 1 );
-threeMonthPricePercent?: (0 | 1 );
-fourMonthPricePercent?: (0 | 1 );
-fiveMonthPricePercent?: (0 | 1 );
-sixMonthPricePercent?: (0 | 1 );
-sevenMonthPricePercent?: (0 | 1 );
-eightMonthPricePercent?: (0 | 1 );
-nineMonthPricePercent?: (0 | 1 );
-tenMonthPricePercent?: (0 | 1 );
-elevenMonthPricePercent?: (0 | 1 );
-twelveMonthPricePercent?: (0 | 1 );
-eighteenMonthPricePercent?: (0 | 1 );
-twentyFourMonthPricePercent?: (0 | 1 );
-twoMonth?: (0 | 1 );
-threeMonth?: (0 | 1 );
-fourMonth?: (0 | 1 );
-fiveMonth?: (0 | 1 );
-sixMonth?: (0 | 1 );
-sevenMonth?: (0 | 1 );
-eightMonth?: (0 | 1 );
-nineMonth?: (0 | 1 );
-tenMonth?: (0 | 1 );
-elevenMonth?: (0 | 1 );
-twelveMonth?: (0 | 1 );
-eighteenMonth?: (0 | 1 );
-twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-wareType?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareClass?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wareGroup?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-wares?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -57136,49 +60825,6 @@ elevenMonth?: (0 | 1 );
 twelveMonth?: (0 | 1 );
 eighteenMonth?: (0 | 1 );
 twentyFourMonth?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchaseOrderItems?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-unitPrice?: (0 | 1 );
-totalPrice?: (0 | 1 );
-status?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-inventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stockMovements?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-balanceBefore?: (0 | 1 );
-balanceAfter?: (0 | 1 );
-reason?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-consumptionRecords?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-consumedAt?: (0 | 1 );
-reason?: (0 | 1 );
-patientId?: (0 | 1 );
-notes?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -57343,6 +60989,162 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wares?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stuffs?: {
+_id?: (0 | 1 );
+inventoryNo?: (0 | 1 );
+price?: (0 | 1 );
+hasAbsolutePrice?: (0 | 1 );
+pricePercentage?: (0 | 1 );
+expiration?: (0 | 1 );
+barcode?: (0 | 1 );
+qrc?: (0 | 1 );
+isBarcodeSet?: (0 | 1 );
+isQrcSet?: (0 | 1 );
+isExpirationNear?: (0 | 1 );
+photoUrl?: (0 | 1 );
+apiId?: (0 | 1 );
+apiLink?: (0 | 1 );
+availableLongPayment?: (0 | 1 );
+twoMonthPricePercent?: (0 | 1 );
+threeMonthPricePercent?: (0 | 1 );
+fourMonthPricePercent?: (0 | 1 );
+fiveMonthPricePercent?: (0 | 1 );
+sixMonthPricePercent?: (0 | 1 );
+sevenMonthPricePercent?: (0 | 1 );
+eightMonthPricePercent?: (0 | 1 );
+nineMonthPricePercent?: (0 | 1 );
+tenMonthPricePercent?: (0 | 1 );
+elevenMonthPricePercent?: (0 | 1 );
+twelveMonthPricePercent?: (0 | 1 );
+eighteenMonthPricePercent?: (0 | 1 );
+twentyFourMonthPricePercent?: (0 | 1 );
+twoMonth?: (0 | 1 );
+threeMonth?: (0 | 1 );
+fourMonth?: (0 | 1 );
+fiveMonth?: (0 | 1 );
+sixMonth?: (0 | 1 );
+sevenMonth?: (0 | 1 );
+eightMonth?: (0 | 1 );
+nineMonth?: (0 | 1 );
+tenMonth?: (0 | 1 );
+elevenMonth?: (0 | 1 );
+twelveMonth?: (0 | 1 );
+eighteenMonth?: (0 | 1 );
+twentyFourMonth?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
 wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -57377,13 +61179,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -57395,6 +61190,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -57834,13 +61636,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -57852,6 +61647,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -58197,25 +61999,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -58230,7 +62013,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -58241,6 +62024,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -58331,13 +62133,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -58349,6 +62144,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -58419,10 +62221,17 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-wareModels?: {
+wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 creator?: {
@@ -58442,6 +62251,12 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+manufacturer?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+country?: (0 | 1 );
 };
 wareType?: {
 _id?: (0 | 1 );
@@ -58458,19 +62273,10 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wares?: {
+wareModel?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
 };
 purchasingRequests?: {
 _id?: (0 | 1 );
@@ -58575,17 +62381,10 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-wares?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 creator?: {
@@ -58606,12 +62405,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-manufacturer?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-country?: (0 | 1 );
-};
 wareType?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -58627,10 +62420,19 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModel?: {
+wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 purchasingRequests?: {
 _id?: (0 | 1 );
@@ -59322,25 +63124,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -59355,7 +63138,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -59366,6 +63149,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -59456,13 +63258,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -59474,6 +63269,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -59544,10 +63346,17 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-wareModels?: {
+wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 creator?: {
@@ -59567,6 +63376,12 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+manufacturer?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+country?: (0 | 1 );
 };
 wareType?: {
 _id?: (0 | 1 );
@@ -59583,19 +63398,10 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wares?: {
+wareModel?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
 };
 purchasingRequests?: {
 _id?: (0 | 1 );
@@ -59700,17 +63506,10 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-wares?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 creator?: {
@@ -59731,12 +63530,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-manufacturer?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-country?: (0 | 1 );
-};
 wareType?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -59752,10 +63545,19 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModel?: {
+wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 purchasingRequests?: {
 _id?: (0 | 1 );
@@ -60444,25 +64246,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -60477,7 +64260,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -60488,6 +64271,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -60578,13 +64380,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -60596,6 +64391,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -60666,10 +64468,17 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-wareModels?: {
+wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 creator?: {
@@ -60689,6 +64498,12 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+manufacturer?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+country?: (0 | 1 );
 };
 wareType?: {
 _id?: (0 | 1 );
@@ -60705,19 +64520,10 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wares?: {
+wareModel?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
 };
 purchasingRequests?: {
 _id?: (0 | 1 );
@@ -60822,17 +64628,10 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-wares?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 creator?: {
@@ -60853,12 +64652,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-manufacturer?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-country?: (0 | 1 );
-};
 wareType?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -60874,10 +64667,19 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModel?: {
+wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 purchasingRequests?: {
 _id?: (0 | 1 );
@@ -61566,25 +65368,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -61599,7 +65382,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -61610,6 +65393,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -61700,13 +65502,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -61718,6 +65513,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -61788,10 +65590,17 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-wareModels?: {
+wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 creator?: {
@@ -61811,6 +65620,12 @@ allowWareClassIds?: (0 | 1 );
 allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
+};
+manufacturer?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+country?: (0 | 1 );
 };
 wareType?: {
 _id?: (0 | 1 );
@@ -61827,19 +65642,10 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wares?: {
+wareModel?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
 };
 purchasingRequests?: {
 _id?: (0 | 1 );
@@ -61944,17 +65750,10 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-wares?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
-brand?: (0 | 1 );
-price?: (0 | 1 );
-orderedNumber?: (0 | 1 );
-irc?: (0 | 1 );
-umdns?: (0 | 1 );
-gtin?: (0 | 1 );
-photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 creator?: {
@@ -61975,12 +65774,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-manufacturer?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-country?: (0 | 1 );
-};
 wareType?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -61996,10 +65789,19 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModel?: {
+wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+brand?: (0 | 1 );
+price?: (0 | 1 );
+orderedNumber?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 purchasingRequests?: {
 _id?: (0 | 1 );
@@ -62885,25 +66687,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -62918,7 +66701,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -62929,6 +66712,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -63019,13 +66821,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -63037,6 +66832,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -63139,13 +66941,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -63157,6 +66952,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -64319,25 +68121,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -64352,7 +68135,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -64363,6 +68146,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -64453,13 +68255,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -64471,6 +68266,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -64573,13 +68375,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -64591,6 +68386,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -65750,25 +69552,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -65783,7 +69566,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -65794,6 +69577,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -65884,13 +69686,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -65902,6 +69697,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -66004,13 +69806,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -66022,6 +69817,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -67179,25 +70981,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -67212,7 +70995,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -67223,6 +71006,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -67313,13 +71115,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -67331,6 +71126,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -67433,13 +71235,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -67451,6 +71246,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -68847,25 +72649,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -68880,7 +72663,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -68891,6 +72674,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -68981,13 +72783,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -68999,6 +72794,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -69101,13 +72903,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -69119,6 +72914,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -70302,25 +74104,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -70335,7 +74118,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -70346,6 +74129,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -70436,13 +74238,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -70454,6 +74249,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -70556,13 +74358,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -70574,6 +74369,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -71761,25 +75563,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -71794,7 +75577,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -71805,6 +75588,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -71895,13 +75697,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -71913,6 +75708,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -72015,13 +75817,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -72033,6 +75828,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -73216,25 +77018,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -73249,7 +77032,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -73260,6 +77043,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -73350,13 +77152,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -73368,6 +77163,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -73470,13 +77272,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -73488,6 +77283,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -74963,25 +78765,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -74996,7 +78779,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -75007,6 +78790,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -75097,13 +78899,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -75115,6 +78910,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -75217,13 +79019,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -75235,6 +79030,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -75868,25 +79670,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -75901,7 +79684,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -75912,6 +79695,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -76002,13 +79804,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -76020,6 +79815,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -76122,13 +79924,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -76140,6 +79935,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -76808,25 +80610,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -76841,7 +80624,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -76852,6 +80635,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -76942,13 +80744,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -76960,6 +80755,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -77062,13 +80864,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -77080,6 +80875,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -77708,25 +81510,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -77741,7 +81524,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -77752,6 +81535,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -77842,13 +81644,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -77860,6 +81655,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -77962,13 +81764,6 @@ _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
 };
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -77980,6 +81775,13 @@ irc?: (0 | 1 );
 umdns?: (0 | 1 );
 gtin?: (0 | 1 );
 photoUrl?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareModels?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -78891,25 +82693,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -78924,7 +82707,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -78935,6 +82718,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -80204,25 +84006,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -80237,7 +84020,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -80248,6 +84031,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -81546,25 +85348,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -81579,7 +85362,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -81590,6 +85373,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -82854,25 +86656,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -82887,7 +86670,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -82898,6 +86681,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -109397,25 +113199,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -109430,7 +113213,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -109441,6 +113224,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -110186,25 +113988,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -110219,7 +114002,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -110230,6 +114013,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -110977,25 +114779,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -111010,7 +114793,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -111021,6 +114804,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -111783,25 +115585,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-wareModels?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
 wares?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -111816,7 +115599,7 @@ photoUrl?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-wareClasses?: {
+wareModels?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -111827,6 +115610,25 @@ wareGroups?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+wareClasses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };

@@ -94,7 +94,7 @@ export default async function MyOffersPage({
               <DataTable columns={columns} data={items} keyExtractor={(item: OfferItem) => item._id} />
             </CardContent>
           </Card>
-          <Pagination prevPageUrl={prevPageUrl} nextPageUrl={nextPageUrl} currentPage={page} />
+          <Pagination prevUrl={prevPageUrl} nextUrl={nextPageUrl} page={page} />
         </>
       )}
     </div>

@@ -1,5 +1,7 @@
 "use client"
 
+import { useState, useCallback } from "react"
+import { createRoot } from "react-dom/client"
 import { AlertTriangle, Loader2 } from "lucide-react"
 import {
   Dialog,
@@ -70,3 +72,70 @@ function ConfirmDialog({
 }
 
 export { ConfirmDialog }
+
+interface ConfirmDialogOptions {
+  title: string
+  description: string
+  confirmLabel?: string
+  cancelLabel?: string
+  variant?: "default" | "destructive"
+}
+
+export function confirmDialog(options: ConfirmDialogOptions): Promise<boolean> {
+  return new Promise((resolve) => {
+    const container = document.createElement("div")
+    document.body.appendChild(container)
+    const root = createRoot(container)
+
+    function DialogWrapper() {
+      const [open, setOpen] = useState(true)
+      const [loading, setLoading] = useState(false)
+
+      const handleConfirm = useCallback(() => {
+        setLoading(true)
+        resolve(true)
+        setOpen(false)
+      }, [])
+
+      const handleCancel = useCallback(() => {
+        setOpen(false)
+        resolve(false)
+      }, [])
+
+      return (
+        <ConfirmDialog
+          open={open}
+          onOpenChange={(val) => {
+            setOpen(val)
+            if (!val) resolve(false)
+          }}
+          title={options.title}
+          description={options.description}
+          confirmLabel={options.confirmLabel}
+          cancelLabel={options.cancelLabel}
+          variant={options.variant}
+          onConfirm={handleConfirm}
+          loading={loading}
+        />
+      )
+    }
+
+    root.render(<DialogWrapper />)
+
+    setTimeout(() => {
+      const timer = setInterval(() => {
+        if (!document.body.contains(container)) {
+          clearInterval(timer)
+          return
+        }
+        const dialog = container.querySelector("[role='dialog']")
+        if (!dialog) {
+          root.unmount()
+          container.remove()
+          resolve(false)
+          clearInterval(timer)
+        }
+      }, 200)
+    }, 0)
+  })
+}
