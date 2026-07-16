@@ -133,7 +133,7 @@ export const purchasingRequest_relations = {
   process: {
     schemaName: "process",
     type: "single" as RelationDataType,
-    optional: false,
+    optional: true,
     excludes: process_excludes,
     relatedRelations: {
       requests: {

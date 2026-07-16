@@ -20,6 +20,22 @@ export const submit = async (
         get: getSelection || { _id: 1, title: 1, status: 1 },
       },
     });
+
+
+    /*
+    *	@LOG @DEBUG @INFO
+    *	This log written by ::==> {{ `` }}
+    *
+    *	Please remove your log after debugging
+    */
+    console.log(" ============= ");
+    console.group("data,activeRoleId ------ ");
+    console.log();
+    console.info({ data, activeRoleId }, " ------ ");
+    console.log();
+    console.groupEnd();
+    console.log(" ============= ");
+
     return result;
   } catch (error: unknown) {
     return {

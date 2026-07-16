@@ -3,12 +3,10 @@ import {
   purchasingRequest,
   processStep,
   stepApproval,
-  budgetEncumbrance,
-  budgetLine,
-  wareModel,
-  unit,
-  user as userModel,
-  inventory,
+  purchaseOrderItem,
+  stuff,
+  ware,
+  tender,
   coreApp,
 } from "../../../mod.ts";
 import type { MyContext } from "@lib";
@@ -20,182 +18,225 @@ export const submitFn: ActFn = async (body) => {
   const { user }: MyContext = coreApp.contextFns
     .getContextModel() as MyContext;
 
-  const { activeRoleId, requestingUnitId, attachmentIds, budgetLineId, wareModelId, storeId, wareId, wareTypeId, wareClassId, wareGroupId, ...rest } =
-    set;
+  const { activeRoleId, _id, storeId, requestingUnitId: overrideUnitId } = set;
 
-  const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
+  const activeRole = (user.roles || []).find(
+    (r: { roleId: string }) => r.roleId === activeRoleId,
+  );
 
   const now = new Date();
+  const prId = new ObjectId(_id as string);
 
-  let organizationId: string | undefined;
-  const userAny = user as Record<string, unknown>;
-  const userOrg = userAny.organization as Record<string, unknown> | undefined;
-  if (userOrg?._id) {
-    organizationId = (userOrg._id as ObjectId).toString();
-  }
-  if (!organizationId && requestingUnitId) {
-    const unitDoc = await unit.findOne({
-      filters: { _id: new ObjectId(requestingUnitId as string) },
-      projection: { organization: { _id: 1 } },
-    }) as Record<string, unknown> | undefined;
-    if (unitDoc?.organization) {
-      const org = unitDoc.organization as Record<string, unknown>;
-      if (org._id) {
-        organizationId = org._id.toString();
-      }
-    }
-  }
-  if (!organizationId) {
-    const userDoc = await userModel.findOne({
-      filters: { _id: user._id },
-      projection: { organization: { _id: 1 } },
-    }) as Record<string, unknown> | undefined;
-    if (userDoc?.organization) {
-      const org = userDoc.organization as Record<string, unknown>;
-      if (org._id) {
-        organizationId = org._id.toString();
-      }
-    }
-  }
-  if (!organizationId) {
-    throwError("Could not determine organization. Please ensure you belong to an organization.");
+  // 1. Fetch Draft PR
+  const pr = await purchasingRequest.findOne({
+    filters: { _id: prId },
+    projection: {
+      _id: 1,
+      status: 1,
+      title: 1,
+      quantity: 1,
+      wareModel: { _id: 1, name: 1, enName: 1 },
+      requestingUnit: { _id: 1, name: 1 },
+    },
+  }) as Record<string, unknown>;
+
+  if (!pr) {
+    throwError("Purchasing request not found");
     return;
   }
 
-  const resolvedProcessId = await resolveProcessForPR({
-    organizationId,
-    requestingUnitId: requestingUnitId as string | undefined,
-    wareModelId: wareModelId as string,
-    wareId: wareId as string | undefined,
-    wareTypeId: wareTypeId as string | undefined,
-    wareClassId: wareClassId as string | undefined,
-    wareGroupId: wareGroupId as string | undefined,
-  });
-
-  const relations: Record<string, unknown> = {
-    process: {
-      _ids: new ObjectId(resolvedProcessId),
-      relatedRelations: { requests: true },
-    },
-    requester: {
-      _ids: user._id,
-      relatedRelations: { requests: true },
-    },
-    wareModel: {
-      _ids: new ObjectId(wareModelId as string),
-      relatedRelations: { purchasingRequests: true },
-    },
-  };
-
-  if (requestingUnitId) {
-    relations.requestingUnit = {
-      _ids: new ObjectId(requestingUnitId as string),
-      relatedRelations: { purchaseRequests: true },
-    };
+  if (pr.status !== "Draft") {
+    throwError("Only Draft purchasing requests can be submitted");
+    return;
   }
 
-  if (attachmentIds && (attachmentIds as string[]).length > 0) {
-    relations.attachments = {
-      _ids: (attachmentIds as string[]).map((id: string) => new ObjectId(id)),
-      relatedRelations: {},
-    };
+  const prWareModel = pr.wareModel as Record<string, unknown> | undefined;
+  const wareModelId = prWareModel?._id?.toString();
+  const wareModelName = (prWareModel?.name as string) || "";
+  const quantity = pr.quantity as number || 0;
+
+  if (!wareModelId) {
+    throwError("Purchasing request has no ware model");
+    return;
   }
 
-  if (budgetLineId) {
-    relations.budgetLine = {
-      _ids: new ObjectId(budgetLineId as string),
-      relatedRelations: { purchasingRequests: true },
-    };
+  // 2. Derive organization
+  const userAny = user as Record<string, unknown>;
+  const userOrgs = userAny.organizations as Array<Record<string, unknown>> | undefined;
+  if (!userOrgs || userOrgs.length === 0) {
+    throwError("Could not determine organization. Please ensure you belong to an organization.");
+    return;
+  }
+  const orgId = (userOrgs[0]._id as ObjectId).toString();
+
+  // 3. Derive requesting unit
+  const requestingUnitId = overrideUnitId
+    ? (overrideUnitId as string)
+    : (activeRole?.scopeType === "unit" && activeRole?.scopeId
+        ? activeRole.scopeId
+        : undefined);
+
+  if (!requestingUnitId) {
+    throwError("Your active role does not have an associated unit.");
+    return;
   }
 
-  // Auto-resolve wareType, wareClass, wareGroup from wareModel if not explicitly provided
-  if (wareModelId) {
-    const resolvedWareTypeId = wareTypeId || null;
-    const resolvedWareClassId = wareClassId || null;
-    const resolvedWareGroupId = wareGroupId || null;
+  // 4. Validate submitter's unit matches PR's requesting unit
+  const prRequestingUnitId = (pr.requestingUnit as Record<string, unknown>)?._id?.toString();
+  if (prRequestingUnitId && requestingUnitId !== prRequestingUnitId) {
+    throwError("You can only submit purchase requests for your own unit");
+    return;
+  }
 
-    if (!resolvedWareTypeId || !resolvedWareClassId || !resolvedWareGroupId) {
-      const wm = await wareModel.findOne({
-        filters: { _id: new ObjectId(wareModelId as string) },
-        projection: { wareType: { _id: 1 }, wareClass: { _id: 1 }, wareGroup: { _id: 1 } },
-      }) as Record<string, unknown> | undefined;
+  // 5. Tender check — if a tender exists, it must be awarded
+  const existingTender = await tender.findOne({
+    filters: { "purchasingRequest._id": prId },
+    projection: { _id: 1, status: 1 },
+  }) as Record<string, unknown> | null;
 
-      if (wm) {
-        if (!resolvedWareTypeId) {
-          const wt = wm.wareType as Record<string, unknown> | undefined;
-          if (wt?._id) {
-            relations.wareType = {
-              _ids: new ObjectId(wt._id as string),
-              relatedRelations: { purchasingRequests: true },
-            };
-          }
-        }
-        if (!resolvedWareClassId) {
-          const wc = wm.wareClass as Record<string, unknown> | undefined;
-          if (wc?._id) {
-            relations.wareClass = {
-              _ids: new ObjectId(wc._id as string),
-              relatedRelations: { purchasingRequests: true },
-            };
-          }
-        }
-        if (!resolvedWareGroupId) {
-          const wg = wm.wareGroup as Record<string, unknown> | undefined;
-          if (wg?._id) {
-            relations.wareGroup = {
-              _ids: new ObjectId(wg._id as string),
-              relatedRelations: { purchasingRequests: true },
-            };
-          }
+  if (existingTender) {
+    const tenderStatus = existingTender.status as string;
+    if (tenderStatus !== "awarded") {
+      throwError(
+        `Cannot submit: the linked tender is ${tenderStatus}. It must be awarded first.`,
+      );
+      return;
+    }
+  }
+
+  // 6. Store assignment (optional) — create PurchaseOrderItem
+  if (storeId) {
+    let unitPrice: number | undefined;
+
+    const stuffDoc = await stuff.aggregation({
+      pipeline: [
+        {
+          $match: {
+            "store._id": new ObjectId(storeId as string),
+            "wareModel._id": new ObjectId(wareModelId),
+          },
+        },
+        { $limit: 1 },
+      ],
+      projection: { price: 1, hasAbsolutePrice: 1, pricePercentage: 1, ware: { _id: 1 } },
+    }).toArray();
+
+    if (stuffDoc.length > 0) {
+      const s = stuffDoc[0] as Record<string, unknown>;
+      if (s.hasAbsolutePrice) {
+        unitPrice = s.price as number;
+      } else if (s.pricePercentage) {
+        const wareDoc = await ware.findOne({
+          filters: { _id: new ObjectId((s.ware as Record<string, unknown>)?._id as string) },
+          projection: { price: 1 },
+        }) as Record<string, unknown>;
+        if (wareDoc) {
+          unitPrice = (wareDoc.price as number) * (1 + (s.pricePercentage as number) / 100);
         }
       }
     }
 
-    if (wareTypeId) {
-      relations.wareType = {
-        _ids: new ObjectId(wareTypeId as string),
-        relatedRelations: { purchasingRequests: true },
-      };
-    }
-    if (wareClassId) {
-      relations.wareClass = {
-        _ids: new ObjectId(wareClassId as string),
-        relatedRelations: { purchasingRequests: true },
-      };
-    }
-    if (wareGroupId) {
-      relations.wareGroup = {
-        _ids: new ObjectId(wareGroupId as string),
-        relatedRelations: { purchasingRequests: true },
-      };
-    }
-  }
-
-  if (storeId) {
-    relations.store = {
-      _ids: new ObjectId(storeId as string),
-      relatedRelations: { purchasingRequests: true },
+    const poRelations: Record<string, unknown> = {
+      purchasingRequest: {
+        _ids: prId,
+        relatedRelations: { purchaseOrderItems: true },
+      },
+      wareModel: {
+        _ids: new ObjectId(wareModelId),
+        relatedRelations: { purchaseOrderItems: true },
+      },
+      assignedBy: {
+        _ids: user._id,
+        relatedRelations: {},
+      },
     };
+
+    if (storeId) {
+      poRelations.assignedFrom = {
+        _ids: new ObjectId(storeId as string),
+        relatedRelations: { purchaseOrderItems: true },
+      };
+    }
+
+    await purchaseOrderItem.insertOne({
+      doc: {
+        quantity,
+        unitPrice,
+        totalPrice: unitPrice ? unitPrice * quantity : undefined,
+        status: "assigned",
+      },
+      relations: poRelations,
+      projection: { _id: 1 },
+    });
+
+    // Link store to the PR
+    await purchasingRequest.addRelation({
+      filters: { _id: prId },
+      relations: {
+        store: {
+          _ids: new ObjectId(storeId as string),
+          relatedRelations: { purchasingRequests: true },
+        },
+      },
+      projection: { _id: 1 },
+      replace: true,
+    });
+
+    // Push item_assigned history
+    await purchasingRequest.findOneAndUpdate({
+      filter: { _id: prId },
+      update: {
+        $push: {
+          history: {
+            action: "item_assigned",
+            performed: {
+              by: user._id.toString(),
+              name: `${user.first_name} ${user.last_name}`,
+              at: now,
+              role: activeRole
+                ? {
+                  id: activeRole.roleId,
+                  name: activeRole.name,
+                  scopeType: activeRole.scopeType,
+                  scopeId: activeRole.scopeId,
+                }
+                : { id: "", name: "" },
+            },
+            details: {
+              wareModelId,
+              wareModelName,
+              quantity,
+              unitPrice,
+              assignedFromId: storeId,
+            },
+          },
+        },
+      },
+      projection: { _id: 1 },
+    });
   }
 
-  if (wareId) {
-    relations.ware = {
-      _ids: new ObjectId(wareId as string),
-      relatedRelations: { purchasingRequests: true },
-    };
-  }
-
-  const createdRequest = await purchasingRequest.insertOne({
-    doc: {
-      ...rest,
-      status: "Pending",
-      currentStep: 0,
-      requestedAt: now,
-    },
-    relations,
-    projection: { _id: 1, status: 1, currentStep: 1 },
+  // 7. Resolve process
+  const resolvedProcessId = await resolveProcessForPR({
+    organizationId: orgId,
+    requestingUnitId,
+    wareModelId,
   });
 
+  // 8. Link process to PR
+  await purchasingRequest.addRelation({
+    filters: { _id: prId },
+    relations: {
+      process: {
+        _ids: new ObjectId(resolvedProcessId),
+        relatedRelations: { requests: true },
+      },
+    },
+    projection: { _id: 1 },
+    replace: true,
+  });
+
+  // 9. Create StepApprovals for first step
   const steps = await processStep.aggregation({
     pipeline: [
       { $match: { "process._id": new ObjectId(resolvedProcessId) } },
@@ -204,65 +245,6 @@ export const submitFn: ActFn = async (body) => {
     ],
     projection: { _id: 1, assigneeGroups: 1 },
   }).toArray();
-
-  if (!createdRequest) {
-    throwError("Failed to create purchasing request");
-    return;
-  }
-
-  // Get requesting unit's current inventory for this ware model
-  let unitInventory: Record<string, unknown> | null = null;
-  if (requestingUnitId && wareModelId) {
-    unitInventory = await inventory.findOne({
-      filters: {
-        unit: new ObjectId(requestingUnitId as string),
-        "wareModel._id": new ObjectId(wareModelId as string),
-      },
-      projection: {
-        quantity: 1,
-        minQuantity: 1,
-        maxQuantity: 1,
-        wareModel: { _id: 1, name: 1 },
-      },
-    }) as Record<string, unknown> | null;
-  }
-
-  // Push "submitted" history entry
-  await purchasingRequest.findOneAndUpdate({
-    filter: { _id: createdRequest._id },
-    update: {
-      $push: {
-        history: {
-          action: "submitted",
-          performed: {
-            by: user._id.toString(),
-            name: `${user.first_name} ${user.last_name}`,
-            at: now,
-            role: activeRole ? {
-              id: activeRole.roleId,
-              name: activeRole.name,
-              scopeType: activeRole.scopeType,
-              scopeId: activeRole.scopeId,
-            } : { id: "", name: "" },
-          },
-          details: {
-            status: "Pending",
-            currentStep: 0,
-            ...(unitInventory && {
-              requestingUnitInventory: {
-                quantity: unitInventory.quantity,
-                minQuantity: unitInventory.minQuantity,
-                maxQuantity: unitInventory.maxQuantity,
-                wareModelId,
-                wareModelName: (unitInventory.wareModel as Record<string, unknown>)?.name,
-              },
-            }),
-          },
-        },
-      },
-    },
-    projection: { _id: 1 },
-  });
 
   if (steps.length > 0) {
     const firstStep = steps[0];
@@ -277,7 +259,7 @@ export const submitFn: ActFn = async (body) => {
         projection: { _id: 1 },
         relations: {
           purchasingRequest: {
-            _ids: createdRequest._id,
+            _ids: prId,
             relatedRelations: { stepApprovals: true },
           },
           processStep: {
@@ -293,46 +275,45 @@ export const submitFn: ActFn = async (body) => {
     }
   }
 
-  // Auto-create budget encumbrance if budgetLineId is provided
-  if (budgetLineId && rest.estimatedAmount) {
-    const amount = rest.estimatedAmount as number;
-    const budgetLineDoc = await budgetLine.findOne({
-      filters: { _id: new ObjectId(budgetLineId as string) },
-      projection: { _id: 1, remainingBudget: 1 },
-    });
-
-    if (budgetLineDoc) {
-      const remaining = (budgetLineDoc as Record<string, unknown>).remainingBudget as number;
-      if (remaining < amount) {
-        throwError("Insufficient remaining budget");
-        return;
-      }
-
-      await budgetEncumbrance.insertOne({
-        doc: {
-          amount,
-          status: "reserved",
-          referenceType: "purchasingRequest",
-          referenceId: createdRequest._id.toString(),
-          description: `Auto-encumbrance for PR: ${rest.title || ""}`,
-        },
-        projection: { _id: 1 },
-        relations: {
-          budgetLine: {
-            _ids: new ObjectId(budgetLineId as string),
-            relatedRelations: { encumbrances: true },
+  // 10. Update PR status and push history
+  await purchasingRequest.findOneAndUpdate({
+    filter: { _id: prId },
+    update: {
+      $set: {
+        status: "Pending",
+        currentStep: 0,
+        requestedAt: now,
+        updatedAt: now,
+      },
+      $push: {
+        history: {
+          action: "submitted",
+          performed: {
+            by: user._id.toString(),
+            name: `${user.first_name} ${user.last_name}`,
+            at: now,
+            role: activeRole
+              ? {
+                id: activeRole.roleId,
+                name: activeRole.name,
+                scopeType: activeRole.scopeType,
+                scopeId: activeRole.scopeId,
+              }
+              : { id: "", name: "" },
           },
-          createdBy: {
-            _ids: user._id,
-            relatedRelations: { budgetEncumbrances: true },
+          details: {
+            status: "Pending",
+            currentStep: 0,
+            processId: resolvedProcessId,
           },
         },
-      });
-    }
-  }
+      },
+    },
+    projection: { _id: 1 },
+  });
 
   return await purchasingRequest.findOne({
-    filters: { _id: createdRequest._id },
+    filters: { _id: prId },
     projection: get,
   });
 };

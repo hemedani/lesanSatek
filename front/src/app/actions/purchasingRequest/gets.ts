@@ -20,6 +20,21 @@ export const gets = async (
         get: getSelection || { _id: 1, title: 1, status: 1, estimatedAmount: 1, createdAt: 1 },
       },
     });
+
+    /*
+    *	@LOG @DEBUG @INFO
+    *	This log written by ::==> {{ `` }}
+    *
+    *	Please remove your log after debugging
+    */
+    console.log(" ============= ");
+    console.group("result, data, activeRoleId------ ");
+    console.log();
+    console.info({ result, data, activeRoleId }, " ------ ");
+    console.log();
+    console.groupEnd();
+    console.log(" ============= ");
+
     return result;
   } catch (error: unknown) {
     return {

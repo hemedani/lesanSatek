@@ -28,7 +28,30 @@ export const getsFn: ActFn = async (body) => {
     get,
   } = body.details;
 
+  const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
+
+  const activeRole = (user.roles || []).find(
+    (r: { roleId: string }) => r.roleId === activeRoleId,
+  ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
+
+  if (!activeRole) {
+    throwError("Active role not found");
+    return;
+  }
+
   const pipeline: Document[] = [];
+
+  if (activeRole.name === "Employee" || activeRole.name === "Ordinary") {
+    pipeline.push({
+      $match: { "requester._id": user._id },
+    });
+  } else if (activeRole.name === "UnitHead") {
+    if (activeRole.scopeType === "unit" && activeRole.scopeId) {
+      pipeline.push({
+        $match: { "requestingUnit._id": new ObjectId(activeRole.scopeId) },
+      });
+    }
+  }
 
   search &&
     pipeline.push({
@@ -81,14 +104,7 @@ export const getsFn: ActFn = async (body) => {
     });
 
   if (unitId) {
-    const { user }: MyContext = coreApp.contextFns
-      .getContextModel() as MyContext;
-
-    const activeRole = (user.roles || []).find(
-      (r: { roleId: string }) => r.roleId === activeRoleId,
-    );
-
-    if (!activeRole || !["Manager", "Admin", "OrgHead"].includes(activeRole.name)) {
+    if (!["Manager", "Admin", "OrgHead"].includes(activeRole.name)) {
       const uId = new ObjectId(unitId as string);
       const unitDoc = await unit.aggregation({
         pipeline: [{ $match: { _id: uId } }],

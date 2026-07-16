@@ -1,14 +1,35 @@
 import type { ActFn, Document } from "lesan";
 import { ObjectId } from "lesan";
-import { purchasingRequest } from "../../../mod.ts";
+import { coreApp, purchasingRequest } from "../../../mod.ts";
+import type { MyContext } from "@lib";
+import { throwError } from "../../../utils/throwError.ts";
 
 export const countFn: ActFn = async (body) => {
   const {
-    set: { status, processId, requesterId, storeId, wareId, wareTypeId, wareClassId, wareGroupId },
+    set: { status, processId, requesterId, storeId, wareId, wareTypeId, wareClassId, wareGroupId, activeRoleId },
     get,
   } = body.details;
 
+  const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
+
+  const activeRole = (user.roles || []).find(
+    (r: { roleId: string }) => r.roleId === activeRoleId,
+  ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
+
+  if (!activeRole) {
+    throwError("Active role not found");
+    return;
+  }
+
   const filters: Document = {};
+
+  if (activeRole.name === "Employee" || activeRole.name === "Ordinary") {
+    filters["requester._id"] = user._id;
+  } else if (activeRole.name === "UnitHead") {
+    if (activeRole.scopeType === "unit" && activeRole.scopeId) {
+      filters["requestingUnit._id"] = new ObjectId(activeRole.scopeId);
+    }
+  }
 
   status && (filters["status"] = status);
   processId && (filters["process._id"] = new ObjectId(processId as string));
