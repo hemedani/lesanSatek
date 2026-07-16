@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
-import { Loader2, Send, ShoppingCart, Building2, Briefcase, FileText } from "lucide-react";
+import { Loader2, Send, ShoppingCart, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
@@ -15,7 +15,6 @@ import { FormTextarea } from "@/components/form/form-textarea";
 import { FormSearchSelect } from "@/components/form/form-search-select";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 import { submit } from "@/app/actions/purchasingRequest/submit";
-import { gets as getProcesses } from "@/app/actions/process/gets";
 import { gets as getWareModels } from "@/app/actions/wareModel/gets";
 
 const newPRSchema = z.object({
@@ -23,7 +22,6 @@ const newPRSchema = z.object({
   description: z.string().optional(),
   estimatedAmount: z.string().optional(),
   quantity: z.string().min(1, "تعداد الزامی است"),
-  processId: z.string().min(1, "انتخاب فرآیند الزامی است"),
   wareModelId: z.string().min(1, "انتخاب مدل کالا الزامی است"),
   requestingUnitId: z.string().optional(),
 });
@@ -41,7 +39,6 @@ export function NewPurchasingRequestForm() {
       description: "",
       estimatedAmount: "",
       quantity: "1",
-      processId: "",
       wareModelId: "",
       requestingUnitId: "",
     },
@@ -57,7 +54,6 @@ export function NewPurchasingRequestForm() {
           description: values.description || undefined,
           estimatedAmount: values.estimatedAmount ? Number(values.estimatedAmount) : undefined,
           quantity: Number(values.quantity),
-          processId: values.processId,
           wareModelId: values.wareModelId,
           requestingUnitId: values.requestingUnitId || undefined,
         },
@@ -163,47 +159,13 @@ export function NewPurchasingRequestForm() {
           </CardContent>
         </Card>
 
-        {/* Process & Unit */}
-        <Card variant="glass">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="size-9 rounded-xl bg-electric-iris/10 flex items-center justify-center">
-                <Briefcase className="size-4.5 text-electric-iris" />
-              </div>
-              <div>
-                <CardTitle>فرآیند و واحد</CardTitle>
-                <CardDescription>انتخاب فرآیند تأیید و واحد درخواست‌کننده</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <FormSearchSelect
-              control={form.control}
-              name="processId"
-              label="فرآیند"
-              placeholder="جستجوی فرآیند..."
-              required
-              fetcher={async (search?: string) => {
-                const result = await getProcesses(
-                  { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-                  { _id: 1, name: 1, description: 1 }
-                );
-                if (!result.success || !result.body) return [];
-                return result.body.map((p: { _id?: string; name?: string; description?: string }) => ({
-                  _id: p._id || "",
-                  name: p.name || "",
-                  sublabel: p.description || undefined,
-                }));
-              }}
-            />
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-white/[0.02] border border-steel-border/30">
-              <Building2 className="size-4 text-fog/50 shrink-0" />
-              <p className="text-xs text-fog/50">
-                واحد درخواست‌کننده به‌صورت پیش‌فرض از نقش فعال شما استفاده می‌شود.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Unit Note */}
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-white/[0.02] border border-steel-border/30">
+          <p className="text-xs text-fog/50">
+            فرآیند تأیید به‌صورت خودکار بر اساس کالا و واحد درخواست‌کننده انتخاب می‌شود.
+            واحد درخواست‌کننده به‌صورت پیش‌فرض از نقش فعال شما استفاده می‌شود.
+          </p>
+        </div>
 
         {/* Actions */}
         <div className="flex items-center gap-3 pt-2">

@@ -92,6 +92,9 @@ export default async function RequestsDashboard() {
             <Link href="/requests/my-requests">
               <Button variant="outline" size="sm">درخواست‌های من</Button>
             </Link>
+            <Link href="/requests/inventory">
+              <Button variant="outline" size="sm">انبار واحد</Button>
+            </Link>
           </CardContent>
         </Card>
 

@@ -5,17 +5,18 @@ import { zodV4Resolver } from "@/lib/zod-v4-resolver"
 import { z } from "zod"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { Loader2 } from "lucide-react"
+import Link from "next/link"
+import { Loader2, ArrowRight } from "lucide-react"
 import { toast } from "sonner"
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { SearchSelect } from "@/components/form/form-search-select"
+import { SearchSelect, type SearchSelectOption } from "@/components/form/form-search-select"
 import { submit as submitPR } from "@/app/actions/purchasingRequest/submit"
-import { gets as getProcesses } from "@/app/actions/process/gets"
 import { gets as getWareModels } from "@/app/actions/wareModel/gets"
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
 
 const prSchema = z.object({
   title: z.string().min(1, "عنوان الزامی است"),
@@ -23,7 +24,6 @@ const prSchema = z.object({
   estimatedAmount: z.string().min(1, "مبلغ تخمینی الزامی است"),
   quantity: z.string().min(1, "تعداد الزامی است"),
   wareModelId: z.string().min(1, "مدل کالا الزامی است"),
-  processId: z.string().min(1, "فرآیند الزامی است"),
 })
 
 type PRData = z.infer<typeof prSchema>
@@ -40,29 +40,17 @@ export default function NewRequestPage() {
       estimatedAmount: "",
       quantity: "1",
       wareModelId: "",
-      processId: "",
     },
   })
 
-  const loadProcesses = async (query: string) => {
-    const res = await getProcesses(
-      { page: 1, limit: 20, search: query || undefined },
-      { _id: 1, name: 1 },
-    )
-    return res.success ? (res.body || []).map((p: { _id?: string; name?: string }) => ({
-      value: p._id || "",
-      label: p.name || "",
-    })) : []
-  }
-
-  const loadWareModels = async (query: string) => {
+  const loadWareModels = async (query?: string): Promise<SearchSelectOption[]> => {
     const res = await getWareModels(
-      { page: 1, limit: 20, search: query || undefined },
+      { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 20, search: query },
       { _id: 1, name: 1 },
     )
     return res.success ? (res.body || []).map((w: { _id?: string; name?: string }) => ({
-      value: w._id || "",
-      label: w.name || "",
+      _id: w._id || "",
+      name: w.name || "",
     })) : []
   }
 
@@ -71,12 +59,12 @@ export default function NewRequestPage() {
     try {
       const result = await submitPR(
         {
+          activeRoleId: getActiveRoleIdFromStore(),
           title: data.title,
           description: data.description || "",
           estimatedAmount: Number(data.estimatedAmount),
           quantity: Number(data.quantity),
           wareModelId: data.wareModelId,
-          processId: data.processId,
         },
         { _id: 1, title: 1, status: 1 },
       )
@@ -96,6 +84,14 @@ export default function NewRequestPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
+      <Link
+        href="/requests"
+        className="inline-flex items-center gap-1 text-sm text-fog hover:text-glacier transition-colors"
+      >
+        <ArrowRight className="size-4" />
+        بازگشت به داشبورد
+      </Link>
+
       <div>
         <h1 className="text-xl font-semibold text-glacier">درخواست خرید جدید</h1>
         <p className="text-sm text-fog mt-1">اطلاعات درخواست خرید خود را وارد کنید</p>
@@ -181,26 +177,6 @@ export default function NewRequestPage() {
                         placeholder="جستجوی مدل کالا..."
                         fetcher={loadWareModels}
                         label="مدل کالا"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="processId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>فرآیند</FormLabel>
-                    <FormControl>
-                      <SearchSelect
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder="انتخاب فرآیند..."
-                        fetcher={loadProcesses}
-                        label="فرآیند"
                       />
                     </FormControl>
                     <FormMessage />

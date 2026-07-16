@@ -7,7 +7,7 @@ export default function RequestsLayout({
   children: React.ReactNode
 }) {
   return (
-    <PanelGuard requiredRoles={["Employee", "Ordinary"]}>
+    <PanelGuard requiredRoles={["Employee"]}>
       <PanelLayout title="درخواست‌های خرید" description="ثبت و پیگیری درخواست‌ها">
         {children}
       </PanelLayout>
