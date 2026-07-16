@@ -38,7 +38,13 @@ export const addUserSetup = () =>
     preAct: [
       setTokens,
       setUser,
-      grantAccess([{ roles: ["Manager"] }]),
+      grantAccess([
+        { roles: ["Manager", "Admin"] },
+        { roles: ["OrgHead"], getScope: (b) => ({
+          scopeType: "organization",
+          scopeId: b?.details?.set?.organization,
+        })},
+      ]),
       checkGhostUser,
     ],
     validator: addUserValidator(),

@@ -11,7 +11,9 @@ export const updateUserSetup = () =>
     preAct: [
       setTokens,
       setUser,
-      grantAccess([{ roles: ["Manager"] }]),
+      grantAccess([
+        { roles: ["Manager", "Admin"] },
+      ]),
     ],
     validator: updateUserValidator(),
     validationRunType: "create",

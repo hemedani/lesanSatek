@@ -15,7 +15,10 @@ export const setUser = async () => {
 
   const foundedUser = await user.findOne({
     filters: { _id: new ObjectId(tokenUser._id) },
-    projection: userPureProjection,
+    projection: {
+      ...userPureProjection,
+      organization: { _id: 1 },
+    },
   });
 
   !foundedUser && throwError("user not exist");

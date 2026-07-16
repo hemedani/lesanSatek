@@ -1,6 +1,25 @@
 import { type ActFn, ObjectId } from "lesan";
-import { unit, coreApp } from "../../../mod.ts";
+import { unit, user, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
+
+const addUnitHeadRole = async (headUserId: string, unitId: string) => {
+  await user.findOneAndUpdate({
+    filter: {
+      _id: new ObjectId(headUserId),
+      roles: { $not: { $elemMatch: { name: "UnitHead", scopeType: "unit", scopeId: unitId } } },
+    },
+    update: { $push: { roles: { roleId: crypto.randomUUID(), name: "UnitHead", scopeType: "unit", scopeId: unitId } } },
+    projection: { _id: 1 },
+  });
+};
+
+const removeUnitHeadRole = async (headUserId: string, unitId: string) => {
+  await user.findOneAndUpdate({
+    filter: { _id: new ObjectId(headUserId) },
+    update: { $pull: { roles: { name: "UnitHead", scopeType: "unit", scopeId: unitId } } },
+    projection: { _id: 1 },
+  });
+};
 
 export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
@@ -59,7 +78,7 @@ export const addFn: ActFn = async (body) => {
     };
   }
 
-  return await unit.insertOne({
+  const createdUnit = await unit.insertOne({
     doc: {
       ...rest,
       ...(features !== undefined && { features }),
@@ -69,6 +88,19 @@ export const addFn: ActFn = async (body) => {
       ...(allowWareModelIds !== undefined && { allowWareModelIds }),
     },
     relations,
+    projection: { _id: 1 },
+  });
+
+  if (!createdUnit) return;
+
+  if (headId) {
+    await addUnitHeadRole(headId as string, createdUnit._id.toString());
+  }
+
+  return await unit.findOne({
+    filters: { _id: createdUnit._id },
     projection: get,
   });
 };
+
+export { addUnitHeadRole, removeUnitHeadRole };

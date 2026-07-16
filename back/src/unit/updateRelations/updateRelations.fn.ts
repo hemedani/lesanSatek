@@ -1,5 +1,5 @@
 import { type ActFn, ObjectId } from "lesan";
-import { unit } from "../../../mod.ts";
+import { unit, user } from "../../../mod.ts";
 
 export const updateRelationsFn: ActFn = async (body) => {
   const {
@@ -58,6 +58,15 @@ export const updateRelationsFn: ActFn = async (body) => {
   }
 
   if (headId !== undefined) {
+    const currentUnit = await unit.findOne({
+      filters: { _id: unitId },
+      projection: { head: { _id: 1 } },
+    }) as Record<string, unknown> | undefined;
+
+    const oldHeadId = currentUnit?.head
+      ? (currentUnit.head as Record<string, unknown>)._id?.toString()
+      : undefined;
+
     await unit.addRelation({
       filters: { _id: unitId },
       relations: {
@@ -71,6 +80,25 @@ export const updateRelationsFn: ActFn = async (body) => {
       projection: get,
       replace: true,
     });
+
+    const unitIdStr = unitId.toString();
+
+    await user.findOneAndUpdate({
+      filter: {
+        _id: new ObjectId(headId as string),
+        roles: { $not: { $elemMatch: { name: "UnitHead", scopeType: "unit", scopeId: unitIdStr } } },
+      },
+      update: { $push: { roles: { roleId: crypto.randomUUID(), name: "UnitHead", scopeType: "unit", scopeId: unitIdStr } } },
+      projection: { _id: 1 },
+    });
+
+    if (oldHeadId && oldHeadId !== headId) {
+      await user.findOneAndUpdate({
+        filter: { _id: new ObjectId(oldHeadId) },
+        update: { $pull: { roles: { name: "UnitHead", scopeType: "unit", scopeId: unitIdStr } } },
+        projection: { _id: 1 },
+      });
+    }
   }
 
   return await unit.findOne({

@@ -27,6 +27,16 @@ export const updateUserFn: ActFn = async (body) => {
     get,
   } = body.details;
 
+  let resolvedRoles = roles;
+  if (resolvedRoles) {
+    resolvedRoles = resolvedRoles.map((r: Record<string, unknown>) => ({
+      roleId: r.roleId || crypto.randomUUID(),
+      name: r.name,
+      ...(r.scopeType !== undefined && { scopeType: r.scopeType }),
+      ...(r.scopeId !== undefined && { scopeId: r.scopeId }),
+    }));
+  }
+
   const pureStruct = object(user_pure);
   const updateObj: Partial<Infer<typeof pureStruct>> = {
     updatedAt: new Date(),
@@ -35,7 +45,7 @@ export const updateUserFn: ActFn = async (body) => {
     ...(gender !== undefined && { gender }),
     ...(birth_date !== undefined && { birth_date: new Date(birth_date as string) }),
     ...(mobile !== undefined && { mobile }),
-    ...(roles !== undefined && { roles }),
+    ...(resolvedRoles !== undefined && { roles: resolvedRoles }),
     ...(email !== undefined && { email }),
     ...(password !== undefined && { password: await hash(password) }),
     ...(is_verified !== undefined && { is_verified }),

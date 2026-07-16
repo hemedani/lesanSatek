@@ -13,6 +13,8 @@ export const updateRelationsSetup = () =>
       setUser,
       grantAccess([
         { roles: ["Manager", "Admin"] },
+        { roles: ["UnitHead"] },
+        { roles: ["OrgHead"] },
       ]),
     ],
     validator: updateRelationsValidator(),

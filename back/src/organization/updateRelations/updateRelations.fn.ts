@@ -1,5 +1,5 @@
 import { type ActFn, ObjectId } from "lesan";
-import { organization } from "../../../mod.ts";
+import { organization, user } from "../../../mod.ts";
 
 export const updateRelationsFn: ActFn = async (body) => {
 	const {
@@ -8,6 +8,7 @@ export const updateRelationsFn: ActFn = async (body) => {
 	} = body.details;
 
 	const orgId = new ObjectId(_id);
+	const orgIdStr = orgId.toString();
 
 	if (removeLogo) {
 		await organization.removeRelation({
@@ -37,6 +38,15 @@ export const updateRelationsFn: ActFn = async (body) => {
 	}
 
 	if (removeHead) {
+		const currentOrg = await organization.findOne({
+			filters: { _id: orgId },
+			projection: { head: { _id: 1 } },
+		}) as Record<string, unknown> | undefined;
+
+		const oldHeadId = currentOrg?.head
+			? (currentOrg.head as Record<string, unknown>)._id?.toString()
+			: undefined;
+
 		await organization.removeRelation({
 			filters: { _id: orgId },
 			relations: {
@@ -49,9 +59,26 @@ export const updateRelationsFn: ActFn = async (body) => {
 			},
 			projection: get,
 		});
+
+		if (oldHeadId) {
+			await user.findOneAndUpdate({
+				filter: { _id: new ObjectId(oldHeadId) },
+				update: { $pull: { roles: { name: "OrgHead", scopeType: "organization", scopeId: orgIdStr } } },
+				projection: { _id: 1 },
+			});
+		}
 	}
 
 	if (head) {
+		const currentOrg = await organization.findOne({
+			filters: { _id: orgId },
+			projection: { head: { _id: 1 } },
+		}) as Record<string, unknown> | undefined;
+
+		const oldHeadId = currentOrg?.head
+			? (currentOrg.head as Record<string, unknown>)._id?.toString()
+			: undefined;
+
 		await organization.addRelation({
 			filters: { _id: orgId },
 			relations: {
@@ -65,6 +92,23 @@ export const updateRelationsFn: ActFn = async (body) => {
 			projection: get,
 			replace: true,
 		});
+
+		await user.findOneAndUpdate({
+			filter: {
+				_id: new ObjectId(head),
+				roles: { $not: { $elemMatch: { name: "OrgHead", scopeType: "organization", scopeId: orgIdStr } } },
+			},
+			update: { $push: { roles: { roleId: crypto.randomUUID(), name: "OrgHead", scopeType: "organization", scopeId: orgIdStr } } },
+			projection: { _id: 1 },
+		});
+
+		if (oldHeadId && oldHeadId !== head) {
+			await user.findOneAndUpdate({
+				filter: { _id: new ObjectId(oldHeadId) },
+				update: { $pull: { roles: { name: "OrgHead", scopeType: "organization", scopeId: orgIdStr } } },
+				projection: { _id: 1 },
+			});
+		}
 	}
 
 	if (removeState) {

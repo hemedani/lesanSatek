@@ -11,7 +11,14 @@ export const updateSetup = () =>
     preAct: [
       setTokens,
       setUser,
-      grantAccess([{ roles: ["Manager", "Admin"] }]),
+      grantAccess([
+        { roles: ["Manager", "Admin"] },
+        { roles: ["UnitHead"], getScope: (b) => ({
+          scopeType: "unit",
+          scopeId: b?.details?.set?.unitId,
+        })},
+        { roles: ["OrgHead"] },
+      ]),
     ],
     validator: updateValidator(),
   });
