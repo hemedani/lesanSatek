@@ -26,7 +26,7 @@ export const getUsers = async (
           isActive: 1,
           position: 1,
           roles: 1,
-          organization: { _id: 1, name: 1 },
+          organizations: { _id: 1, name: 1 },
         },
       },
     });

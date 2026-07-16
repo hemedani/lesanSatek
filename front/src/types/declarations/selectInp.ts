@@ -678,15 +678,13 @@ updatedAt?: Date;
 
     export type userInp = {
       avatar?: number | fileInp
-organization?: number | organizationInp
+organizations?: number | organizationInp
 state?: number | stateInp
 city?: number | cityInp
 units?: number | unitInp
       files?: number | fileInp
 createdOrganizations?: number | organizationInp
-headedOrganization?: number | organizationInp
 createdUnits?: number | unitInp
-headedUnit?: number | unitInp
 tags?: number | tagInp
 createdProcesses?: number | processInp
 requests?: number | purchasingRequestInp
@@ -736,13 +734,13 @@ mimeType: string;
 type: ("image" | "video" | "docs" | "other" );
 alt_text?: string;
 };
-organization?: {
+organizations?: {
 _id?: string;
 name: string;
 enName?: string;
 description?: string;
 isActive: boolean;
-};
+}[];
 state?: {
 _id?: string;
 name: string;
@@ -794,13 +792,6 @@ isActive: boolean;
 createdAt?: Date;
 updatedAt?: Date;
 }[];
-headedOrganization: {
-_id?: string;
-name: string;
-enName?: string;
-description?: string;
-isActive: boolean;
-}[];
 createdUnits: {
 _id?: string;
 name: string;
@@ -824,28 +815,6 @@ allowWareGroupIds?: string[];
 allowWareModelIds?: string[];
 createdAt?: Date;
 updatedAt?: Date;
-}[];
-headedUnit: {
-_id?: string;
-name: string;
-enName?: string;
-description?: string;
-isActive: boolean;
-type: ("General" | "Warehouse" | "Logistics" | "Production" | "Administration" | "Expert" );
-address?: string;
-phone?: string;
-email?: string;
-warehouseCapacity?: number;
-hasColdStorage?: boolean;
-fleetSize?: number;
-serviceRadius?: number;
-features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
-}[];
-allowWareTypeIds?: string[];
-allowWareClassIds?: string[];
-allowWareGroupIds?: string[];
-allowWareModelIds?: string[];
 }[];
 tags: {
 _id?: string;
@@ -4074,7 +4043,8 @@ allowWareClassIds?: string[];
 allowWareGroupIds?: string[];
 allowWareModelIds?: string[];
 avatar?: string;
-organization?: string;
+organizations?: string[];
+units?: string[];
 state?: string;
 city?: string;
 };
@@ -4105,7 +4075,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -4161,13 +4131,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -4189,26 +4152,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -4378,7 +4321,7 @@ allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -5004,131 +4947,6 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-logo?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-mimeType?: (0 | 1 );
-type?: (0 | 1 );
-alt_text?: (0 | 1 );
-};
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-head?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-state?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-city?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-units?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-users?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-birth_date?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-processes?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-version?: (0 | 1 );
-isActive?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -5150,231 +4968,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-organization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
-parentUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-};
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-head?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-subUnits?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-members?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-birth_date?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchaseRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stepApprovals?: {
-_id?: (0 | 1 );
-status?: (0 | 1 );
-comment?: (0 | 1 );
-decidedAt?: (0 | 1 );
-};
-inventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-warehouseInventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stockMovements?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-balanceBefore?: (0 | 1 );
-balanceAfter?: (0 | 1 );
-reason?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-goodsReceipts?: {
-_id?: (0 | 1 );
-receiptNumber?: (0 | 1 );
-description?: (0 | 1 );
-receivedAt?: (0 | 1 );
-status?: (0 | 1 );
-notes?: (0 | 1 );
-items?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-paymentOrders?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-amount?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-paidAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-consumptionRecords?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-consumedAt?: (0 | 1 );
-reason?: (0 | 1 );
-patientId?: (0 | 1 );
-notes?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 organization?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -6650,7 +6243,7 @@ allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -7276,131 +6869,6 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-logo?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-mimeType?: (0 | 1 );
-type?: (0 | 1 );
-alt_text?: (0 | 1 );
-};
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-head?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-state?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-city?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-units?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-users?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-birth_date?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-processes?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-version?: (0 | 1 );
-isActive?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -7422,231 +6890,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-organization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
-parentUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-};
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-head?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-subUnits?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-members?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-birth_date?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchaseRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stepApprovals?: {
-_id?: (0 | 1 );
-status?: (0 | 1 );
-comment?: (0 | 1 );
-decidedAt?: (0 | 1 );
-};
-inventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-warehouseInventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stockMovements?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-balanceBefore?: (0 | 1 );
-balanceAfter?: (0 | 1 );
-reason?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-goodsReceipts?: {
-_id?: (0 | 1 );
-receiptNumber?: (0 | 1 );
-description?: (0 | 1 );
-receivedAt?: (0 | 1 );
-status?: (0 | 1 );
-notes?: (0 | 1 );
-items?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-paymentOrders?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-amount?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-paidAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-consumptionRecords?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-consumedAt?: (0 | 1 );
-reason?: (0 | 1 );
-patientId?: (0 | 1 );
-notes?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 organization?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -8906,7 +8149,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -8962,13 +8205,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -8990,26 +8226,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -9178,7 +8394,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -9234,13 +8450,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -9262,26 +8471,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -9412,12 +8601,6 @@ last_name?: string;
 gender?: ("Male" | "Female" );
 birth_date?: string;
 mobile?: string;
-roles?: {
-roleId?: string;
-name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary" );
-scopeType?: ("organization" | "unit" );
-scopeId?: string;
-}[];
 email?: string;
 password?: string;
 is_verified?: boolean;
@@ -9458,7 +8641,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -9514,13 +8697,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -9542,26 +8718,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -9729,7 +8885,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -9785,13 +8941,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -9813,26 +8962,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -10012,7 +9141,7 @@ allowWareModelIds?: (0 | 1 );
 roles?: (0 | 1 );
 };
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -10638,131 +9767,6 @@ createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-logo?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-mimeType?: (0 | 1 );
-type?: (0 | 1 );
-alt_text?: (0 | 1 );
-};
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-head?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-state?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-city?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-};
-units?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-users?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-birth_date?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-processes?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-version?: (0 | 1 );
-isActive?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -10784,231 +9788,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-organization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
-parentUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-};
-creator?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-head?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-};
-subUnits?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-members?: {
-_id?: (0 | 1 );
-first_name?: (0 | 1 );
-last_name?: (0 | 1 );
-gender?: (0 | 1 );
-birth_date?: (0 | 1 );
-mobile?: (0 | 1 );
-email?: (0 | 1 );
-is_verified?: (0 | 1 );
-position?: (0 | 1 );
-isActive?: (0 | 1 );
-isGhost?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
-roles?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-budgetLines?: {
-_id?: (0 | 1 );
-code?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-totalAllocated?: (0 | 1 );
-totalEncumbered?: (0 | 1 );
-totalSpent?: (0 | 1 );
-remainingBudget?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-purchaseRequests?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-description?: (0 | 1 );
-estimatedAmount?: (0 | 1 );
-status?: (0 | 1 );
-currentStep?: (0 | 1 );
-requestedAt?: (0 | 1 );
-completedAt?: (0 | 1 );
-quantity?: (0 | 1 );
-history?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stepApprovals?: {
-_id?: (0 | 1 );
-status?: (0 | 1 );
-comment?: (0 | 1 );
-decidedAt?: (0 | 1 );
-};
-inventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-warehouseInventories?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-minQuantity?: (0 | 1 );
-maxQuantity?: (0 | 1 );
-batchNo?: (0 | 1 );
-expirationDate?: (0 | 1 );
-location?: (0 | 1 );
-lastCountedAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-stockMovements?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-balanceBefore?: (0 | 1 );
-balanceAfter?: (0 | 1 );
-reason?: (0 | 1 );
-referenceType?: (0 | 1 );
-referenceId?: (0 | 1 );
-description?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-goodsReceipts?: {
-_id?: (0 | 1 );
-receiptNumber?: (0 | 1 );
-description?: (0 | 1 );
-receivedAt?: (0 | 1 );
-status?: (0 | 1 );
-notes?: (0 | 1 );
-items?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-paymentOrders?: {
-_id?: (0 | 1 );
-title?: (0 | 1 );
-amount?: (0 | 1 );
-description?: (0 | 1 );
-status?: (0 | 1 );
-paidAt?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-consumptionRecords?: {
-_id?: (0 | 1 );
-quantity?: (0 | 1 );
-consumedAt?: (0 | 1 );
-reason?: (0 | 1 );
-patientId?: (0 | 1 );
-notes?: (0 | 1 );
-createdAt?: (0 | 1 );
-updatedAt?: (0 | 1 );
-};
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 organization?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -12262,7 +11041,7 @@ set: {
 activeRoleId: string;
 _id: string;
 avatar?: string;
-organization?: string;
+organizations?: string[];
 state?: string;
 city?: string;
 units?: string[];
@@ -12294,7 +11073,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -12350,13 +11129,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -12378,26 +11150,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -12536,6 +11288,1940 @@ userByLevel?: (0 | 1 );
 };
 
           
+            addOrRemoveRoles: {
+set: {
+activeRoleId: string;
+_id: string;
+addRoles?: {
+roleId?: string;
+name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary" );
+scopeType?: ("organization" | "unit" );
+scopeId?: string;
+}[];
+removeRoles?: {
+roleId?: string;
+name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary" );
+scopeType?: ("organization" | "unit" );
+scopeId?: string;
+}[];
+};
+get: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+avatar?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+uploader?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+};
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+logo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+units?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+processes?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+cities?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+organizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stores?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+address?: (0 | 1 );
+location?: (0 | 1 );
+contact?: (0 | 1 );
+logoUrl?: (0 | 1 );
+ceoname?: (0 | 1 );
+workingHours?: (0 | 1 );
+cityDeliveryTime?: (0 | 1 );
+stateDeliveryTime?: (0 | 1 );
+selectedStateDeliveryTime?: (0 | 1 );
+countryDeliveryTime?: (0 | 1 );
+availableFastDeliveryTime?: (0 | 1 );
+fastDelivery?: (0 | 1 );
+isAvailableInHolidays?: (0 | 1 );
+status?: (0 | 1 );
+updateStatusDescription?: (0 | 1 );
+score?: (0 | 1 );
+totalSoldAmount?: (0 | 1 );
+totalSoldNum?: (0 | 1 );
+email?: (0 | 1 );
+storeType?: (0 | 1 );
+economicCode?: (0 | 1 );
+postalCode?: (0 | 1 );
+lastNewspaperUrl?: (0 | 1 );
+certificateUrl?: (0 | 1 );
+bankCardNumber?: (0 | 1 );
+shebaNumber?: (0 | 1 );
+nameOfAccountHolder?: (0 | 1 );
+bankName?: (0 | 1 );
+certificateNumber?: (0 | 1 );
+registerNumber?: (0 | 1 );
+certificateExpireDate?: (0 | 1 );
+legalPerson?: (0 | 1 );
+nationalId?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+units?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+};
+parentUnit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+subUnits?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+members?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stepApprovals?: {
+_id?: (0 | 1 );
+status?: (0 | 1 );
+comment?: (0 | 1 );
+decidedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+warehouseInventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+goodsReceipts?: {
+_id?: (0 | 1 );
+receiptNumber?: (0 | 1 );
+description?: (0 | 1 );
+receivedAt?: (0 | 1 );
+status?: (0 | 1 );
+notes?: (0 | 1 );
+items?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+paymentOrders?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+paidAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+files?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+size?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+uploader?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+};
+createdOrganizations?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+logo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+units?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+processes?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+createdUnits?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+};
+parentUnit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+subUnits?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+members?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stepApprovals?: {
+_id?: (0 | 1 );
+status?: (0 | 1 );
+comment?: (0 | 1 );
+decidedAt?: (0 | 1 );
+};
+inventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+warehouseInventories?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+stockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+goodsReceipts?: {
+_id?: (0 | 1 );
+receiptNumber?: (0 | 1 );
+description?: (0 | 1 );
+receivedAt?: (0 | 1 );
+status?: (0 | 1 );
+notes?: (0 | 1 );
+items?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+paymentOrders?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+paidAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+tags?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+color?: (0 | 1 );
+icon?: (0 | 1 );
+registrar?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+};
+createdProcesses?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+};
+createdBy?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+steps?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+stepType?: (0 | 1 );
+order?: (0 | 1 );
+required?: (0 | 1 );
+groupsOperator?: (0 | 1 );
+assigneeGroups?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+requests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+requests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+process?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+};
+requester?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+requestingUnit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+attachments?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+};
+budgetLine?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+store?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+address?: (0 | 1 );
+location?: (0 | 1 );
+contact?: (0 | 1 );
+logoUrl?: (0 | 1 );
+ceoname?: (0 | 1 );
+workingHours?: (0 | 1 );
+cityDeliveryTime?: (0 | 1 );
+stateDeliveryTime?: (0 | 1 );
+selectedStateDeliveryTime?: (0 | 1 );
+countryDeliveryTime?: (0 | 1 );
+availableFastDeliveryTime?: (0 | 1 );
+fastDelivery?: (0 | 1 );
+isAvailableInHolidays?: (0 | 1 );
+status?: (0 | 1 );
+updateStatusDescription?: (0 | 1 );
+score?: (0 | 1 );
+totalSoldAmount?: (0 | 1 );
+totalSoldNum?: (0 | 1 );
+email?: (0 | 1 );
+storeType?: (0 | 1 );
+economicCode?: (0 | 1 );
+postalCode?: (0 | 1 );
+lastNewspaperUrl?: (0 | 1 );
+certificateUrl?: (0 | 1 );
+bankCardNumber?: (0 | 1 );
+shebaNumber?: (0 | 1 );
+nameOfAccountHolder?: (0 | 1 );
+bankName?: (0 | 1 );
+certificateNumber?: (0 | 1 );
+registerNumber?: (0 | 1 );
+certificateExpireDate?: (0 | 1 );
+legalPerson?: (0 | 1 );
+nationalId?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareClass?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+wareGroup?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+stepApprovals?: {
+_id?: (0 | 1 );
+status?: (0 | 1 );
+comment?: (0 | 1 );
+decidedAt?: (0 | 1 );
+};
+purchaseOrderItems?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+unitPrice?: (0 | 1 );
+totalPrice?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+tender?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+deadline?: (0 | 1 );
+};
+goodsReceipts?: {
+_id?: (0 | 1 );
+receiptNumber?: (0 | 1 );
+description?: (0 | 1 );
+receivedAt?: (0 | 1 );
+status?: (0 | 1 );
+notes?: (0 | 1 );
+items?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+paymentOrders?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+paidAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+stepDecisions?: {
+_id?: (0 | 1 );
+status?: (0 | 1 );
+comment?: (0 | 1 );
+decidedAt?: (0 | 1 );
+purchasingRequest?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+};
+processStep?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+stepType?: (0 | 1 );
+order?: (0 | 1 );
+required?: (0 | 1 );
+groupsOperator?: (0 | 1 );
+assigneeGroups?: (0 | 1 );
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+decidedBy?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+};
+createdTenders?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+deadline?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+purchasingRequest?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+};
+createdBy?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+assignedVendors?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+address?: (0 | 1 );
+location?: (0 | 1 );
+contact?: (0 | 1 );
+logoUrl?: (0 | 1 );
+ceoname?: (0 | 1 );
+workingHours?: (0 | 1 );
+cityDeliveryTime?: (0 | 1 );
+stateDeliveryTime?: (0 | 1 );
+selectedStateDeliveryTime?: (0 | 1 );
+countryDeliveryTime?: (0 | 1 );
+availableFastDeliveryTime?: (0 | 1 );
+fastDelivery?: (0 | 1 );
+isAvailableInHolidays?: (0 | 1 );
+status?: (0 | 1 );
+updateStatusDescription?: (0 | 1 );
+score?: (0 | 1 );
+totalSoldAmount?: (0 | 1 );
+totalSoldNum?: (0 | 1 );
+email?: (0 | 1 );
+storeType?: (0 | 1 );
+economicCode?: (0 | 1 );
+postalCode?: (0 | 1 );
+lastNewspaperUrl?: (0 | 1 );
+certificateUrl?: (0 | 1 );
+bankCardNumber?: (0 | 1 );
+shebaNumber?: (0 | 1 );
+nameOfAccountHolder?: (0 | 1 );
+bankName?: (0 | 1 );
+certificateNumber?: (0 | 1 );
+registerNumber?: (0 | 1 );
+certificateExpireDate?: (0 | 1 );
+legalPerson?: (0 | 1 );
+nationalId?: (0 | 1 );
+};
+offers?: {
+_id?: (0 | 1 );
+price?: (0 | 1 );
+deliveryTime?: (0 | 1 );
+paymentTerms?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+submittedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+createdStockMovements?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+balanceBefore?: (0 | 1 );
+balanceAfter?: (0 | 1 );
+reason?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+createdBy?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+store?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+address?: (0 | 1 );
+location?: (0 | 1 );
+contact?: (0 | 1 );
+logoUrl?: (0 | 1 );
+ceoname?: (0 | 1 );
+workingHours?: (0 | 1 );
+cityDeliveryTime?: (0 | 1 );
+stateDeliveryTime?: (0 | 1 );
+selectedStateDeliveryTime?: (0 | 1 );
+countryDeliveryTime?: (0 | 1 );
+availableFastDeliveryTime?: (0 | 1 );
+fastDelivery?: (0 | 1 );
+isAvailableInHolidays?: (0 | 1 );
+status?: (0 | 1 );
+updateStatusDescription?: (0 | 1 );
+score?: (0 | 1 );
+totalSoldAmount?: (0 | 1 );
+totalSoldNum?: (0 | 1 );
+email?: (0 | 1 );
+storeType?: (0 | 1 );
+economicCode?: (0 | 1 );
+postalCode?: (0 | 1 );
+lastNewspaperUrl?: (0 | 1 );
+certificateUrl?: (0 | 1 );
+bankCardNumber?: (0 | 1 );
+shebaNumber?: (0 | 1 );
+nameOfAccountHolder?: (0 | 1 );
+bankName?: (0 | 1 );
+certificateNumber?: (0 | 1 );
+registerNumber?: (0 | 1 );
+certificateExpireDate?: (0 | 1 );
+legalPerson?: (0 | 1 );
+nationalId?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+};
+receivedGoods?: {
+_id?: (0 | 1 );
+receiptNumber?: (0 | 1 );
+description?: (0 | 1 );
+receivedAt?: (0 | 1 );
+status?: (0 | 1 );
+notes?: (0 | 1 );
+items?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+purchasingRequest?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+};
+receivedBy?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+receivingUnit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+};
+issuedPaymentOrders?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+paidAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+purchasingRequest?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+};
+issuedBy?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+approvedBy?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+payTo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+address?: (0 | 1 );
+location?: (0 | 1 );
+contact?: (0 | 1 );
+logoUrl?: (0 | 1 );
+ceoname?: (0 | 1 );
+workingHours?: (0 | 1 );
+cityDeliveryTime?: (0 | 1 );
+stateDeliveryTime?: (0 | 1 );
+selectedStateDeliveryTime?: (0 | 1 );
+countryDeliveryTime?: (0 | 1 );
+availableFastDeliveryTime?: (0 | 1 );
+fastDelivery?: (0 | 1 );
+isAvailableInHolidays?: (0 | 1 );
+status?: (0 | 1 );
+updateStatusDescription?: (0 | 1 );
+score?: (0 | 1 );
+totalSoldAmount?: (0 | 1 );
+totalSoldNum?: (0 | 1 );
+email?: (0 | 1 );
+storeType?: (0 | 1 );
+economicCode?: (0 | 1 );
+postalCode?: (0 | 1 );
+lastNewspaperUrl?: (0 | 1 );
+certificateUrl?: (0 | 1 );
+bankCardNumber?: (0 | 1 );
+shebaNumber?: (0 | 1 );
+nameOfAccountHolder?: (0 | 1 );
+bankName?: (0 | 1 );
+certificateNumber?: (0 | 1 );
+registerNumber?: (0 | 1 );
+certificateExpireDate?: (0 | 1 );
+legalPerson?: (0 | 1 );
+nationalId?: (0 | 1 );
+};
+financialUnit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+};
+approvedPaymentOrders?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+paidAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+purchasingRequest?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+quantity?: (0 | 1 );
+history?: (0 | 1 );
+};
+issuedBy?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+approvedBy?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+payTo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+address?: (0 | 1 );
+location?: (0 | 1 );
+contact?: (0 | 1 );
+logoUrl?: (0 | 1 );
+ceoname?: (0 | 1 );
+workingHours?: (0 | 1 );
+cityDeliveryTime?: (0 | 1 );
+stateDeliveryTime?: (0 | 1 );
+selectedStateDeliveryTime?: (0 | 1 );
+countryDeliveryTime?: (0 | 1 );
+availableFastDeliveryTime?: (0 | 1 );
+fastDelivery?: (0 | 1 );
+isAvailableInHolidays?: (0 | 1 );
+status?: (0 | 1 );
+updateStatusDescription?: (0 | 1 );
+score?: (0 | 1 );
+totalSoldAmount?: (0 | 1 );
+totalSoldNum?: (0 | 1 );
+email?: (0 | 1 );
+storeType?: (0 | 1 );
+economicCode?: (0 | 1 );
+postalCode?: (0 | 1 );
+lastNewspaperUrl?: (0 | 1 );
+certificateUrl?: (0 | 1 );
+bankCardNumber?: (0 | 1 );
+shebaNumber?: (0 | 1 );
+nameOfAccountHolder?: (0 | 1 );
+bankName?: (0 | 1 );
+certificateNumber?: (0 | 1 );
+registerNumber?: (0 | 1 );
+certificateExpireDate?: (0 | 1 );
+legalPerson?: (0 | 1 );
+nationalId?: (0 | 1 );
+};
+financialUnit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+};
+budgetAllocations?: {
+_id?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+allocatedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+budgetLine?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+};
+allocatedBy?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+};
+budgetEncumbrances?: {
+_id?: (0 | 1 );
+amount?: (0 | 1 );
+status?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+budgetLine?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+};
+createdBy?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+};
+consumptionRecords?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+consumedAt?: (0 | 1 );
+reason?: (0 | 1 );
+patientId?: (0 | 1 );
+notes?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+};
+consumedBy?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+inventory?: {
+_id?: (0 | 1 );
+quantity?: (0 | 1 );
+minQuantity?: (0 | 1 );
+maxQuantity?: (0 | 1 );
+batchNo?: (0 | 1 );
+expirationDate?: (0 | 1 );
+location?: (0 | 1 );
+lastCountedAt?: (0 | 1 );
+};
+wareModel?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+ware?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+brand?: (0 | 1 );
+irc?: (0 | 1 );
+umdns?: (0 | 1 );
+gtin?: (0 | 1 );
+photoUrl?: (0 | 1 );
+};
+};
+};
+};
+
+          
           }
 
         
@@ -12620,7 +13306,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -12676,13 +13362,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -12704,26 +13383,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -12889,7 +13548,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -12945,13 +13604,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -12973,26 +13625,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -13153,7 +13785,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -13209,13 +13841,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -13237,26 +13862,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -13515,7 +14120,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -13571,13 +14176,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -13599,26 +14197,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -13783,7 +14361,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -13839,13 +14417,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -13867,26 +14438,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -14283,7 +14834,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -14339,13 +14890,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -14367,26 +14911,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -14529,7 +15053,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -14585,13 +15109,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -14613,26 +15130,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -15126,7 +15623,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -15182,13 +15679,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -15210,26 +15700,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -15614,7 +16084,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -15670,13 +16140,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -15698,26 +16161,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -15860,7 +16303,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -15916,13 +16359,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -15944,26 +16380,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -16457,7 +16873,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -16513,13 +16929,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -16541,26 +16950,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -17023,8 +17412,6 @@ activeRoleId: string;
 _id: string;
 logo?: string;
 removeLogo?: boolean;
-head?: string;
-removeHead?: boolean;
 state?: string;
 removeState?: boolean;
 city?: string;
@@ -17087,7 +17474,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -17143,13 +17530,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -17171,26 +17551,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -17333,7 +17693,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -17389,13 +17749,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -17417,26 +17770,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -17930,7 +18263,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -17986,13 +18319,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -18014,26 +18340,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -18899,7 +19205,6 @@ _id: string;
 organizationId?: string;
 parentUnitId?: string;
 creatorId?: string;
-headId?: string;
 };
 get: {
 _id?: (0 | 1 );
@@ -19296,7 +19601,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -19352,13 +19657,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -19380,26 +19678,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -19542,7 +19820,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -19598,13 +19876,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -19626,26 +19897,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -20018,7 +20269,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -20074,13 +20325,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -20102,26 +20346,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -21486,7 +21710,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -21542,13 +21766,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -21570,26 +21787,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -21732,7 +21929,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -21788,13 +21985,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -21816,26 +22006,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -22208,7 +22378,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -22264,13 +22434,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -22292,26 +22455,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -23683,7 +23826,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -23739,13 +23882,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -23767,26 +23903,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -23929,7 +24045,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -23985,13 +24101,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -24013,26 +24122,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -24405,7 +24494,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -24461,13 +24550,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -24489,26 +24571,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -25932,7 +25994,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -25988,13 +26050,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -26016,26 +26071,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -27426,7 +27461,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -27482,13 +27517,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -27510,26 +27538,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -28926,7 +28934,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -28982,13 +28990,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -29010,26 +29011,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -30444,7 +30425,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -30500,13 +30481,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -30528,26 +30502,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -31939,7 +31893,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -31995,13 +31949,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -32023,26 +31970,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -33990,7 +33917,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -34046,13 +33973,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -34074,26 +33994,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -36190,7 +36090,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -36246,13 +36146,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -36274,26 +36167,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -38546,7 +38419,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -38602,13 +38475,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -38630,26 +38496,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -40571,7 +40417,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -40627,13 +40473,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -40655,26 +40494,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -42555,7 +42374,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -42611,13 +42430,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -42639,26 +42451,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -44554,7 +44346,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -44610,13 +44402,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -44638,26 +44423,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -46659,7 +46424,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -46715,13 +46480,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -46743,26 +46501,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -48798,7 +48536,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -48854,13 +48592,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -48882,26 +48613,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -49275,7 +48986,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -49331,13 +49042,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -49359,26 +49063,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -49749,7 +49433,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -49805,13 +49489,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -49833,26 +49510,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -50304,7 +49961,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -50360,13 +50017,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -50388,26 +50038,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -50925,7 +50555,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -50981,13 +50611,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -51009,26 +50632,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -51542,7 +51145,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -51598,13 +51201,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -51626,26 +51222,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -52157,7 +51733,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -52213,13 +51789,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -52241,26 +51810,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -53370,7 +52919,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -53426,13 +52975,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -53454,26 +52996,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -54567,7 +54089,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -54623,13 +54145,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -54651,26 +54166,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -55761,7 +55256,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -55817,13 +55312,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -55845,26 +55333,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -57111,7 +56579,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -57167,13 +56635,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -57195,26 +56656,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -58236,7 +57677,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -58292,13 +57733,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -58320,26 +57754,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -59358,7 +58772,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -59414,13 +58828,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -59442,26 +58849,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -60478,7 +59865,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -60534,13 +59921,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -60562,26 +59942,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -61755,7 +61115,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -61811,13 +61171,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -61839,26 +61192,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -62880,7 +62213,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -62936,13 +62269,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -62964,26 +62290,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -64002,7 +63308,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -64058,13 +63364,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -64086,26 +63385,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -65124,7 +64403,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -65180,13 +64459,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -65208,26 +64480,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -66443,7 +65695,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -66499,13 +65751,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -66527,26 +65772,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -67877,7 +67102,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -67933,13 +67158,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -67961,26 +67179,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -69308,7 +68506,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -69364,13 +68562,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -69392,26 +68583,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -70737,7 +69908,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -70793,13 +69964,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -70821,26 +69985,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -72385,7 +71529,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -72441,13 +71585,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -72469,26 +71606,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -73840,7 +72957,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -73896,13 +73013,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -73924,26 +73034,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -75299,7 +74389,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -75355,13 +74445,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -75383,26 +74466,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -76754,7 +75817,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -76810,13 +75873,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -76838,26 +75894,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -82328,7 +81364,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -82384,13 +81420,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -82412,26 +81441,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -83641,7 +82650,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -83697,13 +82706,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -83725,26 +82727,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -84983,7 +83965,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -85039,13 +84021,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -85067,26 +84042,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -86291,7 +85246,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -86347,13 +85302,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -86375,26 +85323,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -88107,7 +87035,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -88163,13 +87091,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -88191,26 +87112,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -88808,7 +87709,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -88864,13 +87765,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -88892,26 +87786,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -89506,7 +88380,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -89562,13 +88436,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -89590,26 +88457,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -90268,7 +89115,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -90324,13 +89171,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -90352,26 +89192,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -91273,7 +90093,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -91329,13 +90149,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -91357,26 +90170,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -92278,7 +91071,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -92334,13 +91127,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -92362,26 +91148,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -93279,7 +92045,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -93335,13 +92101,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -93363,26 +92122,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -94228,7 +92967,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -94284,13 +93023,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -94312,26 +93044,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -94925,7 +93637,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -94981,13 +93693,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -95009,26 +93714,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -95621,7 +94306,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -95677,13 +94362,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -95705,26 +94383,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -96316,7 +94974,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -96372,13 +95030,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -96400,26 +95051,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -97031,7 +95662,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -97087,13 +95718,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -97115,26 +95739,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -97722,7 +96326,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -97778,13 +96382,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -97806,26 +96403,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -103759,7 +102336,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -103815,13 +102392,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -103843,26 +102413,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -104749,7 +103299,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -104805,13 +103355,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -104833,26 +103376,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -105807,7 +104330,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -105863,13 +104386,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -105891,26 +104407,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -106489,7 +104985,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -106545,13 +105041,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -106573,26 +105062,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -107181,7 +105650,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -107237,13 +105706,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -107265,26 +105727,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -108005,7 +106447,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -108061,13 +106503,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -108089,26 +106524,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -108251,7 +106666,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -108307,13 +106722,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -108335,26 +106743,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -109112,7 +107500,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -109168,13 +107556,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -109196,26 +107577,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -109358,7 +107719,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -109414,13 +107775,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -109442,26 +107796,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -110222,7 +108556,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -110278,13 +108612,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -110306,26 +108633,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -110468,7 +108775,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -110524,13 +108831,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -110552,26 +108852,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -111322,7 +109602,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -111378,13 +109658,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -111406,26 +109679,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -111568,7 +109821,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -111624,13 +109877,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -111652,26 +109898,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -116151,7 +114377,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -116207,13 +114433,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -116235,26 +114454,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -116500,7 +114699,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -116556,13 +114755,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -116584,26 +114776,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -116870,7 +115042,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -116926,13 +115098,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -116954,26 +115119,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -117221,7 +115366,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -117277,13 +115422,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -117305,26 +115443,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -117567,7 +115685,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -117623,13 +115741,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -117651,26 +115762,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -117913,7 +116004,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -117969,13 +116060,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -117997,26 +116081,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -118430,7 +116494,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -118486,13 +116550,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -118514,26 +116571,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -119304,7 +117341,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -119360,13 +117397,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -119388,26 +117418,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );
@@ -120186,7 +118196,7 @@ mimeType?: (0 | 1 );
 type?: (0 | 1 );
 alt_text?: (0 | 1 );
 };
-organization?: {
+organizations?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
 enName?: (0 | 1 );
@@ -120242,13 +118252,6 @@ isActive?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
-headedOrganization?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-};
 createdUnits?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -120270,26 +118273,6 @@ allowWareGroupIds?: (0 | 1 );
 allowWareModelIds?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
-};
-headedUnit?: {
-_id?: (0 | 1 );
-name?: (0 | 1 );
-enName?: (0 | 1 );
-description?: (0 | 1 );
-isActive?: (0 | 1 );
-type?: (0 | 1 );
-address?: (0 | 1 );
-phone?: (0 | 1 );
-email?: (0 | 1 );
-warehouseCapacity?: (0 | 1 );
-hasColdStorage?: (0 | 1 );
-fleetSize?: (0 | 1 );
-serviceRadius?: (0 | 1 );
-features?: (0 | 1 );
-allowWareTypeIds?: (0 | 1 );
-allowWareClassIds?: (0 | 1 );
-allowWareGroupIds?: (0 | 1 );
-allowWareModelIds?: (0 | 1 );
 };
 tags?: {
 _id?: (0 | 1 );

@@ -3,7 +3,7 @@ import { user } from "../../../mod.ts";
 
 export const updateUserRelationsFn: ActFn = async (body) => {
   const {
-    set: { _id, avatar, organization, state, city, units },
+    set: { _id, avatar, organizations, state, city, units },
     get,
   } = body.details;
 
@@ -23,12 +23,12 @@ export const updateUserRelationsFn: ActFn = async (body) => {
     });
   }
 
-  if (organization) {
+  if (organizations) {
     await user.addRelation({
       filters: { _id: modelId },
       relations: {
-        organization: {
-          _ids: new ObjectId(organization as string),
+        organizations: {
+          _ids: (organizations as string[]).map((id: string) => new ObjectId(id)),
           relatedRelations: {
             users: true,
           },

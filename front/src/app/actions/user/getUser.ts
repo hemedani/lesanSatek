@@ -27,7 +27,7 @@ export const getUser = async (
           position: 1,
           roles: 1,
           features: 1,
-          organization: { _id: 1, name: 1 },
+          organizations: { _id: 1, name: 1 },
           avatar: { _id: 1, name: 1 },
         },
       },

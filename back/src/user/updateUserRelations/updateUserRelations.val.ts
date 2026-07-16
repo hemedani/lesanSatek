@@ -8,7 +8,7 @@ export const updateUserRelationsValidator = () => {
       ...activeRoleMixin,
       _id: objectIdValidation,
       avatar: optional(objectIdValidation),
-      organization: optional(objectIdValidation),
+      organizations: optional(array(objectIdValidation)),
       state: optional(objectIdValidation),
       city: optional(objectIdValidation),
       units: optional(array(objectIdValidation)),

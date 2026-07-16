@@ -17,7 +17,7 @@ export const setUser = async () => {
     filters: { _id: new ObjectId(tokenUser._id) },
     projection: {
       ...userPureProjection,
-      organization: { _id: 1 },
+      organizations: { _id: 1 },
     },
   });
 

@@ -14,10 +14,12 @@ export const updateUserRelationsSetup = () =>
       setUser,
       grantAccess([
         { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead"], getScope: (b) => ({
-          scopeType: "organization",
-          scopeId: b?.details?.set?.organization,
-        })},
+        { roles: ["OrgHead"], getScope: (b) => {
+          const orgs = b?.details?.set?.organizations as string[] | undefined;
+          return orgs?.[0]
+            ? { scopeType: "organization", scopeId: orgs[0] }
+            : null;
+        }},
       ]),
       checkGhostUser,
     ],

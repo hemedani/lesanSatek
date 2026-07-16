@@ -10,8 +10,6 @@ import { selectStruct } from "../../../mod.ts";
 import { activeRoleMixin } from "@lib";
 import {
   feature_enums,
-  role_emums,
-  role_scope_type_emums,
   user_genders,
 } from "@model";
 
@@ -25,12 +23,6 @@ export const updateUserValidator = () => {
       gender: optional(user_genders),
       birth_date: optional(string()),
       mobile: optional(string()),
-      roles: optional(array(object({
-        roleId: optional(string()),
-        name: role_emums,
-        scopeType: optional(role_scope_type_emums),
-        scopeId: optional(string()),
-      }))),
       email: optional(string()),
       password: optional(string()),
       is_verified: optional(boolean()),

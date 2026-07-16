@@ -9,7 +9,8 @@ export const addUserFn: ActFn = async (body) => {
   const {
     activeRoleId,
     avatar,
-    organization,
+    organizations,
+    units,
     state,
     city,
     password,
@@ -35,13 +36,46 @@ export const addUserFn: ActFn = async (body) => {
       _ids: new ObjectId(avatar as string),
     });
 
-  organization &&
-    (relations.organization = {
-      _ids: new ObjectId(organization as string),
+  const orgIds: string[] = [...(organizations as string[] || [])];
+  const unitIds: string[] = [...(units as string[] || [])];
+
+  if (rolesWithIds) {
+    for (const role of rolesWithIds) {
+      if (
+        role.name === "UnitHead" && role.scopeType === "unit" && role.scopeId
+      ) {
+        if (!unitIds.some((id) => id === role.scopeId)) {
+          unitIds.push(role.scopeId);
+        }
+      }
+      if (
+        role.name === "OrgHead" &&
+        role.scopeType === "organization" && role.scopeId
+      ) {
+        if (!orgIds.some((id) => id === role.scopeId)) {
+          orgIds.push(role.scopeId);
+        }
+      }
+    }
+  }
+
+  if (orgIds.length > 0) {
+    relations.organizations = {
+      _ids: orgIds.map((id: string) => new ObjectId(id)),
       relatedRelations: {
         users: true,
       },
-    });
+    };
+  }
+
+  if (unitIds.length > 0) {
+    relations.units = {
+      _ids: unitIds.map((id: string) => new ObjectId(id)),
+      relatedRelations: {
+        members: true,
+      },
+    };
+  }
 
   state &&
     (relations.state = {

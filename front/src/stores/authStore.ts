@@ -12,10 +12,9 @@ interface User {
   isGhost: boolean;
   position?: string;
   avatar?: { _id: string; name: string; url?: string };
-  organization?: { _id: string; name: string };
+  organizations?: { _id: string; name: string }[];
   features: { feature: string }[];
   roles: { roleId: string; name: string; scopeType?: string; scopeId?: string }[];
-  headedUnit?: { _id: string; name: string };
   units?: { _id: string; name: string }[];
 }
 

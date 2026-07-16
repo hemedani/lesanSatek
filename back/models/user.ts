@@ -10,7 +10,7 @@
  * Pure fields: first_name, last_name, gender, birth_date, mobile, email,
  *   password, is_verified, position, isActive, isGhost, features,
  *   allowWareTypeIds, allowWareClassIds, allowWareGroupIds, allowWareModelIds, roles
- * Relations: avatar (File), organization (Organization), units (Unit[])
+ * Relations: avatar (File), organizations (Organization[]), units (Unit[])
  *
  * @example
  * // A Manager user (Ali Rezaei) — the Purchasing Manager at org_beheshti
@@ -39,7 +39,9 @@
  *   ],
  *   // Relations (populated via Lesan):
  *   // avatar → { _id: ObjectId("file_avatar"), name: "ali_rezaei.jpg", type: "image" }
- *   // organization → { _id: ObjectId("org_beheshti"), name: "بیمارستان شهید بهشتی" }
+ *   // organizations → [
+ *   //   { _id: ObjectId("org_beheshti"), name: "بیمارستان شهید بهشتی" }
+ *   // ]
  *   // units → [
  *   //   { _id: ObjectId("unit_purchasing"), name: "واحد خرید" },
  *   //   { _id: ObjectId("unit_warehouse"), name: "انبار مرکزی" }
@@ -143,11 +145,16 @@ export const user_relations = {
     excludes: file_excludes,
     relatedRelations: {},
   },
-  organization: {
+  organizations: {
     schemaName: "organization",
-    type: "single" as RelationDataType,
+    type: "multiple" as RelationDataType,
     optional: true,
     excludes: organization_excludes,
+    limit: 50,
+    sort: {
+      field: "_id",
+      order: "desc" as RelationSortOrderType,
+    },
     relatedRelations: {
       users: {
         type: "multiple" as RelationDataType,
