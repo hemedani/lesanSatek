@@ -2,12 +2,11 @@
 
 import { AppApi } from "@/lib/api";
 import { getToken, getActiveRoleId } from "@/lib/auth";
+import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 
 export const updateRelations = async (
-  data: {
-    _id: string;
-    fiscalYearId?: string;
-  }
+  data: ReqType["main"]["budgetLine"]["updateRelations"]["set"],
+  getSelection?: DeepPartial<ReqType["main"]["budgetLine"]["updateRelations"]["get"]>
 ) => {
   try {
     const token = await getToken();
@@ -18,7 +17,7 @@ export const updateRelations = async (
       act: "updateRelations",
       details: {
         set: { ...data, activeRoleId },
-        get: { _id: 1 as const, code: 1 as const, title: 1 as const },
+        get: getSelection || { _id: 1, code: 1, title: 1 },
       },
     });
     return result;

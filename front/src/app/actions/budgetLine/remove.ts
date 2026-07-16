@@ -2,12 +2,11 @@
 
 import { AppApi } from "@/lib/api";
 import { getToken, getActiveRoleId } from "@/lib/auth";
+import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 
 export const remove = async (
-  data: {
-    _id: string;
-    hardCascade?: boolean;
-  }
+  data: ReqType["main"]["budgetLine"]["remove"]["set"],
+  getSelection?: DeepPartial<ReqType["main"]["budgetLine"]["remove"]["get"]>
 ) => {
   try {
     const token = await getToken();
@@ -18,7 +17,7 @@ export const remove = async (
       act: "remove",
       details: {
         set: { ...data, activeRoleId },
-        get: { success: 1 as const },
+        get: getSelection || { success: 1 },
       },
     });
     return result;

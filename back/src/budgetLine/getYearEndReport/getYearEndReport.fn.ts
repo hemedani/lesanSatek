@@ -9,7 +9,7 @@ export const getYearEndReportFn: ActFn = async (body) => {
   const match: Document = {
     "fiscalYear._id": new ObjectId(fiscalYearId as string),
   };
-  organizationId && (match.organization = new ObjectId(organizationId as string));
+  organizationId && (match["organization._id"] = new ObjectId(organizationId as string));
 
   const pipeline: Document[] = [
     { $match: match },
