@@ -1,30 +1,8 @@
 import { type ActFn, ObjectId } from "lesan";
-import { unit, user, coreApp } from "../../../mod.ts";
-import type { MyContext } from "@lib";
-
-const addUnitHeadRole = async (headUserId: string, unitId: string) => {
-  await user.findOneAndUpdate({
-    filter: {
-      _id: new ObjectId(headUserId),
-      roles: { $not: { $elemMatch: { name: "UnitHead", scopeType: "unit", scopeId: unitId } } },
-    },
-    update: { $push: { roles: { roleId: crypto.randomUUID(), name: "UnitHead", scopeType: "unit", scopeId: unitId } } },
-    projection: { _id: 1 },
-  });
-};
-
-const removeUnitHeadRole = async (headUserId: string, unitId: string) => {
-  await user.findOneAndUpdate({
-    filter: { _id: new ObjectId(headUserId) },
-    update: { $pull: { roles: { name: "UnitHead", scopeType: "unit", scopeId: unitId } } },
-    projection: { _id: 1 },
-  });
-};
+import { unit } from "../../../mod.ts";
 
 export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
-  const { user }: MyContext = coreApp.contextFns
-    .getContextModel() as MyContext;
 
   const {
     activeRoleId,
@@ -72,13 +50,10 @@ export const addFn: ActFn = async (body) => {
   if (headId) {
     relations.head = {
       _ids: new ObjectId(headId as string),
-      relatedRelations: {
-        headedUnit: true,
-      },
     };
   }
 
-  const createdUnit = await unit.insertOne({
+	const createdUnit = await unit.insertOne({
     doc: {
       ...rest,
       ...(features !== undefined && { features }),
@@ -87,20 +62,14 @@ export const addFn: ActFn = async (body) => {
       ...(allowWareGroupIds !== undefined && { allowWareGroupIds }),
       ...(allowWareModelIds !== undefined && { allowWareModelIds }),
     },
-    relations,
+    relations: relations as never,
     projection: { _id: 1 },
   });
 
   if (!createdUnit) return;
-
-  if (headId) {
-    await addUnitHeadRole(headId as string, createdUnit._id.toString());
-  }
 
   return await unit.findOne({
     filters: { _id: createdUnit._id },
     projection: get,
   });
 };
-
-export { addUnitHeadRole, removeUnitHeadRole };

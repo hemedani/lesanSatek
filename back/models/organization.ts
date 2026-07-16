@@ -73,12 +73,7 @@ export const organization_relations = {
     type: "single" as RelationDataType,
     optional: true,
     excludes: user_excludes,
-    relatedRelations: {
-      headedOrganization: {
-        type: "single" as RelationDataType,
-        excludes: ["createdAt", "updatedAt"],
-      },
-    },
+    relatedRelations: {},
   },
   state: {
     schemaName: "state",

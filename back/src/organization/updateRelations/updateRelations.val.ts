@@ -9,8 +9,6 @@ export const updateRelationsValidator = () => {
 			_id: objectIdValidation,
 			logo: optional(objectIdValidation),
 			removeLogo: optional(boolean()),
-			head: optional(objectIdValidation),
-			removeHead: optional(boolean()),
 			state: optional(objectIdValidation),
 			removeState: optional(boolean()),
 			city: optional(objectIdValidation),

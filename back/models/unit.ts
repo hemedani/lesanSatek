@@ -156,12 +156,7 @@ export const unit_relations = {
     type: "single" as RelationDataType,
     optional: true,
     excludes: user_excludes,
-    relatedRelations: {
-      headedUnit: {
-        type: "single" as RelationDataType,
-        excludes: unit_excludes,
-      },
-    },
+    relatedRelations: {},
   },
 };
 

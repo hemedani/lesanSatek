@@ -10,7 +10,6 @@ export const updateRelationsValidator = () => {
       organizationId: optional(objectIdValidation),
       parentUnitId: optional(objectIdValidation),
       creatorId: optional(objectIdValidation),
-      headId: optional(objectIdValidation),
     }),
     get: selectStruct("unit", 2),
   });

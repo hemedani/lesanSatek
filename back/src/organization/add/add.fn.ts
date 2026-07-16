@@ -1,25 +1,6 @@
 import { type ActFn, ObjectId } from "lesan";
-import { organization, user, coreApp } from "../../../mod.ts";
+import { organization, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
-
-const addOrgHeadRole = async (headUserId: string, orgId: string) => {
-  await user.findOneAndUpdate({
-    filter: {
-      _id: new ObjectId(headUserId),
-      roles: { $not: { $elemMatch: { name: "OrgHead", scopeType: "organization", scopeId: orgId } } },
-    },
-    update: { $push: { roles: { roleId: crypto.randomUUID(), name: "OrgHead", scopeType: "organization", scopeId: orgId } } },
-    projection: { _id: 1 },
-  });
-};
-
-const removeOrgHeadRole = async (headUserId: string, orgId: string) => {
-  await user.findOneAndUpdate({
-    filter: { _id: new ObjectId(headUserId) },
-    update: { $pull: { roles: { name: "OrgHead", scopeType: "organization", scopeId: orgId } } },
-    projection: { _id: 1 },
-  });
-};
 
 export const addFn: ActFn = async (body) => {
 	const { set, get } = body.details;
@@ -43,9 +24,6 @@ export const addFn: ActFn = async (body) => {
 	if (headId) {
 		relations.head = {
 			_ids: new ObjectId(headId as string),
-			relatedRelations: {
-				headedOrganization: true,
-			},
 		};
 	}
 
@@ -69,20 +47,14 @@ export const addFn: ActFn = async (body) => {
 
 	const createdOrg = await organization.insertOne({
 		doc: rest,
-		relations,
+		relations: relations as never,
 		projection: { _id: 1 },
 	});
 
 	if (!createdOrg) return;
-
-	if (headId) {
-		await addOrgHeadRole(headId as string, createdOrg._id.toString());
-	}
 
 	return await organization.findOne({
 		filters: { _id: createdOrg._id },
 		projection: get,
 	});
 };
-
-export { addOrgHeadRole, removeOrgHeadRole };
