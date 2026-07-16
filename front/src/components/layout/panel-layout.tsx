@@ -1,6 +1,7 @@
 import { Logo } from "@/components/layout/logo"
 import { UserMenu } from "@/components/layout/user-menu"
-import { PanelSelector } from "@/components/layout/panel-selector"
+import { RoleSelector } from "@/components/layout/role-selector"
+import { PanelContext } from "@/components/layout/panel-context"
 import { AmbientBackground } from "@/components/layout/ambient-background"
 
 interface PanelLayoutProps {
@@ -30,10 +31,11 @@ function PanelLayout({ title, description, children, actions }: PanelLayoutProps
           {description && (
             <span className="hidden sm:inline text-sm text-fog">— {description}</span>
           )}
+          <PanelContext />
         </div>
         <div className="flex items-center gap-2">
           {actions}
-          <PanelSelector />
+          <RoleSelector />
           <UserMenu />
         </div>
       </header>

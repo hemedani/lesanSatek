@@ -32,6 +32,8 @@ export const login = async (
             features: 1,
             roles: 1,
             organization: { _id: 1, name: 1 },
+            units: { _id: 1, name: 1 },
+            headedUnit: { _id: 1, name: 1 },
             avatar: { _id: 1, name: 1 },
           },
         },

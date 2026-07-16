@@ -15,6 +15,8 @@ interface User {
   organization?: { _id: string; name: string };
   features: { feature: string }[];
   roles: { roleId: string; name: string; scopeType?: string; scopeId?: string }[];
+  headedUnit?: { _id: string; name: string };
+  units?: { _id: string; name: string }[];
 }
 
 interface AuthState {

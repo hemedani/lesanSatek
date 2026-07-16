@@ -27,6 +27,11 @@ function PanelGuard({ children, requiredRoles, requiredFeatures }: PanelGuardPro
       if (result.success && result.body) {
         const panels = getAccessiblePanels(result.body)
         setUser(result.body, panels)
+        const activeRoleCookie = document.cookie.replace(/(?:(?:^|.*;\s*)activeRoleId\s*=\s*([^;]*).*$)|^.*$/, "$1")
+        if (activeRoleCookie) {
+          const { setActiveRoleId } = useAuthStore.getState()
+          setActiveRoleId(activeRoleCookie)
+        }
       } else {
         setUser(null)
         router.replace("/login")
@@ -42,22 +47,14 @@ function PanelGuard({ children, requiredRoles, requiredFeatures }: PanelGuardPro
 
     const roleNames = user.roles?.map((r) => r.name) ?? []
     const featureNames = user.features?.map((f) => f.feature) ?? []
-    const isSuper = roleNames.some((r) => ["Manager", "Admin", "OrgHead"].includes(r))
 
     let authorized = false
 
-    if (isSuper) {
-      authorized = true
-    } else {
-      if (requiredRoles && requiredRoles.length > 0) {
-        authorized = requiredRoles.some((r) => roleNames.includes(r))
-      }
-      if (requiredFeatures && requiredFeatures.length > 0) {
-        authorized = requiredFeatures.some((f) => featureNames.includes(f))
-      }
-      if (!requiredRoles && !requiredFeatures) {
-        authorized = true
-      }
+    if (requiredRoles && requiredRoles.length > 0) {
+      authorized = requiredRoles.some((r) => roleNames.includes(r))
+    }
+    if (!authorized && requiredFeatures && requiredFeatures.length > 0) {
+      authorized = requiredFeatures.some((f) => featureNames.includes(f))
     }
 
     if (!authorized) {

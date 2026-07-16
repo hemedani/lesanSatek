@@ -40,7 +40,15 @@ export const PANEL_DEFINITIONS: PanelDef[] = [
     label: "درخواست‌ها",
     icon: ShoppingCart,
     description: "ثبت و پیگیری درخواست‌های خرید",
-    requiredRole: ["Employee", "Ordinary"],
+    requiredRole: ["Employee"],
+  },
+  {
+    id: "ordinary",
+    path: "/ordinary",
+    label: "پیش‌خوان",
+    icon: LayoutDashboard,
+    description: "صفحه اصلی کاربران عادی",
+    requiredRole: ["Ordinary"],
   },
   {
     id: "finance",
@@ -104,8 +112,11 @@ export function getDefaultPanel(
   if (featureNames.includes("canManageBudget")) {
     return "/finance"
   }
-  if (roleNames.some((r) => ["Employee", "Ordinary"].includes(r))) {
+  if (roleNames.includes("Employee")) {
     return "/requests"
+  }
+  if (roleNames.includes("Ordinary")) {
+    return "/ordinary"
   }
   if (featureNames.includes("canRespondToTender")) {
     return "/vendor"

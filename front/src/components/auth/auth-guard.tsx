@@ -7,9 +7,7 @@ import { Loader2 } from "lucide-react"
 import { getMe } from "@/app/actions/auth/getMe"
 import { useAuthStore } from "@/stores/authStore"
 
-function setActiveRoleCookie(roleId: string) {
-  document.cookie = `activeRoleId=${encodeURIComponent(roleId)}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`
-}
+const ADMIN_ROLES = ["Manager", "Admin", "OrgHead"]
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -23,13 +21,21 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
       setLoading(true)
       const result = await getMe()
       if (result.success && result.body) {
-        const { getAccessiblePanels } = await import("@/lib/roles")
+        const { getAccessiblePanels, getDefaultPanel } = await import("@/lib/roles")
+        const roleNames = result.body.roles?.map((r: { name: string }) => r.name) ?? []
+
+        if (!roleNames.some((r: string) => ADMIN_ROLES.includes(r))) {
+          const defaultPanel = getDefaultPanel(result.body)
+          router.replace(defaultPanel)
+          return
+        }
+
         const panels = getAccessiblePanels(result.body)
         setUser(result.body, panels)
-        const firstRole = result.body.roles?.[0]
-        if (firstRole && !useAuthStore.getState().activeRoleId) {
-          setActiveRoleId(firstRole.roleId)
-          setActiveRoleCookie(firstRole.roleId)
+        const activeRoleCookie = document.cookie.replace(/(?:(?:^|.*;\s*)activeRoleId\s*=\s*([^;]*).*$)|^.*$/, "$1")
+        if (activeRoleCookie) {
+          const { setActiveRoleId } = useAuthStore.getState()
+          setActiveRoleId(activeRoleCookie)
         }
       } else {
         setUser(null)

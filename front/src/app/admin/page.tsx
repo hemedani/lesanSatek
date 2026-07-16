@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { Button } from "@/components/ui/button"
-import { RoleBanner } from "@/components/layout/role-banner"
+
 import { gets as getOrganizations } from "@/app/actions/organization/gets"
 import { getUsers } from "@/app/actions/user/getUsers"
 import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
@@ -42,7 +42,6 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      <RoleBanner />
       <PageHeader title="داشبورد" description="خلاصه وضعیت سامانه" />
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
