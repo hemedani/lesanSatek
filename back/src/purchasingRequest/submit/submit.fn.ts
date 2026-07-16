@@ -7,6 +7,7 @@ import {
   budgetLine,
   wareModel,
   unit,
+  user as userModel,
   inventory,
   coreApp,
 } from "../../../mod.ts";
@@ -39,6 +40,18 @@ export const submitFn: ActFn = async (body) => {
     }) as Record<string, unknown> | undefined;
     if (unitDoc?.organization) {
       const org = unitDoc.organization as Record<string, unknown>;
+      if (org._id) {
+        organizationId = org._id.toString();
+      }
+    }
+  }
+  if (!organizationId) {
+    const userDoc = await userModel.findOne({
+      filters: { _id: user._id },
+      projection: { organization: { _id: 1 } },
+    }) as Record<string, unknown> | undefined;
+    if (userDoc?.organization) {
+      const org = userDoc.organization as Record<string, unknown>;
       if (org._id) {
         organizationId = org._id.toString();
       }
