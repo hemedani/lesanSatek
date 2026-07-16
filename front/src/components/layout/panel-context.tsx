@@ -18,7 +18,7 @@ function PanelContext() {
   const { user, activeRoleId } = useAuthStore()
   const [unitName, setUnitName] = useState<string | undefined>()
 
-  const orgName = user?.organization?.name
+  const orgName = user?.organizations?.[0]?.name
   const activeRole = user?.roles?.find((r) => r.roleId === activeRoleId)
   const roleLabel = activeRole?.name ? (roleLabelMap[activeRole.name] || activeRole.name) : null
 
@@ -36,7 +36,7 @@ function PanelContext() {
     return () => { cancelled = true }
   }, [scopeId])
 
-  const displayUnit = unitName || user?.headedUnit?.name || user?.units?.[0]?.name
+  const displayUnit = unitName || user?.units?.[0]?.name
 
   if (!orgName && !displayUnit && !roleLabel) return null
 

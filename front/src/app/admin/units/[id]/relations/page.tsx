@@ -12,6 +12,7 @@ import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { ErrorState } from "@/components/ui/error-state";
 import { get } from "@/app/actions/unit/get";
 import { updateRelations } from "@/app/actions/unit/updateRelations";
+import { addOrRemoveRoles } from "@/app/actions/user/addOrRemoveRoles";
 import { gets as getOrgs } from "@/app/actions/organization/gets";
 import { gets as getUnits } from "@/app/actions/unit/gets";
 import { getUsers } from "@/app/actions/user/getUsers";
@@ -31,6 +32,7 @@ export default function UnitRelationsPage({
   const [orgId, setOrgId] = useState("");
   const [parentUnitId, setParentUnitId] = useState("");
   const [headId, setHeadId] = useState("");
+  const [originalHeadId, setOriginalHeadId] = useState("");
 
   useEffect(() => {
     const load = async () => {
@@ -49,6 +51,7 @@ export default function UnitRelationsPage({
         setOrgId(unit.organization?._id || "");
         setParentUnitId(unit.parentUnit?._id || "");
         setHeadId(unit.head?._id || "");
+        setOriginalHeadId(unit.head?._id || "");
       } else {
         setNotFound(true);
       }
@@ -60,23 +63,49 @@ export default function UnitRelationsPage({
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    const result = await updateRelations(
+
+    const relResult = await updateRelations(
       {
         activeRoleId: getActiveRoleIdFromStore(),
         _id: id,
         ...(orgId ? { organizationId: orgId } : {}),
         ...(parentUnitId ? { parentUnitId } : {}),
-        ...(headId ? { headId } : {}),
       },
       { _id: 1, name: 1 }
     );
-    setSubmitting(false);
-    if (result.success) {
-      toast.success("روابط با موفقیت به‌روزرسانی شد");
-      router.refresh();
-    } else {
-      toast.error(result.body?.message || "خطا در به‌روزرسانی روابط");
+
+    if (!relResult.success) {
+      toast.error(relResult.body?.message || "خطا در به‌روزرسانی روابط");
+      setSubmitting(false);
+      return;
     }
+
+    if (headId !== originalHeadId) {
+      if (originalHeadId) {
+        await addOrRemoveRoles(
+          {
+            activeRoleId: getActiveRoleIdFromStore(),
+            _id: originalHeadId,
+            removeRoles: [{ name: "UnitHead", scopeType: "unit", scopeId: id }],
+          },
+          { _id: 1 }
+        );
+      }
+      if (headId) {
+        await addOrRemoveRoles(
+          {
+            activeRoleId: getActiveRoleIdFromStore(),
+            _id: headId,
+            addRoles: [{ name: "UnitHead", scopeType: "unit", scopeId: id }],
+          },
+          { _id: 1, roles: 1, units: { _id: 1, name: 1 } }
+        );
+      }
+    }
+
+    setSubmitting(false);
+    toast.success("روابط با موفقیت به‌روزرسانی شد");
+    router.refresh();
   };
 
   if (loading) return <LoadingSkeleton type="card" count={1} />;

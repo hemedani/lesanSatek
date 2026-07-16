@@ -107,10 +107,12 @@ export default function AddUserPage() {
   };
 
   const onSubmit = async (data: UserData) => {
+    const { organization, ...rest } = data;
     const result = await addUser(
       {
         activeRoleId: getActiveRoleIdFromStore(),
-        ...data,
+        ...rest,
+        ...(organization ? { organizations: [organization] } : {}),
         features: features.map((f) => ({ feature: f as "canRegisterPurchaseRequest" })),
         roles: roles.map((r) => ({
           name: r.name as "Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary",

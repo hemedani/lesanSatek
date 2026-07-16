@@ -27,7 +27,7 @@ interface UserItem {
   position?: string;
   createdAt?: string;
   roles?: { roleId?: string; name?: string }[];
-  organization?: { _id: string; name?: string };
+  organizations?: { _id: string; name?: string }[];
 }
 
 interface UsersClientProps {
@@ -235,8 +235,8 @@ export function UsersClient({
             </div>
 
             <div className="flex items-center justify-between mt-4">
-              {item.organization && (
-                <span className="text-xs text-fog/50">{item.organization.name}</span>
+              {item.organizations?.[0] && (
+                <span className="text-xs text-fog/50">{item.organizations[0].name}</span>
               )}
               <div className="flex items-center gap-1 me-auto">
                 <Link href={`/admin/users/${item._id}`}>

@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ArrowRight, Loader2, Trash2, Shield, Check, X, Share2 } from "lucide-react";
+import { ArrowRight, Loader2, Trash2, Shield, Check, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/form/form-input";
 import { FormSelect } from "@/components/form/form-select";
@@ -22,7 +22,6 @@ import { updateUser } from "@/app/actions/user/updateUser";
 import { removeUser } from "@/app/actions/user/removeUser";
 import {
   FEATURES_OPTIONS,
-  ROLE_OPTIONS,
 } from "@/types/permissions";
 import Link from "next/link";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
@@ -41,13 +40,6 @@ const userSchema = z.object({
 
 type UserData = z.input<typeof userSchema>;
 
-interface RoleEntry {
-  roleId?: string;
-  name?: string;
-  scopeType?: string;
-  scopeId?: string;
-}
-
 export default function EditUserPage({
   params,
 }: {
@@ -59,7 +51,6 @@ export default function EditUserPage({
   const [showDelete, setShowDelete] = useState(false);
   const { id } = use(params);
   const [features, setFeatures] = useState<string[]>([]);
-  const [roles, setRoles] = useState<RoleEntry[]>([{ name: "Ordinary" }]);
   const form = useForm<UserData>({
     resolver: zodV4Resolver(userSchema),
     defaultValues: {
@@ -92,7 +83,7 @@ export default function EditUserPage({
           birth_date: 1,
           roles: 1,
           features: 1,
-          organization: { _id: 1, name: 1 },
+          organizations: { _id: 1, name: 1 },
         }
       );
       if (result.success && result.body) {
@@ -109,7 +100,6 @@ export default function EditUserPage({
           birth_date: user.birth_date || "",
         });
         setFeatures(user.features?.map((f: { feature: string }) => f.feature) || []);
-        setRoles(user.roles || [{ name: "Ordinary" }]);
       } else {
         setNotFound(true);
       }
@@ -126,22 +116,6 @@ export default function EditUserPage({
     );
   };
 
-  const updateRole = (index: number, field: string, value: string) => {
-    setRoles((prev) => {
-      const next = [...prev];
-      next[index] = { ...next[index], [field]: value };
-      return next;
-    });
-  };
-
-  const addRole = () => {
-    setRoles((prev) => [...prev, { name: "Ordinary" }]);
-  };
-
-  const removeRole = (index: number) => {
-    setRoles((prev) => prev.filter((_, i) => i !== index));
-  };
-
   const onSubmit = async (data: UserData) => {
     const result = await updateUser(
       {
@@ -149,12 +123,6 @@ export default function EditUserPage({
         _id: id,
         ...data,
         features: features.map((f) => ({ feature: f as "canRegisterPurchaseRequest" })),
-        roles: roles.map((r) => ({
-          ...(r.roleId ? { roleId: r.roleId } : {}),
-          name: (r.name || "Ordinary") as "Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary",
-          ...(r.scopeType ? { scopeType: r.scopeType as "organization" | "unit" } : {}),
-          ...(r.scopeId ? { scopeId: r.scopeId } : {}),
-        })),
       },
       { _id: 1, first_name: 1 }
     );
@@ -290,68 +258,14 @@ export default function EditUserPage({
             />
           </FormCard>
 
-          <FormCard title="نقش‌ها" description="نقش‌های دسترسی کاربر">
-            <div className="space-y-3">
-              {roles.map((role, index) => (
-                <div key={index} className="flex items-center gap-2 p-3 rounded-lg bg-white/[0.02] border border-steel-border/30">
-                  <div className="flex-1 grid grid-cols-3 gap-2">
-                    <div>
-                      <label className="text-xs text-fog/70 mb-1.5 block">نقش</label>
-                      <select
-                        value={role.name || "Ordinary"}
-                        onChange={(e) => updateRole(index, "name", e.target.value)}
-                        className="w-full h-9 rounded-sm bg-white/[0.03] border border-steel-border/60 px-3 text-sm text-moonlight focus:border-ring focus:ring-3 focus:ring-ring/50 outline-none"
-                      >
-                        {ROLE_OPTIONS.map((opt) => (
-                          <option key={opt.value} value={opt.value}>{opt.label}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-xs text-fog/70 mb-1.5 block">حوزه</label>
-                      <select
-                        value={role.scopeType || ""}
-                        onChange={(e) => updateRole(index, "scopeType", e.target.value)}
-                        className="w-full h-9 rounded-sm bg-white/[0.03] border border-steel-border/60 px-3 text-sm text-moonlight focus:border-ring focus:ring-3 focus:ring-ring/50 outline-none"
-                      >
-                        <option value="">بدون محدودیت</option>
-                        <option value="organization">سازمان</option>
-                        <option value="unit">واحد</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-xs text-fog/70 mb-1.5 block">شناسه حوزه</label>
-                      <input
-                        value={role.scopeId || ""}
-                        onChange={(e) => updateRole(index, "scopeId", e.target.value)}
-                        placeholder="شناسه..."
-                        className="w-full h-9 rounded-sm bg-white/[0.03] border border-steel-border/60 px-3 text-sm text-moonlight focus:border-ring focus:ring-3 focus:ring-ring/50 outline-none placeholder:text-fog/40"
-                      />
-                    </div>
-                  </div>
-                  {roles.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-xs"
-                      className="mt-6 text-destructive"
-                      onClick={() => removeRole(index)}
-                    >
-                      <X className="size-3.5" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="gap-1.5"
-                onClick={addRole}
-              >
-                <Shield className="size-3.5" />
-                افزودن نقش
-              </Button>
+          <FormCard title="نقش‌ها" description="مدیریت نقش‌های دسترسی کاربر از طریق صفحه اختصاصی">
+            <div className="flex justify-center py-4">
+              <Link href={`/admin/users/${id}/roles`}>
+                <Button type="button" variant="outline" className="gap-2">
+                  <Shield className="size-4" />
+                  مدیریت نقش‌ها
+                </Button>
+              </Link>
             </div>
           </FormCard>
 

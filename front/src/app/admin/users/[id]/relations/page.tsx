@@ -33,7 +33,7 @@ export default function UserRelationsPage({
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [organization, setOrganization] = useState("");
+  const [organizations, setOrganizations] = useState<string[]>([]);
   const [state, setState] = useState("");
   const [city, setCity] = useState("");
 
@@ -45,14 +45,14 @@ export default function UserRelationsPage({
           _id: 1,
           first_name: 1,
           last_name: 1,
-          organization: { _id: 1, name: 1 },
+          organizations: { _id: 1, name: 1 },
           state: { _id: 1, name: 1 },
           city: { _id: 1, name: 1 },
         }
       );
       if (result.success && result.body) {
         const user = result.body;
-        setOrganization(user.organization?._id || "");
+        setOrganizations(user.organizations?.map((o: { _id: string }) => o._id) || []);
         setState(user.state?._id || "");
         setCity(user.city?._id || "");
       } else {
@@ -70,7 +70,7 @@ export default function UserRelationsPage({
       {
         activeRoleId: getActiveRoleIdFromStore(),
         _id: id,
-        ...(organization ? { organization } : {}),
+        ...(organizations.length ? { organizations } : {}),
         ...(state ? { state } : {}),
         ...(city ? { city } : {}),
       },
@@ -130,8 +130,8 @@ export default function UserRelationsPage({
           <div className="space-y-2">
             <label className="text-xs text-fog/70 block font-medium">سازمان</label>
             <SearchSelect
-              value={organization}
-              onChange={setOrganization}
+              value={organizations[0] || ""}
+              onChange={(v) => setOrganizations(v ? [v] : [])}
               placeholder="انتخاب سازمان..."
               fetcher={async (search?: string) => {
                 const result = await getOrganizations(

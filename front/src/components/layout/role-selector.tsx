@@ -28,6 +28,29 @@ function labelForRole(name?: string): string {
   return name ? (roleLabelMap[name] || name) : "نقش"
 }
 
+function scopeLabel(scopeType?: string): string {
+  if (scopeType === "unit") return "واحد"
+  if (scopeType === "organization") return "سازمان"
+  return scopeType || ""
+}
+
+function getScopeName(
+  user: NonNullable<ReturnType<typeof useAuthStore.getState>["user"]>,
+  scopeType?: string,
+  scopeId?: string
+): string | null {
+  if (!scopeType || !scopeId) return null
+  if (scopeType === "organization") {
+    const match = user.organizations?.find((o) => o._id === scopeId)
+    if (match) return match.name
+  }
+  if (scopeType === "unit") {
+    const match = user.units?.find((u) => u._id === scopeId)
+    if (match) return match.name
+  }
+  return null
+}
+
 function setActiveRoleCookie(roleId: string) {
   document.cookie = `activeRoleId=${encodeURIComponent(roleId)}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`
 }
@@ -88,7 +111,7 @@ function RoleSelector() {
               <span className="text-sm font-medium">{labelForRole(activeRole?.name)}</span>
               {activeRole?.scopeType && activeRole?.scopeId && (
                 <span className="text-xs text-fog">
-                  {activeRole.scopeType === "unit" ? "واحد" : activeRole.scopeType === "organization" ? "سازمان" : activeRole.scopeType} • {activeRole.scopeId}
+                  {scopeLabel(activeRole.scopeType)} • {getScopeName(user, activeRole.scopeType, activeRole.scopeId) || activeRole.scopeId}
                 </span>
               )}
             </div>
@@ -114,7 +137,7 @@ function RoleSelector() {
                     <span className="text-sm font-medium">{labelForRole(role.name)}</span>
                     {role.scopeType && role.scopeId && (
                       <span className="text-xs text-fog">
-                        {role.scopeType === "unit" ? "واحد" : role.scopeType === "organization" ? "سازمان" : role.scopeType}
+                        {scopeLabel(role.scopeType)} • {getScopeName(user, role.scopeType, role.scopeId) || role.scopeId}
                       </span>
                     )}
                   </div>
