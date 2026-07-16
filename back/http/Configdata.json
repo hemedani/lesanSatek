@@ -64,7 +64,7 @@
   },
   {
     "id": "gen-user-relations",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"Authorization\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"updateUserRelations\", \"details\": {\"get\": {\"_id\": 1}, \"set\": {\"_id\": \"{ghostId}\", \"activeRoleId\": \"\", \"organization\": \"{orgId}\"}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"Authorization\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"updateUserRelations\", \"details\": {\"get\": {\"_id\": 1}, \"set\": {\"_id\": \"{ghostId}\", \"activeRoleId\": \"\", \"organizations\": [\"{orgId}\"]}}}}",
     "repeat": 1,
     "captures": []
   },
