@@ -36,17 +36,17 @@ LesanSatek backend is a Deno + Lesan application for an organizational process m
 The backend defines models across four domains: Organizational, Procurement/Purchasing, Warehouse/Inventory, and Budget/Finance.
 
 #### Organizational Management Domain
-- **User** - User authentication and authorization (first_name, last_name, gender, birth_date, mobile, email, password, is_verified, isGhost, roles, position, isActive, features, allowWareTypeIds, allowWareClassIds, allowWareGroupIds, allowWareModelIds). Relations: avatar, organization, units. *Employee was merged into User. Level was replaced by multi-role `roles` array.*
+- **User** - User authentication and authorization (first_name, last_name, gender, birth_date, mobile, email, password, is_verified, isGhost, roles: [{roleId, name: Manager|Admin|OrgHead|UnitHead|Employee|Ordinary, scopeType?: organization|unit, scopeId?: objectId}], position, isActive, features, allowWareTypeIds, allowWareClassIds, allowWareGroupIds, allowWareModelIds). Relations: avatar, organizations (multiple), units. *Employee was merged into User. Level was replaced by multi-role `roles` array.* Custom actions: addOrRemoveRoles (single source of truth for role + unit/org membership + head assignment).
 - **File** - File upload management (name, mimeType, size, type: image/video/docs/other, alt_text)
 - **Tag** - Metadata categorization (name, description, color, icon)
 - **Organization** - Organizations that own purchasing processes (name, enName, description, isActive)
 - **Unit** - Hierarchical units/subunits in a tree (name, enName, description, isActive, organization denormalized on all units, parentUnit for nesting, head as User, features, allowWareTypeIds, allowWareClassIds, allowWareGroupIds, allowWareModelIds). Unit has a `type` enum (General|Warehouse|Logistics|Production|Administration|Expert) and optional attribute fields (address, phone, email, warehouseCapacity, hasColdStorage, fleetSize, serviceRadius). *Department was eliminated.*
-- **Process** - Process builder workflow definitions (name, description, status: Draft|Active|Archived, version, isActive). Custom actions: activateProcess, duplicateProcess.
+- **Process** - Process builder workflow definitions (name, description, status: Draft|Active|Archived, version, isActive). Scoping relations: unit, wareType, wareClass, wareGroup, wareModel, ware (all optional — unscoped process is org-wide). Custom actions: activateProcess, duplicateProcess.
 - **ProcessStep** - Individual steps within a process (name, description, stepType: Approval|Review|Notification|Action|Delivery|Receipt|Payment, order, required, groupsOperator: AND|OR, assigneeGroups: embedded array of {operator, unitIds}). *ProcessStepAssigneeGroup was eliminated — assignee groups are now embedded directly in ProcessStep.*
 
 #### Procurement & Purchasing Domain
-- **StepApproval** - Per-unit per-step approval decisions (status: pending|approved|rejected, comment, decidedAt). Relations: purchasingRequest, processStep, unit, decidedBy.
-- **PurchasingRequest** - Actual purchasing requests flowing through processes (title, description, estimatedAmount, quantity, status: Draft|Pending|InProgress|Approved|Rejected|Completed|Cancelled, currentStep, history: embedded array with nested performed{by,name,at,role} + optional unit + details). Custom actions: submit, getHistory, assignStore, warehouseCheck, checkStoreAvailability. Relations: wareModel (WareModel), process, requester, requestingUnit, attachments, stepApprovals, purchaseOrderItems, tender, goodsReceipts, paymentOrders, budgetLine.
+- **StepApproval** - Per-unit per-step approval decisions (status: pending|approved|rejected, comment, decidedAt). Relations: purchasingRequest, processStep, unit, decidedBy. Gets filterable by status (pending|approved|rejected). submitDecision validates unit head (unless Manager/Admin).
+- **PurchasingRequest** - Actual purchasing requests flowing through processes (title, description, quantity, status: Draft|Pending|InProgress|Approved|Rejected|Completed|Cancelled, currentStep, history: embedded array with nested performed{by,name,at,role} + optional unit + details). Feature-gated actions: add (creates Draft, requires canRegisterPurchaseRequest feature for non-Manager/Admin), submit (Draft→Pending, requires canSubmitPurchaseRequest feature for non-Manager/Admin, auto-resolves process via resolveProcessForPR). Custom actions: getHistory, assignStore, warehouseCheck, checkStoreAvailability. Relations: wareModel (WareModel), process (optional — null for Draft), requester, requestingUnit, attachments, goodsReceipts, paymentOrders, budgetLine.
 - **PurchaseOrderItem** - Line items on a purchase order (wareModelId, wareModelName, wareId?, wareName?, quantity, unitPrice?, totalPrice?, status: pending|assigned|ordered|received|cancelled). Relations: purchasingRequest, assignedFrom (store), assignedBy (user).
 - **Tender** - RFP/RFQ for vendor selection (title, description, status: open|closed|awarded|cancelled, deadline). Custom actions: close, award. Relations: purchasingRequest, createdBy, assignedVendors (stores), offers (tenderOffers).
 - **TenderOffer** - Vendor bid on a tender (price, deliveryTime, paymentTerms?, description?, status: submitted|accepted|rejected, submittedAt). Relations: tender, store.
@@ -88,7 +88,7 @@ Organization
 Key points:
 - **Unit** has an `organization` relation (denormalized on all units for query efficiency - set on every unit, not just top-level)
 - **Unit** supports `parentUnit`/`subUnits` for infinite nesting/tree structure
-- **User** is linked to org via `organization` relation and to units via `units` relation
+- **User** is linked to org via `organizations` relation (multiple, was single) and to units via `units` relation
 - **User** has `position` and `isActive` fields (migrated from the eliminated Employee model)
 - **Unit.head** is a User (was Employee before the merge)
 - **User has a `roles` array**: Each role has `{ roleId, name, scopeType?, scopeId? }`. Roles: Manager, Admin, OrgHead, UnitHead, Employee, Ordinary. `isGhost` boolean for the bootstrap user (replaces former "Ghost" level).
@@ -137,6 +137,21 @@ Draft  ──►  activateProcess()  ──►  Active  ──►  update(status
 
 **Archive guard (in process.update):** Prevents archiving a process when any PurchasingRequest has status `["Pending", "InProgress", "Approved"]` for that process. Returns error with active request count.
 
+### Process Scoping & Auto-Resolve
+
+Processes can be scoped to a unit or warehouse hierarchy level (all optional single relations). An unscoped process is org-wide.
+
+**Priority resolution chain** (first match wins, used by `resolveProcessForPR()`):
+1. Unit-scoped process (`process.unit._id === requestingUnitId`)
+2. Ware-scoped process
+3. WareModel-scoped process
+4. WareGroup-scoped process
+5. WareClass-scoped process
+6. WareType-scoped process
+7. Org-wide general process (no scope fields)
+
+**`checkWareModelAccess.ts`** — Utility checking if a user/unit can access a ware model based on `allowWareTypeIds`, `allowWareClassIds`, `allowWareGroupIds`, `allowWareModelIds` fields on User and Unit. If all fields empty, access is granted (no restriction).
+
 ### Automated Purchase Lifecycle (Procure-to-Pay)
 
 The complete purchase-to-payment flow is automated:
@@ -170,7 +185,7 @@ PR Draft ──► submit() ──► Pending ──► submitDecision() (per st
                  Completed
 ```
 
-**`purchasingRequest.submit`:** Creates a request with status=Pending, currentStep=0. Sets `wareModel` relation and optionally `budgetLine` relation on the PR. Creates StepApproval(status:pending) for each unit in the first step's assigneeGroups. Optionally auto-creates BudgetEncumbrance if `budgetLineId` and `estimatedAmount` are provided (validates sufficient remaining budget first). Pushes "submitted" history entry.
+**`purchasingRequest.submit`:** Transitions Draft→Pending. Auto-resolves the active process via `resolveProcessForPR()` (scoped by unit/wareModel hierarchy). Sets `process` relation, creates StepApproval(status:pending) for each unit in the first step's assigneeGroups, sets `currentStep=0`. Pushes "submitted" history entry.
 
 **`stepApproval.submitDecision`:** Processes a unit's decision (approved/rejected):
 1. Validates request is Pending/InProgress, step matches currentStep, unit is in step's assigneeGroups
@@ -548,7 +563,7 @@ Ware and Stuff models use denormalized relations to WareType, WareClass, WareGro
 
 | Model | Acts | Special Endpoints | Auth Required |
 |-------|------|-------------------|---------------|
-| **User** | addUser, get, gets, update, updateRelations, remove, count | login, register, tempUser, getMe, dashboardStatistic | Mixed (login/register/tempUser: public; getMe: auth only; all others: auth + activeRoleId) |
+| **User** | addUser, get, gets, update, updateRelations, remove, count | login, register, tempUser, getMe, dashboardStatistic, addOrRemoveRoles | Mixed (login/register/tempUser: public; getMe: auth only; all others: auth + activeRoleId) |
 | **File** | get, gets, getFiles, update, uploadFile | - | Mixed |
 | **Tag** | add, get, gets, update, remove, count | - | Mixed |
 | **Organization** | add, get, gets, update, updateRelations, remove, count | - | Mixed |
@@ -609,6 +624,13 @@ Ware and Stuff models use denormalized relations to WareType, WareClass, WareGro
    - **Percentage**: `pricePercentage` is applied to `Ware.price` → `stuffPrice = warePrice * (1 + pricePercentage/100)`.
 3. **Long payment prices**: For each month, if a `{month}MonthPricePercent` is set, the price = `ware.price * (1 + percent/100)` (or `stuffPrice` if `isExpirationNear`).
 
+### Remove Endpoints
+
+11 models have remove endpoints (all guarded to Manager/Admin):
+- BudgetAllocation, BudgetEncumbrance, BudgetLine, ConsumptionRecord, File, FiscalYear, GoodsReceipt, PaymentOrder, StepApproval, StockMovement, TenderOffer
+
+Each accepts `{ _id, activeRoleId, hardCascade?: boolean }` and follows the standard `deleteOne` pattern.
+
 ## Complete Relation Maps
 
 ### Organizational Relation Map
@@ -616,7 +638,7 @@ Ware and Stuff models use denormalized relations to WareType, WareClass, WareGro
 ```
 User
   ├── avatar (File)
-  ├── organization (Organization) [optional]
+  ├── organizations (Organization) [multiple, optional]
   └── units (Unit) [multiple, optional]
 
 Organization
@@ -634,20 +656,22 @@ Unit
 Process
   ├── organization (Organization)
   ├── createdBy (User)
-
+  ├── unit (Unit) [optional — scoping]
+  ├── wareType (WareType) [optional — scoping]
+  ├── wareClass (WareClass) [optional — scoping]
+  ├── wareGroup (WareGroup) [optional — scoping]
+  ├── wareModel (WareModel) [optional — scoping]
+  └── ware (Ware) [optional — scoping]
 
 ProcessStep
   ├── process (Process)
   └── assigneeGroups [embedded: array({ operator, unitIds })]
 
 PurchasingRequest
-  ├── process (Process)
+  ├── process (Process) [optional — null for Draft]
   ├── requester (User)
   ├── requestingUnit (Unit)
   ├── attachments (File)
-  ├── stepApprovals (StepApproval) [multiple]
-  ├── purchaseOrderItems (PurchaseOrderItem) [multiple]
-  ├── tender (Tender) [single, optional]
   ├── goodsReceipts (GoodsReceipt) [multiple]
   ├── paymentOrders (PaymentOrder) [multiple]
   └── budgetLine (BudgetLine) [single, optional]

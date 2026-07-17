@@ -7,7 +7,6 @@ import { MyRequestsClient } from "./my-requests-client"
 interface PRItem {
   _id: string
   title?: string
-  estimatedAmount?: number
   quantity?: number
   status?: string
   currentStep?: string
@@ -28,7 +27,6 @@ export default async function MyRequestsPage({
     {
       _id: 1,
       title: 1,
-      estimatedAmount: 1,
       quantity: 1,
       status: 1,
       currentStep: 1,

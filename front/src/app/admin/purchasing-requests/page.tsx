@@ -21,7 +21,6 @@ export default async function PurchasingRequestsPage({
       _id: 1,
       title: 1,
       status: 1,
-      estimatedAmount: 1,
       quantity: 1,
       currentStep: 1,
       createdAt: 1,

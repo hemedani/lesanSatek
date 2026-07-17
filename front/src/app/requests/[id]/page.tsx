@@ -12,6 +12,7 @@ import { gets as getUnits } from "@/app/actions/unit/gets"
 import { WorkflowVisualizer } from "@/components/purchasing/workflow-visualizer"
 import { HistoryTimeline } from "@/components/purchasing/history-timeline"
 import { ReceiveGoodsButton } from "./receive-goods-button"
+import { SubmitPRButton } from "./submit-pr-button"
 import { cookies } from "next/headers"
 import { getUser } from "@/app/actions/user/getUser"
 
@@ -62,7 +63,6 @@ export default async function RequestDetailPage({
       _id: 1,
       title: 1,
       description: 1,
-      estimatedAmount: 1,
       quantity: 1,
       status: 1,
       currentStep: 1,
@@ -251,12 +251,6 @@ export default async function RequestDetailPage({
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <div>
-                  <p className="text-xs text-fog">مبلغ تخمینی</p>
-                  <p className="text-sm text-moonlight font-medium">
-                    {pr.estimatedAmount?.toLocaleString("fa-IR") || "—"} تومان
-                  </p>
-                </div>
                 <div>
                   <p className="text-xs text-fog">تعداد</p>
                   <p className="text-sm text-moonlight font-medium">
@@ -570,6 +564,25 @@ export default async function RequestDetailPage({
                 {pr.store.address && (
                   <p className="text-xs text-fog/50">{pr.store.address}</p>
                 )}
+              </CardContent>
+            </Card>
+          )}
+
+          {pr.status === "Draft" && (
+            <Card variant="glass">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-fog">ارسال درخواست</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-fog mb-3">
+                  با ارسال این درخواست، فرآیند خرید آغاز می‌شود.
+                </p>
+                <SubmitPRButton
+                  purchasingRequestId={pr._id}
+                  title={pr.title}
+                  quantity={pr.quantity}
+                  wareModelName={pr.wareModel?.name}
+                />
               </CardContent>
             </Card>
           )}

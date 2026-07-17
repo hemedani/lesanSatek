@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
-import { Loader2, Send, ShoppingCart, FileText } from "lucide-react";
+import { Loader2, Save, Send, ShoppingCart, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
@@ -14,67 +14,99 @@ import { FormInput } from "@/components/form/form-input";
 import { FormTextarea } from "@/components/form/form-textarea";
 import { FormSearchSelect } from "@/components/form/form-search-select";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
+import { add } from "@/app/actions/purchasingRequest/add";
 import { submit } from "@/app/actions/purchasingRequest/submit";
 import { gets as getWareModels } from "@/app/actions/wareModel/gets";
 
 const newPRSchema = z.object({
   title: z.string().min(1, "عنوان درخواست الزامی است"),
   description: z.string().optional(),
-  estimatedAmount: z.string().optional(),
   quantity: z.string().min(1, "تعداد الزامی است"),
   wareModelId: z.string().min(1, "انتخاب مدل کالا الزامی است"),
-  requestingUnitId: z.string().optional(),
 });
 
 type NewPRData = z.input<typeof newPRSchema>;
 
 export function NewPurchasingRequestForm() {
   const router = useRouter();
-  const [submitting, setSubmitting] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const form = useForm<NewPRData>({
     resolver: zodV4Resolver(newPRSchema),
     defaultValues: {
       title: "",
       description: "",
-      estimatedAmount: "",
       quantity: "1",
       wareModelId: "",
-      requestingUnitId: "",
     },
   });
 
-  const onSubmit = async (values: NewPRData) => {
-    setSubmitting(true);
+  const handleSaveDraft = async (values: NewPRData) => {
+    setSaving(true);
     try {
-      const result = await submit(
+      const result = await add(
         {
           activeRoleId: getActiveRoleIdFromStore(),
           title: values.title,
           description: values.description || undefined,
-          estimatedAmount: values.estimatedAmount ? Number(values.estimatedAmount) : undefined,
           quantity: Number(values.quantity),
           wareModelId: values.wareModelId,
-          requestingUnitId: values.requestingUnitId || undefined,
         },
         { _id: 1, title: 1, status: 1 }
       );
-      if (result.success && result.body?.[0]?._id) {
-        toast.success("درخواست خرید با موفقیت ثبت شد.");
-        router.push(`/admin/purchasing-requests/${result.body[0]._id}`);
+      if (result.success && result.body?._id) {
+        toast.success("پیش‌نویس درخواست خرید ذخیره شد.");
+        router.push(`/admin/purchasing-requests/${result.body._id}`);
       } else {
-        toast.error(result.body?.message || "خطا در ثبت درخواست خرید");
+        toast.error(result.body?.message || "خطا در ذخیره پیش‌نویس");
+      }
+    } catch {
+      toast.error("خطا در ذخیره پیش‌نویس");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveAndSubmit = async (values: NewPRData) => {
+    setSaving(true);
+    try {
+      const result = await add(
+        {
+          activeRoleId: getActiveRoleIdFromStore(),
+          title: values.title,
+          description: values.description || undefined,
+          quantity: Number(values.quantity),
+          wareModelId: values.wareModelId,
+        },
+        { _id: 1, title: 1, status: 1 }
+      );
+      if (!result.success || !result.body?._id) {
+        toast.error(result.body?.message || "خطا در ایجاد درخواست خرید");
+        setSaving(false);
+        return;
+      }
+      const draftId = result.body._id;
+      const submitResult = await submit(
+        { activeRoleId: getActiveRoleIdFromStore(), _id: draftId },
+        { _id: 1, title: 1, status: 1 }
+      );
+      if (submitResult.success) {
+        toast.success("درخواست خرید با موفقیت ثبت و ارسال شد.");
+        router.push(`/admin/purchasing-requests/${draftId}`);
+      } else {
+        toast.error(submitResult.body?.message || "پیش‌نویس ذخیره شد اما ارسال ناموفق بود");
+        router.push(`/admin/purchasing-requests/${draftId}`);
       }
     } catch {
       toast.error("خطا در ثبت درخواست خرید");
     } finally {
-      setSubmitting(false);
+      setSaving(false);
     }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 relative z-[1]">
+      <form className="space-y-6 relative z-[1]">
         {/* Basic Info */}
         <Card variant="glass">
           <CardHeader>
@@ -84,7 +116,7 @@ export function NewPurchasingRequestForm() {
               </div>
               <div>
                 <CardTitle>اطلاعات اولیه</CardTitle>
-                <CardDescription>عنوان، توضیحات و مبلغ تخمینی درخواست</CardDescription>
+                <CardDescription>عنوان، توضیحات و تعداد درخواست</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -104,13 +136,6 @@ export function NewPurchasingRequestForm() {
               rows={3}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormInput
-                control={form.control}
-                name="estimatedAmount"
-                label="مبلغ تخمینی (ریال)"
-                placeholder="مثال: ۵۰۰۰۰۰۰۰۰"
-                type="number"
-              />
               <FormInput
                 control={form.control}
                 name="quantity"
@@ -169,13 +194,27 @@ export function NewPurchasingRequestForm() {
 
         {/* Actions */}
         <div className="flex items-center gap-3 pt-2">
-          <Button type="submit" disabled={submitting} className="gap-2 min-w-[160px]">
-            {submitting ? (
+          <Button type="button" disabled={saving} className="gap-2 min-w-[160px]" onClick={form.handleSubmit(handleSaveAndSubmit)}>
+            {saving ? (
               <Loader2 className="size-4 animate-spin" />
             ) : (
               <Send className="size-4" />
             )}
-            {submitting ? "در حال ثبت..." : "ثبت و ارسال درخواست"}
+            {saving ? "در حال ثبت..." : "ثبت و ارسال"}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={saving}
+            className="gap-2"
+            onClick={form.handleSubmit(handleSaveDraft)}
+          >
+            {saving ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Save className="size-4" />
+            )}
+            ذخیره به عنوان پیش‌نویس
           </Button>
           <Button
             type="button"

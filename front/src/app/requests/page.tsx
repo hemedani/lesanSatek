@@ -21,7 +21,6 @@ export default async function RequestsDashboard() {
       _id: 1,
       title: 1,
       status: 1,
-      estimatedAmount: 1,
       createdAt: 1,
     },
   )
@@ -108,7 +107,7 @@ export default async function RequestsDashboard() {
           <CardContent>
             {prs.length > 0 ? (
               <ul className="space-y-2">
-                {prs.map((p: { _id: string; title?: string; status?: string; estimatedAmount?: number }) => (
+                {prs.map((p: { _id: string; title?: string; status?: string }) => (
                   <li key={p._id} className="flex items-center justify-between py-1">
                     <Link href={`/requests/${p._id}`} className="text-sm text-frost-link hover:underline">
                       {p.title || "بدون عنوان"}

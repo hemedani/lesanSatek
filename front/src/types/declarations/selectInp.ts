@@ -29,7 +29,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -86,7 +86,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -111,7 +111,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -149,7 +149,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -171,7 +171,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -255,7 +255,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -315,7 +315,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -407,7 +407,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -437,7 +437,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -456,7 +456,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -481,7 +481,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -509,7 +509,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -531,7 +531,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -713,7 +713,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -766,7 +766,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -807,7 +807,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -989,7 +989,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -1047,7 +1047,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -1244,7 +1244,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -1440,7 +1440,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -1595,7 +1595,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -1753,7 +1753,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -1937,7 +1937,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -1965,7 +1965,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -2144,7 +2144,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -2276,7 +2276,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -2489,7 +2489,7 @@ details?: {
 }[];
 createdAt?: Date;
 updatedAt?: Date;
-process: {
+process?: {
 _id?: string;
 name: string;
 description?: string;
@@ -2509,7 +2509,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -2537,7 +2537,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -2913,7 +2913,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -2932,7 +2932,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -3120,7 +3120,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -3220,7 +3220,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -3320,7 +3320,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -3342,7 +3342,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -3414,7 +3414,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -3433,7 +3433,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -3571,7 +3571,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -3599,7 +3599,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -3672,7 +3672,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -3697,7 +3697,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -3762,7 +3762,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -3840,7 +3840,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -3895,7 +3895,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -3946,7 +3946,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -3965,7 +3965,7 @@ position?: string;
 isActive: boolean;
 isGhost: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -4036,7 +4036,7 @@ email: string;
 password: string;
 is_verified: boolean;
 features?: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -8360,7 +8360,7 @@ password: string;
 position?: string;
 isActive: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -8607,7 +8607,7 @@ is_verified?: boolean;
 position?: string;
 isActive?: boolean;
 features?: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -8851,7 +8851,7 @@ password: string;
 position?: string;
 isActive: boolean;
 features: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -18702,7 +18702,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features?: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -18960,7 +18960,7 @@ hasColdStorage?: boolean;
 fleetSize?: number;
 serviceRadius?: number;
 features?: {
-feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" );
+feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
@@ -33756,20 +33756,8 @@ set: {
 activeRoleId: string;
 title: string;
 description?: string;
-estimatedAmount?: number;
 quantity: number;
-status?: ("Draft" | "Pending" | "InProgress" | "Approved" | "Rejected" | "Completed" | "Cancelled" );
-currentStep?: number;
-requestedAt?: string;
-completedAt?: string;
 wareModelId: string;
-requestingUnitId?: string;
-attachmentIds?: string[];
-storeId?: string;
-wareId?: string;
-wareTypeId?: string;
-wareClassId?: string;
-wareGroupId?: string;
 };
 get: {
 _id?: (0 | 1 );
@@ -40257,19 +40245,9 @@ qty?: (0 | 1 );
             submit: {
 set: {
 activeRoleId: string;
-title: string;
-description?: string;
-estimatedAmount?: number;
-quantity: number;
-wareModelId: string;
-requestingUnitId?: string;
-attachmentIds?: string[];
-budgetLineId?: string;
+_id: string;
 storeId?: string;
-wareId?: string;
-wareTypeId?: string;
-wareClassId?: string;
-wareGroupId?: string;
+requestingUnitId?: string;
 };
 get: {
 _id?: (0 | 1 );
@@ -87245,6 +87223,7 @@ sortOrder?: ("asc" | "desc" );
 purchasingRequestId?: string;
 processStepId?: string;
 unitId?: string;
+status?: ("pending" | "approved" | "rejected" );
 };
 get: {
 _id?: (0 | 1 );

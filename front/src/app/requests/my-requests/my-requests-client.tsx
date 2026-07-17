@@ -10,18 +10,23 @@ import { Pagination } from "@/components/ui/pagination"
 import { EmptyState } from "@/components/ui/empty-state"
 
 const statusMap: Record<string, string> = {
+  Draft: "پیش‌نویس",
   draft: "پیش‌نویس",
+  Pending: "در انتظار تایید",
   pending: "در انتظار تایید",
+  Approved: "تایید شده",
   approved: "تایید شده",
+  Rejected: "رد شده",
   rejected: "رد شده",
+  InProgress: "در حال انجام",
   in_progress: "در حال انجام",
+  Completed: "تکمیل شده",
   completed: "تکمیل شده",
 }
 
 interface PRItem {
   _id: string
   title?: string
-  estimatedAmount?: number
   quantity?: number
   status?: string
   currentStep?: string
@@ -37,11 +42,6 @@ const columns = [
         {item.title || "—"}
       </Link>
     ),
-  },
-  {
-    key: "estimatedAmount",
-    label: "مبلغ تخمینی",
-    render: (item: PRItem) => `${item.estimatedAmount?.toLocaleString("fa-IR") || "—"} تومان`,
   },
   {
     key: "quantity",

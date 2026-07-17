@@ -21,7 +21,6 @@ interface PurchasingRequest {
   _id: string;
   title?: string;
   status?: string;
-  estimatedAmount?: number;
   quantity?: number;
   currentStep?: number;
   createdAt?: string;
@@ -83,15 +82,6 @@ export function PurchasingRequestsClient({
       key: "status",
       label: "وضعیت",
       render: (item) => <RequestStatusBadge status={item.status} />,
-    },
-    {
-      key: "estimatedAmount",
-      label: "مبلغ تخمینی",
-      render: (item) => (
-        <span className="text-fog text-sm font-mono" dir="ltr">
-          {item.estimatedAmount != null ? item.estimatedAmount.toLocaleString("fa-IR") : "—"}
-        </span>
-      ),
     },
     {
       key: "quantity",
@@ -158,7 +148,6 @@ export function PurchasingRequestsClient({
           <RequestCard
             title={item.title}
             status={item.status}
-            estimatedAmount={item.estimatedAmount}
             quantity={item.quantity}
             processName={item.process?.name}
             createdAt={item.createdAt}

@@ -12,7 +12,8 @@ export type FeatureName =
   | "canManageFeatures"
   | "canConfirmGoodsReceipt"
   | "canIssuePaymentOrder"
-  | "canViewHistory";
+  | "canViewHistory"
+  | "canSubmitPurchaseRequest";
 
 export type RoleName =
   | "Manager"
@@ -49,6 +50,7 @@ export const FEATURES_OPTIONS: FeatureOption[] = [
   { value: "canConfirmGoodsReceipt", label: "تایید رسید کالا" },
   { value: "canIssuePaymentOrder", label: "صدور دستور پرداخت" },
   { value: "canViewHistory", label: "مشاهده تاریخچه" },
+  { value: "canSubmitPurchaseRequest", label: "ارسال درخواست خرید" },
 ];
 
 export const ROLE_OPTIONS: RoleOption[] = [

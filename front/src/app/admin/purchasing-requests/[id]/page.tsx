@@ -16,7 +16,6 @@ export default async function PurchasingRequestDetailPage({
         _id: 1,
         title: 1,
         description: 1,
-        estimatedAmount: 1,
         status: 1,
         currentStep: 1,
         quantity: 1,

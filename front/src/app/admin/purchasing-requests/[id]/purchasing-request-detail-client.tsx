@@ -2,15 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ArrowRight, ShoppingCart, Building2, DollarSign, Package, Calendar, FileText, BarChart3, Store, Gavel } from "lucide-react";
+import { ArrowRight, ShoppingCart, Building2, Package, Calendar, FileText, BarChart3, Store, Gavel, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { RequestStatusBadge } from "@/components/purchasing/request-status-badge";
 import { WorkflowVisualizer } from "@/components/purchasing/workflow-visualizer";
 import { HistoryTimeline } from "@/components/purchasing/history-timeline";
 import { AssignStoreDialog } from "@/components/purchasing/assign-store-dialog";
 import { TenderCreateDialog } from "@/components/purchasing/tender-create-dialog";
+import { SubmitPRDialog } from "@/components/purchasing/submit-pr-dialog";
 
 interface ProcessStep {
   _id: string;
@@ -23,13 +23,6 @@ interface Process {
   name?: string;
   description?: string;
   steps?: ProcessStep[];
-}
-
-interface BudgetLine {
-  _id: string;
-  code?: string;
-  title?: string;
-  remainingBudget?: number;
 }
 
 interface Unit {
@@ -52,11 +45,17 @@ interface HistoryEntry {
   };
 }
 
+interface BudgetLine {
+  _id: string;
+  code?: string;
+  title?: string;
+  remainingBudget?: number;
+}
+
 interface PurchasingRequest {
   _id: string;
   title?: string;
   description?: string;
-  estimatedAmount?: number;
   status?: string;
   currentStep?: number;
   quantity?: number;
@@ -92,6 +91,7 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
 
   const [showAssignStore, setShowAssignStore] = useState(false);
   const [showCreateTender, setShowCreateTender] = useState(false);
+  const [showSubmitPR, setShowSubmitPR] = useState(false);
 
   if (!pr) {
     return (
@@ -105,6 +105,7 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
     );
   }
 
+  const isDraft = pr.status === "Draft";
   const currentStep = pr.currentStep || 0;
   const totalSteps = pr.process?.steps?.length || 0;
 
@@ -129,9 +130,9 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
               <div className="flex items-center gap-2 mt-1">
                 <RequestStatusBadge status={pr.status} />
                 {pr.process?.name && (
-                  <Badge variant="outline" className="text-[11px] px-2 py-0.5 bg-white/[0.03] text-fog/60 border-steel-border/30">
+                  <span className="text-[11px] px-2 py-0.5 rounded-sm bg-white/[0.03] text-fog/60 border border-steel-border/30">
                     {pr.process.name}
-                  </Badge>
+                  </span>
                 )}
               </div>
             </div>
@@ -142,29 +143,38 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-[1]">
         {/* Main Content (2/3) */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Workflow Visualizer */}
-          <Card variant="glass">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="size-8 rounded-xl bg-electric-iris/10 flex items-center justify-center">
-                  <BarChart3 className="size-4 text-electric-iris" />
+          {/* Workflow Visualizer — only if process is assigned */}
+          {pr.process && pr.process.steps && pr.process.steps.length > 0 ? (
+            <Card variant="glass">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="size-8 rounded-xl bg-electric-iris/10 flex items-center justify-center">
+                    <BarChart3 className="size-4 text-electric-iris" />
+                  </div>
+                  <div>
+                    <CardTitle>پیشرفت فرآیند</CardTitle>
+                    <CardDescription>
+                      مرحله {currentStep} از {totalSteps}
+                    </CardDescription>
+                  </div>
                 </div>
-                <div>
-                  <CardTitle>پیشرفت فرآیند</CardTitle>
-                  <CardDescription>
-                    مرحله {currentStep} از {totalSteps}
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <WorkflowVisualizer
-                steps={pr.process?.steps || []}
-                currentStep={currentStep}
-                status={pr.status}
-              />
-            </CardContent>
-          </Card>
+              </CardHeader>
+              <CardContent>
+                <WorkflowVisualizer
+                  steps={pr.process.steps}
+                  currentStep={currentStep}
+                  status={pr.status}
+                />
+              </CardContent>
+            </Card>
+          ) : isDraft ? (
+            <Card variant="glass">
+              <CardContent className="py-8 text-center">
+                <BarChart3 className="size-10 text-fog/20 mx-auto mb-3" />
+                <p className="text-sm text-fog/50">پس از ارسال درخواست، فرآیند خرید به این درخواست متصل می‌شود.</p>
+              </CardContent>
+            </Card>
+          ) : null}
 
           {/* Description */}
           {pr.description && (
@@ -204,7 +214,7 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
           </Card>
         </div>
 
-          {/* Sidebar (1/3) */}
+        {/* Sidebar (1/3) */}
         <div className="space-y-6">
           <Card variant="glass">
             <CardHeader>
@@ -220,11 +230,16 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
             <CardContent className="p-0">
               <div className="px-5">
                 <InfoRow
-                  icon={DollarSign}
-                  label="مبلغ تخمینی"
+                  icon={Package}
+                  label="تعداد"
+                  value={pr.quantity != null ? pr.quantity.toLocaleString("fa-IR") : "—"}
+                />
+                <InfoRow
+                  icon={BarChart3}
+                  label="بودجه"
                   value={
-                    pr.estimatedAmount != null
-                      ? `${pr.estimatedAmount.toLocaleString("fa-IR")} ریال`
+                    pr.budgetLine
+                      ? `${pr.budgetLine.code || ""} - ${pr.budgetLine.title || ""}`
                       : "—"
                   }
                 />
@@ -252,12 +267,8 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
                 />
                 <InfoRow
                   icon={BarChart3}
-                  label="بودجه"
-                  value={
-                    pr.budgetLine
-                      ? `${pr.budgetLine.code || ""} - ${pr.budgetLine.title || ""}`
-                      : "—"
-                  }
+                  label="فرآیند"
+                  value={pr.process?.name || "تعیین نشده"}
                 />
                 <InfoRow
                   icon={Calendar}
@@ -272,31 +283,35 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
             </CardContent>
           </Card>
 
-          {/* Actions Card */}
-          <Card variant="glass">
-            <CardContent className="p-4">
-              <Button
-                className="w-full gap-2"
-                size="sm"
-                onClick={() => setShowAssignStore(true)}
-              >
-                <Store className="size-4" />
-                تخصیص فروشگاه
-              </Button>
-            </CardContent>
-          </Card>
-
+          {/* Actions */}
           <div className="flex flex-col gap-2">
-            <Button className="w-full gap-2" size="sm" onClick={() => setShowAssignStore(true)}>
-              <Store className="size-4" />
-              تخصیص فروشگاه
-            </Button>
-            <Button className="w-full gap-2" size="sm" variant="secondary" onClick={() => setShowCreateTender(true)}>
-              <Gavel className="size-4" />
-              ایجاد مناقصه
-            </Button>
+            {isDraft ? (
+              <Button className="w-full gap-2" size="sm" onClick={() => setShowSubmitPR(true)}>
+                <Send className="size-4" />
+                ارسال درخواست
+              </Button>
+            ) : (
+              <>
+                <Button className="w-full gap-2" size="sm" onClick={() => setShowAssignStore(true)}>
+                  <Store className="size-4" />
+                  تخصیص فروشگاه
+                </Button>
+                <Button className="w-full gap-2" size="sm" variant="secondary" onClick={() => setShowCreateTender(true)}>
+                  <Gavel className="size-4" />
+                  ایجاد مناقصه
+                </Button>
+              </>
+            )}
           </div>
 
+          <SubmitPRDialog
+            open={showSubmitPR}
+            onOpenChange={setShowSubmitPR}
+            purchasingRequestId={pr._id}
+            title={pr.title}
+            quantity={pr.quantity}
+            wareModelName={pr.wareModel?.name}
+          />
           <AssignStoreDialog
             open={showAssignStore}
             onOpenChange={setShowAssignStore}
