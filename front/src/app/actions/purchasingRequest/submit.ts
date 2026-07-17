@@ -21,21 +21,6 @@ export const submit = async (
       },
     });
 
-
-    /*
-    *	@LOG @DEBUG @INFO
-    *	This log written by ::==> {{ `` }}
-    *
-    *	Please remove your log after debugging
-    */
-    console.log(" ============= ");
-    console.group("data,activeRoleId ------ ");
-    console.log();
-    console.info({ data, activeRoleId }, " ------ ");
-    console.log();
-    console.groupEnd();
-    console.log(" ============= ");
-
     return result;
   } catch (error: unknown) {
     return {
