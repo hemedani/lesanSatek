@@ -11,6 +11,7 @@ import { getUser } from "@/app/actions/user/getUser"
 import { WorkflowVisualizer } from "@/components/purchasing/workflow-visualizer"
 import { HistoryTimeline } from "@/components/purchasing/history-timeline"
 import { StepApprovalPanel } from "@/components/purchasing/step-approval-panel"
+import { SubmitPRButton } from "@/app/requests/[id]/submit-pr-button"
 import { cookies } from "next/headers"
 
 const statusMap: Record<string, string> = {
@@ -35,7 +36,6 @@ export default async function UnitHeadRequestDetailPage({
       _id: 1,
       title: 1,
       description: 1,
-      estimatedAmount: 1,
       quantity: 1,
       status: 1,
       currentStep: 1,
@@ -44,6 +44,7 @@ export default async function UnitHeadRequestDetailPage({
       requester: { _id: 1, first_name: 1, last_name: 1 },
       process: { _id: 1, name: 1, steps: { _id: 1, name: 1, order: 1 } },
       wareModel: { _id: 1, name: 1 },
+      requestingUnit: { _id: 1, name: 1 },
     },
   )
 
@@ -116,12 +117,6 @@ export default async function UnitHeadRequestDetailPage({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-fog">مبلغ تخمینی</p>
-                  <p className="text-sm text-moonlight font-medium">
-                    {pr.estimatedAmount?.toLocaleString("fa-IR") || "—"} تومان
-                  </p>
-                </div>
-                <div>
                   <p className="text-xs text-fog">تعداد</p>
                   <p className="text-sm text-moonlight font-medium">
                     {pr.quantity?.toLocaleString("fa-IR") || "—"}
@@ -176,12 +171,31 @@ export default async function UnitHeadRequestDetailPage({
         </div>
 
         <div className="space-y-6">
-          <StepApprovalPanel
-            purchasingRequestId={pr._id || id}
-            processStep={currentProcessStep}
-            unitId={unitId}
-            existingApprovals={approvals}
-          />
+          {pr.status === "Draft" ? (
+            <Card variant="glass">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-fog">ارسال درخواست</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-fog mb-3">
+                  با ارسال این درخواست، فرآیند خرید آغاز شده و به مرحله تأیید وارد می‌شود.
+                </p>
+                <SubmitPRButton
+                  purchasingRequestId={pr._id || id}
+                  title={pr.title}
+                  quantity={pr.quantity}
+                  wareModelName={pr.wareModel?.name}
+                />
+              </CardContent>
+            </Card>
+          ) : (
+            <StepApprovalPanel
+              purchasingRequestId={pr._id || id}
+              processStep={currentProcessStep}
+              unitId={unitId}
+              existingApprovals={approvals}
+            />
+          )}
         </div>
       </div>
     </div>
