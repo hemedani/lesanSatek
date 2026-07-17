@@ -14,6 +14,7 @@ export const getsFn: ActFn = async (body) => {
       purchasingRequestId,
       processStepId,
       unitId,
+      status,
       activeRoleId,
     },
     get,
@@ -47,6 +48,7 @@ export const getsFn: ActFn = async (body) => {
   purchasingRequestId && (match["purchasingRequest._id"] = new ObjectId(purchasingRequestId as string));
   processStepId && (match["processStep._id"] = new ObjectId(processStepId as string));
   unitId && (match["unit._id"] = new ObjectId(unitId as string));
+  status && (match.status = status);
   if (Object.keys(match).length > 0) {
     pipeline.push({ $match: match });
   }
