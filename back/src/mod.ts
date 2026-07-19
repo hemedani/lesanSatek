@@ -17,7 +17,6 @@ import { wareSetup } from "./ware/mod.ts";
 import { stuffSetup } from "./stuff/mod.ts";
 import { storeSetup } from "./store/mod.ts";
 import { stepApprovalSetup } from "./stepApproval/mod.ts";
-import { purchaseOrderItemSetup } from "./purchaseOrderItem/mod.ts";
 import { tenderSetup } from "./tender/mod.ts";
 import { tenderOfferSetup } from "./tenderOffer/mod.ts";
 import { inventorySetup } from "./inventory/mod.ts";
@@ -51,7 +50,6 @@ export const functionsSetup = () => {
 	stuffSetup();
 	storeSetup();
 	stepApprovalSetup();
-  purchaseOrderItemSetup();
   tenderSetup();
   tenderOfferSetup();
   inventorySetup();

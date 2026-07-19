@@ -23,7 +23,6 @@ export * from "./organization.ts";
 export * from "./unit.ts";
 export * from "./process.ts";
 export * from "./processStep.ts";
-export * from "./purchaseOrderItem.ts";
 export * from "./purchasingRequest.ts";
 export * from "./state.ts";
 export * from "./city.ts";

@@ -110,11 +110,6 @@ export const stepApproval_excludes: string[] = [
   "updatedAt",
 ];
 
-export const purchaseOrderItem_excludes: string[] = [
-  "createdAt",
-  "updatedAt",
-];
-
 export const tender_excludes: string[] = [
   "createdAt",
   "updatedAt",
