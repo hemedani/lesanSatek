@@ -16,7 +16,6 @@ import {
   paymentOrders,
   processes,
   processSteps,
-  purchaseOrderItems,
   purchasingRequests,
   states,
   stepApprovals,
@@ -64,7 +63,6 @@ export const ware = wares();
 export const stuff = stuffs();
 export const store = stores();
 export const stepApproval = stepApprovals();
-export const purchaseOrderItem = purchaseOrderItems();
 export const tender = tenders();
 export const tenderOffer = tenderOffers();
 export const inventory = inventories();
