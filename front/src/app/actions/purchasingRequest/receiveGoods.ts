@@ -5,7 +5,7 @@ import { getToken, getActiveRoleId } from "@/lib/auth";
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 
 export const receiveGoods = async (
-  data: { purchasingRequestId: string; wareModelId: string; quantity: number; unitId: string },
+  data: { purchasingRequestId: string; wareModelId: string; wareModelName?: string; wareId?: string; wareName?: string; quantity: number; unitId: string },
 ) => {
   try {
     const token = await getToken();
@@ -27,6 +27,9 @@ export const receiveGoods = async (
           items: [
             {
               wareModelId: data.wareModelId,
+              wareModelName: data.wareModelName || undefined,
+              wareId: data.wareId || undefined,
+              wareName: data.wareName || undefined,
               quantityReceived: data.quantity,
               quantityAccepted: data.quantity,
               quantityRejected: 0,

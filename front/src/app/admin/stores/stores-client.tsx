@@ -25,6 +25,7 @@ import { add } from "@/app/actions/store/add";
 import { update } from "@/app/actions/store/update";
 import { gets as getCities } from "@/app/actions/city/gets";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
+import { useAuthStore } from "@/stores/authStore";
 
 interface Store {
   _id: string;
@@ -77,6 +78,10 @@ export function StoresClient({
   search = "",
 }: StoresClientProps) {
   const router = useRouter();
+  const { user } = useAuthStore();
+  const activeRoleIdFromStore = getActiveRoleIdFromStore();
+  const activeRole = user?.roles?.find((r) => r.roleId === activeRoleIdFromStore);
+  const isStoreHead = activeRole?.name === "StoreHead";
   const [cardView, setCardView] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<Store | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -229,9 +234,11 @@ export function StoresClient({
           <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200" onClick={() => openEdit(item)}>
             <Pencil className="size-3.5" />
           </Button>
-          <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200 text-fog/60 hover:text-destructive" onClick={() => setDeleteTarget(item)}>
-            <Trash2 className="size-3.5" />
-          </Button>
+          {!isStoreHead && (
+            <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200 text-fog/60 hover:text-destructive" onClick={() => setDeleteTarget(item)}>
+              <Trash2 className="size-3.5" />
+            </Button>
+          )}
         </div>
       ),
     },
@@ -275,9 +282,11 @@ export function StoresClient({
                 <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-moonlight" onClick={(e) => { e.stopPropagation(); openEdit(item); }}>
                   <Pencil className="size-3.5" />
                 </Button>
-                <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteTarget(item); }}>
-                  <Trash2 className="size-3.5" />
-                </Button>
+                {!isStoreHead && (
+                  <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteTarget(item); }}>
+                    <Trash2 className="size-3.5" />
+                  </Button>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-2 mt-3">

@@ -20,10 +20,11 @@ export type RoleName =
   | "Admin"
   | "OrgHead"
   | "UnitHead"
+  | "StoreHead"
   | "Employee"
   | "Ordinary";
 
-export type ScopeType = "organization" | "unit";
+export type ScopeType = "organization" | "unit" | "store";
 
 export interface FeatureOption {
   value: FeatureName;
@@ -57,6 +58,7 @@ export const ROLE_OPTIONS: RoleOption[] = [
   { value: "Ordinary", label: "عادی" },
   { value: "Employee", label: "کارمند" },
   { value: "UnitHead", label: "رئیس واحد" },
+  { value: "StoreHead", label: "رئیس فروشگاه" },
   { value: "OrgHead", label: "رئیس سازمان" },
   { value: "Admin", label: "ادمین" },
   { value: "Manager", label: "مدیر" },
@@ -66,4 +68,5 @@ export const SCOPE_OPTIONS: { value: ScopeType | ""; label: string }[] = [
   { value: "", label: "بدون محدودیت" },
   { value: "organization", label: "سازمان" },
   { value: "unit", label: "واحد" },
+  { value: "store", label: "فروشگاه" },
 ];

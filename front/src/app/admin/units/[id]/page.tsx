@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ArrowRight, Loader2, Trash2, Share2 } from "lucide-react";
+import { ArrowRight, Loader2, Trash2, Share2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/form/form-input";
 import { FormTextarea } from "@/components/form/form-textarea";
@@ -23,6 +23,8 @@ import { update } from "@/app/actions/unit/update";
 import { remove } from "@/app/actions/unit/remove";
 import Link from "next/link";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
+import { LocationPicker } from "@/components/ui/location-picker";
+import type { GeoPoint } from "@/components/ui/location-picker";
 
 const unitSchema = z.object({
   name: z.string().min(1, "نام واحد الزامی است"),
@@ -60,6 +62,7 @@ export default function EditUnitPage({
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [geoLocation, setGeoLocation] = useState<GeoPoint>(null);
 
   const form = useForm<UnitData>({
     resolver: zodV4Resolver(unitSchema),
@@ -97,10 +100,12 @@ export default function EditUnitPage({
           hasColdStorage: 1,
           fleetSize: 1,
           serviceRadius: 1,
+          location: 1,
         }
       );
       if (result.success && result.body?.[0]) {
         const unit = result.body[0];
+        if (unit.location) setGeoLocation(unit.location);
         form.reset({
           name: unit.name || "",
           enName: unit.enName || "",
@@ -140,6 +145,7 @@ export default function EditUnitPage({
         hasColdStorage: data.hasColdStorage || undefined,
         fleetSize: data.fleetSize || undefined,
         serviceRadius: data.serviceRadius || undefined,
+        ...(geoLocation ? { location: geoLocation } : {}),
       },
       { _id: 1, name: 1 }
     );
@@ -296,6 +302,10 @@ export default function EditUnitPage({
                 type="number"
               />
             </div>
+          </FormCard>
+
+          <FormCard title="موقعیت جغرافیایی">
+            <LocationPicker value={geoLocation} onChange={setGeoLocation} />
           </FormCard>
 
           <div className="flex items-center gap-2 justify-end">

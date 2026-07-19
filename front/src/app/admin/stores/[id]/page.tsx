@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
 import { Loader2, Save, Store, Banknote, MapPin, BadgeInfo, Shield, ArrowRight, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { FormInput } from "@/components/form/form-input";
 import { FormSelect } from "@/components/form/form-select";
@@ -16,10 +17,14 @@ import { FormTextarea } from "@/components/form/form-textarea";
 import { FormCheckbox } from "@/components/form/form-checkbox";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/ui/error-state";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
+import { useAuthStore } from "@/stores/authStore";
 import { get } from "@/app/actions/store/get";
 import { update } from "@/app/actions/store/update";
 import { remove } from "@/app/actions/store/remove";
+import { LocationPicker } from "@/components/ui/location-picker";
+import type { GeoPoint } from "@/components/ui/location-picker";
 
 const storeSchema = z.object({
   name: z.string().min(1, "نام فروشگاه الزامی است"),
@@ -54,6 +59,12 @@ export default function EditStorePage() {
   const [submitting, setSubmitting] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [denied, setDenied] = useState(false);
+  const [geoLocation, setGeoLocation] = useState<GeoPoint>(null);
+
+  const { user } = useAuthStore();
+  const activeRole = user?.roles?.find((r) => r.roleId === getActiveRoleIdFromStore());
+  const isStoreHead = activeRole?.name === "StoreHead";
 
   const form = useForm<StoreData>({
     resolver: zodV4Resolver(storeSchema),
@@ -83,6 +94,12 @@ export default function EditStorePage() {
 
   useEffect(() => {
     (async () => {
+      if (isStoreHead && activeRole?.scopeId !== id) {
+        setDenied(true);
+        setLoading(false);
+        return;
+      }
+
       const result = await get({ _id: id }, {
         _id: 1, name: 1, address: 1, contact: 1, ceoname: 1,
         workingHours: 1, email: 1, economicCode: 1, postalCode: 1,
@@ -90,9 +107,11 @@ export default function EditStorePage() {
         legalPerson: 1, bankCardNumber: 1, shebaNumber: 1,
         nameOfAccountHolder: 1, bankName: 1, fastDelivery: 1,
         isAvailableInHolidays: 1, score: 1, status: 1,
+        geoLocation: 1,
       });
       if (result.success && result.body?.[0]) {
         const s = result.body[0];
+        if (s.geoLocation) setGeoLocation(s.geoLocation);
         form.reset({
           name: s.name || "",
           address: s.address || "",
@@ -150,6 +169,7 @@ export default function EditStorePage() {
           isAvailableInHolidays: values.isAvailableInHolidays,
           score: Number(values.score),
           status: values.status,
+          ...(geoLocation ? { geoLocation } : {}),
         },
         { _id: 1, name: 1 }
       );
@@ -191,6 +211,25 @@ export default function EditStorePage() {
     );
   }
 
+  if (denied) {
+    return (
+      <div className="space-y-6">
+        <ErrorState
+          title="دسترسی محدود"
+          message="شما فقط می‌توانید فروشگاه خود را ویرایش کنید."
+        />
+        <div className="flex justify-center mt-4">
+          <Link href="/admin/stores">
+            <Button variant="ghost" size="sm" className="text-frost-link">
+              <ArrowRight className="size-4 ms-1" />
+              بازگشت به لیست فروشگاه‌ها
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 relative">
       <div className="relative z-[1]">
@@ -204,9 +243,11 @@ export default function EditStorePage() {
               <p className="text-sm text-fog/60 mt-1">به‌روزرسانی اطلاعات فروشگاه</p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" className="gap-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10" onClick={() => setShowDelete(true)}>
-            <Trash2 className="size-4" /> حذف
-          </Button>
+          {!isStoreHead && (
+            <Button variant="ghost" size="sm" className="gap-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10" onClick={() => setShowDelete(true)}>
+              <Trash2 className="size-4" /> حذف
+            </Button>
+          )}
         </div>
       </div>
 
@@ -289,6 +330,20 @@ export default function EditStorePage() {
                 <FormInput control={form.control} name="nameOfAccountHolder" label="نام صاحب حساب" />
                 <FormInput control={form.control} name="bankName" label="نام بانک" />
               </div>
+            </CardContent>
+          </Card>
+
+          <Card variant="glass">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="size-9 rounded-xl bg-electric-iris/10 flex items-center justify-center">
+                  <MapPin className="size-4.5 text-electric-iris" />
+                </div>
+                <div><CardTitle>موقعیت جغرافیایی</CardTitle></div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <LocationPicker value={geoLocation} onChange={setGeoLocation} />
             </CardContent>
           </Card>
 

@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Loader2, Building2 } from "lucide-react";
+import { Loader2, Building2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/form/form-input";
 import { FormTextarea } from "@/components/form/form-textarea";
@@ -20,6 +21,8 @@ import { gets as getCities } from "@/app/actions/city/gets";
 import type { ReqType } from "@/types/declarations/selectInp";
 import Link from "next/link";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
+import { LocationPicker } from "@/components/ui/location-picker";
+import type { GeoPoint } from "@/components/ui/location-picker";
 
 const orgSchema = z.object({
   name: z.string().min(1, "نام سازمان الزامی است"),
@@ -34,6 +37,7 @@ type OrgData = z.input<typeof orgSchema>;
 
 export default function AddOrganizationPage() {
   const router = useRouter();
+  const [geoLocation, setGeoLocation] = useState<GeoPoint>(null);
   const form = useForm<OrgData>({
     resolver: zodV4Resolver(orgSchema),
     defaultValues: {
@@ -50,7 +54,7 @@ export default function AddOrganizationPage() {
 
   const onSubmit = async (data: OrgData) => {
     const result = await add(
-      { activeRoleId: getActiveRoleIdFromStore(), ...data, isActive: data.isActive },
+      { activeRoleId: getActiveRoleIdFromStore(), ...data, isActive: data.isActive, ...(geoLocation ? { location: geoLocation } : {}) },
       { _id: 1, name: 1 }
     );
     if (result.success) {
@@ -165,6 +169,13 @@ export default function AddOrganizationPage() {
               label="فعال"
               disabled={form.formState.isSubmitting}
             />
+          </FormSection>
+
+          <FormSection
+            title="موقعیت جغرافیایی"
+            description="موقعیت دفتر مرکزی سازمان روی نقشه"
+          >
+            <LocationPicker value={geoLocation} onChange={setGeoLocation} />
           </FormSection>
 
           <div className="sticky bottom-0 z-10 bg-[rgba(5,6,15,0.85)] backdrop-blur-xl border border-steel-border/15 rounded-xl p-4 flex items-center justify-end gap-3 shadow-[0_-8px_32px_rgba(0,0,0,0.4)]">

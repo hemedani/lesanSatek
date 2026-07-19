@@ -22,6 +22,7 @@ const roleLabelMap: Record<string, string> = {
   Ordinary: "کاربر عادی",
   OrgHead: "رئیس سازمان",
   UnitHead: "رئیس واحد",
+  StoreHead: "رئیس فروشگاه",
 }
 
 function labelForRole(name?: string): string {
@@ -31,6 +32,7 @@ function labelForRole(name?: string): string {
 function scopeLabel(scopeType?: string): string {
   if (scopeType === "unit") return "واحد"
   if (scopeType === "organization") return "سازمان"
+  if (scopeType === "store") return "فروشگاه"
   return scopeType || ""
 }
 
@@ -47,6 +49,10 @@ function getScopeName(
   if (scopeType === "unit") {
     const match = user.units?.find((u) => u._id === scopeId)
     if (match) return match.name
+  }
+  if (scopeType === "store") {
+    if (user.managedStore?._id === scopeId) return user.managedStore.name
+    return null
   }
   return null
 }

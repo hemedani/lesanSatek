@@ -17,7 +17,7 @@ export const gets = async (
       act: "gets",
       details: {
         set: { ...data, activeRoleId },
-        get: getSelection || { _id: 1, inventoryNo: 1, price: 1, hasAbsolutePrice: 1 },
+        get: getSelection || { _id: 1, quantity: 1, price: 1, hasAbsolutePrice: 1 },
       },
     });
     return result;

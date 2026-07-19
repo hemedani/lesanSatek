@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Loader2, GitBranch } from "lucide-react";
+import { Loader2, GitBranch, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/form/form-input";
 import { FormTextarea } from "@/components/form/form-textarea";
@@ -21,6 +22,8 @@ import { gets as getUnits } from "@/app/actions/unit/gets";
 import { getUsers } from "@/app/actions/user/getUsers";
 import Link from "next/link";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
+import { LocationPicker } from "@/components/ui/location-picker";
+import type { GeoPoint } from "@/components/ui/location-picker";
 
 const unitSchema = z.object({
   name: z.string().min(1, "نام واحد الزامی است"),
@@ -53,6 +56,7 @@ const unitTypeOptions = [
 
 export default function AddUnitPage() {
   const router = useRouter();
+  const [geoLocation, setGeoLocation] = useState<GeoPoint>(null);
   const form = useForm<UnitData>({
     resolver: zodV4Resolver(unitSchema),
     defaultValues: {
@@ -95,6 +99,7 @@ export default function AddUnitPage() {
         hasColdStorage: data.hasColdStorage || undefined,
         fleetSize: data.fleetSize || undefined,
         serviceRadius: data.serviceRadius || undefined,
+        ...(geoLocation ? { location: geoLocation } : {}),
       },
       { _id: 1, name: 1 }
     );
@@ -306,6 +311,13 @@ export default function AddUnitPage() {
                 disabled={form.formState.isSubmitting}
               />
             </div>
+          </FormSection>
+
+          <FormSection
+            title="موقعیت جغرافیایی"
+            description="تعیین موقعیت واحد روی نقشه"
+          >
+            <LocationPicker value={geoLocation} onChange={setGeoLocation} />
           </FormSection>
 
           <div className="sticky bottom-0 z-10 bg-[rgba(5,6,15,0.85)] backdrop-blur-xl border border-steel-border/15 rounded-xl p-4 flex items-center justify-end gap-3 shadow-[0_-8px_32px_rgba(0,0,0,0.4)]">

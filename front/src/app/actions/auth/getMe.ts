@@ -35,6 +35,7 @@ export const getMe = async (
           organizations: { _id: 1, name: 1 },
           avatar: { _id: 1, name: 1 },
           units: { _id: 1, name: 1 },
+          managedStore: { _id: 1, name: 1 },
         },
       },
     });

@@ -17,7 +17,7 @@ export const update = async (
       act: "update",
       details: {
         set: { ...data, activeRoleId },
-        get: getSelection || { _id: 1, inventoryNo: 1 },
+        get: getSelection || { _id: 1, quantity: 1 },
       },
     });
     return result;

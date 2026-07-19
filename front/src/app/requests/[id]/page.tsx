@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowRight, ShoppingCart, Building2, Landmark, Store, Package, ClipboardList, FileText } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { get as getPR } from "@/app/actions/purchasingRequest/get"
 import { gets as getApprovals } from "@/app/actions/stepApproval/gets"
 import { gets as getGoodsReceipts } from "@/app/actions/goodsReceipt/gets"
-import { gets as getPOItems } from "@/app/actions/purchaseOrderItem/gets"
 import { gets as getPaymentOrders } from "@/app/actions/paymentOrder/gets"
 import { gets as getUnits } from "@/app/actions/unit/gets"
 import { WorkflowVisualizer } from "@/components/purchasing/workflow-visualizer"
@@ -68,6 +68,9 @@ export default async function RequestDetailPage({
       currentStep: 1,
       createdAt: 1,
       updatedAt: 1,
+      stuff: { _id: 1, quantity: 1, price: 1 },
+      stuffStatus: 1,
+      estimatedAmount: 1,
       requester: { _id: 1, first_name: 1, last_name: 1 },
       process: {
         _id: 1,
@@ -130,7 +133,7 @@ export default async function RequestDetailPage({
 
   const canReceive = pr.status === "approved" && isCurrentUserRequester && pr.wareModel?._id && userUnitId
 
-  const [approvalsRes, grRes, poiRes, poRes] = await Promise.all([
+  const [approvalsRes, grRes, poRes] = await Promise.all([
     getApprovals(
       { page: 1, limit: 50, filter: { purchasingRequestId: id } } as any,
       {
@@ -147,10 +150,6 @@ export default async function RequestDetailPage({
       { page: 1, limit: 20, purchasingRequestId: id },
       { _id: 1, receiptNumber: 1, quantityReceived: 1, receivedAt: 1, status: 1, notes: 1 },
     ),
-    getPOItems(
-      { page: 1, limit: 20, purchasingRequestId: id },
-      { _id: 1, quantity: 1, unitPrice: 1, totalPrice: 1, status: 1, assignedFrom: { _id: 1, name: 1 } },
-    ),
     getPaymentOrders(
       { page: 1, limit: 20, purchasingRequestId: id },
       { _id: 1, title: 1, amount: 1, status: 1, paidAt: 1 },
@@ -159,7 +158,6 @@ export default async function RequestDetailPage({
 
   const approvals = approvalsRes.success ? approvalsRes.body || [] : []
   const goodsReceipts = grRes.success ? grRes.body || [] : []
-  const purchaseOrderItems = poiRes.success ? poiRes.body || [] : []
   const paymentOrders = poRes.success ? poRes.body || [] : []
 
   const currentStepIdx = pr.currentStep ?? 0
@@ -379,39 +377,44 @@ export default async function RequestDetailPage({
             </Card>
           )}
 
-          {purchaseOrderItems.length > 0 && (
+          {pr.stuff && (
             <Card variant="glass">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2.5">
                   <div className="flex size-8 items-center justify-center rounded-lg bg-amber-500/10 ring-1 ring-inset ring-amber-500/15">
                     <ClipboardList className="size-4 text-amber-400" />
                   </div>
-                  <CardTitle className="text-sm font-medium text-moonlight">آیتم‌های سفارش خرید</CardTitle>
+                  <CardTitle className="text-sm font-medium text-moonlight">کالای تخصیص داده شده</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="divide-y divide-steel-border/10">
-                  {purchaseOrderItems.map((poi: Record<string, unknown>) => (
-                    <div key={String(poi._id)} className="py-3 first:pt-0 last:pb-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-moonlight">
-                          {Number(poi.quantity || 0).toLocaleString("fa-IR")} عدد
-                        </span>
-                        <span className="text-sm text-moonlight">
-                          {Number(poi.totalPrice || poi.unitPrice || 0).toLocaleString("fa-IR")} تومان
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-4 text-xs text-fog/50">
-                        <span>قیمت واحد: {Number(poi.unitPrice || 0).toLocaleString("fa-IR")} تومان</span>
-                        <StatusBadge status={String(poi.status || "")} />
-                      </div>
-                      {poi.assignedFrom && (
-                        <p className="text-xs text-fog/40 mt-1">
-                          فروشنده: {(poi.assignedFrom as Record<string, unknown>).name as string || "—"}
-                        </p>
-                      )}
+                <div className="py-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium text-moonlight">
+                      {pr.stuff.quantity != null ? pr.stuff.quantity.toLocaleString("fa-IR") : "—"}
+                    </span>
+                    {pr.stuffStatus && (
+                      <span className={cn(
+                        "text-[11px] px-2 py-0.5 rounded-full font-medium",
+                        pr.stuffStatus === "assigned" ? "bg-blue-500/10 text-blue-400 border border-blue-500/20" :
+                        pr.stuffStatus === "received" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" :
+                        pr.stuffStatus === "cancelled" ? "bg-rose-500/10 text-rose-400 border border-rose-500/20" :
+                        "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20"
+                      )}>
+                        {pr.stuffStatus === "assigned" ? "تخصیص داده شده" :
+                         pr.stuffStatus === "received" ? "دریافت شده" :
+                         pr.stuffStatus === "cancelled" ? "لغو شده" : "—"}
+                      </span>
+                    )}
+                  </div>
+                  {pr.wareModel?.name && (
+                    <p className="text-xs text-fog/70">{pr.wareModel.name}</p>
+                  )}
+                  {pr.estimatedAmount != null && (
+                    <div className="flex items-center gap-4 text-xs text-fog/50 mt-2">
+                      <span>مبلغ برآوردی: {Number(pr.estimatedAmount).toLocaleString("fa-IR")} تومان</span>
                     </div>
-                  ))}
+                  )}
                 </div>
               </CardContent>
             </Card>

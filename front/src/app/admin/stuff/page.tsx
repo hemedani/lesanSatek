@@ -12,7 +12,7 @@ export default async function StuffPage({
 
   const result = await gets(
     { activeRoleId: "", page, limit, search: resolvedSearchParams.search || undefined },
-    { _id: 1, inventoryNo: 1, price: 1, hasAbsolutePrice: 1, pricePercentage: 1, createdAt: 1, ware: { _id: 1, name: 1 }, store: { _id: 1, name: 1 } }
+    { _id: 1, quantity: 1, price: 1, hasAbsolutePrice: 1, pricePercentage: 1, createdAt: 1, expiration: 1, barcode: 1, ware: { _id: 1, name: 1 }, store: { _id: 1, name: 1 } }
   );
 
   const items = result.success ? result.body : [];

@@ -6,7 +6,7 @@ import { getToken, getActiveRoleId } from "@/lib/auth";
 export const count = async (
   data: {
     activeRoleId: string;
-    inventoryNo?: number;
+    quantity?: number;
   }
 ) => {
   try {

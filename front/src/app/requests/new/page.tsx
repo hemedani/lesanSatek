@@ -6,7 +6,7 @@ import { z } from "zod"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import Link from "next/link"
-import { Loader2, ArrowRight, Save, Send } from "lucide-react"
+import { Loader2, ArrowRight, FileText } from "lucide-react"
 import { toast } from "sonner"
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { SearchSelect, type SearchSelectOption } from "@/components/form/form-search-select"
 import { add as addPR } from "@/app/actions/purchasingRequest/add"
-import { submit as submitPR } from "@/app/actions/purchasingRequest/submit"
 import { gets as getWareModels } from "@/app/actions/wareModel/gets"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
 
@@ -53,7 +52,7 @@ export default function NewRequestPage() {
     })) : []
   }
 
-  const handleSaveDraft = async (data: PRData) => {
+  const handleCreate = async (data: PRData) => {
     setSaving(true)
     try {
       const result = await addPR(
@@ -68,53 +67,13 @@ export default function NewRequestPage() {
       )
 
       if (result.success && result.body?._id) {
-        toast.success("پیش‌نویس درخواست خرید ذخیره شد")
+        toast.success("درخواست خرید با موفقیت ایجاد شد")
         router.push(`/requests/${result.body._id}`)
       } else {
-        toast.error(result.body?.message || "خطا در ذخیره پیش‌نویس")
-      }
-    } catch {
-      toast.error("خطا در ذخیره پیش‌نویس")
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const handleSaveAndSubmit = async (data: PRData) => {
-    setSaving(true)
-    try {
-      const result = await addPR(
-        {
-          activeRoleId: getActiveRoleIdFromStore(),
-          title: data.title,
-          description: data.description || undefined,
-          quantity: Number(data.quantity),
-          wareModelId: data.wareModelId,
-        },
-        { _id: 1, title: 1, status: 1 },
-      )
-
-      if (!result.success || !result.body?._id) {
         toast.error(result.body?.message || "خطا در ایجاد درخواست خرید")
-        setSaving(false)
-        return
-      }
-
-      const draftId = result.body._id
-      const submitResult = await submitPR(
-        { activeRoleId: getActiveRoleIdFromStore(), _id: draftId },
-        { _id: 1, title: 1, status: 1 },
-      )
-
-      if (submitResult.success) {
-        toast.success("درخواست خرید با موفقیت ثبت و ارسال شد")
-        router.push("/requests/my-requests")
-      } else {
-        toast.error(submitResult.body?.message || "پیش‌نویس ذخیره شد اما ارسال ناموفق بود")
-        router.push(`/requests/${draftId}`)
       }
     } catch {
-      toast.error("خطا در ثبت درخواست")
+      toast.error("خطا در ایجاد درخواست")
     } finally {
       setSaving(false)
     }
@@ -209,21 +168,10 @@ export default function NewRequestPage() {
               />
 
               <div className="flex gap-3 pt-2">
-                <Button type="button" disabled={saving} className="flex-1 gap-2" onClick={form.handleSubmit(handleSaveAndSubmit)}>
+                <Button type="button" disabled={saving} className="flex-1 gap-2" onClick={form.handleSubmit(handleCreate)}>
                   {saving && <Loader2 className="size-4 animate-spin" />}
-                  <Send className="size-4" />
-                  ثبت و ارسال
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={saving}
-                  className="gap-2"
-                  onClick={form.handleSubmit(handleSaveDraft)}
-                >
-                  {saving && <Loader2 className="size-4 animate-spin" />}
-                  <Save className="size-4" />
-                  ذخیره پیش‌نویس
+                  <FileText className="size-4" />
+                  ایجاد درخواست
                 </Button>
                 <Button
                   type="button"

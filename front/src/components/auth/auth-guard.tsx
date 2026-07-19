@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react"
 import { getMe } from "@/app/actions/auth/getMe"
 import { useAuthStore } from "@/stores/authStore"
 
-const ADMIN_ROLES = ["Manager", "Admin", "OrgHead"]
+const ADMIN_ROLES = ["Manager", "Admin", "OrgHead", "StoreHead"]
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()

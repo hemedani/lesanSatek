@@ -22,7 +22,7 @@ The app is at `http://localhost:3000`.
 Run the `e2e.json` test suite via the playground at `http://localhost:1370/playground`.  
 Paste each entry from `back/http/e2e.json` sequentially, or use the collection runner.
 
-The suite creates **116 records** spanning the full lifecycle. Below is the complete reference.
+The suite creates **126 records** spanning the full lifecycle. Below is the complete reference.
 
 ---
 
@@ -37,14 +37,15 @@ The suite creates **116 records** spanning the full lifecycle. Below is the comp
 7. [Test the Employee/Requester Panel](#7-test-the-employeerequester-panel)
 8. [Test the Finance Panel](#8-test-the-finance-panel)
 9. [Test the Vendor Panel](#9-test-the-vendor-panel)
-10. [Test Inventory & Stock Management](#10-test-inventory--stock-management)
-11. [Test Budget & Reporting](#11-test-budget--reporting)
-12. [Test Process Builder & Archiving](#12-test-process-builder--archiving)
-13. [Test Extended Features](#13-test-extended-features)
-14. [Test Panel Switching & Role Routing](#14-test-panel-switching--role-routing)
-15. [Test Edge Cases](#15-test-edge-cases)
-16. [Verification Checklist](#16-verification-checklist)
-17. [Appendix — Complete Test Data Reference](#17-appendix--complete-test-data-reference)
+10. [Test the Store Panel (StoreHead)](#10-test-the-store-panel-storehead)
+11. [Test Inventory & Stock Management](#11-test-inventory--stock-management)
+12. [Test Budget & Reporting](#12-test-budget--reporting)
+13. [Test Process Builder & Archiving](#13-test-process-builder--archiving)
+14. [Test Extended Features](#14-test-extended-features)
+15. [Test Panel Switching & Role Routing](#15-test-panel-switching--role-routing)
+16. [Test Edge Cases](#16-test-edge-cases)
+17. [Verification Checklist](#17-verification-checklist)
+18. [Appendix — Complete Test Data Reference](#18-appendix--complete-test-data-reference)
 
 ---
 
@@ -76,7 +77,7 @@ The `e2e.json` suite creates the following entities in order.
 | `gen-warehouse-head` | حسین کاظمی (hossein@lesansatek.com) | UnitHead (scope: Warehouse) | Warehouse Unit Head |
 | `gen-finance-head` | فاطمه موسوی (fatemeh@lesansatek.com) | UnitHead (scope: Finance) | Finance Unit Head |
 | `gen-finance-user` | مریم حسینی (maryam@lesansatek.com) | Ordinary + canManageBudget | Finance Panel |
-| `gen-vendor-user` | سارا کریمی (sara@lesansatek.com) | Ordinary + canRespondToTender | Vendor Panel |
+| `gen-vendor-user` | سارا کریمی (sara@lesansatek.com) | Manager + Ordinary + Employee + canRespondToTender + canAssignItemsToOrder | Vendor / Store Head |
 
 ### 1c. Units (15 total)
 
@@ -164,8 +165,8 @@ All processes are **activated** via `activateProcess`.
 ### 1g. PR #1 — Direct Store Purchase
 
 - **Auto-resolved process**: Process #2 (unit-scoped, Procurement)
-- **Flow**: Submit → Check Store Availability → Assign Store → Step 1 (Procurement approve) → Warehouse Check → Step 2 (Warehouse approve) → Step 3 (Finance approve) → Goods Receipt → Auto Payment → Mark Paid
-- `{prId}`, `{poItemId}`, `{goodsReceiptId}`, `{paymentOrderId}`
+- **Flow**: Submit → Check Store Availability → Add Stuff (via `addStuff`) → Step 1 (Procurement approve) → Warehouse Check → Step 2 (Warehouse approve) → Step 3 (Finance approve) → Goods Receipt → Auto Payment → Mark Paid
+- `{prId}`, `{goodsReceiptId}`, `{paymentOrderId}`
 
 ### 1h. PR #2 — Tender Purchase
 
@@ -201,6 +202,14 @@ All processes are **activated** via `activateProcess`.
 | `gen-add-removable-tag` | Tag for deletion test (موقت, #00FF00) |
 | `gen-remove-tag` | Delete that tag |
 | `gen-ware-update-relations` | Update ware's manufacturer relation |
+| `gen-sara-login` | Login as Sara (StoreHead), captures `saraToken`, `saraRoleId` |
+| `storehead-stuff-gets` | StoreHead views their store's stuff (auto-filtered by `store._id`) |
+| `storehead-store-gets` | StoreHead views store list |
+| `storehead-tender-gets` | StoreHead browses open tenders |
+| `storehead-tenderOffer-gets` | StoreHead views offers for a tender |
+| `storehead-pr-gets` | StoreHead views PRs assigned to their store |
+| `storehead-update-stuff-status` | StoreHead sets `stuffStatus` to `ready_to_ship` |
+| `storehead-verify-stuff-status` | Confirm `stuffStatus` update via `get` |
 
 ---
 
@@ -211,7 +220,7 @@ All processes are **activated** via `activateProcess`.
 | **Admin** | Admin System | admin@lesansatek.com | password123 | Manager + Ordinary | Bootstrap ghost, full access |
 | **UnitHead** | رضا احمدی | reza@lesansatek.com | password123 | UnitHead (Procurement) | Approves PRs for Procurement Unit |
 | **Finance** | مریم حسینی | maryam@lesansatek.com | password123 | Ordinary + canManageBudget | Budget management, payment orders |
-| **Vendor** | سارا کریمی | sara@lesansatek.com | password123 | Ordinary + canRespondToTender | Tender offer submission |
+| **Vendor / Store Head** | سارا کریمی | sara@lesansatek.com | password123 | Manager + Ordinary + Employee + canRespondToTender + canAssignItemsToOrder | Store manager, tender offer submission, can add stuff to store |
 | **Employee** | علی محمدی | ali@lesansatek.com | password123 | Manager | Can also act as requester |
 | **Warehouse** | حسین کاظمی | hossein@lesansatek.com | password123 | UnitHead (Warehouse) | Warehouse operations |
 
@@ -329,12 +338,12 @@ This is the core business flow: **PR submit → UnitHead approves step-by-step �
 This step calls `checkStoreAvailability` to see which stores carry the ware model.  
 In the frontend this would be a UI action to preview available stores and their pricing.
 
-### 4c. Assign Store (Admin/Procurement)
+### 4c. Assign Stuff to PR (Admin/Procurement)
 
 1. Navigate to the PR detail
-2. Assign "فروشگاه نمونه" as the supplier
+2. Assign the stuff (فروشگاه نمونه's inventory of TSH Kit at 2,800,000 IRR) to the PR
 3. **Verify:**
-   - Purchase order item created (qty=10, unitPrice auto-calculated from Stuff)
+   - PR's `stuffStatus` becomes `"assigned"`, `estimatedAmount` set to stuff price * quantity
    - History shows "item_assigned" entry
 
 ### 4d. Approve Step 1 — Procurement Unit
@@ -381,7 +390,7 @@ In the frontend this would be a UI action to preview available stores and their 
 2. Create receipt: GR-001, 10 units received, 10 accepted, 0 rejected
 3. **Verify:**
    - Inventory updated (+10 units from goods receipt)
-   - PO item status → "received"
+   - PR's `stuffStatus` → `"received"`
    - Auto-created draft PaymentOrder with payTo=فروشگاه نمونه, financialUnit=Central Warehouse
    - Budget encumbrance converted to spent
    - History shows "goods_received" entry
@@ -429,7 +438,7 @@ In the frontend this would be a UI action to preview available stores and their 
 4. **Verify:**
    - Tender status → "awarded"
    - Winning offer status → "accepted", others → "rejected"
-   - PurchaseOrderItem created from tender (qty=20, unitPrice=2,500,000)
+   - PR's `stuffStatus` → `"assigned"`, `estimatedAmount` set to winning price * quantity
    - History "item_assigned" entry
 
 ---
@@ -486,93 +495,167 @@ In the frontend this would be a UI action to preview available stores and their 
 
 ---
 
-## 9. Test the Vendor Panel
+## 9. Test the Vendor / Store Head Panel
 
 **Login:** `sara@lesansatek.com` / `password123`
 
+Sara is the **vendor** (canRespondToTender), the **StoreHead** of فروشگاه نمونه (`scopeType: "store"`, `scopeId: {storeId}`), and has **Manager** role (`/admin` panel access). She also has `canAssignItemsToOrder` feature for inventory management.
+
 | # | Test Case | Expected Result |
 |---|-----------|----------------|
-| 9.1 | Login redirect | Lands on `/vendor` dashboard |
+| 9.1 | Login redirect | Lands on `/vendor` dashboard (default for her role set) |
 | 9.2 | Dashboard KPIs | Open tenders, my offers, awarded count, win rate |
 | 9.3 | Open tenders (`/vendor/tenders`) | DataTable with title, deadline, status; "ثبت پیشنهاد" for open |
 | 9.4 | Submit offer form | Fields: price, delivery time, terms, notes |
 | 9.5 | My offers (`/vendor/my-offers`) | The submitted offer (2,500,000, 7 days, status=submitted) |
 | 9.6 | Empty states | Persian empty state when no data |
+| 9.7 | **Manager role** | Also has `/admin` panel access (PanelSelector shows مدیریت) |
+| 9.8 | **Store management** | Can add/edit Stuff (store inventory) via admin panel or designated store UI |
+
+### Adding Stuff to Store Manually
+
+Sara (as store head with Manager role) can add inventory items to her store:
+
+1. Login as `sara@lesansatek.com` / `password123`
+2. Switch to **Admin panel** via PanelSelector (or navigate to store management page)
+3. Go to stores section → find **فروشگاه نمونه**
+4. Add new Stuff entry with:
+   - Ware: کیت TSH زیشیمی
+   - Price: 2,800,000 (absolute) or any valid price
+   - Inventory No: custom number
+   - Denormalized hierarchy: wareTypeId, wareClassId, wareGroupId, wareModelId
+5. **Or** use the Vendor panel's store inventory management feature to add new stock items
+6. **Verify:** New Stuff record appears in the store's inventory list
 
 ---
 
-## 10. Test Inventory & Stock Management
+## 10. Test the Store Panel (StoreHead)
+
+**Login:** `sara@lesansatek.com` / `password123`
+
+Sara has a **StoreHead** role with `scopeType: "store"` and `scopeId: {storeId}` (فروشگاه نمونه). This gives her a dedicated `/store` panel for managing her store.
+
+| # | Test Case | Expected Result |
+|---|-----------|----------------|
+| 10.1 | Login redirect → `/store` dashboard (or via PanelSelector) | Lands on `/store` dashboard with store info and KPIs |
+| 10.2 | Dashboard shows store overview | Store name (فروشگاه نمونه), address, contact, score, total sales |
+| 10.3 | **Edit store info** – update name, address, contact, bank info | `store.update` succeeds (scope check: `_id` matches `activeRole.scopeId`) |
+| 10.4 | **Cannot edit another store** – try to access a non-existent or different store ID | Backend returns "You cant do this" (scope mismatch) |
+| 10.5 | **Cannot delete store** – delete button hidden or disabled | Remove restricted to Manager/Admin only |
+| 10.6 | **View store inventory (Stuff list)** – list all Stuff items for this store | All stuff entries for فروشگاه نمونه visible (inventoryNo, price, ware info) |
+| 10.7 | **Store settings** – manage delivery settings, working hours, status | Update pure fields works within scope |
+| 10.8 | **Can also access `/admin`** via PanelSelector (has Manager role) | PanelSelector shows مدیریت and فروشگاه options |
+| 10.9 | **Cannot access `/vendor`** – not a vendor panel by default | PanelSelector may show فروشندگان due to Manager role |
+| 10.10 | **Add Stuff to store** – add new inventory item to own store | `stuff.add` succeeds (scope check: `storeId` matches `activeRole.scopeId`) |
+| 10.11 | **Update Stuff** – edit price, inventoryNo of own store's stuff | `stuff.update` succeeds (scope check: fetched `store._id` matches `activeRole.scopeId`) |
+| 10.12 | **Remove Stuff** – delete own store's stuff | `stuff.remove` succeeds (scope check: fetched `store._id` matches `activeRole.scopeId`) |
+| 10.13 | **View open tenders** – browse tenders with status `open` | `tender.gets` returns open tenders; StoreHead can view offers |
+| 10.14 | **Submit tender offer** – submit a bid on an open tender | `tenderOffer.submit` succeeds (scope check: `storeId` matches `activeRole.scopeId`) |
+| 10.15 | **View PRs assigned to store** – list PRs where `store._id` matches own store | `purchasingRequest.gets` auto-filters by `store._id`; only PRs assigned to فروشگاه نمونه visible |
+| 10.16 | **Update stuff status** – change PR's `stuffStatus` (ready_to_ship → shipped → delivered) | `purchasingRequest.updateStuffStatus` succeeds (scope check: PR's `store._id` matches `activeRole.scopeId`) |
+
+### StoreHead Scope Rules
+
+- **`store.update`**: Only if `_id` in request matches `activeRole.scopeId` (i.e., Sara can only edit her own store)
+- **`store.updateRelations`**: Same scope rule as update
+- **`store.get` / `store.gets`**: Any authenticated user, including StoreHead
+- **`store.add`**: Allowed for StoreHead (creates a new store)
+- **`store.remove` / `store.count`**: Manager/Admin only — StoreHead cannot delete
+- **`stuff.add`**: Allowed for StoreHead; `storeId` must match `activeRole.scopeId`
+- **`stuff.update`**: Allowed for StoreHead; the Stuff document's `store._id` must match `activeRole.scopeId`
+- **`stuff.remove`**: Allowed for StoreHead; the Stuff document's `store._id` must match `activeRole.scopeId`
+- **`stuff.gets`**: Allowed for StoreHead; auto-filtered by `store._id` = `activeRole.scopeId`
+- **`tender.gets`**: Allowed for StoreHead; returns all tenders (no store filter)
+- **`tenderOffer.submit`**: Allowed for StoreHead; `storeId` must match `activeRole.scopeId`
+- **`tenderOffer.gets`**: Allowed for StoreHead; auto-filtered by `store._id` = `activeRole.scopeId`
+- **`purchasingRequest.gets`**: Allowed for StoreHead; auto-filtered by `store._id` = `activeRole.scopeId`
+- **`purchasingRequest.updateStuffStatus`**: Allowed for StoreHead; the PR's `store._id` must match `activeRole.scopeId`
+
+### PanelSelector Behavior for Sara
+
+Sara has **3 roles** with different panels:
+| Role | Panel | Access |
+|------|-------|--------|
+| Manager | `/admin` | Full admin panel |
+| StoreHead | `/store` | Store management panel (NEW) |
+| Employee | `/employee` | PR submission panel |
+
+The PanelSelector should show all 3 options for role switching.
+
+---
+
+## 11. Test Inventory & Stock Management
 
 **Login as:** `admin@lesansatek.com`
 
 | # | Test Case | Expected Result |
 |---|-----------|----------------|
-| 10.1 | **موجودی انبار** (Inventory list) | TSH Kit: qty=45 (after adjust), min=10, max=200, Shelf A-12 |
-| 10.2 | Click inventory → adjust qty | Can update quantity |
-| 10.3 | **حرکات انبار** (Stock Movements list) | Chronological list: addStock(50) → adjust(45) → consumption(-5) → goodsReceipt(+10) → transfer(-10) → consumption(-3) |
-| 10.4 | Click any movement | Detail with balanceBefore, balanceAfter, reason, reference |
-| 10.5 | **مصرف کالا** (Consumption Records) | 2 records: qty=5 (routine lab testing), qty=3 (quality control, linked to PR) |
+| 11.1 | **موجودی انبار** (Inventory list) | TSH Kit: qty=45 (after adjust), min=10, max=200, Shelf A-12 |
+| 11.2 | Click inventory → adjust qty | Can update quantity |
+| 11.3 | **حرکات انبار** (Stock Movements list) | Chronological list: addStock(50) → adjust(45) → consumption(-5) → goodsReceipt(+10) → transfer(-10) → consumption(-3) |
+| 11.4 | Click any movement | Detail with balanceBefore, balanceAfter, reason, reference |
+| 11.5 | **مصرف کالا** (Consumption Records) | 2 records: qty=5 (routine lab testing), qty=3 (quality control, linked to PR) |
 
 ---
 
-## 11. Test Budget & Reporting
+## 12. Test Budget & Reporting
 
 | # | Test Case | Expected Result |
 |---|-----------|----------------|
-| 11.1 | Fiscal years list | "سال مالی 1405", open, active |
-| 11.2 | Budget lines list | BUD-001 with allocations, spending, remaining |
-| 11.3 | Click budget line | Detail: 100M allocated, encumbrances converted to spent, remaining |
-| 11.4 | Budget report | Total allocated, spent, surplus/deficit, utilization % |
-| 11.5 | Budget reports by fiscal year | Filter to 1405 → same data |
+| 12.1 | Fiscal years list | "سال مالی 1405", open, active |
+| 12.2 | Budget lines list | BUD-001 with allocations, spending, remaining |
+| 12.3 | Click budget line | Detail: 100M allocated, encumbrances converted to spent, remaining |
+| 12.4 | Budget report | Total allocated, spent, surplus/deficit, utilization % |
+| 12.5 | Budget reports by fiscal year | Filter to 1405 → same data |
 
 ---
 
-## 12. Test Process Builder & Archiving
+## 13. Test Process Builder & Archiving
 
 | # | Test Case | Expected Result |
 |---|-----------|----------------|
-| 12.1 | **Create process** | Form with name, description, optional scoping (unit / wareType / wareClass / wareGroup / wareModel) |
-| 12.2 | **Create step** | Form with name, type, order, assignee groups (unit selector + AND/OR operator) |
-| 12.3 | **Activate process** | Validates consecutive order, auto-increments version, status=Active |
-| 12.4 | **Duplicate process** | Creates Draft copy with "(Copy)" suffix |
-| 12.5 | **Archive process** | Set status=Archived on duplicate (no active PRs for that process) |
-| 12.6 | **Archive guard** | Cannot archive a process with active PRs → error message |
+| 13.1 | **Create process** | Form with name, description, optional scoping (unit / wareType / wareClass / wareGroup / wareModel) |
+| 13.2 | **Create step** | Form with name, type, order, assignee groups (unit selector + AND/OR operator) |
+| 13.3 | **Activate process** | Validates consecutive order, auto-increments version, status=Active |
+| 13.4 | **Duplicate process** | Creates Draft copy with "(Copy)" suffix |
+| 13.5 | **Archive process** | Set status=Archived on duplicate (no active PRs for that process) |
+| 13.6 | **Archive guard** | Cannot archive a process with active PRs → error message |
 
 ---
 
-## 13. Test Extended Features
+## 14. Test Extended Features
 
 | # | Test Case | Steps | Expected |
 |---|-----------|-------|----------|
-| 13.1 | **getMe** | Any user, navigate to profile | Returns user profile with roles, features |
-| 13.2 | **Store score update** | Admin → edit store | score=4.5, totalSoldAmount=15,000,000, totalSoldNum=5 |
-| 13.3 | **Step approval gets** | UnitHead → PR detail → approvals tab | 3 approval records (one per step), with unit and step names |
-| 13.4 | **Tender offer gets** | Vendor → my offers | Winning offer: 2,500,000, 7 days, store name |
-| 13.5 | **Tag CRUD** | Admin → tags | Create فوری (#FF0000), create موقت (#00FF00), delete موقت |
-| 13.6 | **Ware update relations** | Admin → ware detail → edit | Link/unlink manufacturer |
-| 13.7 | **Consumption with PR** | Admin → consumption records | qty=3, "Quality control testing", linked to PR #1 |
-| 13.8 | **Role update** | Admin → edit admin user | Manager role added alongside Ordinary |
+| 14.1 | **getMe** | Any user, navigate to profile | Returns user profile with roles, features |
+| 14.2 | **Store score update** | Admin → edit store | score=4.5, totalSoldAmount=15,000,000, totalSoldNum=5 |
+| 14.3 | **Step approval gets** | UnitHead → PR detail → approvals tab | 3 approval records (one per step), with unit and step names |
+| 14.4 | **Tender offer gets** | Vendor → my offers | Winning offer: 2,500,000, 7 days, store name |
+| 14.5 | **Tag CRUD** | Admin → tags | Create فوری (#FF0000), create موقت (#00FF00), delete موقت |
+| 14.6 | **Ware update relations** | Admin → ware detail → edit | Link/unlink manufacturer |
+| 14.7 | **Consumption with PR** | Admin → consumption records | qty=3, "Quality control testing", linked to PR #1 |
+| 14.8 | **Role update** | Admin → edit admin user | Manager role added alongside Ordinary |
 
 ---
 
-## 14. Test Panel Switching & Role Routing
+## 15. Test Panel Switching & Role Routing
 
-### 14a. Multi-Role Panel Switching
+### 15a. Multi-Role Panel Switching
 
 1. Login as **admin@lesansatek.com** — has Manager + Ordinary roles, all features
 2. **PanelSelector** — in admin header, click the LayoutDashboard icon
-3. **Verify:** Dropdown shows: مدیریت, پنل واحد, درخواست‌ها, مالی, فروشندگان
+3. **Verify:** Dropdown shows: مدیریت, پنل واحد, درخواست‌ها, مالی, فروشندگان, فروشگاه
 4. Click **"پنل واحد"** → redirects to `/unit-head`
 5. Header changes to simpler PanelLayout (no sidebar)
 6. Click PanelSelector → switch back to **"مدیریت"** → back to `/admin`
 
-### 14b. User Menu Panel Links
+### 15b. User Menu Panel Links
 
 1. Click avatar → user menu opens
 2. **Verify:** "پنل‌ها" section shows accessible panels
 3. Click any panel → redirects
 
-### 14c. Direct URL Access Control
+### 15c. Direct URL Access Control
 
 | URL | Login as | Expected |
 |-----|----------|----------|
@@ -580,33 +663,35 @@ In the frontend this would be a UI action to preview available stores and their 
 | `/unit-head` | `ali@lesansatek.com` | Redirect to default panel (`/requests`) |
 | `/finance` | `ali@lesansatek.com` | Redirect to default panel |
 | `/vendor` | `ali@lesansatek.com` | Redirect to default panel |
+| `/store` | `ali@lesansatek.com` | Redirect to default panel |
+| `/store` | `sara@lesansatek.com` | Allowed (StoreHead role) |
 | `/admin` | unauthenticated | Redirect to `/login` |
 | `/unit-head` | unauthenticated | Redirect to `/login` |
 
 ---
 
-## 15. Test Edge Cases
+## 16. Test Edge Cases
 
 | # | Scenario | Steps | Expected |
 |---|----------|-------|----------|
-| 15.1 | **Empty lists** | Visit panel with no data (e.g., no PRs for a new user) | Persian empty state with icon + description |
-| 15.2 | **Loading skeletons** | Hard refresh any list page | Brief skeleton loaders, then data |
-| 15.3 | **Form double-submit** | Click submit button rapidly | Button disabled after first click (Loader2 spinner) |
-| 15.4 | **Invalid route** | Navigate to `/nonexistent` | Next.js 404 page |
-| 15.5 | **Error boundary** | Invalid PR ID in URL | Error page with "تلاش مجدد" button |
-| 15.6 | **RTL text** | Inspect any page | All text right-aligned, headings end with colon (:) |
-| 15.7 | **RTL icons** | Check arrows, breadcrumbs | Arrows point right (← instead of →) |
-| 15.8 | **Responsive — mobile** | Resize < 768px | Sidebar hidden, hamburger menu, DataTable → card view |
-| 15.9 | **Responsive — tablet** | Resize 768-1024px | Layout adapts, grid columns reduce |
-| 15.10 | **Concurrent approval** | Two tabs, same UnitHead, approve same PR | Second submission → appropriate error |
-| 15.11 | **Backend down** | Stop Deno backend while using app | Error toasts, error boundaries catch failures |
-| 15.12 | **PR with no auto-resolve** | Create unit with no matching process | Error: "No active process found for this organization" |
-| 15.13 | **Rejection on any step** | UnitHead rejects a PR | Status=Rejected, workflow stops, all steps marked incomplete |
-| 15.14 | **Tender before close** | Vendor tries to submit offer after deadline | Validation error |
+| 16.1 | **Empty lists** | Visit panel with no data (e.g., no PRs for a new user) | Persian empty state with icon + description |
+| 16.2 | **Loading skeletons** | Hard refresh any list page | Brief skeleton loaders, then data |
+| 16.3 | **Form double-submit** | Click submit button rapidly | Button disabled after first click (Loader2 spinner) |
+| 16.4 | **Invalid route** | Navigate to `/nonexistent` | Next.js 404 page |
+| 16.5 | **Error boundary** | Invalid PR ID in URL | Error page with "تلاش مجدد" button |
+| 16.6 | **RTL text** | Inspect any page | All text right-aligned, headings end with colon (:) |
+| 16.7 | **RTL icons** | Check arrows, breadcrumbs | Arrows point right (← instead of →) |
+| 16.8 | **Responsive — mobile** | Resize < 768px | Sidebar hidden, hamburger menu, DataTable → card view |
+| 16.9 | **Responsive — tablet** | Resize 768-1024px | Layout adapts, grid columns reduce |
+| 16.10 | **Concurrent approval** | Two tabs, same UnitHead, approve same PR | Second submission → appropriate error |
+| 16.11 | **Backend down** | Stop Deno backend while using app | Error toasts, error boundaries catch failures |
+| 16.12 | **PR with no auto-resolve** | Create unit with no matching process | Error: "No active process found for this organization" |
+| 16.13 | **Rejection on any step** | UnitHead rejects a PR | Status=Rejected, workflow stops, all steps marked incomplete |
+| 16.14 | **Tender before close** | Vendor tries to submit offer after deadline | Validation error |
 
 ---
 
-## 16. Verification Checklist
+## 17. Verification Checklist
 
 ### Authentication & Routing
 - [ ] Login with each user (5 panel users) redirects to correct panel
@@ -653,12 +738,29 @@ In the frontend this would be a UI action to preview available stores and their 
 - [ ] Mark paid updates budget encumbrance
 - [ ] Budget report shows summaries
 
+### Store Panel (StoreHead)
+- [ ] StoreHead can view their store dashboard (`/store`)
+- [ ] StoreHead can edit their own store (name, address, contact, bank info, delivery settings)
+- [ ] StoreHead cannot edit another store (scope check returns "You cant do this")
+- [ ] StoreHead cannot delete their store
+- [ ] StoreHead can view store inventory (Stuff list) — auto-filtered by their store
+- [ ] StoreHead can add new Stuff to their store (`storeId` validated against `activeRole.scopeId`)
+- [ ] StoreHead can update existing Stuff in their store (scope check on stuff's `store._id`)
+- [ ] StoreHead can delete Stuff from their store (scope check on stuff's `store._id`)
+- [ ] StoreHead can view open tenders and browse them
+- [ ] StoreHead can submit a tender offer for their store (`storeId` validated against `activeRole.scopeId`)
+- [ ] StoreHead can view offers submitted by their store
+- [ ] StoreHead can view PRs assigned to their store — auto-filtered by `store._id`
+- [ ] StoreHead can update `stuffStatus` on PRs assigned to their store (ready_to_ship → shipped → delivered)
+- [ ] PanelSelector shows فروشگاه option for StoreHead users
+
 ### Panel Layouts
 - [ ] Admin: sidebar + header + PanelSelector
 - [ ] UnitHead: PanelLayout (simple header)
 - [ ] Employee: PanelLayout (simple header)
 - [ ] Finance: PanelLayout (simple header)
 - [ ] Vendor: PanelLayout (simple header)
+- [ ] Store: PanelLayout (simple header)
 
 ### UI/UX
 - [ ] All text in Persian (no English strings)
@@ -678,26 +780,27 @@ In the frontend this would be a UI action to preview available stores and their 
 
 ---
 
-## 17. Standard Workflow Examples
+## 18. Standard Workflow Examples
 
-### 17a. Organization & User Quick Reference
+### 18a. Organization & User Quick Reference
 
-| User | Login | Panel | Can Submit PR | Can Approve Steps |
-|------|-------|-------|--------------|-------------------|
+| User | Login | Panel(s) | Can Submit PR | Can Approve Steps |
+|------|-------|----------|--------------|-------------------|
 | **Admin System** | admin@lesansatek.com / password123 | `/admin` or `/employee` | ✓ (Employee role) | ✓ (Manager role) |
 | **علی محمدی** (prodHead) | ali@lesansatek.com / password123 | `/admin` | ✓ (Employee role) | ✓ (Manager role) |
 | **رضا احمدی** (unitheadUser) | reza@lesansatek.com / password123 | `/unit-head` | ✓ (Employee role) | ✓ (UnitHead role) |
 | **حسین کاظمی** (warehouseHead) | hossein@lesansatek.com / password123 | `/unit-head` | ✓ (Employee role) | ✓ (UnitHead role) |
 | **فاطمه موسوی** (finHead) | fatemeh@lesansatek.com / password123 | `/unit-head` | ✓ (Employee role) | ✓ (UnitHead role) |
 | **مریم حسینی** (financeUser) | maryam@lesansatek.com / password123 | `/finance` | ✓ (Employee role) | ✗ (Ordinary) |
-| **سارا کریمی** (vendorUser) | sara@lesansatek.com / password123 | `/vendor` | ✓ (Employee role) | ✗ (Ordinary) |
+| **سارا کریمی** (vendorUser) | sara@lesansatek.com / password123 | `/vendor`, `/admin`, or `/store` | ✓ (Employee/Manager role) | ✓ (Manager role) |
 
 **All unit heads** (علی محمدی through فاطمه موسوی) work via `/admin` panel — they have Manager role.  
-**UnitHead users** (رضا احمدی, حسین کاظمی, فاطمه موسوی) work via `/unit-head` panel — they see only their unit's data. This is the most common approval panel.
+**UnitHead users** (رضا احمدی, حسین کاظمی, فاطمه موسوی) work via `/unit-head` panel — they see only their unit's data. This is the most common approval panel.  
+**StoreHead user** (سارا کریمی) works via `/store` panel — manages فروشگاه نمونه with StoreHead role.
 
 ---
 
-### 17b. Simple Workflow (1-Step: Finance Unit)
+### 18b. Simple Workflow (1-Step: Finance Unit)
 
 **Objective:** Single-step approval flow with one submitter and one approver.
 
@@ -742,7 +845,7 @@ In the frontend this would be a UI action to preview available stores and their 
 
 ---
 
-### 17c. Complex Workflow (3-Step: Procurement → Warehouse → Finance)
+### 18c. Complex Workflow (3-Step: Procurement → Warehouse → Finance)
 
 **Objective:** Full multi-approver chain. Three different users approve across three units, demonstrating OR/AND step logic and role switching.
 
@@ -810,7 +913,7 @@ In the frontend this would be a UI action to preview available stores and their 
 
 ---
 
-### 17d. Alternative Workflow: Direct Store Purchase
+### 18d. Alternative Workflow: Direct Store Purchase
 
 **Objective:** After the 3-step approval above, test store assignment, goods receipt, and payment using the completed PR.
 
@@ -821,15 +924,15 @@ In the frontend this would be a UI action to preview available stores and their 
 | 3 | Mark Payment | حسین کاظمی | hossein@lesansatek.com |
 
 **Frontend flow:**
-1. After PR is Completed, find it in the Admin panel
-2. Click **"اختصاص فروشنده"** (Assign Store) → select the vendor store from seed data
-3. A PurchaseOrderItem is auto-created
-4. Click **"دریافت کالا"** (Goods Receipt) → fill in receipt details, quantity received
+1. After PR approval flow completes (still InProgress/Completed), find it in the Admin panel
+2. Click **"اختصاص کالا"** (Add Stuff) → select the stuff item from the store's inventory
+3. PR's `stuffStatus` is set to `"assigned"`, `estimatedAmount` updated with pricing
+4. Click **"دریافت کالا"** (Goods Receipt) → fill in receipt details, quantity received (no purchaseOrderItemId)
 5. System auto-creates a draft PaymentOrder
 6. Login as حسین کاظمی (warehouse) or Admin → navigate to Payment Orders
 7. Click **"پرداخت شد"** (Mark Paid)
 
-### 17e. Workflow: Tender / Vendor Selection
+### 18e. Workflow: Tender / Vendor Selection
 
 **Objective:** PR that goes through tender/auction instead of direct store assignment.
 
@@ -849,22 +952,34 @@ In the frontend this would be a UI action to preview available stores and their 
 4. سارا کریمی logs into `/vendor` panel, sees the tender, submits an offer (price, delivery time)
 5. Admin closes the tender (no more offers accepted)
 6. Admin awards the tender to سارا کریمی's store
-7. PurchaseOrderItem is auto-created with the winning offer's price
+7. PR's `stuffStatus` is set to `"assigned"`, store and pricing recorded internally
 8. PR can now proceed to goods receipt
 
 ---
 
-### 17f. Role Switching Reference
+### 18f. Role Switching Reference
 
 | Action | Allowed Roles | Which Role to Use | Admin's Available RoleId |
 |--------|--------------|-------------------|--------------------------|
 | `purchasingRequest.submit` | `Manager`, `Admin`, `OrgHead`, `UnitHead`, `Employee` | **Employee** (all users have it) | `{employeeRoleId}` |
 | `stepApproval.submitDecision` | `Manager`, `Admin`, `OrgHead`, `UnitHead` | **Manager** (org-wide) or **UnitHead** (scoped) | `{managerRoleId}` or `{adminUnitHeadProcRoleId}` / `{adminUnitHeadWhRoleId}` / `{adminUnitHeadFinRoleId}` |
-| `purchasingRequest.assignStore` | Feature: `canAssignItemsToOrder` | Any | Any |
+| `purchasingRequest.addStuff` | Feature: `canAssignItemsToOrder` | Any | Any |
 | `goodsReceipt.add` | `Manager`, `Admin`, `OrgHead`, `UnitHead` | **Manager** | `{managerRoleId}` |
 | `paymentOrder.markPaid` | `Manager`, `Admin`, `OrgHead`, `UnitHead` | **Manager** or **UnitHead** | `{managerRoleId}` or unit-specific |
+| `stuff.add` | `Manager`, `Admin`, `StoreHead` (scoped) | **Manager** (any store) or **StoreHead** (own store only) | `{managerRoleId}` or `{storeHeadRoleId}` |
+| `stuff.update` | `Manager`, `Admin`, `StoreHead` (scoped) | **Manager** (any store) or **StoreHead** (own store only) | `{managerRoleId}` or `{storeHeadRoleId}` |
+| `stuff.remove` | `Manager`, `Admin`, `StoreHead` (scoped) | **Manager** (any store) or **StoreHead** (own store only) | `{managerRoleId}` or `{storeHeadRoleId}` |
+| `stuff.gets` | `Manager`, `Admin`, `StoreHead` (scoped filter) | **StoreHead** (auto-filtered) | `{storeHeadRoleId}` |
+| `store.add` | `Manager`, `Admin`, `StoreHead` | **Manager** or **StoreHead** | `{managerRoleId}` or `{storeHeadRoleId}` |
+| `store.update` | `Manager`, `Admin`, `StoreHead` (scoped) | **Manager** (any store) or **StoreHead** (own store only) | `{managerRoleId}` or `{storeHeadRoleId}` |
+| `store.updateRelations` | `Manager`, `Admin`, `StoreHead` (scoped) | **Manager** (any store) or **StoreHead** (own store only) | `{managerRoleId}` or `{storeHeadRoleId}` |
+| `tender.gets` | `Manager`, `Admin`, `StoreHead` | **StoreHead** | `{storeHeadRoleId}` |
+| `tenderOffer.submit` | `Manager`, `Admin`, `StoreHead` (scoped) | **StoreHead** (own store only) | `{storeHeadRoleId}` |
+| `tenderOffer.gets` | `Manager`, `Admin`, `StoreHead` (scoped filter) | **StoreHead** (auto-filtered) | `{storeHeadRoleId}` |
+| `purchasingRequest.gets` | `Manager`, `Admin`, `OrgHead`, `UnitHead`, `Employee`, `StoreHead` (scoped filter) | **StoreHead** (auto-filtered by store) | `{storeHeadRoleId}` |
+| `purchasingRequest.updateStuffStatus` | `Manager`, `Admin`, `StoreHead` (scoped) | **StoreHead** (own store's PRs only) | `{storeHeadRoleId}` |
 
-**Key rule:** submit → **Employee** role; approval/CRUD → **Manager** (for org-wide) or **UnitHead** (for unit-specific).
+**Key rule:** submit → **Employee** role; approval/CRUD → **Manager** (for org-wide) or **UnitHead** (for unit-specific); store management → **StoreHead** (own store only).
 
 **Admin's full role set:**
 - `{roleId}` → Ordinary (default, not used for submit/approve)
@@ -874,22 +989,35 @@ In the frontend this would be a UI action to preview available stores and their 
 - `{adminUnitHeadWhRoleId}` → UnitHead at Central Warehouse
 - `{adminUnitHeadFinRoleId}` → UnitHead at Finance Unit
 
-### 17g. Troubleshooting Common Issues
+**سارا کریمی's (Store Head) role set:**
+- She has **Manager** role (added at user creation) → can access `/admin` panel and call `purchasingRequest.addStuff`, etc.
+- She has **StoreHead** role with `scopeType: "store"` and `scopeId: {storeId}` → can access `/store` panel and manage فروشگاه نمونه:
+  - `stuff.add` / `stuff.update` / `stuff.remove` (scoped to own store)
+  - `stuff.gets` (auto-filtered to own store)
+  - `tender.gets` / `tenderOffer.submit` / `tenderOffer.gets`
+  - `purchasingRequest.gets` (auto-filtered by store)
+  - `purchasingRequest.updateStuffStatus`
+- She has **Ordinary** + **Employee** roles → can submit PRs and view the employee panel
+- She has `canRespondToTender` → can submit tender offers via `/vendor` panel
+- She has `canAssignItemsToOrder` → can assign store inventory to purchase requests
+
+### 18g. Troubleshooting Common Issues
 
 | Issue | Likely Cause | Fix |
 |-------|-------------|-----|
 | "You cant do this" | `activeRoleId` resolves to `Ordinary` role, or role has no `roleId` UUID | Use Employee/Manager/UnitHead roleId; re-run `gen-update-admin-roles` to regenerate roles with proper UUIDs |
 | "Could not determine organization" | `requestingUnitId` not sent or user/unit missing org relation | Send `requestingUnitId` in submit; ensure user has `organization` relation |
 | PR stuck on step 1 | No StepApproval created for the unit | Check process step assigneeGroups — units must match the requesting unit's process |
-| Goods Receipt fails | PR not completed or PO item missing | Complete store assignment first; ensure PR is in Completed status |
+| Goods Receipt fails | PR not completed or stuff not assigned | Complete `addStuff` first; ensure PR's `stuffStatus` is `"assigned"` |
+| "Stuff not found" | `addStuff` called with invalid `stuffId` | Verify the stuff document exists for the given wareModel and store |
 
 ---
 
-## 18. Appendix — Complete Test Data Reference
+## 19. Appendix — Complete Test Data Reference
 
 This appendix provides the full field-level reference for all test data created by the `e2e.json` suite. Use it when verifying data in the frontend UI.
 
-### 18a. User Info
+### 19a. User Info
 
 #### TempUser (Bootstrap Ghost)
 
@@ -933,7 +1061,7 @@ This appendix provides the full field-level reference for all test data created 
 | 9 | `{warehouseHeadId}` | حسین کاظمی | hossein@lesansatek.com | password123 | 09120000010 | Male | UnitHead (Warehouse) + Employee | ✓ (Employee) | Cold Storage | Head of Warehouse |
 | 10 | `{finHeadId}` | فاطمه موسوی | fatemeh@lesansatek.com | password123 | 09120000011 | Female | UnitHead (Finance) + Employee | ✓ (Employee) | Internal Audit | Head of Finance |
 | 11 | `{financeUserId}` | مریم حسینی | maryam@lesansatek.com | password123 | 09120000002 | Female | Ordinary + Employee + `canManageBudget` | ✓ (Employee) | — | `/finance` panel |
-| 12 | `{vendorUserId}` | سارا کریمی | sara@lesansatek.com | password123 | 09120000003 | Female | Ordinary + Employee + `canRespondToTender` | ✓ (Employee) | — | `/vendor` panel |
+| 12 | `{vendorUserId}` | سارا کریمی | sara@lesansatek.com | password123 | 09120000003 | Female | **Manager** + **StoreHead** (scope: فروشگاه نمونه) + Ordinary + Employee + `canRespondToTender` + `canAssignItemsToOrder` | ✓ (Employee) or ✓ (Manager) | فروشگاه نمونه (store head via StoreHead role) | `/vendor`, `/admin` (Manager), `/store` (StoreHead) |
 
 **Notes:**
 - Every user now has the **`Employee` role** as their secondary role, which is allowed by `grantAccess` for `purchasingRequest.submit`. Use `activeRoleId: {employeeRoleId}` (or each user's own Employee roleId) when submitting PRs.
@@ -941,11 +1069,12 @@ This appendix provides the full field-level reference for all test data created 
 - User 1 starts with a single role added at tempUser creation (`roles: [{name: "Ordinary"}]`). The `gen-update-admin-roles` entry appends `{name: "Manager"}` and `{name: "Employee"}` so the admin can use `/admin` and submit PRs via the employee panel.
 - Users 8–10 are scoped UnitHeads — they manage a specific unit and see only that unit's data in their panels. They can also submit PRs using their Employee role.
 - Users 11–12 are feature-gated Ordinary users — they can now also submit PRs because `Employee` is in their roles.
-- **Role switching pattern:** `submit` → `Employee` role, `approve` → `Manager`/`UnitHead` role.
+- User 12 (سارا کریمی) also has **StoreHead** role with `scopeType: "store"` and `scopeId: {storeId}` — this gives her the `/store` panel for managing فروشگاه نمونه.
+- **Role switching pattern:** `submit` → `Employee` role, `approve` → `Manager`/`UnitHead` role, `store management` → `StoreHead` role.
 
 ---
 
-### 17b. Geographic Data
+### 19b. Geographic Data
 
 #### State
 
@@ -963,7 +1092,7 @@ This appendix provides the full field-level reference for all test data created 
 
 ---
 
-### 17c. Organizational Structure
+### 19c. Organizational Structure
 
 #### Organization
 
@@ -1021,9 +1150,15 @@ This appendix provides the full field-level reference for all test data created 
 | Technical Support | واحد پشتیبانی فنی | زهرا احمدی | `{itHeadId}` |
 | Internal Audit | واحد حسابرسی داخلی | فاطمه موسوی | `{finHeadId}` |
 
+#### Store Head Mapping
+
+| Store | `name` | Head User | Head Captured ID | Role |
+|-------|--------|-----------|------------------|------|
+| Sample Store | فروشگاه نمونه | سارا کریمی | `{vendorUserId}` | `StoreHead` (scope: فروشگاه نمونه) |
+
 ---
 
-### 17d. Product Hierarchy
+### 19d. Product Hierarchy
 
 #### Manufacturer
 
@@ -1085,7 +1220,7 @@ WareType (تجهیزات آزمایشگاهی)
 
 ---
 
-### 17e. Store & Stuff
+### 19e. Store & Stuff
 
 #### Store
 
@@ -1096,7 +1231,7 @@ WareType (تجهیزات آزمایشگاهی)
 | `economicCode` | 123456789 |
 | `postalCode` | 1234567890 |
 
-**Relations:** `cityId`, `stateId`, `storeHeadId` → user
+**Relations:** `cityId`, `stateId`, `storeHeadId` → **سارا کریمی** (`{vendorUserId}`)
 
 #### Stuff (Store Inventory)
 
@@ -1112,7 +1247,7 @@ Pricing: **Absolute** (not percentage) — `hasAbsolutePrice: true`, actual pric
 
 ---
 
-### 17f. Process & Steps — 8 Scoped Processes
+### 19f. Process & Steps — 8 Scoped Processes
 
 The E2E suite creates **8 processes** covering every scope form. PR creation auto-resolves the correct process via `resolveProcessForPR()`.
 
@@ -1234,7 +1369,7 @@ The general process is duplicated via `duplicateProcess` (creates Draft copy nam
 
 ---
 
-### 17g. Tag
+### 19g. Tag
 
 | Field | Value |
 |-------|-------|
@@ -1244,7 +1379,7 @@ The general process is duplicated via `duplicateProcess` (creates Draft copy nam
 
 ---
 
-### 17h. Budget
+### 19h. Budget
 
 #### FiscalYear
 
@@ -1275,7 +1410,7 @@ Status defaults to `"open"`.
 
 ---
 
-### 17i. Purchasing Requests
+### 19i. Purchasing Requests
 
 #### PR #1 — Direct Store Purchase
 
@@ -1290,7 +1425,7 @@ Status defaults to `"open"`.
 
 **Auto-resolve:** requestingUnit=`{unitId}` → matches Process #2 (unit-scoped, Procurement) → resolves `{processUnitId}`
 
-**Flow:** Submit → Check Store Availability → Assign Store → Step 1 Decision (approved) → Warehouse Check → Step 2 Decision (approved) → Step 3 Decision (approved) → Goods Receipt → Auto Payment
+**Flow:** Submit → Check Store Availability → Add Stuff (`addStuff`) → Step 1 Decision (approved) → Warehouse Check → Step 2 Decision (approved) → Step 3 Decision (approved) → Goods Receipt → Auto Payment
 
 #### PR #2 — Tender-Based Purchase
 
@@ -1317,7 +1452,7 @@ Status defaults to `"open"`.
 
 ---
 
-### 17j. Tender
+### 19j. Tender
 
 | Field | Value |
 |-------|-------|
@@ -1340,20 +1475,21 @@ Status defaults to `"open"`.
 
 ---
 
-### 17k. Goods Receipt
+### 19k. Goods Receipt
 
 | Field | Value |
 |-------|-------|
 | `receiptNumber` | GR-001 |
 | `description` | First goods receipt |
 | `receivedAt` | 2026-04-01 |
-| `items` | `[{purchaseOrderItemId, wareModelId, quantityReceived: 10, quantityAccepted: 10, quantityRejected: 0}]` |
+| `items` | `[{wareModelId, quantityReceived: 10, quantityAccepted: 10, quantityRejected: 0}]` |
 
-**Relations:** `purchasingRequestId` → PR #1, `receivedById` → user, `receivingUnitId` → Central Warehouse
+**Relations:** `purchasingRequestId` → PR #1, `receivedById` → user, `receivingUnitId` → Central Warehouse  
+**Pricing:** Reads `estimatedAmount` from PR (prorated by accepted qty). No purchaseOrderItem needed.
 
 ---
 
-### 17l. Inventory & Stock
+### 19l. Inventory & Stock
 
 #### Inventory (Initial)
 
@@ -1404,15 +1540,31 @@ Status defaults to `"open"`.
 
 ---
 
-### 17m. Role Management (Frontend Panel Users)
+### 19m. Role Management (Frontend Panel Users)
+
+> **Roles are ONLY managed via `addOrRemoveRoles`** — `addUser` no longer accepts a `roles` field. All users are created with a default `[{name: "Ordinary"}]` role, and their full role set is applied via `addOrRemoveRoles` calls.
 
 | # | ID | Purpose | Captures |
 |---|-----|---------|----------|
-| 51 | `gen-update-admin-roles` | Adds `"Manager"` role to admin (alongside `"Ordinary"`) for `/admin` panel | — |
-| 52 | `gen-unithead-user` | Creates **رضا احمدی** (`reza@lesansatek.com` / `password123`) with `UnitHead` role scoped to Procurement Unit | `{unitheadUserId}` |
+| 51 | `gen-update-admin-roles` | Adds `Manager`, scoped `Employee`, and scoped `UnitHead`×3 roles to admin for `/admin` panel | — |
+| 52 | `gen-unithead-user` | Creates **رضا احمدی** (`reza@lesansatek.com` / `password123`) | `{unitheadUserId}` |
 | 53 | `gen-finance-user` | Creates **مریم حسینی** (`maryam@lesansatek.com` / `password123`) with `canManageBudget` feature | `{financeUserId}` |
-| 54 | `gen-vendor-user` | Creates **سارا کریمی** (`sara@lesansatek.com` / `password123`) with `canRespondToTender` feature | `{vendorUserId}` |
-| 55 | `gen-pr-pending` | Submits a 3rd PR (25,000,000, qty=5, TSH Kit) that stays in `Pending` status | `{prPendingId}` |
+| 54 | `gen-vendor-user` | Creates **سارا کریمی** (`sara@lesansatek.com` / `password123`) with `canRespondToTender` + `canAssignItemsToOrder` features. Also serves as **store head** of فروشگاه نمونه. | `{vendorUserId}` |
+| 55 | `gen-roles-sara` | Adds `Manager` + scoped `Employee` (Procurement unit) to سارا کریمی | — |
+| 56 | `gen-roles-sara-storehead` | Adds **StoreHead** role (`scopeType: "store"`, `scopeId: {storeId}`) to سارا کریمی for managing فروشگاه نمونه | `{storeHeadRoleId}` |
+| 57 | `gen-roles-ali` | Adds `Manager` + scoped `Employee` (Production) + `UnitHead` (Production, QA) to علی محمدی | — |
+| 58 | `gen-roles-mohammad` | Adds `Manager` + scoped `Employee` (Logistics) + `UnitHead` (Logistics, Internal Procurement) to محمد رضایی | — |
+| 59 | `gen-roles-zahra` | Adds `Manager` + scoped `Employee` (IT) + `UnitHead` (IT, Technical Support) to زهرا احمدی | — |
+| 60 | `gen-roles-narges` | Adds `Manager` + scoped `Employee` (HR) + `UnitHead` (HR) to نرگس کریمی | — |
+| 61 | `gen-roles-farhad` | Adds `Manager` + scoped `Employee` (Legal) + `UnitHead` (Legal) to فرهاد نوروزی | — |
+| 62 | `gen-roles-parisa` | Adds `Manager` + scoped `Employee` (R&D) + `UnitHead` (R&D) to پریسا صادقی | — |
+| 63 | `gen-roles-reza` | Adds `UnitHead` (Procurement) + scoped `Employee` (Procurement) + `UnitHead` (Hematology/Micro/Pathology labs) to رضا احمدی | — |
+| 64 | `gen-roles-hossein` | Adds `UnitHead` (Warehouse) + scoped `Employee` (Warehouse) + `UnitHead` (Cold Storage) to حسین کاظمی | — |
+| 65 | `gen-roles-fatemeh` | Adds `UnitHead` (Finance) + scoped `Employee` (Finance) + `UnitHead` (Internal Audit) to فاطمه موسوی | — |
+| 66 | `gen-roles-maryam` | Adds scoped `Employee` (Finance unit) to مریم حسینی | — |
+| 67 | `gen-pr-pending` | Submits a 3rd PR (25,000,000, qty=5, TSH Kit) that stays in `Pending` status | `{prPendingId}` |
+
+**Note:** All users are created with only `[{name: "Ordinary"}]` by `addUser`. Their full role set (Manager, UnitHead, scoped Employee, etc.) is applied immediately after via `addOrRemoveRoles`. This enforces a single source of truth for role management.
 
 #### Panel-to-User Mapping
 
@@ -1421,7 +1573,9 @@ Status defaults to `"open"`.
 | `/admin` | Admin System (existing) | `Manager` + `Ordinary` | admin@lesansatek.com / password123 |
 | `/unit-head` | رضا احمدی | `UnitHead` (scope: Procurement Unit) | reza@lesansatek.com / password123 |
 | `/finance` | مریم حسینی | `Ordinary` + `canManageBudget` | maryam@lesansatek.com / password123 |
-| `/vendor` | سارا کریمی | `Ordinary` + `canRespondToTender` | sara@lesansatek.com / password123 |
+| `/vendor` | سارا کریمی | `Manager` + `Ordinary` + `Employee` + `canRespondToTender` + `canAssignItemsToOrder` | sara@lesansatek.com / password123 |
+| `/store` | سارا کریمی | `StoreHead` (scope: فروشگاه نمونه) | sara@lesansatek.com / password123 |
+| `/admin` | سارا کریمی | `Manager` (via role switching) | sara@lesansatek.com / password123 |
 | `/employee` | Admin System (existing) | `Ordinary` | admin@lesansatek.com / password123 |
 
 #### Complete Captured Variables
@@ -1439,25 +1593,25 @@ Status defaults to `"open"`.
 
 ---
 
-### 17n. Extended E2E Coverage
+### 19n. Extended E2E Coverage
 
 | # | ID | What It Tests | Data Added |
 |---|-----|---------------|------------|
-| 56 | `gen-get-me` | Authenticated `user/getMe` endpoint | Returns admin profile with roles |
-| 57 | `gen-unit-child` | Unit tree nesting (`parentUnit`) | Hematology Lab (Expert) under Procurement Unit, head=رضا احمدی |
-| 58 | `gen-store-update-score` | Pure field update on store | score=4.5, totalSoldAmount=15,000,000, totalSoldNum=5 |
-| 59 | `gen-stepApproval-gets` | Filtered `stepApproval/gets` | Returns 3 approval records (one per step) for completed PR #1 |
-| 60 | `gen-budgetLine-gets` | Filtered `budgetLine/gets` by fiscal year | Returns BUD-001 with allocation/spent/remaining |
-| 61 | `gen-tenderOffer-gets` | Filtered `tenderOffer/gets` by tender | Returns the winning offer (2,500,000, 7 day delivery) |
-| 62 | `gen-consumption-with-pr` | Consumption linked to PR (history push) | qty=3, Quality control testing, linked to PR #1 |
-| 63 | `gen-archive-process` | Archive guard — uses dupProcessId (no active PRs) | Duplicate process status → Archived |
-| 64 | `gen-add-removable-tag` | Tag creation for deletion test | name="موقت", color=#00FF00 |
-| 65 | `gen-remove-tag` | `tag/remove` action | Deletes the temporary tag |
-| 66 | `gen-ware-update-relations` | Update ware's manufacturer relation | Links ware to manufacturer via `manufacturerId` |
+| 67 | `gen-get-me` | Authenticated `user/getMe` endpoint | Returns admin profile with roles |
+| 68 | `gen-unit-child` | Unit tree nesting (`parentUnit`) | Hematology Lab (Expert) under Procurement Unit, head=رضا احمدی |
+| 69 | `gen-store-update-score` | Pure field update on store | score=4.5, totalSoldAmount=15,000,000, totalSoldNum=5 |
+| 70 | `gen-stepApproval-gets` | Filtered `stepApproval/gets` | Returns 3 approval records (one per step) for completed PR #1 |
+| 71 | `gen-budgetLine-gets` | Filtered `budgetLine/gets` by fiscal year | Returns BUD-001 with allocation/spent/remaining |
+| 72 | `gen-tenderOffer-gets` | Filtered `tenderOffer/gets` by tender | Returns the winning offer (2,500,000, 7 day delivery) |
+| 73 | `gen-consumption-with-pr` | Consumption linked to PR (history push) | qty=3, Quality control testing, linked to PR #1 |
+| 74 | `gen-archive-process` | Archive guard — uses dupProcessId (no active PRs) | Duplicate process status → Archived |
+| 75 | `gen-add-removable-tag` | Tag creation for deletion test | name="موقت", color=#00FF00 |
+| 76 | `gen-remove-tag` | `tag/remove` action | Deletes the temporary tag |
+| 77 | `gen-ware-update-relations` | Update ware's manufacturer relation | Links ware to manufacturer via `manufacturerId` |
 
 ---
 
-### 17o. Complete Data Flow Summary
+### 19o. Complete Data Flow Summary
 
 ```
 Setup Phase:
@@ -1467,7 +1621,7 @@ Setup Phase:
   15 units (7 type=General, 2 Warehouse, 2 Administration, 4 Logistics/Production, 5 Expert-labs)
   8 unit heads + 3 panel users
   Manufacturer → WareType → WareClass → WareGroup → WareModel → Ware → Stuff
-  Store → link to city/state
+  Store → link to city/state → StoreHead role assigned to سارا کریمی
   ↓
   8 Processes (1 general + 3 unit-scoped + 4 hierarchy-scoped)
   All activated with consecutive steps
@@ -1479,7 +1633,7 @@ Setup Phase:
 E2E Flow #1 — Direct Store Purchase (auto-resolved → Process #2, unit-scoped):
   PR Submit (TSH Kit, qty=10, est=50M, requestingUnit=Procurement) → Pending
     Auto-resolve: requestingUnit matches Process #2 (unit-scoped, Procurement)
-  Check Store Availability → Assign Store → PO Item created
+  Check Store Availability → Add Stuff (`addStuff`, uses `{stuffId}`) → `stuffStatus=assigned`
   Step 1 (Procurement Unit): approve → advances to step 2
   Warehouse Check → Step 2 (Warehouse): approve → advances to step 3
   Step 3 (Finance): approve → Completed
@@ -1500,7 +1654,7 @@ E2E Flow #3 — Tender Purchase (auto-resolved → Process #2, unit-scoped):
   Tender add (deadline: 2026-05-01)
   Assign vendor (Store) to tender via updateRelations
   Vendor submits Offer (price=2,500,000, 7 day delivery)
-  Close tender → Award to winning offer
+  Close tender → Award to winning offer → `stuffStatus=assigned` on PR
   ↓
 
 Utility:
@@ -1509,11 +1663,13 @@ Utility:
   Budget report (gets budget line report)
   ↓
 
-E2E Flow #4 — Role Management:
-  Admin role update (add Manager)
+E2E Flow #4 — Role Management (all via `addOrRemoveRoles`):
+  Admin role update (add Manager + UnitHead scopes via `addOrRemoveRoles`)
+  All users created with only `[{name: "Ordinary"}]` — roles applied after via `addOrRemoveRoles`
   UnitHead user (رضا احمدی)
   Finance user (مریم حسینی, canManageBudget)
-  Vendor user (سارا کریمی, canRespondToTender)
+  Vendor user / Store head (سارا کریمی, canRespondToTender + canAssignItemsToOrder + store head of فروشگاه نمونه)
+  12x `addOrRemoveRoles` calls — Manager + scoped Employee + UnitHead for all unit-head users + finance user + sara (+ StoreHead for sara)
   Pending PR (25M, qty=5, for approval flow test)
   ↓
 

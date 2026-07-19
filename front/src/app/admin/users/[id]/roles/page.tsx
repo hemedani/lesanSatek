@@ -14,6 +14,7 @@ import { getUser } from "@/app/actions/user/getUser";
 import { addOrRemoveRoles } from "@/app/actions/user/addOrRemoveRoles";
 import { gets as getOrganizations } from "@/app/actions/organization/gets";
 import { gets as getUnits } from "@/app/actions/unit/gets";
+import { gets as getStores } from "@/app/actions/store/gets";
 import { ROLE_OPTIONS } from "@/types/permissions";
 import Link from "next/link";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
@@ -32,6 +33,7 @@ const roleLabelMap: Record<string, string> = {
   Ordinary: "کاربر عادی",
   OrgHead: "رئیس سازمان",
   UnitHead: "رئیس واحد",
+  StoreHead: "رئیس فروشگاه",
 };
 
 export default function UserRolesPage({
@@ -76,8 +78,8 @@ export default function UserRolesPage({
   const handleAddRole = async () => {
     const addRoles = [
       {
-        name: newRoleName as "Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary",
-        ...(newScopeType ? { scopeType: newScopeType as "organization" | "unit" } : {}),
+        name: newRoleName as "Manager" | "Admin" | "OrgHead" | "UnitHead" | "StoreHead" | "Employee" | "Ordinary",
+        ...(newScopeType ? { scopeType: newScopeType as "organization" | "unit" | "store" } : {}),
         ...(newScopeId ? { scopeId: newScopeId } : {}),
       },
     ];
@@ -113,8 +115,8 @@ export default function UserRolesPage({
         _id: id,
         removeRoles: [
           {
-            name: role.name as "Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary",
-            ...(role.scopeType ? { scopeType: role.scopeType as "organization" | "unit" } : {}),
+            name: role.name as "Manager" | "Admin" | "OrgHead" | "UnitHead" | "StoreHead" | "Employee" | "Ordinary",
+            ...(role.scopeType ? { scopeType: role.scopeType as "organization" | "unit" | "store" } : {}),
             ...(role.scopeId ? { scopeId: role.scopeId } : {}),
           },
         ],
@@ -190,7 +192,7 @@ export default function UserRolesPage({
                     </span>
                     {role.scopeType && role.scopeId && (
                       <span className="text-xs text-fog/60 block truncate">
-                        {role.scopeType === "organization" ? "سازمان" : "واحد"} • {role.scopeId}
+                        {role.scopeType === "organization" ? "سازمان" : role.scopeType === "store" ? "فروشگاه" : "واحد"} • {role.scopeId}
                       </span>
                     )}
                   </div>
@@ -243,13 +245,14 @@ export default function UserRolesPage({
               <option value="">بدون محدودیت</option>
               <option value="organization">سازمان</option>
               <option value="unit">واحد</option>
+              <option value="store">فروشگاه</option>
             </select>
           </div>
 
           {newScopeType && (
             <div className="space-y-1.5">
               <label className="text-xs text-fog/70 block font-medium">
-                {newScopeType === "organization" ? "سازمان" : "واحد"}
+                {newScopeType === "organization" ? "سازمان" : newScopeType === "store" ? "فروشگاه" : "واحد"}
               </label>
               <SearchSelect
                 value={newScopeId}
@@ -257,6 +260,8 @@ export default function UserRolesPage({
                 placeholder={
                   newScopeType === "organization"
                     ? "انتخاب سازمان..."
+                    : newScopeType === "store"
+                    ? "انتخاب فروشگاه..."
                     : "انتخاب واحد..."
                 }
                 fetcher={
@@ -272,6 +277,18 @@ export default function UserRolesPage({
                           name: o.name || "",
                         }));
                       }
+                    : newScopeType === "store"
+                    ? async (search?: string) => {
+                        const result = await getStores(
+                          { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
+                          { _id: 1, name: 1 }
+                        );
+                        if (!result.success || !result.body) return [];
+                        return result.body.map((s: { _id?: string; name?: string }) => ({
+                          _id: s._id || "",
+                          name: s.name || "",
+                        }));
+                      }
                     : async (search?: string) => {
                         const result = await getUnits(
                           { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
@@ -284,7 +301,7 @@ export default function UserRolesPage({
                         }));
                       }
                 }
-                label={newScopeType === "organization" ? "سازمان" : "واحد"}
+                label={newScopeType === "organization" ? "سازمان" : newScopeType === "store" ? "فروشگاه" : "واحد"}
                 disabled={submitting}
               />
             </div>

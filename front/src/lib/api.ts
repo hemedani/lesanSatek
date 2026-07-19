@@ -1,4 +1,4 @@
-import { lesanApi } from "@/types/declarations/selectInp";
+import { lesanApi } from "@/lib/lesan-client";
 
 const getLesanUrl = () => {
   const url = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:1370";

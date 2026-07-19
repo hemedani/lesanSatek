@@ -1,6 +1,5 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import { logout } from "@/app/actions/auth/logout"
 import { useAuthStore } from "@/stores/authStore"
 import { LogOut } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 function UserMenu() {
   const router = useRouter()
@@ -26,8 +26,8 @@ function UserMenu() {
     .join("")
 
   const handleLogout = async () => {
-    await logout()
     clearStore()
+    await logout()
     router.push("/login")
   }
 

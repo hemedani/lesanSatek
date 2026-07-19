@@ -16,6 +16,7 @@ interface User {
   features: { feature: string }[];
   roles: { roleId: string; name: string; scopeType?: string; scopeId?: string }[];
   units?: { _id: string; name: string }[];
+  managedStore?: { _id: string; name: string };
 }
 
 interface AuthState {

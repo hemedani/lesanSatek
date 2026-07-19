@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, Box } from "lucide-react";
+import { Plus, Pencil, Trash2, Box, Package } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
@@ -28,7 +28,7 @@ import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 
 interface Stuff {
   _id: string;
-  inventoryNo?: string;
+  quantity?: number;
   price?: number;
   hasAbsolutePrice?: boolean;
   pricePercentage?: number;
@@ -46,7 +46,7 @@ interface StuffClientProps {
 }
 
 const stuffSchema = z.object({
-  inventoryNo: z.string().min(1, "شماره موجودی الزامی است"),
+  quantity: z.string().min(1, "تعداد الزامی است"),
   price: z.string().min(1, "قیمت الزامی است"),
   hasAbsolutePrice: z.boolean().optional(),
   pricePercentage: z.string().optional(),
@@ -84,7 +84,7 @@ export function StuffClient({
 
   const form = useForm<StuffData>({
     resolver: zodV4Resolver(stuffSchema),
-    defaultValues: { inventoryNo: "", price: "", hasAbsolutePrice: false, pricePercentage: "", wareId: "", storeId: "" },
+    defaultValues: { quantity: "", price: "", hasAbsolutePrice: false, pricePercentage: "", wareId: "", storeId: "" },
   });
 
   const handleSearch = (value: string) => {
@@ -96,14 +96,14 @@ export function StuffClient({
   };
 
   const openAdd = () => {
-    form.reset({ inventoryNo: "", price: "", hasAbsolutePrice: false, pricePercentage: "", wareId: "", storeId: "" });
+    form.reset({ quantity: "", price: "", hasAbsolutePrice: false, pricePercentage: "", wareId: "", storeId: "" });
     setEditTarget(null);
     setShowDialog(true);
   };
 
   const openEdit = (item: Stuff) => {
     form.reset({
-      inventoryNo: item.inventoryNo?.toString() ?? "",
+      quantity: item.quantity?.toString() ?? "",
       price: item.price?.toString() ?? "",
       hasAbsolutePrice: item.hasAbsolutePrice ?? false,
       pricePercentage: item.pricePercentage?.toString() ?? "",
@@ -117,8 +117,8 @@ export function StuffClient({
   const onSubmit = async (data: StuffData) => {
     if (editTarget) {
       const result = await update(
-        { activeRoleId: getActiveRoleIdFromStore(), _id: editTarget._id, inventoryNo: Number(data.inventoryNo) || 0, price: Number(data.price) || 0, hasAbsolutePrice: data.hasAbsolutePrice ?? false, pricePercentage: data.pricePercentage ? Number(data.pricePercentage) : undefined },
-        { _id: 1, inventoryNo: 1 }
+        { activeRoleId: getActiveRoleIdFromStore(), _id: editTarget._id, quantity: Number(data.quantity) || 0, price: Number(data.price) || 0, hasAbsolutePrice: data.hasAbsolutePrice ?? false, pricePercentage: data.pricePercentage ? Number(data.pricePercentage) : undefined },
+        { _id: 1, quantity: 1 }
       );
       if (result.success) {
         toast.success("موجودی با موفقیت به‌روزرسانی شد");
@@ -131,7 +131,7 @@ export function StuffClient({
       const result = await add(
         {
           activeRoleId: getActiveRoleIdFromStore(),
-          inventoryNo: Number(data.inventoryNo) || 0,
+          quantity: Number(data.quantity) || 0,
           price: Number(data.price) || 0,
           hasAbsolutePrice: data.hasAbsolutePrice ?? false,
           pricePercentage: data.pricePercentage ? Number(data.pricePercentage) : undefined,
@@ -144,7 +144,7 @@ export function StuffClient({
           wareGroupId: "",
           wareModelId: "",
         } as any,
-        { _id: 1, inventoryNo: 1 }
+        { _id: 1, quantity: 1 }
       );
       if (result.success) {
         toast.success("موجودی با موفقیت ایجاد شد");
@@ -172,14 +172,14 @@ export function StuffClient({
 
   const columns: Column<Stuff>[] = [
     {
-      key: "inventoryNo",
-      label: "شماره موجودی",
+      key: "quantity",
+      label: "تعداد",
       render: (item) => (
         <div className="flex items-center gap-3">
           <div className="size-6 rounded-lg bg-electric-iris/10 flex items-center justify-center shrink-0">
-            <Box className="size-3.5 text-electric-iris" />
+            <Package className="size-3.5 text-electric-iris" />
           </div>
-          <span className="text-moonlight font-medium font-mono text-sm" dir="ltr">{item.inventoryNo || "—"}</span>
+          <span className="text-moonlight font-medium font-mono text-sm" dir="ltr">{item.quantity != null ? item.quantity.toLocaleString("fa-IR") : "—"}</span>
         </div>
       ),
     },
@@ -243,7 +243,7 @@ export function StuffClient({
         </PageHeader>
       </div>
 
-      <FilterBar search={search} onSearchChange={handleSearch} searchPlaceholder="جستجوی شماره موجودی..." />
+      <FilterBar search={search} onSearchChange={handleSearch} searchPlaceholder="جستجوی کالا..." />
 
       <DataTable
         columns={columns}
@@ -256,10 +256,10 @@ export function StuffClient({
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="size-10 rounded-xl bg-electric-iris/10 flex items-center justify-center shrink-0">
-                  <Box className="size-5 text-electric-iris" />
+                  <Package className="size-5 text-electric-iris" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-base font-semibold text-moonlight leading-6 truncate font-mono" dir="ltr">{item.inventoryNo || "—"}</p>
+                  <p className="text-base font-semibold text-moonlight leading-6 truncate font-mono" dir="ltr">{item.quantity != null ? item.quantity.toLocaleString("fa-IR") : "—"}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     {item.ware?.name && <span className="text-xs text-fog/60">{item.ware.name}</span>}
                     {item.store?.name && <span className="text-xs text-fog/40">- {item.store.name}</span>}
@@ -296,7 +296,7 @@ export function StuffClient({
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-              <FormInput control={form.control} name="inventoryNo" label="شماره موجودی" placeholder="مثال: INV-001" disabled={form.formState.isSubmitting} />
+              <FormInput control={form.control} name="quantity" label="تعداد" type="number" placeholder="مثال: ۵۰" disabled={form.formState.isSubmitting} />
 
               <FormSearchSelect control={form.control} name="wareId" label="کالا" placeholder="کالا را انتخاب کنید..." fetcher={wareFetcher} required disabled={form.formState.isSubmitting} />
 
@@ -332,7 +332,7 @@ export function StuffClient({
         open={!!deleteTarget}
         onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
         title="حذف موجودی"
-        description={`آیا از حذف موجودی "${deleteTarget?.inventoryNo || ''}" اطمینان دارید؟ این اقدام قابل بازگشت نیست.`}
+        description={`آیا از حذف این موجودی اطمینان دارید؟ این اقدام قابل بازگشت نیست.`}
         confirmLabel="حذف"
         onConfirm={handleDelete}
         loading={deleting}

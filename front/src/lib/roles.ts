@@ -3,7 +3,9 @@ import {
   GitBranch,
   ShoppingCart,
   Calculator,
+  ShoppingBag,
   Store,
+  Package,
   type LucideIcon,
 } from "lucide-react"
 
@@ -66,6 +68,14 @@ export const PANEL_DEFINITIONS: PanelDef[] = [
     description: "مناقصات و پیشنهادهای فروش",
     requiredFeature: ["canRespondToTender"],
   },
+  {
+    id: "storehead",
+    path: "/storehead",
+    label: "پنل فروشگاه",
+    icon: Store,
+    description: "مدیریت فروشگاه، کالاها و مناقصات",
+    requiredRole: ["StoreHead"],
+  },
 ]
 
 function getUserRoleNames(
@@ -108,6 +118,9 @@ export function getDefaultPanel(
   }
   if (roleNames.includes("UnitHead")) {
     return "/unit-head"
+  }
+  if (roleNames.includes("StoreHead")) {
+    return "/storehead"
   }
   if (featureNames.includes("canManageBudget")) {
     return "/finance"

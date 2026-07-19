@@ -19,6 +19,8 @@ import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 import { add } from "@/app/actions/store/add";
 import { gets as getStates } from "@/app/actions/state/gets";
 import { gets as getCities } from "@/app/actions/city/gets";
+import { LocationPicker } from "@/components/ui/location-picker";
+import type { GeoPoint } from "@/components/ui/location-picker";
 
 const storeSchema = z.object({
   name: z.string().min(1, "نام فروشگاه الزامی است"),
@@ -50,6 +52,7 @@ type StoreData = z.input<typeof storeSchema>;
 export default function AddStorePage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [geoLocation, setGeoLocation] = useState<GeoPoint>(null);
 
   const form = useForm<StoreData>({
     resolver: zodV4Resolver(storeSchema),
@@ -109,6 +112,7 @@ export default function AddStorePage() {
           totalSoldNum: 0,
           cityId: values.cityId || undefined,
           stateId: values.stateId || undefined,
+          ...(geoLocation ? { geoLocation } : {}),
         },
         { _id: 1, name: 1 }
       );
@@ -183,7 +187,7 @@ export default function AddStorePage() {
                 </div>
                 <div>
                   <CardTitle>موقعیت جغرافیایی</CardTitle>
-                  <CardDescription>استان و شهر</CardDescription>
+                  <CardDescription>استان، شهر و موقعیت روی نقشه</CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -223,6 +227,10 @@ export default function AddStorePage() {
                     }));
                   }}
                 />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-moonlight mb-2 block">موقعیت روی نقشه</label>
+                <LocationPicker value={geoLocation} onChange={setGeoLocation} />
               </div>
             </CardContent>
           </Card>

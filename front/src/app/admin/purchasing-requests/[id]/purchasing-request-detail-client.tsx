@@ -2,15 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ArrowRight, ShoppingCart, Building2, Package, Calendar, FileText, BarChart3, Store, Gavel, Send } from "lucide-react";
+import { ArrowRight, ShoppingCart, Building2, Package, Calendar, FileText, BarChart3, Store, Gavel, Send, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { RequestStatusBadge } from "@/components/purchasing/request-status-badge";
 import { WorkflowVisualizer } from "@/components/purchasing/workflow-visualizer";
 import { HistoryTimeline } from "@/components/purchasing/history-timeline";
-import { AssignStoreDialog } from "@/components/purchasing/assign-store-dialog";
+import { AddStuffDialog } from "@/components/purchasing/add-stuff-dialog";
 import { TenderCreateDialog } from "@/components/purchasing/tender-create-dialog";
 import { SubmitPRDialog } from "@/components/purchasing/submit-pr-dialog";
+import { cn } from "@/lib/utils";
 
 interface ProcessStep {
   _id: string;
@@ -36,6 +38,15 @@ interface WareModel {
   enName?: string;
 }
 
+interface Stuff {
+  _id: string;
+  quantity?: number;
+  price?: number;
+  hasAbsolutePrice?: boolean;
+  pricePercentage?: number;
+  ware?: { _id?: string; name?: string; brand?: string };
+}
+
 interface HistoryEntry {
   action?: string;
   performed?: {
@@ -59,11 +70,14 @@ interface PurchasingRequest {
   status?: string;
   currentStep?: number;
   quantity?: number;
+  estimatedAmount?: number;
+  stuffStatus?: string;
   createdAt?: string;
   process?: Process;
   budgetLine?: BudgetLine;
   requestingUnit?: Unit;
   wareModel?: WareModel;
+  stuff?: Stuff;
   history?: HistoryEntry[];
 }
 
@@ -89,7 +103,7 @@ function InfoRow({ icon: Icon, label, value }: { icon: React.ElementType; label:
 export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequestDetailClientProps) {
   const router = useRouter();
 
-  const [showAssignStore, setShowAssignStore] = useState(false);
+  const [showAddStuff, setShowAddStuff] = useState(false);
   const [showCreateTender, setShowCreateTender] = useState(false);
   const [showSubmitPR, setShowSubmitPR] = useState(false);
 
@@ -108,6 +122,21 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
   const isDraft = pr.status === "Draft";
   const currentStep = pr.currentStep || 0;
   const totalSteps = pr.process?.steps?.length || 0;
+  const isStuffAssigned = pr.stuffStatus === "assigned" || pr.stuffStatus === "received";
+
+  const stuffStatusLabel: Record<string, string> = {
+    none: "بدون کالا",
+    assigned: "تخصیص داده شده",
+    received: "دریافت شده",
+    cancelled: "لغو شده",
+  };
+
+  const stuffStatusColor: Record<string, string> = {
+    none: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
+    assigned: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    received: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    cancelled: "bg-rose-500/10 text-rose-400 border-rose-500/20",
+  };
 
   return (
     <div className="space-y-6 relative">
@@ -195,6 +224,48 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
             </Card>
           )}
 
+          {/* Assigned Stuff */}
+          {isStuffAssigned && pr.stuff && (
+            <Card variant="glass">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="size-8 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                    <BadgeCheck className="size-4 text-emerald-400" />
+                  </div>
+                  <div>
+                    <CardTitle>کالای تخصیص داده شده</CardTitle>
+                    <CardDescription>اطلاعات محصول انتخاب شده</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-moonlight">
+                      {pr.stuff.ware?.name || "—"}
+                    </p>
+                    {pr.stuff.ware?.brand && (
+                      <p className="text-xs text-fog/50 mt-0.5">{pr.stuff.ware.brand}</p>
+                    )}
+                    {pr.stuff.quantity != null && (
+                      <p className="text-xs text-fog/40 mt-0.5">تعداد: {pr.stuff.quantity.toLocaleString("fa-IR")}</p>
+                    )}
+                  </div>
+                  <div className="text-end">
+                    {pr.estimatedAmount != null && (
+                      <p className="text-sm font-medium text-moonlight" dir="ltr">
+                        {pr.estimatedAmount.toLocaleString("fa-IR")} ریال
+                      </p>
+                    )}
+                    <Badge className={cn("text-[10px] mt-1", stuffStatusColor[pr.stuffStatus || "none"])}>
+                      {stuffStatusLabel[pr.stuffStatus || "none"]}
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* History Timeline */}
           <Card variant="glass">
             <CardHeader>
@@ -244,10 +315,21 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
                   }
                 />
                 <InfoRow
-                  icon={Package}
-                  label="تعداد"
-                  value={pr.quantity != null ? pr.quantity.toLocaleString("fa-IR") : "—"}
+                  icon={BadgeCheck}
+                  label="وضعیت کالا"
+                  value={
+                    <Badge className={cn("text-[10px]", stuffStatusColor[pr.stuffStatus || "none"])}>
+                      {stuffStatusLabel[pr.stuffStatus || "none"]}
+                    </Badge>
+                  }
                 />
+                {pr.estimatedAmount != null && (
+                  <InfoRow
+                    icon={Store}
+                    label="مبلغ برآوردی"
+                    value={`${pr.estimatedAmount.toLocaleString("fa-IR")} ریال`}
+                  />
+                )}
                 <InfoRow
                   icon={Building2}
                   label="واحد درخواست‌کننده"
@@ -292,10 +374,12 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
               </Button>
             ) : (
               <>
-                <Button className="w-full gap-2" size="sm" onClick={() => setShowAssignStore(true)}>
-                  <Store className="size-4" />
-                  تخصیص فروشگاه
-                </Button>
+                {!isStuffAssigned && (
+                  <Button className="w-full gap-2" size="sm" onClick={() => setShowAddStuff(true)}>
+                    <Package className="size-4" />
+                    تخصیص کالا
+                  </Button>
+                )}
                 <Button className="w-full gap-2" size="sm" variant="secondary" onClick={() => setShowCreateTender(true)}>
                   <Gavel className="size-4" />
                   ایجاد مناقصه
@@ -312,11 +396,12 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
             quantity={pr.quantity}
             wareModelName={pr.wareModel?.name}
           />
-          <AssignStoreDialog
-            open={showAssignStore}
-            onOpenChange={setShowAssignStore}
+          <AddStuffDialog
+            open={showAddStuff}
+            onOpenChange={setShowAddStuff}
             purchasingRequestId={pr._id}
             wareModelId={pr.wareModel?._id}
+            quantity={pr.quantity}
           />
           <TenderCreateDialog
             open={showCreateTender}

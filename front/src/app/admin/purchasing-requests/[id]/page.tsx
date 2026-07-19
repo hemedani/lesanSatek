@@ -24,6 +24,9 @@ export default async function PurchasingRequestDetailPage({
         budgetLine: { _id: 1, code: 1, title: 1, remainingBudget: 1 },
         requestingUnit: { _id: 1, name: 1 },
         wareModel: { _id: 1, name: 1, enName: 1 },
+        stuff: { _id: 1, quantity: 1, price: 1, hasAbsolutePrice: 1, pricePercentage: 1, ware: { _id: 1, name: 1, brand: 1 } },
+        stuffStatus: 1,
+        estimatedAmount: 1,
         history: { action: 1, performed: { by: 1, name: 1, at: 1 } },
       }
     ),

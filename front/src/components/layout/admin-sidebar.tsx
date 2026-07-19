@@ -44,6 +44,7 @@ interface NavItem {
   label: string;
   href: string;
   icon: React.ElementType;
+  allowedRoles?: string[];
 }
 
 interface NavSection {
@@ -80,12 +81,12 @@ const navSections: NavSection[] = [
       { label: "انواع کالا", href: "/admin/ware-types", icon: FolderTree },
       { label: "کلاس کالا", href: "/admin/ware-classes", icon: Layers },
       { label: "گروه کالا", href: "/admin/ware-groups", icon: Grid3X3 },
-      { label: "مدل کالا", href: "/admin/ware-models", icon: Cuboid },
-      { label: "کالاها", href: "/admin/wares", icon: Package },
+      { label: "مدل کالا", href: "/admin/ware-models", icon: Cuboid, allowedRoles: ["StoreHead"] },
+      { label: "کالاها", href: "/admin/wares", icon: Package, allowedRoles: ["StoreHead"] },
       { label: "تولیدکنندگان", href: "/admin/manufacturers", icon: Factory },
-      { label: "انبارها", href: "/admin/stores", icon: Store },
+      { label: "انبارها", href: "/admin/stores", icon: Store, allowedRoles: ["StoreHead"] },
       { label: "موجودی انبار", href: "/admin/inventory", icon: Warehouse },
-      { label: "موجودی", href: "/admin/stuff", icon: Box },
+      { label: "موجودی", href: "/admin/stuff", icon: Box, allowedRoles: ["StoreHead"] },
       { label: "مصرف", href: "/admin/consumption", icon: ScrollText },
     ],
   },
@@ -314,19 +315,29 @@ function AdminSidebar() {
   const roleNames = user?.roles?.map((r) => r.name) ?? []
   const featureNames = user?.features?.map((f) => f.feature) ?? []
   const isSuper = roleNames.some((r) => ["Manager", "Admin", "OrgHead"].includes(r))
+  const roleNamesKey = roleNames.join(",")
+  const featureNamesKey = featureNames.join(",")
 
   const filteredSections = useMemo(() => {
     if (isSuper) return navSections
-    return navSections.filter((section) => {
-      if (section.label === "بودجه") {
-        return featureNames.includes("canManageBudget")
-      }
-      if (section.label === "انبار") {
-        return featureNames.includes("canViewWarehouse")
-      }
-      return true
-    })
-  }, [isSuper, featureNames.join(",")])
+    return navSections
+      .map((section) => {
+        if (section.label === "انبار") {
+          const allowedItems = section.items.filter((item) => {
+            if (item.allowedRoles?.some((r) => roleNames.includes(r))) return true
+            if (!item.allowedRoles && featureNames.includes("canViewWarehouse")) return true
+            return false
+          })
+          return allowedItems.length > 0 ? { ...section, items: allowedItems } : null
+        }
+        if (section.label === "بودجه") {
+          if (!featureNames.includes("canManageBudget")) return null
+        }
+        return section
+      })
+      .filter(Boolean) as NavSection[]
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuper, roleNamesKey, featureNamesKey])
 
   const handleToggle = useCallback(() => {
     setCollapsed((prev) => {
@@ -353,19 +364,29 @@ function AdminMobileNav() {
   const roleNames = user?.roles?.map((r) => r.name) ?? []
   const featureNames = user?.features?.map((f) => f.feature) ?? []
   const isSuper = roleNames.some((r) => ["Manager", "Admin", "OrgHead"].includes(r))
+  const roleNamesKey = roleNames.join(",")
+  const featureNamesKey = featureNames.join(",")
 
   const filteredSections = useMemo(() => {
     if (isSuper) return navSections
-    return navSections.filter((section) => {
-      if (section.label === "بودجه") {
-        return featureNames.includes("canManageBudget")
-      }
-      if (section.label === "انبار") {
-        return featureNames.includes("canViewWarehouse")
-      }
-      return true
-    })
-  }, [isSuper, featureNames.join(",")])
+    return navSections
+      .map((section) => {
+        if (section.label === "انبار") {
+          const allowedItems = section.items.filter((item) => {
+            if (item.allowedRoles?.some((r) => roleNames.includes(r))) return true
+            if (!item.allowedRoles && featureNames.includes("canViewWarehouse")) return true
+            return false
+          })
+          return allowedItems.length > 0 ? { ...section, items: allowedItems } : null
+        }
+        if (section.label === "بودجه") {
+          if (!featureNames.includes("canManageBudget")) return null
+        }
+        return section
+      })
+      .filter(Boolean) as NavSection[]
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuper, roleNamesKey, featureNamesKey])
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
