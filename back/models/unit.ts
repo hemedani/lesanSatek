@@ -99,6 +99,10 @@ export const unit_pure = {
   allowWareClassIds: optional(array(string())),
   allowWareGroupIds: optional(array(string())),
   allowWareModelIds: optional(array(string())),
+  location: optional(object({
+    type: string(),
+    coordinates: array(number()),
+  })),
   ...createUpdateAt,
 };
 
@@ -170,3 +174,7 @@ export const units = () =>
       },
     },
   });
+
+// Geospatial index on Unit for proximity queries — created separately
+// because 2dsphere and text cannot share the same index spec.
+// Run in MongoDB shell if needed: db.getCollection("unit").createIndex({ location: "2dsphere" })

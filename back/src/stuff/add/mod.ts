@@ -2,6 +2,7 @@ import { coreApp } from "../../../mod.ts";
 import { addFn } from "./add.fn.ts";
 import { addValidator } from "./add.val.ts";
 import { grantAccess, setTokens, setUser } from "@lib";
+import { checkStoreHeadAccess } from "../../../utils/checkStoreHeadAccess.ts";
 
 export const addSetup = () =>
 	coreApp.acts.setAct({
@@ -11,7 +12,11 @@ export const addSetup = () =>
 	preAct: [
 		setTokens,
 		setUser,
-		grantAccess([{ roles: ["Manager", "Admin"] }]),
+		grantAccess([
+			{ roles: ["Manager", "Admin"] },
+			{ roles: ["StoreHead"] },
+		]),
+		checkStoreHeadAccess("add"),
 	],
 		validator: addValidator(),
 		validationRunType: "create",

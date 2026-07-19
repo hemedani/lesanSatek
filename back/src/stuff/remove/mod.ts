@@ -2,6 +2,7 @@ import { coreApp } from "../../../mod.ts";
 import { removeFn } from "./remove.fn.ts";
 import { removeValidator } from "./remove.val.ts";
 import { grantAccess, setTokens, setUser } from "@lib";
+import { checkStoreHeadAccess } from "../../../utils/checkStoreHeadAccess.ts";
 
 export const removeSetup = () =>
 	coreApp.acts.setAct({
@@ -11,7 +12,11 @@ export const removeSetup = () =>
 	preAct: [
 		setTokens,
 		setUser,
-		grantAccess([{ roles: ["Manager", "Admin"] }]),
+		grantAccess([
+			{ roles: ["Manager", "Admin"] },
+			{ roles: ["StoreHead"] },
+		]),
+		checkStoreHeadAccess("remove"),
 	],
 		validator: removeValidator(),
 		

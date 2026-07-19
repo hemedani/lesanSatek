@@ -8,7 +8,7 @@
  * barcode/QR code, and API sync fields are included.
  * All 4 hierarchy levels are denormalized on Stuff for query efficiency.
  *
- * Pure fields: inventoryNo, price, hasAbsolutePrice, pricePercentage, expiration,
+ * Pure fields: quantity, price, hasAbsolutePrice, pricePercentage, expiration,
  *   barcode, qrc, isBarcodeSet, isQrcSet, isExpirationNear, photoUrl, apiId, apiLink,
  *   availableLongPayment, twoMonthPricePercent … twentyFourMonthPricePercent,
  *   twoMonth … twentyFourMonth
@@ -19,7 +19,7 @@
  * // TSH Kit available at a pharmacy store
  * {
  *   _id: ObjectId("..."),
- *   inventoryNo: 1001,
+ *   quantity: 50,
  *   price: 260000,
  *   hasAbsolutePrice: true,
  *   expiration: ISODate("2025-06-01"),
@@ -38,6 +38,7 @@
 import { coreApp } from "../mod.ts";
 import {
   boolean,
+  coerce,
   date,
   defaulted,
   number,
@@ -57,11 +58,11 @@ import {
 } from "./excludes.ts";
 
 export const stuff_pure = {
-  inventoryNo: number(),
+  quantity: number(),
   price: number(),
   hasAbsolutePrice: defaulted(boolean(), false),
   pricePercentage: optional(number()),
-  expiration: optional(date()),
+  expiration: optional(coerce(date(), string(), (value) => new Date(value))),
   barcode: optional(number()),
   qrc: optional(string()),
   isBarcodeSet: defaulted(boolean(), false),

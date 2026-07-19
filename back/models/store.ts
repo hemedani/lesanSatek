@@ -55,10 +55,12 @@
  */
 import { coreApp } from "../mod.ts";
 import {
+  array,
   boolean,
   date,
   defaulted,
   number,
+  object,
   optional,
   string,
   type RelationDataType,
@@ -107,6 +109,10 @@ export const store_pure = {
   certificateExpireDate: optional(date()),
   legalPerson: optional(string()),
   nationalId: optional(string()),
+  geoLocation: optional(object({
+    type: string(),
+    coordinates: array(number()),
+  })),
   ...createUpdateAt,
 };
 
@@ -116,7 +122,13 @@ export const store_relations = {
     type: "single" as RelationDataType,
     optional: true,
     excludes: user_excludes,
-    relatedRelations: {},
+    relatedRelations: {
+      managedStore: {
+        type: "single" as RelationDataType,
+        optional: true,
+        relatedRelations: {},
+      },
+    },
   },
   city: {
     schemaName: "city",

@@ -39,7 +39,7 @@ export const getValidator = () => {
       wareClass: 1,
       wareGroup: 1,
       stepApprovals: 1,
-      purchaseOrderItems: 1,
+      stuff: 1,
       tender: 1,
       goodsReceipts: 1,
       paymentOrders: 1,

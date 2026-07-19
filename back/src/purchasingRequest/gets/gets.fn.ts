@@ -51,6 +51,12 @@ export const getsFn: ActFn = async (body) => {
         $match: { "requestingUnit._id": new ObjectId(activeRole.scopeId) },
       });
     }
+  } else if (activeRole.name === "StoreHead") {
+    if (activeRole.scopeType === "store" && activeRole.scopeId) {
+      pipeline.push({
+        $match: { "store._id": new ObjectId(activeRole.scopeId) },
+      });
+    }
   }
 
   search &&

@@ -10,7 +10,6 @@ export const updateRelationsValidator = () => {
       requestingUnitId: optional(objectIdValidation),
       attachmentIds: optional(array(objectIdValidation)),
       tenderId: optional(string()),
-      purchaseOrderItemIds: optional(array(objectIdValidation)),
       stepApprovalIds: optional(array(objectIdValidation)),
       goodsReceiptIds: optional(array(objectIdValidation)),
       paymentOrderIds: optional(array(objectIdValidation)),

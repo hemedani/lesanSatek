@@ -71,6 +71,7 @@ import {
   purchasingRequest_excludes,
   wareModel_excludes,
   store_excludes,
+  stuff_excludes,
   ware_excludes,
   wareType_excludes,
   wareClass_excludes,
@@ -104,6 +105,7 @@ export const purchasingRequest_pure = {
   requestedAt: optional(coerce(date(), string(), (value) => new Date(value))),
   completedAt: optional(coerce(date(), string(), (value) => new Date(value))),
   quantity: number(),
+  stuffStatus: defaulted(string(), "none"),
   history: defaulted(
     array(object({
       action: string(),
@@ -292,6 +294,22 @@ export const purchasingRequest_relations = {
     type: "single" as RelationDataType,
     optional: true,
     excludes: wareGroup_excludes,
+    relatedRelations: {
+      purchasingRequests: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  stuff: {
+    schemaName: "stuff",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: stuff_excludes,
     relatedRelations: {
       purchasingRequests: {
         type: "multiple" as RelationDataType,

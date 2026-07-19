@@ -14,20 +14,8 @@ export const addUserFn: ActFn = async (body) => {
     state,
     city,
     password,
-    roles,
     ...rest
   } = set;
-
-  const rolesWithIds =
-    (roles as {
-      name: string;
-      scopeType?: "organization" | "unit";
-      scopeId?: string;
-      roleId?: string;
-    }[] | undefined)?.map((r) => ({
-      ...r,
-      roleId: r.roleId || crypto.randomUUID(),
-    }));
 
   const relations: TInsertRelations<typeof user_relations> = {};
 
@@ -36,41 +24,18 @@ export const addUserFn: ActFn = async (body) => {
       _ids: new ObjectId(avatar as string),
     });
 
-  const orgIds: string[] = [...(organizations as string[] || [])];
-  const unitIds: string[] = [...(units as string[] || [])];
-
-  if (rolesWithIds) {
-    for (const role of rolesWithIds) {
-      if (
-        role.name === "UnitHead" && role.scopeType === "unit" && role.scopeId
-      ) {
-        if (!unitIds.some((id) => id === role.scopeId)) {
-          unitIds.push(role.scopeId);
-        }
-      }
-      if (
-        role.name === "OrgHead" &&
-        role.scopeType === "organization" && role.scopeId
-      ) {
-        if (!orgIds.some((id) => id === role.scopeId)) {
-          orgIds.push(role.scopeId);
-        }
-      }
-    }
-  }
-
-  if (orgIds.length > 0) {
+  if (organizations && (organizations as string[]).length > 0) {
     relations.organizations = {
-      _ids: orgIds.map((id: string) => new ObjectId(id)),
+      _ids: (organizations as string[]).map((id: string) => new ObjectId(id)),
       relatedRelations: {
         users: true,
       },
     };
   }
 
-  if (unitIds.length > 0) {
+  if (units && (units as string[]).length > 0) {
     relations.units = {
-      _ids: unitIds.map((id: string) => new ObjectId(id)),
+      _ids: (units as string[]).map((id: string) => new ObjectId(id)),
       relatedRelations: {
         members: true,
       },
@@ -96,11 +61,11 @@ export const addUserFn: ActFn = async (body) => {
   const addedUser = await user.insertOne({
     doc: {
       ...rest,
-      ...(rolesWithIds && { roles: rolesWithIds }),
       password: password ? await hash(password as string) : undefined,
       birth_date: rest.birth_date
         ? new Date(rest.birth_date as string)
         : undefined,
+      roles: [{ roleId: crypto.randomUUID(), name: "Ordinary" }],
     },
     relations,
     projection: get,

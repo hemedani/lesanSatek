@@ -26,8 +26,11 @@
  */
 import { coreApp } from "../mod.ts";
 import {
+  array,
   boolean,
   defaulted,
+  number,
+  object,
   optional,
   type RelationDataType,
   type RelationSortOrderType,
@@ -41,6 +44,10 @@ export const organization_pure = {
   enName: optional(string()),
   description: optional(string()),
   isActive: defaulted(boolean(), true),
+  location: optional(object({
+    type: string(),
+    coordinates: array(number()),
+  })),
   ...createUpdateAt,
 };
 

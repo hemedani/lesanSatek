@@ -1,5 +1,5 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { tender, tenderOffer, purchasingRequest, purchaseOrderItem, coreApp } from "../../../mod.ts";
+import { tender, tenderOffer, purchasingRequest, stuff, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 
 export const awardFn: ActFn = async (body) => {
@@ -73,47 +73,60 @@ export const awardFn: ActFn = async (body) => {
   const wareModelName = (wareModel?.name as string) || "";
   const quantity = (pr?.quantity as number) || 0;
 
-  // Create a single PurchaseOrderItem from the PR's wareModel + quantity
-  const poRelations: Record<string, unknown> = {
-    purchasingRequest: {
-      _ids: new ObjectId(prRef),
-      relatedRelations: { purchaseOrderItems: true },
+  const estimatedAmount = Math.round(offerPrice * quantity * 100) / 100;
+
+  // Find the Stuff matching the winning store + PR's wareModel
+  const stuffDoc = await stuff.aggregation({
+    pipeline: [
+      {
+        $match: {
+          "store._id": new ObjectId(winningStoreId),
+          "wareModel._id": new ObjectId(wareModelId),
+        },
+      },
+      { $limit: 1 },
+    ],
+    projection: { _id: 1 },
+  }).toArray();
+
+  const stuffId = stuffDoc.length > 0 ? (stuffDoc[0]._id as ObjectId).toString() : undefined;
+
+  // Set PR fields directly instead of creating a separate order item
+  await purchasingRequest.findOneAndUpdate({
+    filter: { _id: new ObjectId(prRef) },
+    update: {
+      $set: {
+        stuffStatus: "assigned",
+        estimatedAmount,
+        updatedAt: now,
+      },
     },
-    wareModel: {
-      _ids: new ObjectId(wareModelId),
-      relatedRelations: { purchaseOrderItems: true },
-    },
-  };
-
-  if (winningStoreId) {
-    poRelations.assignedFrom = {
-      _ids: new ObjectId(winningStoreId),
-      relatedRelations: { purchaseOrderItems: true },
-    };
-  }
-
-  poRelations.assignedBy = {
-    _ids: user._id,
-    relatedRelations: {},
-  };
-
-  poRelations.tenderOffer = {
-    _ids: new ObjectId(winningOfferId as string),
-    relatedRelations: { purchaseOrderItem: true },
-  };
-
-  await purchaseOrderItem.insertOne({
-    doc: {
-      quantity,
-      unitPrice: offerPrice,
-      totalPrice: offerPrice * quantity,
-      status: "assigned",
-    },
-    relations: poRelations,
     projection: { _id: 1 },
   });
 
-  // Push item_assigned history on the PR
+  // Link stuff + store on the PR
+  const prRelations: Record<string, unknown> = {};
+  if (stuffId) {
+    prRelations.stuff = {
+      _ids: new ObjectId(stuffId),
+      relatedRelations: { purchasingRequests: true },
+    };
+  }
+  if (winningStoreId) {
+    prRelations.store = {
+      _ids: new ObjectId(winningStoreId),
+      relatedRelations: { purchasingRequests: true },
+    };
+  }
+  if (Object.keys(prRelations).length > 0) {
+    await purchasingRequest.addRelation({
+      filters: { _id: new ObjectId(prRef) },
+      relations: prRelations,
+      projection: { _id: 1 },
+      replace: true,
+    });
+  }
+
   const activeRole = ((user as Record<string, unknown>).roles as Array<{ roleId: string; name: string; scopeType?: string; scopeId?: string }> || [])
     .find((r) => r.roleId === activeRoleId);
 
@@ -122,7 +135,7 @@ export const awardFn: ActFn = async (body) => {
     update: {
       $push: {
         history: {
-          action: "item_assigned",
+          action: "stuff_assigned",
           performed: {
             by: user._id.toString(),
             name: `${(user as Record<string, unknown>).first_name} ${(user as Record<string, unknown>).last_name}`,
@@ -140,6 +153,7 @@ export const awardFn: ActFn = async (body) => {
             quantity,
             unitPrice: offerPrice,
             storeId: winningStoreId,
+            stuffId,
             tenderOfferId: winningOfferId,
           },
         },
@@ -147,21 +161,6 @@ export const awardFn: ActFn = async (body) => {
     },
     projection: { _id: 1 },
   });
-
-  // Auto-populate store on the PR
-  if (winningStoreId) {
-    await purchasingRequest.addRelation({
-      filters: { _id: new ObjectId(prRef) },
-      relations: {
-        store: {
-          _ids: new ObjectId(winningStoreId),
-          relatedRelations: { purchasingRequests: true },
-        },
-      },
-      projection: { _id: 1 },
-      replace: true,
-    });
-  }
 
   // Mark tender as awarded
   return await tender.findOneAndUpdate({

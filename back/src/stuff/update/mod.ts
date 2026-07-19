@@ -2,6 +2,7 @@ import { coreApp } from "../../../mod.ts";
 import { updateFn } from "./update.fn.ts";
 import { updateValidator } from "./update.val.ts";
 import { grantAccess, setTokens, setUser } from "@lib";
+import { checkStoreHeadAccess } from "../../../utils/checkStoreHeadAccess.ts";
 
 export const updateSetup = () =>
 	coreApp.acts.setAct({
@@ -11,7 +12,11 @@ export const updateSetup = () =>
 	preAct: [
 		setTokens,
 		setUser,
-		grantAccess([{ roles: ["Manager", "Admin"] }]),
+		grantAccess([
+			{ roles: ["Manager", "Admin"] },
+			{ roles: ["StoreHead"] },
+		]),
+		checkStoreHeadAccess("update"),
 	],
 		validator: updateValidator(),
 		

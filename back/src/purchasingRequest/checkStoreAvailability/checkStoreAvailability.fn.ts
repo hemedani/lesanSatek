@@ -6,12 +6,14 @@ export const checkStoreAvailabilityFn: ActFn = async (body) => {
 
   const pr = await purchasingRequest.findOne({
     filters: { _id: new ObjectId(purchasingRequestId as string) },
-    projection: { _id: 1, wareModel: { _id: 1, name: 1, enName: 1 } },
+    projection: { _id: 1, quantity: 1, wareModel: { _id: 1, name: 1, enName: 1 } },
   }) as Record<string, unknown>;
 
   if (!pr) {
     throw new Error("Purchasing request not found");
   }
+
+  const prQuantity = (pr.quantity as number) || 0;
 
   const wareModel = pr.wareModel as Record<string, unknown> | undefined;
   const wareModelId = wareModel?._id?.toString();
@@ -23,6 +25,7 @@ export const checkStoreAvailabilityFn: ActFn = async (body) => {
   if (storeId) {
     match["store._id"] = new ObjectId(storeId as string);
   }
+  match["quantity"] = { $gte: prQuantity };
 
   const availableStuff = await stuff.aggregation({
     pipeline: [
@@ -48,7 +51,7 @@ export const checkStoreAvailabilityFn: ActFn = async (body) => {
       {
         $project: {
           _id: 1,
-          inventoryNo: 1,
+          quantity: 1,
           price: 1,
           hasAbsolutePrice: 1,
           pricePercentage: 1,
@@ -77,7 +80,7 @@ export const checkStoreAvailabilityFn: ActFn = async (body) => {
       stuffId: s._id?.toString(),
       storeId: s.store?._id?.toString(),
       storeName: (s.storeInfo as Record<string, unknown>)?.name as string || "",
-      inventoryNo: s.inventoryNo as number,
+      quantity: s.quantity as number,
       price: s.price as number,
       hasAbsolutePrice: s.hasAbsolutePrice as boolean,
       pricePercentage: s.pricePercentage as number | undefined,
@@ -93,6 +96,7 @@ export const checkStoreAvailabilityFn: ActFn = async (body) => {
       name: wareModel?.name,
       enName: wareModel?.enName,
     },
+    requestedQuantity: prQuantity,
     stores: result,
   };
 };

@@ -1,5 +1,5 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { goodsReceipt, purchasingRequest, paymentOrder, purchaseOrderItem, processStep, stepApproval, budgetEncumbrance, budgetLine, coreApp } from "../../../mod.ts";
+import { goodsReceipt, purchasingRequest, paymentOrder, processStep, stepApproval, budgetEncumbrance, budgetLine, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { addStock } from "../../../utils/inventoryManager.ts";
 import { evaluateStepStatus } from "../../../utils/stepEvaluator.ts";
@@ -58,7 +58,6 @@ export const addFn: ActFn = async (body) => {
   }
 
   const items = (rest.items as Array<{
-    purchaseOrderItemId: string;
     wareModelId: string;
     wareModelName?: string;
     wareId?: string;
@@ -70,23 +69,30 @@ export const addFn: ActFn = async (body) => {
 
   const userId = receivedById ? (receivedById as string) : `${user._id}`;
 
-  // Get PR's store for inventory traceability
+  // Get PR's store + pricing info for inventory traceability and auto-payment
   let prStoreId: string | undefined;
+  let prEstimatedAmount = 0;
+  let prQuantity = 0;
   if (purchasingRequestId) {
     const prDoc = await purchasingRequest.findOne({
       filters: { _id: new ObjectId(purchasingRequestId as string) },
-      projection: { store: { _id: 1 } },
+      projection: { store: { _id: 1 }, estimatedAmount: 1, quantity: 1, stuffStatus: 1 },
     }) as Record<string, unknown> | null;
     if (prDoc?.store) {
       prStoreId = ((prDoc.store as Record<string, unknown>)._id as ObjectId).toString();
     }
+    prEstimatedAmount = (prDoc?.estimatedAmount as number) || 0;
+    prQuantity = (prDoc?.quantity as number) || 0;
   }
 
-  // Gaps 4 & 6: Update PO item status + collect pricing for auto-payment
+  // Calculate order total from PR's estimatedAmount (prorated by accepted quantity)
   let orderTotal = 0;
+  let totalAccepted = 0;
 
   for (const item of items) {
     if (item.quantityAccepted > 0) {
+      totalAccepted += item.quantityAccepted;
+
       // Add stock
       await addStock(
         receivingUnitId as string,
@@ -103,28 +109,21 @@ export const addFn: ActFn = async (body) => {
           storeId: prStoreId,
         },
       );
-
-      // Gap 4: Update purchaseOrderItem status to "received"
-      if (item.purchaseOrderItemId) {
-        const poItem = await purchaseOrderItem.findOne({
-          filters: { _id: new ObjectId(item.purchaseOrderItemId) },
-          projection: { _id: 1, unitPrice: 1, totalPrice: 1, quantity: 1 },
-        }) as Record<string, unknown>;
-
-        if (poItem) {
-          await purchaseOrderItem.findOneAndUpdate({
-            filter: { _id: new ObjectId(item.purchaseOrderItemId) },
-            update: { $set: { status: "received", updatedAt: now } },
-            projection: { _id: 1 },
-          });
-
-          // Gap 6: Calculate order total from PO item pricing
-          const itemTotal = (poItem.totalPrice as number) ||
-            ((poItem.unitPrice as number || 0) * item.quantityAccepted);
-          orderTotal += itemTotal;
-        }
-      }
     }
+  }
+
+  // Compute prorated order total from PR's estimatedAmount
+  if (totalAccepted > 0 && prQuantity > 0) {
+    orderTotal = Math.round((prEstimatedAmount / prQuantity) * totalAccepted * 100) / 100;
+  }
+
+  // Update PR's stuffStatus to "received"
+  if (purchasingRequestId && totalAccepted > 0) {
+    await purchasingRequest.findOneAndUpdate({
+      filter: { _id: new ObjectId(purchasingRequestId as string) },
+      update: { $set: { stuffStatus: "received", updatedAt: now } },
+      projection: { _id: 1 },
+    });
   }
 
   // Push "goods_received" history on the purchasing request
@@ -339,24 +338,9 @@ export const addFn: ActFn = async (body) => {
     }
   }
 
-  // Gap 6: Auto-create draft payment order from receipt items
+  // Auto-create draft payment order from receipt items
   if (orderTotal > 0 && purchasingRequestId) {
     const poTitle = `Payment for goods receipt ${rest.receiptNumber || ""}`;
-
-    // Find the store from the first purchase order item that has assignedFrom
-    let payToStoreId: string | undefined;
-    for (const item of items) {
-      if (item.purchaseOrderItemId) {
-        const poItem = await purchaseOrderItem.findOne({
-          filters: { _id: new ObjectId(item.purchaseOrderItemId) },
-          projection: { assignedFrom: { _id: 1 } },
-        }) as Record<string, unknown> | null;
-        if (poItem?.assignedFrom) {
-          payToStoreId = ((poItem.assignedFrom as Record<string, unknown>)._id as ObjectId).toString();
-          break;
-        }
-      }
-    }
 
     const paymentRelations: Record<string, unknown> = {
       purchasingRequest: {
@@ -369,9 +353,9 @@ export const addFn: ActFn = async (body) => {
       },
     };
 
-    if (payToStoreId) {
+    if (prStoreId) {
       paymentRelations.payTo = {
-        _ids: new ObjectId(payToStoreId),
+        _ids: new ObjectId(prStoreId),
         relatedRelations: { paymentOrders: true },
       };
     }

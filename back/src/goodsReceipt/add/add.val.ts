@@ -14,8 +14,10 @@ export const addValidator = () => {
       notes: optional(string()),
       items: defaulted(
         array(object({
-          purchaseOrderItemId: string(),
           wareModelId: string(),
+          wareModelName: optional(string()),
+          wareId: optional(string()),
+          wareName: optional(string()),
           quantityReceived: number(),
           quantityAccepted: number(),
           quantityRejected: number(),

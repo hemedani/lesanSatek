@@ -1,5 +1,5 @@
 import { type ActFn, ObjectId } from "lesan";
-import { organization, unit, user } from "../../../mod.ts";
+import { organization, store, unit, user } from "../../../mod.ts";
 
 export const addOrRemoveRolesFn: ActFn = async (body) => {
   const { set, get } = body.details;
@@ -91,6 +91,19 @@ export const addOrRemoveRolesFn: ActFn = async (body) => {
           filters: { _id: new ObjectId(role.scopeId) },
           relations: {
             head: {
+              _ids: userId,
+            },
+          },
+          projection: { _id: 1 },
+          replace: true,
+        });
+      }
+
+      if (role.name === "StoreHead" && role.scopeId) {
+        await store.addRelation({
+          filters: { _id: new ObjectId(role.scopeId) },
+          relations: {
+            storeHead: {
               _ids: userId,
             },
           },
@@ -206,6 +219,28 @@ export const addOrRemoveRolesFn: ActFn = async (body) => {
               filters: { _id: new ObjectId(role.scopeId) },
               relations: {
                 head: {
+                  _ids: userId,
+                },
+              },
+              projection: { _id: 1 },
+            });
+          }
+        }
+      }
+
+      if (role.name === "StoreHead" && role.scopeId) {
+        const currentStore = await store.findOne({
+          filters: { _id: new ObjectId(role.scopeId) },
+          projection: { storeHead: { _id: 1 } },
+        });
+        if (currentStore?.storeHead) {
+          const headId = (currentStore.storeHead as { _id?: ObjectId })._id?.toString?.() ||
+            (currentStore.storeHead as ObjectId).toString?.();
+          if (headId === userId.toString()) {
+            await store.removeRelation({
+              filters: { _id: new ObjectId(role.scopeId) },
+              relations: {
+                storeHead: {
                   _ids: userId,
                 },
               },

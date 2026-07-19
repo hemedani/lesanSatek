@@ -1,5 +1,6 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { tenderOffer } from "../../../mod.ts";
+import { tenderOffer, coreApp } from "../../../mod.ts";
+import type { MyContext } from "@lib";
 
 export const getsFn: ActFn = async (body) => {
   const {
@@ -12,13 +13,27 @@ export const getsFn: ActFn = async (body) => {
       tenderId,
       storeId,
       status,
+      activeRoleId,
     },
     get,
   } = body.details;
 
+  const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
+
   const pipeline: Document[] = [];
 
   const match: Document = {};
+
+  const activeRole = (user.roles || []).find(
+    (r: { roleId: string }) => r.roleId === activeRoleId,
+  ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
+
+  if (activeRole?.name === "StoreHead") {
+    if (activeRole.scopeType === "store" && activeRole.scopeId) {
+      match.store = new ObjectId(activeRole.scopeId);
+    }
+  }
+
   tenderId && (match.tender = new ObjectId(tenderId as string));
   storeId && (match.store = new ObjectId(storeId as string));
   status && (match.status = status);

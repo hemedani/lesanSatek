@@ -8,16 +8,8 @@ import {
   string,
 } from "lesan";
 import { selectStruct } from "../../../mod.ts";
-import {
-  activeRoleMixin,
-} from "@lib";
-import {
-  feature_enums,
-  role_array,
-  role_emums,
-  role_scope_type_emums,
-  user_genders,
-} from "@model";
+import { activeRoleMixin } from "@lib";
+import { feature_enums, user_genders } from "@model";
 
 export const addUserValidator = () => {
   return object({
@@ -29,12 +21,6 @@ export const addUserValidator = () => {
       birth_date: optional(string()),
       position: optional(string()),
       isActive: defaulted(boolean(), true),
-      roles: array(object({
-        roleId: optional(string()),
-        name: role_emums,
-        scopeType: optional(role_scope_type_emums),
-        scopeId: optional(string()),
-      })),
       mobile: string(),
       email: string(),
       password: string(),

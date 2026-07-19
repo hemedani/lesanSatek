@@ -2,6 +2,7 @@ import { grantAccess, requireFeature, setTokens, setUser } from "@lib";
 import { coreApp } from "../../../mod.ts";
 import { submitFn } from "./submit.fn.ts";
 import { submitValidator } from "./submit.val.ts";
+import { checkStoreHeadAccess } from "../../../utils/checkStoreHeadAccess.ts";
 
 export const submitSetup = () =>
   coreApp.acts.setAct({
@@ -15,7 +16,9 @@ export const submitSetup = () =>
         { roles: ["Manager", "Admin"], features: ["canRespondToTender"] },
         { roles: ["OrgHead", "UnitHead", "Employee"], features: ["canRespondToTender"] },
         { roles: ["Ordinary"], features: ["canRespondToTender"] },
+        { roles: ["StoreHead"] },
       ]),
+      checkStoreHeadAccess("add"),
     ],
     validator: submitValidator(),
     validationRunType: "create",

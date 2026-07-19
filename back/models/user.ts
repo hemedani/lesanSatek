@@ -84,13 +84,14 @@ export const role_array = [
   "Admin",
   "OrgHead",
   "UnitHead",
+  "StoreHead",
   "Employee",
   "Ordinary",
 ];
 
 export const role_emums = enums(role_array);
 
-export const role_scope_type_emums = enums(["organization", "unit"]);
+export const role_scope_type_emums = enums(["organization", "unit", "store"]);
 
 export const mobile_pattern = pattern(
   string(),

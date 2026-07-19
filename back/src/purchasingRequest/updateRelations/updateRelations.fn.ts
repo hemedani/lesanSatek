@@ -2,7 +2,6 @@ import { type ActFn, ObjectId } from "lesan";
 import {
   purchasingRequest,
   tender,
-  purchaseOrderItem,
   stepApproval,
   goodsReceipt,
   paymentOrder,
@@ -10,11 +9,10 @@ import {
 } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
-import { hasFeature } from "../../../utils/checkFeature.ts";
 
 export const updateRelationsFn: ActFn = async (body) => {
   const {
-    set: { _id, requestingUnitId, attachmentIds, tenderId, purchaseOrderItemIds, stepApprovalIds, goodsReceiptIds, paymentOrderIds, budgetLineId, storeId, wareId, wareTypeId, wareClassId, wareGroupId },
+    set: { _id, requestingUnitId, attachmentIds, tenderId, stepApprovalIds, goodsReceiptIds, paymentOrderIds, budgetLineId, storeId, wareId, wareTypeId, wareClassId, wareGroupId },
     get,
   } = body.details;
 
@@ -79,47 +77,6 @@ export const updateRelationsFn: ActFn = async (body) => {
         });
       }
     }
-  }
-
-  if (purchaseOrderItemIds !== undefined) {
-    if (!hasFeature(user, "canAssignItemsToOrder")) {
-      throwError("You do not have permission to modify purchase items");
-    }
-    const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === body.details.set.activeRoleId);
-
-    const poiIds = (purchaseOrderItemIds as string[]).map((id: string) => new ObjectId(id));
-    await purchaseOrderItem.addRelation({
-      filters: { _id: { $in: poiIds } },
-      relations: {
-        purchasingRequest: {
-          _ids: requestId,
-          relatedRelations: { purchaseOrderItems: true },
-        },
-      },
-      projection: { _id: 1 },
-      replace: true,
-    });
-
-    await purchasingRequest.findOneAndUpdate({
-      filter: { _id: requestId },
-      update: {
-        $push: {
-          history: {
-            action: "item_assigned",
-            performed: {
-              by: user._id.toString(),
-              name: `${user.first_name} ${user.last_name}`,
-              at: now,
-              role: activeRole
-                ? { id: activeRole.roleId, name: activeRole.name, scopeType: activeRole.scopeType, scopeId: activeRole.scopeId }
-                : { id: "", name: "" },
-            },
-            details: { purchaseOrderItemIds, note: "Purchase items updated via relations" },
-          },
-        },
-      },
-      projection: { _id: 1 },
-    });
   }
 
   if (stepApprovalIds !== undefined) {
