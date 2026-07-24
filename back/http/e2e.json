@@ -447,6 +447,23 @@
     "captures": []
   },
   {
+    "id": "gen-orghead-user",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"first_name\": \"دکتر\", \"last_name\": \"احمدی\", \"email\": \"dr.ahmadi@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000012\", \"gender\": \"Male\", \"isActive\": true, \"is_verified\": true, \"organizations\": [\"{orgId}\"]}, \"get\": {\"_id\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "orgHeadUserId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-roles-orghead",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addOrRemoveRoles\", \"details\": {\"set\": {\"_id\": \"{orgHeadUserId}\", \"activeRoleId\": \"{roleId}\", \"addRoles\": [{\"name\": \"OrgHead\", \"scopeType\": \"organization\", \"scopeId\": \"{orgId}\"}]}, \"get\": {\"_id\": 1, \"roles\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
     "id": "gen-mfr",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"manufacturer\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"تولیدکننده نمونه\", \"enName\": \"تولیدکننده نمونه\", \"country\": \"ایران\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,

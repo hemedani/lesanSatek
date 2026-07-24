@@ -15,6 +15,7 @@ import { removeFromPurchaseSetup } from "./removeFromPurchase/mod.ts";
 import { updateStuffStatusSetup } from "./updateStuffStatus/mod.ts";
 import { selectTenderOfferSetup } from "./selectTenderOffer/mod.ts";
 import { removeTenderSelectionSetup } from "./removeTenderSelection/mod.ts";
+import { getPendingByUnitSetup } from "./getPendingByUnit/mod.ts";
 
 export const purchasingRequestSetup = () => {
   addSetup();
@@ -33,4 +34,5 @@ export const purchasingRequestSetup = () => {
   updateStuffStatusSetup();
   selectTenderOfferSetup();
   removeTenderSelectionSetup();
+  getPendingByUnitSetup();
 };

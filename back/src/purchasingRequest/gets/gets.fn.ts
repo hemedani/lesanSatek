@@ -148,7 +148,7 @@ export const getsFn: ActFn = async (body) => {
           as: "_unitPendingApprovals",
         },
       },
-      { $match: { _unitPendingApprovals: { $ne: [] } } },
+      { $match: { $or: [{ _unitPendingApprovals: { $ne: [] } }, { status: "Draft" }] } },
       { $project: { _unitPendingApprovals: 0 } },
     );
   }
