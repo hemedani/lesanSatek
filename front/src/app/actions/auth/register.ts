@@ -4,7 +4,7 @@ import { AppApi } from "@/lib/api";
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 
 export const register = async (
-  data: ReqType["main"]["user"]["registerUser"]["set"],
+  data: Omit<ReqType["main"]["user"]["registerUser"]["set"], "activeRoleId"> & { activeRoleId?: string },
   getSelection?: DeepPartial<ReqType["main"]["user"]["registerUser"]["get"]>
 ) => {
   try {

@@ -5,7 +5,7 @@ import { getToken, getActiveRoleId } from "@/lib/auth";
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 
 export const duplicateProcess = async (
-  data: ReqType["main"]["process"]["duplicateProcess"]["set"],
+  data: Omit<ReqType["main"]["process"]["duplicateProcess"]["set"], "activeRoleId"> & { activeRoleId?: string },
   getSelection?: DeepPartial<ReqType["main"]["process"]["duplicateProcess"]["get"]>
 ) => {
   try {

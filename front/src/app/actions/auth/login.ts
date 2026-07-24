@@ -3,9 +3,10 @@
 import { AppApi } from "@/lib/api";
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 import { cookies } from "next/headers";
+import { getHighestRole } from "@/lib/roles";
 
 export const login = async (
-  data: ReqType["main"]["user"]["login"]["set"],
+  data: Omit<ReqType["main"]["user"]["login"]["set"], "activeRoleId"> & { activeRoleId?: string },
   getSelection?: DeepPartial<ReqType["main"]["user"]["login"]["get"]>
 ) => {
   const cookieStore = await cookies();
@@ -50,7 +51,8 @@ export const login = async (
 
       if (result.body.user?.roles?.length > 0) {
         const currentActiveRoleId = cookieStore.get("activeRoleId")?.value;
-        const roleId = currentActiveRoleId || result.body.user.roles[0].roleId;
+        const highest = getHighestRole(result.body.user.roles);
+        const roleId = currentActiveRoleId || (highest ? highest.roleId : result.body.user.roles[0].roleId);
         cookieStore.set("activeRoleId", roleId, {
           httpOnly: false,
           secure: process.env.NODE_ENV === "production",

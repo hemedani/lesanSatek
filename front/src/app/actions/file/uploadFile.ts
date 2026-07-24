@@ -5,7 +5,7 @@ import { getToken, getActiveRoleId } from "@/lib/auth";
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 
 export const uploadFile = async (
-  data: ReqType["main"]["file"]["uploadFile"]["set"],
+  data: Omit<ReqType["main"]["file"]["uploadFile"]["set"], "activeRoleId"> & { activeRoleId?: string },
   getSelection?: DeepPartial<ReqType["main"]["file"]["uploadFile"]["get"]>
 ) => {
   try {

@@ -5,7 +5,7 @@ import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 import { cookies } from "next/headers";
 
 export const tempUser = async (
-  data: ReqType["main"]["user"]["tempUser"]["set"],
+  data: Omit<ReqType["main"]["user"]["tempUser"]["set"], "activeRoleId"> & { activeRoleId?: string },
   getSelection?: DeepPartial<ReqType["main"]["user"]["tempUser"]["get"]>
 ) => {
   const cookieStore = await cookies();

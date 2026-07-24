@@ -5,7 +5,7 @@ import { getToken, getActiveRoleId } from "@/lib/auth";
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 
 export const release = async (
-  data: ReqType["main"]["budgetEncumbrance"]["release"]["set"],
+  data: Omit<ReqType["main"]["budgetEncumbrance"]["release"]["set"], "activeRoleId"> & { activeRoleId?: string },
   getSelection?: DeepPartial<ReqType["main"]["budgetEncumbrance"]["release"]["get"]>
 ) => {
   try {

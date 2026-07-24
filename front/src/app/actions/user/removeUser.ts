@@ -5,7 +5,7 @@ import { getToken, getActiveRoleId } from "@/lib/auth";
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 
 export const removeUser = async (
-  data: ReqType["main"]["user"]["removeUser"]["set"],
+  data: Omit<ReqType["main"]["user"]["removeUser"]["set"], "activeRoleId"> & { activeRoleId?: string },
   getSelection?: DeepPartial<ReqType["main"]["user"]["removeUser"]["get"]>
 ) => {
   try {

@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 
 export const submit = async (
-  data: ReqType["main"]["tenderOffer"]["submit"]["set"],
+  data: Omit<ReqType["main"]["tenderOffer"]["submit"]["set"], "activeRoleId"> & { activeRoleId?: string },
   getSelection?: DeepPartial<ReqType["main"]["tenderOffer"]["submit"]["get"]>
 ) => {
   try {
