@@ -14,7 +14,7 @@ import { WorkflowVisualizer } from "@/components/purchasing/workflow-visualizer"
 import { HistoryTimeline } from "@/components/purchasing/history-timeline"
 import { ReceiveGoodsButton } from "./receive-goods-button"
 import { cookies } from "next/headers"
-import { getUser } from "@/app/actions/user/getUser"
+import { getMe } from "@/app/actions/user/getMe"
 
 type StepApprovalInline = {
   _id: string
@@ -128,9 +128,9 @@ export default async function RequestDetailPage({
   let isCurrentUserRequester = false
 
   if (activeRoleId) {
-    const userRes = await getUser({}, {
+    const userRes = await getMe({
       _id: 1,
-      roles: { roleId: 1, scopeId: 1, scopeType: 1, name: 1 },
+      roles: 1,
     }).catch(() => ({ success: false, body: null }))
     const currentUser = userRes.success ? userRes.body : null
     const activeRole = currentUser?.roles?.find((r: { roleId?: string }) => r.roleId === activeRoleId)

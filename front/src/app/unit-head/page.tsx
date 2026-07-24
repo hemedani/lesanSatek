@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
 import { gets as getApprovals } from "@/app/actions/stepApproval/gets"
 import { cookies } from "next/headers"
-import { getUser } from "@/app/actions/user/getUser"
+import { getMe } from "@/app/actions/user/getMe"
 
 export default async function UnitHeadDashboard() {
   const cookieStore = await cookies()
@@ -13,9 +13,9 @@ export default async function UnitHeadDashboard() {
   let unitId: string | undefined
 
   if (activeRoleId) {
-    const userRes = await getUser({}, {
+    const userRes = await getMe({
       _id: 1,
-      roles: { roleId: 1, scopeId: 1, scopeType: 1, name: 1 },
+      roles: 1,
     }).catch(() => ({ success: false, body: null }))
     const user = userRes.success ? userRes.body : null
     const activeRole = user?.roles?.find((r: { roleId?: string }) => r.roleId === activeRoleId)

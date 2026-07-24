@@ -13,7 +13,7 @@ import { UnitHeadActions } from "./unit-head-actions"
 import { ActiveTenderCard } from "@/components/purchasing/active-tender-card"
 import { TendersList } from "@/components/purchasing/tenders-list"
 import { cookies } from "next/headers"
-import { getUser } from "@/app/actions/user/getUser"
+import { getMe } from "@/app/actions/user/getMe"
 
 type StepApprovalInline = {
   _id: string
@@ -152,10 +152,10 @@ export default async function UnitHeadRequestDetailPage({
   let userUnitId: string | undefined
 
   if (activeRoleId) {
-    const userRes = await getUser({}, {
+    const userRes = await getMe({
       _id: 1,
-      roles: { roleId: 1, scopeId: 1, scopeType: 1, name: 1 },
-    }).catch(() => ({ success: false, body: null }))
+      roles: 1,
+    } as any).catch(() => ({ success: false, body: null }))
     const currentUser = userRes.success ? userRes.body : null
     const activeRole = currentUser?.roles?.find((r: { roleId?: string }) => r.roleId === activeRoleId)
     if (activeRole?.scopeType === "unit" && activeRole.scopeId) {
@@ -222,6 +222,28 @@ export default async function UnitHeadRequestDetailPage({
       const groups = step.assigneeGroups || []
       const unitIds = [...new Set(groups.flatMap((g) => g.unitIds || []))]
       stepResponsibleUnits[step._id] = (unitIds as string[]).map((id) => unitsById[id]).filter(Boolean)
+    }
+  }
+
+  const currentStep = sortedSteps[currentStepIdx] || null
+
+  function isStepFullyApproved(stepId: string): boolean {
+    const stepApprovals = (pr.stepApprovals || []).filter((a: any) => a.processStep?._id === stepId)
+    const stepUnits = stepResponsibleUnits[stepId] || []
+    if (stepUnits.length === 0) return false
+    return stepUnits.every((unit: any) =>
+      stepApprovals.some((a: any) => a.unit?._id === unit._id && a.status === "approved")
+    )
+  }
+
+  let effectiveStep = currentStep
+  const prStatus = (pr.status || "").toLowerCase()
+  if (!["completed", "rejected", "cancelled"].includes(prStatus) && currentStep?._id && isStepFullyApproved(currentStep._id)) {
+    const nextIdx = sortedSteps.findIndex(
+      (s) => (s.order || 0) > (currentStep?.order || 0) && !isStepFullyApproved(s._id)
+    )
+    if (nextIdx !== -1) {
+      effectiveStep = sortedSteps[nextIdx]
     }
   }
 
@@ -636,7 +658,7 @@ export default async function UnitHeadRequestDetailPage({
               </Card>
               <StepApprovalPanel
                 purchasingRequestId={pr._id || id}
-                processStep={sortedSteps[currentStepIdx] || null}
+                processStep={effectiveStep}
                 unitId={userUnitId || ""}
                 existingApprovals={approvals}
               />
@@ -644,7 +666,7 @@ export default async function UnitHeadRequestDetailPage({
           ) : (
             <StepApprovalPanel
               purchasingRequestId={pr._id || id}
-              processStep={sortedSteps[currentStepIdx] || null}
+              processStep={effectiveStep}
               unitId={userUnitId || ""}
               existingApprovals={approvals}
             />

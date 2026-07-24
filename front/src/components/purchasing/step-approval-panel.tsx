@@ -16,9 +16,10 @@ interface StepApprovalPanelProps {
     _id?: string
     name?: string
     description?: string
+    assigneeGroups?: { operator?: string; unitIds?: string[] }[]
   }
   unitId: string
-  existingApprovals?: { _id: string; status: string; comment?: string }[]
+  existingApprovals?: { _id: string; status: string; comment?: string; unit?: { _id?: string } }[]
   onDecision?: () => void
 }
 
@@ -34,7 +35,14 @@ function StepApprovalPanel({
   const [submitting, setSubmitting] = useState<string | null>(null)
   const [localDecision, setLocalDecision] = useState<{ status: string } | null>(null)
 
-  const userDecision = existingApprovals?.find((a) => a.status === "approved" || a.status === "rejected") || localDecision
+  const isAssignedToStep = !!(
+    unitId &&
+    processStep &&
+    (processStep.assigneeGroups || []).some((g) => (g.unitIds || []).includes(unitId))
+  )
+
+  const myApproval = existingApprovals?.find((a) => a.unit?._id === unitId && (a.status === "approved" || a.status === "rejected"))
+  const userDecision = myApproval || localDecision
   const hasDecided = !!userDecision
 
   const handleDecision = async (decision: "approved" | "rejected") => {
@@ -115,7 +123,14 @@ function StepApprovalPanel({
           </div>
         )}
 
-        {!hasDecided && (
+        {!isAssignedToStep && !hasDecided && (
+          <div className="rounded-sm bg-zinc-400/5 border border-zinc-400/20 px-3 py-2 text-sm text-fog/60">
+            <Loader2 className="size-4 inline ms-1.5 animate-spin" />
+            در انتظار تایید واحد مربوطه
+          </div>
+        )}
+
+        {isAssignedToStep && !hasDecided && (
           <>
             <div className="space-y-2">
               <label className="text-xs text-fog">توضیحات (اختیاری)</label>

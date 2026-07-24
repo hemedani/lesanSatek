@@ -1,6 +1,6 @@
 import { gets as getInventory } from "@/app/actions/inventory/gets"
 import { cookies } from "next/headers"
-import { getUser } from "@/app/actions/user/getUser"
+import { getMe } from "@/app/actions/user/getMe"
 import { InventoryClient } from "./inventory-client"
 
 interface InventoryItem {
@@ -31,9 +31,9 @@ export default async function EmployeeInventoryPage({
   let unitId: string | undefined
 
   if (activeRoleId) {
-    const userRes = await getUser({}, {
+    const userRes = await getMe({
       _id: 1,
-      roles: { roleId: 1, scopeId: 1, scopeType: 1, name: 1 },
+      roles: 1,
     }).catch(() => ({ success: false, body: null }))
     const user = userRes.success ? userRes.body : null
     const activeRole = user?.roles?.find((r: { roleId?: string }) => r.roleId === activeRoleId)

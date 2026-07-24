@@ -106,7 +106,29 @@ export function WorkflowVisualizer({
     }
   }
 
-  const activeStepUnits = activeStepId ? stepResponsibleUnits?.[activeStepId] || [] : []
+  function isStepFullyApproved(stepId: string): boolean {
+    const stepApprovals = approvals?.filter((a) => a.processStep?._id === stepId) || []
+    const stepUnits = stepResponsibleUnits?.[stepId] || []
+    if (stepUnits.length === 0) return false
+    return stepUnits.every((unit) =>
+      stepApprovals.some((a) => a.unit?._id === unit._id && a.status === "approved")
+    )
+  }
+
+  let displayStepIndex = currentStepIndex
+  let displayStep = activeStep
+  if (!isComplete && !isRejected && activeStepId && isStepFullyApproved(activeStepId)) {
+    const nextIdx = sortedSteps.findIndex(
+      (s) => (s.order || 0) > (activeStep?.order || 0) && !isStepFullyApproved(s._id)
+    )
+    if (nextIdx !== -1) {
+      displayStep = sortedSteps[nextIdx]
+      displayStepIndex = displayStep?.order ?? nextIdx
+    }
+  }
+
+  const displayStepId = displayStep?._id ?? null
+  const displayStepUnits = displayStepId ? stepResponsibleUnits?.[displayStepId] || [] : []
 
   const toggleNotes = (stepId: string) => {
     setExpandedNotes((prev) => {
@@ -135,20 +157,20 @@ export function WorkflowVisualizer({
         </div>
       </div>
 
-      {activeStep && !isComplete && !isRejected && activeStepUnits.length > 0 && (
+      {displayStep && !isComplete && !isRejected && displayStepUnits.length > 0 && (
         <div className="mb-5 p-3 rounded-lg bg-electric-iris/[0.06] border border-electric-iris/15">
           <div className="flex items-center gap-2 text-xs text-fog/60 mb-1.5">
             <Loader2 className="size-3.5 animate-spin text-electric-iris" />
             <span>مرحله جاری:</span>
-            <span className="text-frost-link font-medium">{activeStep.name || `مرحله ${activeStep.order || "—"}`}</span>
+            <span className="text-frost-link font-medium">{displayStep.name || `مرحله ${displayStep.order || "—"}`}</span>
           </div>
           <div className="text-xs text-fog/80 space-y-1">
-            {activeStepUnits.map((unit) => (
+            {displayStepUnits.map((unit) => (
               <div key={unit._id} className="flex items-center gap-1.5">
                 <User className="size-3 text-electric-iris/60" />
                 <span>
                   {unit.head
-                    ? `${unit.head.first_name || ""} ${unit.head.last_name || ""}${unit.head.position ? ` · ${unit.head.position}` : ""}`
+                    ? `${unit.name || ""} · ${unit.head.first_name || ""} ${unit.head.last_name || ""}${unit.head.position ? ` · ${unit.head.position}` : ""}`
                     : `${unit.name}: مسئولی تعیین نشده`
                   }
                 </span>
