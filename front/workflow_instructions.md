@@ -78,6 +78,7 @@ The `e2e.json` suite creates the following entities in order.
 | `gen-finance-head` | فاطمه موسوی (fatemeh@lesansatek.com) | UnitHead (scope: Finance) | Finance Unit Head |
 | `gen-finance-user` | مریم حسینی (maryam@lesansatek.com) | Ordinary + canManageBudget | Finance Panel |
 | `gen-vendor-user` | سارا کریمی (sara@lesansatek.com) | Manager + Ordinary + Employee + canRespondToTender + canAssignItemsToOrder | Vendor / Store Head |
+| `gen-orghead-user` | دکتر احمدی (dr.ahmadi@lesansatek.com) | OrgHead (scope: organization) | OrgHead Panel |
 
 ### 1c. Units (15 total)
 
@@ -223,6 +224,7 @@ All processes are **activated** via `activateProcess`.
 | **Vendor / Store Head** | سارا کریمی | sara@lesansatek.com | password123 | Manager + Ordinary + Employee + canRespondToTender + canAssignItemsToOrder | Store manager, tender offer submission, can add stuff to store |
 | **Employee** | علی محمدی | ali@lesansatek.com | password123 | Manager | Can also act as requester |
 | **Warehouse** | حسین کاظمی | hossein@lesansatek.com | password123 | UnitHead (Warehouse) | Warehouse operations |
+| **OrgHead** | دکتر احمدی | dr.ahmadi@lesansatek.com | password123 | OrgHead (Organization) | Organization-level oversight, tender finalization |
 
 ---
 
@@ -793,6 +795,7 @@ The PanelSelector should show all 3 options for role switching.
 | **فاطمه موسوی** (finHead) | fatemeh@lesansatek.com / password123 | `/unit-head` | ✓ (Employee role) | ✓ (UnitHead role) |
 | **مریم حسینی** (financeUser) | maryam@lesansatek.com / password123 | `/finance` | ✓ (Employee role) | ✗ (Ordinary) |
 | **سارا کریمی** (vendorUser) | sara@lesansatek.com / password123 | `/vendor`, `/admin`, or `/store` | ✓ (Employee/Manager role) | ✓ (Manager role) |
+| **دکتر احمدی** (orgHeadUser) | dr.ahmadi@lesansatek.com / password123 | `/org-head` | ✓ (Employee role) | ✓ (OrgHead role) |
 
 **All unit heads** (علی محمدی through فاطمه موسوی) work via `/admin` panel — they have Manager role.  
 **UnitHead users** (رضا احمدی, حسین کاظمی, فاطمه موسوی) work via `/unit-head` panel — they see only their unit's data. This is the most common approval panel.  
