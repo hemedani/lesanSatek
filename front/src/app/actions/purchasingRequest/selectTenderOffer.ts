@@ -2,33 +2,29 @@
 
 import { AppApi } from "@/lib/api";
 import { getToken, getActiveRoleId } from "@/lib/auth";
-import { revalidatePath } from "next/cache";
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 
-export const submit = async (
-  data: ReqType["main"]["tenderOffer"]["submit"]["set"],
-  getSelection?: DeepPartial<ReqType["main"]["tenderOffer"]["submit"]["get"]>
+export const selectTenderOffer = async (
+  data: ReqType["main"]["purchasingRequest"]["selectTenderOffer"]["set"],
+  getSelection?: DeepPartial<ReqType["main"]["purchasingRequest"]["selectTenderOffer"]["get"]>
 ) => {
   try {
     const token = await getToken();
     const activeRoleId = await getActiveRoleId();
     const result = await AppApi(undefined, token).send({
       service: "main",
-      model: "tenderOffer",
-      act: "submit",
+      model: "purchasingRequest",
+      act: "selectTenderOffer",
       details: {
         set: { ...data, activeRoleId },
-        get: getSelection || { _id: 1, price: 1, status: 1 },
+        get: getSelection || { _id: 1, title: 1, selectionType: 1, selectedTenderOfferId: 1, estimatedAmount: 1 },
       },
     });
-    if (result.success) {
-      revalidatePath("/storehead", "layout");
-    }
     return result;
   } catch (error: unknown) {
     return {
       success: false,
-      body: { message: error instanceof Error ? error.message : "خطا در ثبت پیشنهاد" },
+      body: { message: error instanceof Error ? error.message : "خطا در انتخاب پیشنهاد مناقصه" },
     };
   }
 };

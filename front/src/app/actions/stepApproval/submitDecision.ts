@@ -11,12 +11,16 @@ export const submitDecision = async (
   try {
     const token = await getToken();
     const activeRoleId = await getActiveRoleId();
+    const setData: Record<string, unknown> = { ...data, activeRoleId };
+    if (!setData.unitId) {
+      delete setData.unitId;
+    }
     const result = await AppApi(undefined, token).send({
       service: "main",
       model: "stepApproval",
       act: "submitDecision",
       details: {
-        set: { ...data, activeRoleId },
+        set: setData,
         get: getSelection || { _id: 1, status: 1 },
       },
     });
