@@ -31,6 +31,9 @@ export const submitFn: ActFn = async (body) => {
       status: 1,
       title: 1,
       quantity: 1,
+      selectionType: 1,
+      selectedTenderOfferId: 1,
+      stuff: { _id: 1 },
       wareModel: { _id: 1, name: 1, enName: 1 },
       requestingUnit: { _id: 1, name: 1 },
     },
@@ -44,6 +47,26 @@ export const submitFn: ActFn = async (body) => {
   if (pr.status !== "Draft") {
     throwError("Only Draft purchasing requests can be submitted");
     return;
+  }
+
+  // Validate that a selection method has been completed
+  const selectionType = pr.selectionType as string || "none";
+  if (selectionType === "none") {
+    throwError("Please assign stuff or select a tender offer before submitting this request");
+    return;
+  }
+  if (selectionType === "stuff") {
+    const prStuff = pr.stuff as Record<string, unknown> | undefined;
+    if (!prStuff?._id) {
+      throwError("Stuff selection is incomplete. Please re-assign stuff.");
+      return;
+    }
+  }
+  if (selectionType === "tender") {
+    if (!pr.selectedTenderOfferId) {
+      throwError("Tender offer selection is incomplete. Please re-select a tender offer.");
+      return;
+    }
   }
 
   const prWareModel = pr.wareModel as Record<string, unknown> | undefined;

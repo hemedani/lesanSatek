@@ -58,22 +58,22 @@ export const updateRelationsFn: ActFn = async (body) => {
         relations: {
           purchasingRequest: {
             _ids: requestId,
-            relatedRelations: { tender: true },
+            relatedRelations: { tenders: true },
           },
         },
         projection: get,
         replace: true,
       });
     } else {
-      const currentTender = await tender.findOne({
-        filters: { "purchasingRequest._id": requestId },
+      const linkedTenders = await tender.aggregation({
+        pipeline: [{ $match: { "purchasingRequest._id": requestId } }],
         projection: { _id: 1 },
-      });
-      if (currentTender) {
+      }).toArray();
+      for (const t of linkedTenders) {
         await tender.findOneAndUpdate({
-          filter: { _id: currentTender._id },
+          filter: { _id: t._id as ObjectId },
           update: { $unset: { purchasingRequest: "" } },
-          projection: get,
+          projection: { _id: 1 },
         });
       }
     }

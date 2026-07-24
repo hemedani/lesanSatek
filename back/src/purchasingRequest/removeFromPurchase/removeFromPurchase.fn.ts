@@ -38,6 +38,7 @@ export const removeFromPurchaseFn: ActFn = async (body) => {
     update: {
       $set: {
         stuffStatus: "cancelled",
+        selectionType: "none",
         updatedAt: now,
       },
       $unset: {

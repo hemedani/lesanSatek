@@ -26,8 +26,8 @@ export const addStuffFn: ActFn = async (body) => {
     throw new Error("Purchasing request not found");
   }
 
-  if (!["Pending", "InProgress"].includes(pr.status as string)) {
-    throw new Error("Can only add stuff to an active purchasing request (Pending/InProgress)");
+  if (!["Draft", "Pending", "InProgress"].includes(pr.status as string)) {
+    throw new Error("Can only add stuff to a Draft or active purchasing request");
   }
 
   const prWareModelId = (pr.wareModel as Record<string, unknown>)?._id?.toString();
@@ -82,6 +82,7 @@ export const addStuffFn: ActFn = async (body) => {
     update: {
       $set: {
         stuffStatus: "assigned",
+        selectionType: "stuff",
         estimatedAmount,
         updatedAt: now,
       },
@@ -121,6 +122,11 @@ export const addStuffFn: ActFn = async (body) => {
           },
           details: {
             stuffId,
+            storeId: store._id?.toString(),
+            storeName: (store as Record<string, unknown>).name,
+            unitPrice,
+            pricingMode: s.hasAbsolutePrice ? "absolute" : s.pricePercentage ? "percentage" : "base",
+            quantity,
             estimatedAmount,
           },
         },

@@ -10,7 +10,7 @@ export const submitDecisionValidator = () => {
       ...activeRoleMixin,
       purchasingRequestId: objectIdValidation,
       processStepId: objectIdValidation,
-      unitId: objectIdValidation,
+      unitId: optional(objectIdValidation),
       status: enums(decision_status_array),
       comment: optional(string()),
     }),
