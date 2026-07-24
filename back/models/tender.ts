@@ -76,9 +76,13 @@ export const tender_relations = {
     optional: false,
     excludes: purchasingRequest_excludes,
     relatedRelations: {
-      tender: {
-        type: "single" as RelationDataType,
-        excludes: purchasingRequest_excludes,
+      tenders: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
       },
     },
   },

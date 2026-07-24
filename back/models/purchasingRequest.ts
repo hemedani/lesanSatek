@@ -106,6 +106,8 @@ export const purchasingRequest_pure = {
   completedAt: optional(coerce(date(), string(), (value) => new Date(value))),
   quantity: number(),
   stuffStatus: defaulted(string(), "none"),
+  selectionType: defaulted(string(), "none"),
+  selectedTenderOfferId: optional(string()),
   history: defaulted(
     array(object({
       action: string(),

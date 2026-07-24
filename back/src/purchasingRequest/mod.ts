@@ -13,6 +13,8 @@ import { addStuffSetup } from "./addStuff/mod.ts";
 import { checkStoreAvailabilitySetup } from "./checkStoreAvailability/mod.ts";
 import { removeFromPurchaseSetup } from "./removeFromPurchase/mod.ts";
 import { updateStuffStatusSetup } from "./updateStuffStatus/mod.ts";
+import { selectTenderOfferSetup } from "./selectTenderOffer/mod.ts";
+import { removeTenderSelectionSetup } from "./removeTenderSelection/mod.ts";
 
 export const purchasingRequestSetup = () => {
   addSetup();
@@ -29,4 +31,6 @@ export const purchasingRequestSetup = () => {
   checkStoreAvailabilitySetup();
   removeFromPurchaseSetup();
   updateStuffStatusSetup();
+  selectTenderOfferSetup();
+  removeTenderSelectionSetup();
 };

@@ -43,6 +43,7 @@ import { createUpdateAt } from "@lib";
 import {
   tender_excludes,
   store_excludes,
+  ware_excludes,
 } from "./excludes.ts";
 
 export const tenderOffer_status_array = ["submitted", "accepted", "rejected"];
@@ -87,6 +88,22 @@ export const tenderOffer_relations = {
     type: "single" as RelationDataType,
     optional: false,
     excludes: store_excludes,
+    relatedRelations: {
+      tenderOffers: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  ware: {
+    schemaName: "ware",
+    type: "single" as RelationDataType,
+    optional: false,
+    excludes: ware_excludes,
     relatedRelations: {
       tenderOffers: {
         type: "multiple" as RelationDataType,
