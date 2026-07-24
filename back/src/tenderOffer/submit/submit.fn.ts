@@ -4,7 +4,7 @@ import { tenderOffer } from "../../../mod.ts";
 export const submitFn: ActFn = async (body) => {
   const { set, get } = body.details;
 
-  const { activeRoleId, tenderId, storeId, ...rest } = set;
+  const { activeRoleId, tenderId, storeId, wareId, ...rest } = set;
 
   const relations: Record<string, unknown> = {};
 
@@ -24,9 +24,19 @@ export const submitFn: ActFn = async (body) => {
     };
   }
 
+  if (wareId) {
+    relations.ware = {
+      _ids: new ObjectId(wareId as string),
+      relatedRelations: {
+        tenderOffers: true,
+      },
+    };
+  }
+
   return await tenderOffer.insertOne({
     doc: {
       ...rest,
+      status: rest.status || "submitted",
       submittedAt: new Date(rest.submittedAt as string || new Date()),
     },
     relations,

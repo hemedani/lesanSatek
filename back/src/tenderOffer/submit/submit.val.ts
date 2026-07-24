@@ -15,6 +15,7 @@ export const submitValidator = () => {
       submittedAt: coerce(date(), string(), (value) => new Date(value)),
       tenderId: objectIdValidation,
       storeId: objectIdValidation,
+      wareId: objectIdValidation,
     }),
     get: selectStruct("tenderOffer", 1),
   });

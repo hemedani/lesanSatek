@@ -949,12 +949,6 @@
     ]
   },
   {
-    "id": "gen-pr-submit",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"submit\", \"details\": {\"set\": {\"_id\": \"{prId}\", \"activeRoleId\": \"{employeeRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1, \"currentStep\": 1, \"process\": {\"_id\": 1, \"name\": 1}, \"stepApprovals\": {\"_id\": 1, \"status\": 1, \"processStep\": {\"_id\": 1}, \"unit\": {\"_id\": 1}}}}}}",
-    "repeat": 1,
-    "captures": []
-  },
-  {
     "id": "gen-check-store",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"checkStoreAvailability\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"price\": 1, \"store\": {\"_id\": 1, \"name\": 1}}}}}",
     "repeat": 1,
@@ -963,6 +957,12 @@
   {
     "id": "gen-assign-store",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"addStuff\", \"details\": {\"set\": {\"_id\": \"{prId}\", \"activeRoleId\": \"{roleId}\", \"stuffId\": \"{stuffId}\"}, \"get\": {\"_id\": 1, \"stuffStatus\": 1, \"estimatedAmount\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-pr-submit",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"submit\", \"details\": {\"set\": {\"_id\": \"{prId}\", \"activeRoleId\": \"{employeeRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1, \"selectionType\": 1, \"currentStep\": 1, \"process\": {\"_id\": 1, \"name\": 1}, \"stepApprovals\": {\"_id\": 1, \"status\": 1, \"processStep\": {\"_id\": 1}, \"unit\": {\"_id\": 1}}}}}}",
     "repeat": 1,
     "captures": []
   },
@@ -1071,14 +1071,8 @@
     ]
   },
   {
-    "id": "gen-tender-pr-submit",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"submit\", \"details\": {\"set\": {\"_id\": \"{prTenderId}\", \"activeRoleId\": \"{employeeRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1}}}}",
-    "repeat": 1,
-    "captures": []
-  },
-  {
     "id": "gen-tender",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"tender\", \"act\": \"add\", \"details\": {\"set\": {\"title\": \"مناقصه خرید کیت TSH\", \"description\": \"مناقصه باز برای کیت TSH\", \"deadline\": \"2026-05-01\", \"purchasingRequestId\": \"{prTenderId}\", \"createdById\": \"{userId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"tender\", \"act\": \"add\", \"details\": {\"set\": {\"title\": \"مناقصه خرید کیت TSH\", \"description\": \"مناقصه باز برای کیت TSH\", \"deadline\": \"2026-05-01\", \"purchasingRequestId\": \"{prTenderId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": [
       {
@@ -1095,7 +1089,7 @@
   },
   {
     "id": "gen-tender-offer",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"tenderOffer\", \"act\": \"submit\", \"details\": {\"set\": {\"price\": 2500000, \"deliveryTime\": 7, \"paymentTerms\": \"۳۰ روز\", \"submittedAt\": \"2026-04-10\", \"tenderId\": \"{tenderId}\", \"storeId\": \"{storeId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"price\": 1, \"status\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"tenderOffer\", \"act\": \"submit\", \"details\": {\"set\": {\"price\": 2500000, \"deliveryTime\": 7, \"paymentTerms\": \"۳۰ روز\", \"status\": \"submitted\", \"submittedAt\": \"2026-04-10\", \"tenderId\": \"{tenderId}\", \"storeId\": \"{storeId}\", \"wareId\": \"{wareId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"price\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": [
       {
@@ -1111,11 +1105,18 @@
     "captures": []
   },
   {
-    "id": "gen-tender-award",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"tender\", \"act\": \"award\", \"details\": {\"set\": {\"_id\": \"{tenderId}\", \"winningOfferId\": \"{offerId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1, \"offers\": {\"_id\": 1, \"status\": 1}}}}}",
+    "id": "gen-tender-select-offer",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"selectTenderOffer\", \"details\": {\"set\": {\"_id\": \"{prTenderId}\", \"tenderOfferId\": \"{offerId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"selectionType\": 1, \"selectedTenderOfferId\": 1, \"estimatedAmount\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
+  {
+    "id": "gen-tender-pr-submit",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"submit\", \"details\": {\"set\": {\"_id\": \"{prTenderId}\", \"activeRoleId\": \"{employeeRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1, \"selectionType\": 1, \"selectedTenderOfferId\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+
   {
     "id": "gen-tag",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"tag\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"فوری\", \"color\": \"#FF0000\", \"description\": \"موارد فوری\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
@@ -1156,8 +1157,14 @@
     ]
   },
   {
+    "id": "gen-assign-store-pending",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"addStuff\", \"details\": {\"set\": {\"_id\": \"{prPendingId}\", \"activeRoleId\": \"{roleId}\", \"stuffId\": \"{stuffId}\"}, \"get\": {\"_id\": 1, \"stuffStatus\": 1, \"estimatedAmount\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
     "id": "gen-pr-pending-submit",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"submit\", \"details\": {\"set\": {\"_id\": \"{prPendingId}\", \"activeRoleId\": \"{employeeRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1, \"currentStep\": 1, \"process\": {\"_id\": 1, \"name\": 1}, \"stepApprovals\": {\"_id\": 1, \"status\": 1, \"processStep\": {\"_id\": 1}, \"unit\": {\"_id\": 1}}}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"submit\", \"details\": {\"set\": {\"_id\": \"{prPendingId}\", \"activeRoleId\": \"{employeeRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1, \"selectionType\": 1, \"currentStep\": 1, \"process\": {\"_id\": 1, \"name\": 1}, \"stepApprovals\": {\"_id\": 1, \"status\": 1, \"processStep\": {\"_id\": 1}, \"unit\": {\"_id\": 1}}}}}}",
     "repeat": 1,
     "captures": []
   },
