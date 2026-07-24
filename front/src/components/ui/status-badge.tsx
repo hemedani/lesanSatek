@@ -17,10 +17,11 @@ interface StatusBadgeProps {
   status: string
   label?: string
   labelMap?: Record<string, string>
+  size?: string
   className?: string
 }
 
-function StatusBadge({ status, label, labelMap, className }: StatusBadgeProps) {
+function StatusBadge({ status, label, labelMap, size: _size, className }: StatusBadgeProps) {
   const displayLabel = label || (labelMap?.[status.toLowerCase()]) || status
   return (
     <Badge

@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-const publicRoutes = ["/login", "/register", "/ordinary"]
+const publicRoutes = ["/login", "/register"]
 
 const panelRoutes = [
   "/admin",
+  "/ordinary",
   "/unit-head",
   "/requests",
   "/finance",
