@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, Award } from "lucide-react";
+import { Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
-import { award } from "@/app/actions/tender/award";
+import { selectTenderOffer } from "@/app/actions/purchasingRequest/selectTenderOffer";
 
 interface OfferItem {
   _id: string;
@@ -17,40 +17,41 @@ interface OfferItem {
   deliveryTime?: string;
   paymentTerms?: string;
   status?: string;
-  vendor?: { _id: string; name?: string };
+  store?: { _id: string; name?: string };
 }
 
 interface TenderAwardDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  purchasingRequestId: string;
   tenderId: string;
   offers: OfferItem[];
 }
 
-export function TenderAwardDialog({ open, onOpenChange, tenderId, offers }: TenderAwardDialogProps) {
+export function TenderAwardDialog({ open, onOpenChange, purchasingRequestId, tenderId, offers }: TenderAwardDialogProps) {
   const router = useRouter();
   const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
-  const [awarding, setAwarding] = useState(false);
+  const [selecting, setSelecting] = useState(false);
 
-  const handleAward = async () => {
+  const handleSelect = async () => {
     if (!selectedOfferId) return;
-    setAwarding(true);
+    setSelecting(true);
     try {
-      const result = await award(
-        { activeRoleId: getActiveRoleIdFromStore(), _id: tenderId, winningOfferId: selectedOfferId },
-        { _id: 1, status: 1 }
+      const result = await selectTenderOffer(
+        { _id: purchasingRequestId, tenderOfferId: selectedOfferId },
+        { _id: 1, title: 1, selectionType: 1, estimatedAmount: 1 }
       );
       if (result.success) {
-        toast.success("مناقصه با موفقیت اعطا شد.");
+        toast.success("برنده مناقصه با موفقیت انتخاب شد.");
         onOpenChange(false);
         router.refresh();
       } else {
-        toast.error(result.body?.message || "خطا در اعطای مناقصه");
+        toast.error(result.body?.message || "خطا در انتخاب برنده مناقصه");
       }
     } catch {
-      toast.error("خطا در اعطای مناقصه");
+      toast.error("خطا در انتخاب برنده مناقصه");
     } finally {
-      setAwarding(false);
+      setSelecting(false);
     }
   };
 
@@ -58,7 +59,7 @@ export function TenderAwardDialog({ open, onOpenChange, tenderId, offers }: Tend
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg" dir="rtl">
         <DialogHeader>
-          <DialogTitle className="text-glacier">اعطای مناقصه</DialogTitle>
+          <DialogTitle className="text-glacier">انتخاب برنده مناقصه</DialogTitle>
           <DialogDescription className="text-fog/70">انتخاب برنده مناقصه از میان پیشنهادات</DialogDescription>
         </DialogHeader>
         <div className="space-y-3 py-2">
@@ -79,7 +80,7 @@ export function TenderAwardDialog({ open, onOpenChange, tenderId, offers }: Tend
               >
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-moonlight">
-                    {offer.vendor?.name || "فروشنده"}
+                    {offer.store?.name || "فروشنده"}
                   </p>
                   <div className="flex items-center gap-3 mt-1 text-xs text-fog/50">
                     {offer.price != null && (
@@ -103,12 +104,12 @@ export function TenderAwardDialog({ open, onOpenChange, tenderId, offers }: Tend
             ))
           )}
           <div className="flex items-center justify-end gap-3 pt-2">
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} disabled={awarding}>
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} disabled={selecting}>
               انصراف
             </Button>
-            <Button type="button" onClick={handleAward} disabled={!selectedOfferId || awarding} className="gap-1.5">
-              {awarding ? <Loader2 className="size-4 animate-spin" /> : <Award className="size-4" />}
-              {awarding ? "در حال اعطا..." : "اعطای مناقصه"}
+            <Button type="button" onClick={handleSelect} disabled={!selectedOfferId || selecting} className="gap-1.5">
+              {selecting ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
+              {selecting ? "در حال انتخاب..." : "انتخاب برنده مناقصه"}
             </Button>
           </div>
         </div>

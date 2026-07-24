@@ -2,6 +2,7 @@ import { Gavel } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
 import { EmptyState } from "@/components/ui/empty-state"
+import { cookies } from "next/headers"
 import { gets } from "@/app/actions/tender/gets"
 import { TendersListClient } from "./tenders-list-client"
 
@@ -13,9 +14,11 @@ export default async function StoreTendersPage({
   const resolvedSearchParams = await searchParams
   const page = Number(resolvedSearchParams.page) || 1
   const limit = 20
+  const cookieStore = await cookies()
+  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
 
   const result = await gets(
-    { activeRoleId: "", page, limit, status: (resolvedSearchParams.status || "open") as any },
+    { activeRoleId, page, limit, status: (resolvedSearchParams.status || "open") as any },
     {
       _id: 1,
       title: 1,

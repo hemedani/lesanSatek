@@ -50,12 +50,11 @@ export default async function PendingApprovalsPage({
   }
 
   const result = await getApprovals(
-    { page, limit, unitId, status: "pending" },
+    { page, limit, unitId, status: "pending", activeRoleId: activeRoleId! },
     {
       _id: 1,
       status: 1,
       comment: 1,
-      createdAt: 1,
       purchasingRequest: {
         _id: 1,
         title: 1,

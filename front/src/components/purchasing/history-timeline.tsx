@@ -1,4 +1,4 @@
-import { Check, X, Clock, Send, RotateCcw, Circle, Package, ShoppingBag, CreditCard, Store, Pencil, History, FileCheck, UserCheck } from "lucide-react";
+import { Check, X, Clock, Send, RotateCcw, Circle, Package, ShoppingBag, CreditCard, Store, Pencil, History, FileCheck, UserCheck, Gavel, Award, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface HistoryPerformer {
@@ -41,6 +41,10 @@ const actionConfig: Record<string, { icon: typeof History; label: string; color:
   add: { icon: Clock, label: "ایجاد شد", color: "bg-white/[0.05] text-fog/40 ring-steel-border/20" },
   Receive: { icon: Package, label: "دریافت کالا", color: "bg-teal-500/15 text-teal-400 ring-teal-500/20" },
   request_submitted: { icon: Send, label: "درخواست ارسال شد", color: "bg-sky-500/15 text-sky-400 ring-sky-500/20" },
+  tender_created: { icon: FileText, label: "مناقصه ایجاد شد", color: "bg-violet-500/15 text-violet-400 ring-violet-500/20" },
+  tender_offer_selected: { icon: Check, label: "پیشنهاد مناقصه انتخاب شد", color: "bg-emerald-500/15 text-emerald-400 ring-emerald-500/20" },
+  tender_awarded: { icon: Award, label: "مناقصه اعطا شد", color: "bg-amber-500/15 text-amber-400 ring-amber-500/20" },
+  tender_offer_removed: { icon: X, label: "انتخاب مناقصه لغو شد", color: "bg-rose-500/15 text-rose-400 ring-rose-500/20" },
 };
 
 function getConfig(action?: string) {
@@ -108,10 +112,29 @@ function renderDetails(entry: HistoryEntry) {
     if (d.wareModelName) items.push(`کالا: ${d.wareModelName}`);
   } else if (action === "PaymentInitiated") {
     if (d.amount) items.push(`مبلغ: ${Number(d.amount).toLocaleString("fa-IR")} تومان`);
+  } else if (action === "tender_created") {
+    if (d.tenderId) items.push(`شناسه: ${String(d.tenderId)}`);
+    if (d.title) items.push(`عنوان: ${d.title}`);
+    if (d.deadline) items.push(`مهلت: ${new Date(String(d.deadline)).toLocaleDateString("fa-IR")}`);
+  } else if (action === "tender_offer_selected") {
+    if (d.storeName) items.push(`فروشگاه: ${d.storeName}`);
+    if (d.offerPrice) items.push(`قیمت: ${Number(d.offerPrice).toLocaleString("fa-IR")} ریال`);
+    if (d.estimatedAmount) items.push(`مبلغ: ${Number(d.estimatedAmount).toLocaleString("fa-IR")} ریال`);
+    if (d.wareModelName) items.push(`کالا: ${d.wareModelName}`);
+    if (d.quantity) items.push(`تعداد: ${Number(d.quantity).toLocaleString("fa-IR")}`);
+    if (d.tenderTitle) items.push(`مناقصه: ${d.tenderTitle}`);
+  } else if (action === "tender_awarded") {
+    if (d.tenderId) items.push(`شناسه مناقصه: ${String(d.tenderId)}`);
+    if (d.offerPrice) items.push(`قیمت برنده: ${Number(d.offerPrice).toLocaleString("fa-IR")} ریال`);
+    if (d.storeName || d.storeId) items.push(`فروشگاه: ${d.storeName || String(d.storeId)}`);
+    if (d.wareModelName) items.push(`کالا: ${d.wareModelName}`);
+    if (d.estimatedAmount) items.push(`مبلغ برآوردی: ${Number(d.estimatedAmount).toLocaleString("fa-IR")} ریال`);
+  } else if (action === "tender_offer_removed") {
+    if (d.previousTenderOfferId) items.push(`پیشنهاد قبلی: ${String(d.previousTenderOfferId)}`);
   }
 
   for (const [key, val] of Object.entries(d)) {
-    if (["wareModelName", "quantity", "unitPrice", "storeId", "assignedFromId", "stepName", "comment", "itemCount", "storeName", "amount", "wareModelId", "goodsReceiptId", "consumptionRecordId", "tenderOfferId", "receivingUnitId", "stepIndex", "_id", "status", "currentStep", "completed"].includes(key)) continue;
+    if (["wareModelName", "quantity", "unitPrice", "storeId", "assignedFromId", "stepName", "comment", "itemCount", "storeName", "amount", "wareModelId", "goodsReceiptId", "consumptionRecordId", "tenderOfferId", "receivingUnitId", "stepIndex", "_id", "status", "currentStep", "completed", "tenderId", "title", "deadline", "offerPrice", "estimatedAmount", "tenderTitle", "previousTenderOfferId", "tenderOfferId", "storeName", "wareModelName"].includes(key)) continue;
     if (typeof val === "string" && val.length < 80) {
       items.push(`${key}: ${val}`);
     } else if (typeof val === "number") {

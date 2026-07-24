@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { gets as getWares } from "@/app/actions/ware/gets";
 import { gets as getWareTypes } from "@/app/actions/wareType/gets";
 import { WaresClient } from "./wares-client";
@@ -10,14 +11,16 @@ export default async function WaresPage({
   const resolvedSearchParams = await searchParams;
   const page = Number(resolvedSearchParams.page) || 1;
   const limit = 30;
+  const cookieStore = await cookies();
+  const activeRoleId = cookieStore.get("activeRoleId")?.value || "";
 
   const [waresResult, typesResult] = await Promise.all([
     getWares(
-      { activeRoleId: "", page, limit, search: resolvedSearchParams.search || undefined },
+      { activeRoleId, page, limit, search: resolvedSearchParams.search || undefined, wareTypeId: resolvedSearchParams.wareTypeId || undefined },
       { _id: 1, name: 1, enName: 1, brand: 1, price: 1, orderedNumber: 1, createdAt: 1, wareType: { _id: 1, name: 1 }, wareClass: { _id: 1, name: 1 }, wareGroup: { _id: 1, name: 1 }, wareModel: { _id: 1, name: 1 }, manufacturer: { _id: 1, name: 1 } }
     ),
     getWareTypes(
-      { activeRoleId: "", page: 1, limit: 100, search: undefined },
+      { activeRoleId, page: 1, limit: 100, search: undefined },
       { _id: 1, name: 1 }
     ),
   ]);

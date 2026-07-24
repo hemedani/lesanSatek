@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect, useId } from "react"
 import { createRoot } from "react-dom/client"
 import { AlertTriangle, Loader2 } from "lucide-react"
 import {
@@ -23,6 +23,7 @@ interface ConfirmDialogProps {
   variant?: "default" | "destructive"
   onConfirm: () => void
   loading?: boolean
+  dialogId?: string
 }
 
 function ConfirmDialog({
@@ -35,10 +36,11 @@ function ConfirmDialog({
   variant = "destructive",
   onConfirm,
   loading,
+  dialogId,
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-sm" dir="rtl">
+      <DialogContent className="sm:max-w-sm" dir="rtl" data-confirm-dialog={dialogId}>
         <DialogHeader>
           <div className="flex items-center gap-3">
             <div className="flex size-9 items-center justify-center rounded-full bg-ember/10 shrink-0">
@@ -86,6 +88,7 @@ export function confirmDialog(options: ConfirmDialogOptions): Promise<boolean> {
     const container = document.createElement("div")
     document.body.appendChild(container)
     const root = createRoot(container)
+    const dialogId = `cd-${Date.now()}`
 
     function DialogWrapper() {
       const [open, setOpen] = useState(true)
@@ -102,6 +105,16 @@ export function confirmDialog(options: ConfirmDialogOptions): Promise<boolean> {
         resolve(false)
       }, [])
 
+      useEffect(() => {
+        if (!open) {
+          const t = setTimeout(() => {
+            root.unmount()
+            container.remove()
+          }, 300)
+          return () => clearTimeout(t)
+        }
+      }, [open])
+
       return (
         <ConfirmDialog
           open={open}
@@ -116,6 +129,7 @@ export function confirmDialog(options: ConfirmDialogOptions): Promise<boolean> {
           variant={options.variant}
           onConfirm={handleConfirm}
           loading={loading}
+          dialogId={dialogId}
         />
       )
     }
@@ -128,14 +142,14 @@ export function confirmDialog(options: ConfirmDialogOptions): Promise<boolean> {
           clearInterval(timer)
           return
         }
-        const dialog = container.querySelector("[role='dialog']")
+        const dialog = document.querySelector(`[data-confirm-dialog="${dialogId}"]`)
         if (!dialog) {
           root.unmount()
           container.remove()
           resolve(false)
           clearInterval(timer)
         }
-      }, 200)
-    }, 0)
+      }, 500)
+    }, 500)
   })
 }

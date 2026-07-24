@@ -5,15 +5,13 @@ import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { get as getPR } from "@/app/actions/purchasingRequest/get"
-import { gets as getApprovals } from "@/app/actions/stepApproval/gets"
-import { gets as getGoodsReceipts } from "@/app/actions/goodsReceipt/gets"
-import { gets as getPaymentOrders } from "@/app/actions/paymentOrder/gets"
-import { gets as getTenders } from "@/app/actions/tender/gets"
 import { gets as getUnits } from "@/app/actions/unit/gets"
 import { WorkflowVisualizer } from "@/components/purchasing/workflow-visualizer"
 import { HistoryTimeline } from "@/components/purchasing/history-timeline"
 import { StepApprovalPanel } from "@/components/purchasing/step-approval-panel"
 import { UnitHeadActions } from "./unit-head-actions"
+import { ActiveTenderCard } from "@/components/purchasing/active-tender-card"
+import { TendersList } from "@/components/purchasing/tenders-list"
 import { cookies } from "next/headers"
 import { getUser } from "@/app/actions/user/getUser"
 
@@ -69,6 +67,8 @@ export default async function UnitHeadRequestDetailPage({
       currentStep: 1,
       createdAt: 1,
       updatedAt: 1,
+      selectionType: 1,
+      selectedTenderOfferId: 1,
       stuff: { _id: 1, quantity: 1, price: 1 },
       stuffStatus: 1,
       estimatedAmount: 1,
@@ -105,9 +105,26 @@ export default async function UnitHeadRequestDetailPage({
       budgetLine: { _id: 1, code: 1, title: 1, totalAllocated: 1, totalEncumbered: 1 },
       store: { _id: 1, name: 1, address: 1 },
       history: 1,
-    },
+      stepApprovals: {
+        _id: 1,
+        status: 1,
+        comment: 1,
+        decidedAt: 1,
+        processStep: { _id: 1, name: 1 },
+        unit: { _id: 1, name: 1 },
+        decidedBy: { _id: 1, first_name: 1, last_name: 1, position: 1, roles: 1 },
+      },
+      goodsReceipts: { _id: 1, receiptNumber: 1, items: 1, receivedAt: 1, status: 1, notes: 1 },
+      paymentOrders: { _id: 1, title: 1, amount: 1, status: 1, paidAt: 1 },
+      tenders: {
+        _id: 1,
+        title: 1,
+        status: 1,
+        deadline: 1,
+        offers: { _id: 1, price: 1, deliveryTime: 1, paymentTerms: 1, status: 1, store: { _id: 1, name: 1 } },
+      },
+    } as any,
   )
-
 
   /*
   *	@LOG @DEBUG @INFO
@@ -116,7 +133,7 @@ export default async function UnitHeadRequestDetailPage({
   *	Please remove your log after debugging
   */
   console.log(" ============= ");
-  console.group("prRes ------ ");
+  console.group("prRess ------ ");
   console.log();
   console.info({ prRes }, " ------ ");
   console.log();
@@ -146,43 +163,10 @@ export default async function UnitHeadRequestDetailPage({
     }
   }
 
-  const [approvalsRes, grRes, poRes, tendersRes] = await Promise.all([
-    getApprovals(
-      { page: 1, limit: 50, filter: { purchasingRequestId: id } } as any,
-      {
-        _id: 1,
-        status: 1,
-        comment: 1,
-        decidedAt: 1,
-        processStep: { _id: 1, name: 1 },
-        unit: { _id: 1, name: 1 },
-        decidedBy: { _id: 1, first_name: 1, last_name: 1, position: 1, roles: { name: 1 } },
-      },
-    ),
-    getGoodsReceipts(
-      { page: 1, limit: 20, purchasingRequestId: id },
-      { _id: 1, receiptNumber: 1, quantityReceived: 1, receivedAt: 1, status: 1, notes: 1 },
-    ),
-    getPaymentOrders(
-      { page: 1, limit: 20, purchasingRequestId: id },
-      { _id: 1, title: 1, amount: 1, status: 1, paidAt: 1 },
-    ),
-    getTenders(
-      { page: 1, limit: 10, filter: { purchasingRequestId: id } } as any,
-      {
-        _id: 1,
-        title: 1,
-        status: 1,
-        deadline: 1,
-        offers: { _id: 1, price: 1, deliveryTime: 1, paymentTerms: 1, status: 1, vendor: { _id: 1, name: 1 } },
-      },
-    ),
-  ])
-
-  const approvals = approvalsRes.success ? approvalsRes.body || [] : []
-  const goodsReceipts = grRes.success ? grRes.body || [] : []
-  const paymentOrders = poRes.success ? poRes.body || [] : []
-  const tenders = tendersRes.success ? tendersRes.body || [] : []
+  const approvals = pr.stepApprovals || []
+  const goodsReceipts = pr.goodsReceipts || []
+  const paymentOrders = pr.paymentOrders || []
+  const tenders = pr.tenders || []
 
   const currentStepIdx = pr.currentStep ?? 0
 
@@ -241,8 +225,10 @@ export default async function UnitHeadRequestDetailPage({
     }
   }
 
-  const activeTender = tenders.find((t: any) => t.status === "active" || t.status === "open")
+  const actionableTender = tenders.find((t: any) => t.status === "active" || t.status === "open" || t.status === "closed")
+  const tenderWithSelection = pr.selectionType === "tender"
   const completedTender = tenders.find((t: any) => t.status === "awarded" || t.status === "closed")
+  const hasActiveTenderOrSelected = actionableTender || completedTender || tenderWithSelection
 
   return (
     <div className="space-y-6">
@@ -269,7 +255,7 @@ export default async function UnitHeadRequestDetailPage({
                     <CardTitle className="text-base font-medium text-frost-link leading-6">
                       {pr.title || "درخواست خرید"}
                     </CardTitle>
-                    <StatusBadge status={pr.status || "draft"} labelMap={statusMap} className="mt-1" />
+                    <StatusBadge status={pr.status || "Draft"} label={statusMap[pr.status?.toLowerCase() || "draft"] || pr.status} className="mt-1" />
                   </div>
                 </div>
               </div>
@@ -411,35 +397,7 @@ export default async function UnitHeadRequestDetailPage({
             </Card>
           )}
 
-          {tenders.length > 0 && (
-            <Card variant="glass">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex size-8 items-center justify-center rounded-lg bg-violet-500/10 ring-1 ring-inset ring-violet-500/15">
-                    <Package className="size-4 text-violet-400" />
-                  </div>
-                  <CardTitle className="text-sm font-medium text-moonlight">مناقصات</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="divide-y divide-steel-border/10">
-                  {tenders.map((t: any) => (
-                    <div key={t._id} className="py-3 first:pt-0 last:pb-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-moonlight">{t.title || "—"}</span>
-                        <StatusBadge status={t.status || ""} />
-                      </div>
-                      {t.deadline && (
-                        <p className="text-xs text-fog/50">
-                          مهلت: {new Date(t.deadline).toLocaleDateString("fa-IR")}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          <TendersList tenders={tenders} purchasingRequestId={id} />
 
           {goodsReceipts.length > 0 && (
             <Card variant="glass">
@@ -462,7 +420,7 @@ export default async function UnitHeadRequestDetailPage({
                         <StatusBadge status={String(gr.status || "")} />
                       </div>
                       <div className="flex items-center gap-4 text-xs text-fog/50">
-                        <span>تعداد: {Number(gr.quantityReceived || 0).toLocaleString("fa-IR")}</span>
+                        <span>تعداد: {Number((gr.items as any[])?.[0]?.quantityReceived || 0).toLocaleString("fa-IR")}</span>
                         {gr.receivedAt && (
                           <span>{new Date(String(gr.receivedAt)).toLocaleDateString("fa-IR")}</span>
                         )}
@@ -523,8 +481,20 @@ export default async function UnitHeadRequestDetailPage({
             <CardContent className="space-y-3 text-sm">
               <div>
                 <p className="text-xs text-fog">وضعیت</p>
-                <StatusBadge status={pr.status || "draft"} labelMap={statusMap} className="mt-1" />
+                <StatusBadge status={pr.status || "Draft"} label={statusMap[pr.status?.toLowerCase() || "draft"] || pr.status} className="mt-1" />
               </div>
+              {pr.selectionType && pr.selectionType !== "none" && (
+                <div>
+                  <p className="text-xs text-fog">نحوه تأمین</p>
+                  <p className="text-moonlight">
+                    {pr.selectionType === "stuff"
+                      ? "تخصیص کالا"
+                      : pr.selectionType === "tender"
+                        ? "مناقصه"
+                        : "—"}
+                  </p>
+                </div>
+              )}
               {pr.requester && (
                 <div>
                   <p className="text-xs text-fog">ثبت‌کننده</p>
@@ -628,6 +598,8 @@ export default async function UnitHeadRequestDetailPage({
             </Card>
           )}
 
+          {actionableTender && <ActiveTenderCard tender={actionableTender} purchasingRequestId={id} selectedTenderOfferId={pr.selectedTenderOfferId} />}
+
           {pr.status === "Draft" ? (
             <Card variant="glass">
               <CardHeader className="pb-3">
@@ -639,9 +611,9 @@ export default async function UnitHeadRequestDetailPage({
                   wareModelId={pr.wareModel?._id}
                   quantity={pr.quantity}
                   tenderCount={tenders.length}
-                  activeTenderId={activeTender?._id}
-                  activeTenderOffers={activeTender?.offers || []}
-                  hasCompletedTender={!!completedTender}
+                  hasCompletedTender={!!hasActiveTenderOrSelected}
+                  selectionType={pr.selectionType}
+                  isDraft
                 />
               </CardContent>
             </Card>
@@ -657,9 +629,8 @@ export default async function UnitHeadRequestDetailPage({
                     wareModelId={pr.wareModel?._id}
                     quantity={pr.quantity}
                     tenderCount={tenders.length}
-                    activeTenderId={activeTender?._id}
-                    activeTenderOffers={activeTender?.offers || []}
-                    hasCompletedTender={!!completedTender}
+                    hasCompletedTender={!!hasActiveTenderOrSelected}
+                    selectionType={pr.selectionType}
                   />
                 </CardContent>
               </Card>

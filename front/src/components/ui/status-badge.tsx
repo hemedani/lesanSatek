@@ -16,20 +16,22 @@ const statusStyles: Record<string, string> = {
 interface StatusBadgeProps {
   status: string
   label?: string
+  labelMap?: Record<string, string>
   className?: string
 }
 
-function StatusBadge({ status, label, className }: StatusBadgeProps) {
+function StatusBadge({ status, label, labelMap, className }: StatusBadgeProps) {
+  const displayLabel = label || (labelMap?.[status.toLowerCase()]) || status
   return (
     <Badge
       variant="outline"
       className={cn(
         "rounded-md px-2 py-0.5 text-xs font-medium shadow-subtle",
-        statusStyles[status] || "bg-graphite-plate text-fog border-steel-border",
+        statusStyles[status.toLowerCase()] || "bg-graphite-plate text-fog border-steel-border",
         className
       )}
     >
-      {label || status}
+      {displayLabel}
     </Badge>
   )
 }

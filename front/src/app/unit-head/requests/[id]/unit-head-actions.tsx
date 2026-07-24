@@ -1,30 +1,24 @@
 "use client"
 
 import { useState } from "react"
-import { Package, Gavel, Award } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { Package, Gavel, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AddStuffDialog } from "@/components/purchasing/add-stuff-dialog"
 import { TenderCreateDialog } from "@/components/purchasing/tender-create-dialog"
-import { TenderAwardDialog } from "@/components/purchasing/tender-award-dialog"
 import { SubmitPRButton } from "@/app/requests/[id]/submit-pr-button"
-
-interface OfferItem {
-  _id: string
-  price?: number
-  deliveryTime?: string
-  paymentTerms?: string
-  status?: string
-  vendor?: { _id: string; name?: string }
-}
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
+import { removeTenderSelection } from "@/app/actions/purchasingRequest/removeTenderSelection"
 
 interface UnitHeadActionsProps {
   purchasingRequestId: string
   wareModelId?: string
   quantity?: number
   tenderCount: number
-  activeTenderId?: string
-  activeTenderOffers: OfferItem[]
   hasCompletedTender: boolean
+  selectionType?: string
+  isDraft?: boolean
 }
 
 export function UnitHeadActions({
@@ -32,13 +26,34 @@ export function UnitHeadActions({
   wareModelId,
   quantity,
   tenderCount,
-  activeTenderId,
-  activeTenderOffers,
   hasCompletedTender,
+  selectionType,
+  isDraft,
 }: UnitHeadActionsProps) {
+  const router = useRouter()
   const [addStuffOpen, setAddStuffOpen] = useState(false)
   const [createTenderOpen, setCreateTenderOpen] = useState(false)
-  const [awardTenderOpen, setAwardTenderOpen] = useState(false)
+  const [removingSelection, setRemovingSelection] = useState(false)
+
+  const handleRemoveTenderSelection = async () => {
+    setRemovingSelection(true)
+    try {
+      const result = await removeTenderSelection(
+        { _id: purchasingRequestId },
+        { _id: 1, selectionType: 1, selectedTenderOfferId: 1 }
+      )
+      if (result.success) {
+        toast.success("انتخاب مناقصه با موفقیت لغو شد.")
+        router.refresh()
+      } else {
+        toast.error(result.body?.message || "خطا در لغو انتخاب مناقصه")
+      }
+    } catch {
+      toast.error("خطا در لغو انتخاب مناقصه")
+    } finally {
+      setRemovingSelection(false)
+    }
+  }
 
   return (
     <div className="space-y-3">
@@ -54,19 +69,21 @@ export function UnitHeadActions({
         </Button>
       )}
 
-      {activeTenderOffers.length > 0 && (
-        <Button className="w-full gap-2" variant="outline" onClick={() => setAwardTenderOpen(true)}>
-          <Award className="size-4" />
-          اعطای مناقصه
+      {selectionType === "tender" && (
+        <Button className="w-full gap-2" variant="ghost" onClick={handleRemoveTenderSelection} disabled={removingSelection}>
+          <X className="size-4" />
+          {removingSelection ? "در حال لغو..." : "لغو انتخاب مناقصه"}
         </Button>
       )}
 
-      <SubmitPRButton
-        purchasingRequestId={purchasingRequestId}
-        title={undefined}
-        quantity={quantity}
-        wareModelName={undefined}
-      />
+      {isDraft && (
+        <SubmitPRButton
+          purchasingRequestId={purchasingRequestId}
+          title={undefined}
+          quantity={quantity}
+          wareModelName={undefined}
+        />
+      )}
 
       <AddStuffDialog
         open={addStuffOpen}
@@ -81,15 +98,6 @@ export function UnitHeadActions({
         onOpenChange={setCreateTenderOpen}
         purchasingRequestId={purchasingRequestId}
       />
-
-      {activeTenderId && (
-        <TenderAwardDialog
-          open={awardTenderOpen}
-          onOpenChange={setAwardTenderOpen}
-          tenderId={activeTenderId}
-          offers={activeTenderOffers}
-        />
-      )}
     </div>
   )
 }

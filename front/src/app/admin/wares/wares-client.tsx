@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Pencil, Trash2, Package } from "lucide-react";
 import { toast } from "sonner";
@@ -220,11 +220,6 @@ export function WaresClient({
     setDeleteTarget(null);
   };
 
-  const filteredItems = useMemo(() => {
-    if (!selectedWareTypeId) return items;
-    return items.filter((item) => item.wareType?._id === selectedWareTypeId);
-  }, [items, selectedWareTypeId]);
-
   const columns: Column<Ware>[] = [
     {
       key: "name",
@@ -321,7 +316,7 @@ export function WaresClient({
 
       <DataTable
         columns={columns}
-        data={filteredItems}
+        data={items}
         keyExtractor={(item) => item._id}
         cardView={cardView}
         onViewToggle={() => setCardView((v) => !v)}
@@ -357,7 +352,7 @@ export function WaresClient({
         emptyAction={<Button size="sm" className="gap-1.5" onClick={openAdd}><Plus className="size-4" />ایجاد کالا</Button>}
       />
 
-      {!selectedWareTypeId && <Pagination prevUrl={prevPageUrl} nextUrl={nextPageUrl} page={page} />}
+      <Pagination prevUrl={prevPageUrl} nextUrl={nextPageUrl} page={page} />
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent className="sm:max-w-lg" dir="rtl">

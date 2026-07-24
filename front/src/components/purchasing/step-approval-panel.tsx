@@ -32,8 +32,9 @@ function StepApprovalPanel({
   const router = useRouter()
   const [comment, setComment] = useState("")
   const [submitting, setSubmitting] = useState<string | null>(null)
+  const [localDecision, setLocalDecision] = useState<{ status: string } | null>(null)
 
-  const userDecision = existingApprovals?.find((a) => a.status === "approved" || a.status === "rejected")
+  const userDecision = existingApprovals?.find((a) => a.status === "approved" || a.status === "rejected") || localDecision
   const hasDecided = !!userDecision
 
   const handleDecision = async (decision: "approved" | "rejected") => {
@@ -62,6 +63,7 @@ function StepApprovalPanel({
       )
       if (result.success) {
         toast.success(decision === "approved" ? "درخواست با موفقیت تایید شد" : "درخواست رد شد")
+        setLocalDecision({ status: decision })
         onDecision?.()
         router.refresh()
       } else {

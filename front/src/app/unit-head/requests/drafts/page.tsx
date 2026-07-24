@@ -9,6 +9,7 @@ interface DraftItem {
   title?: string
   quantity?: number
   status?: string
+  selectionType?: string
   createdAt?: string
   requester?: { _id: string; first_name?: string; last_name?: string }
   wareModel?: { _id: string; name?: string }
@@ -46,6 +47,7 @@ export default async function DraftsPage({
       title: 1,
       quantity: 1,
       status: 1,
+      selectionType: 1,
       createdAt: 1,
       requester: { _id: 1, first_name: 1, last_name: 1 },
       wareModel: { _id: 1, name: 1 },

@@ -33,7 +33,6 @@ export function TenderCreateDialog({ open, onOpenChange, purchasingRequestId }: 
           description: description.trim() || undefined,
           deadline: new Date(deadlineDate),
           purchasingRequestId,
-          createdById: "",
         },
         { _id: 1, title: 1, status: 1 }
       );
@@ -45,7 +44,14 @@ export function TenderCreateDialog({ open, onOpenChange, purchasingRequestId }: 
         setDeadlineDate("");
         router.refresh();
       } else {
-        toast.error(result.body?.message || "خطا در ایجاد مناقصه");
+        const msg = result.body?.message || "";
+        if (msg.includes("already has an active tender")) {
+          toast.error("این درخواست خرید مناقصه فعال دارد. ابتدا مناقصه قبلی را تعیین تکلیف کنید.");
+        } else if (msg.includes("Can only create tender for a Draft")) {
+          toast.error("تنها می‌توانید برای درخواست‌های پیش‌نویس یا فعال مناقصه ایجاد کنید");
+        } else {
+          toast.error(msg || "خطا در ایجاد مناقصه");
+        }
       }
     } catch {
       toast.error("خطا در ایجاد مناقصه");

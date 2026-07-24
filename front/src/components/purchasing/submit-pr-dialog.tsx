@@ -48,6 +48,8 @@ export function SubmitPRDialog({ open, onOpenChange, purchasingRequestId, title,
           toast.error("شما فقط می‌توانید درخواست‌های واحد خود را ارسال کنید.");
         } else if (msg.includes("linked tender is")) {
           toast.error("این درخواست مناقصه فعال دارد. ابتدا مناقصه را تعیین تکلیف کنید.");
+        } else if (msg.includes("Please assign stuff or select a tender offer")) {
+          toast.error("لطفاً ابتدا کالا تخصیص دهید یا از طریق مناقصه پیشنهاد انتخاب کنید");
         } else if (msg.includes("Purchasing request not found")) {
           toast.error("درخواست خرید یافت نشد.");
         } else if (msg.includes("No active process found")) {

@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { ShoppingCart, FileEdit } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
 import { RequestStatusBadge } from "@/components/purchasing/request-status-badge"
 import { Pagination } from "@/components/ui/pagination"
@@ -12,6 +13,7 @@ interface DraftItem {
   title?: string
   quantity?: number
   status?: string
+  selectionType?: string
   createdAt?: string
   requester?: { _id: string; first_name?: string; last_name?: string }
   wareModel?: { _id: string; name?: string }
@@ -53,8 +55,18 @@ function DraftsClient({ items, prevUrl, nextUrl, page }: DraftsClientProps) {
                   <p className="text-base font-semibold text-moonlight leading-6 truncate">
                     {item.title || "—"}
                   </p>
-                  <div className="mt-1">
+                  <div className="flex items-center gap-2 mt-1">
                     <RequestStatusBadge status={item.status} />
+                    {item.selectionType && item.selectionType !== "none" && (
+                      <span className={cn(
+                        "text-[10px] px-1.5 py-0.5 rounded-sm font-medium",
+                        item.selectionType === "stuff"
+                          ? "bg-blue-500/10 text-blue-400"
+                          : "bg-violet-500/10 text-violet-400"
+                      )}>
+                        {item.selectionType === "stuff" ? "کالا" : "مناقصه"}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

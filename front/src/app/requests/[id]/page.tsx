@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { ArrowRight, ShoppingCart, Building2, Landmark, Store, Package, ClipboardList, FileText } from "lucide-react"
+import { ArrowRight, ShoppingCart, Building2, Landmark, Store, Package, ClipboardList, FileText, Gavel, BadgeCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatusBadge } from "@/components/ui/status-badge"
@@ -8,11 +8,11 @@ import { get as getPR } from "@/app/actions/purchasingRequest/get"
 import { gets as getApprovals } from "@/app/actions/stepApproval/gets"
 import { gets as getGoodsReceipts } from "@/app/actions/goodsReceipt/gets"
 import { gets as getPaymentOrders } from "@/app/actions/paymentOrder/gets"
+import { gets as getTenderOffers } from "@/app/actions/tenderOffer/gets"
 import { gets as getUnits } from "@/app/actions/unit/gets"
 import { WorkflowVisualizer } from "@/components/purchasing/workflow-visualizer"
 import { HistoryTimeline } from "@/components/purchasing/history-timeline"
 import { ReceiveGoodsButton } from "./receive-goods-button"
-import { SubmitPRButton } from "./submit-pr-button"
 import { cookies } from "next/headers"
 import { getUser } from "@/app/actions/user/getUser"
 
@@ -103,6 +103,15 @@ export default async function RequestDetailPage({
       requestingUnit: { _id: 1, name: 1 },
       budgetLine: { _id: 1, code: 1, title: 1, totalAllocated: 1, totalEncumbered: 1 },
       store: { _id: 1, name: 1, address: 1 },
+      tenders: {
+        _id: 1,
+        title: 1,
+        description: 1,
+        status: 1,
+        deadline: 1,
+        createdAt: 1,
+      },
+      selectedTenderOfferId: 1,
       history: 1,
     },
   )
@@ -159,6 +168,32 @@ export default async function RequestDetailPage({
   const approvals = approvalsRes.success ? approvalsRes.body || [] : []
   const goodsReceipts = grRes.success ? grRes.body || [] : []
   const paymentOrders = poRes.success ? poRes.body || [] : []
+
+  const tenders = pr.tenders || []
+  const selectedTenderOfferId = pr.selectedTenderOfferId
+
+  const tenderOffersRes = await Promise.all(
+    tenders.map((t: { _id: string }) =>
+      getTenderOffers(
+        { page: 1, limit: 100, tenderId: t._id } as any,
+        {
+          _id: 1,
+          price: 1,
+          deliveryTime: 1,
+          paymentTerms: 1,
+          description: 1,
+          status: 1,
+          submittedAt: 1,
+          store: { _id: 1, name: 1 },
+        },
+      )
+    )
+  )
+  const offersByTenderId: Record<string, any[]> = {}
+  tenders.forEach((t: { _id: string }, idx: number) => {
+    const res = tenderOffersRes[idx]
+    offersByTenderId[t._id] = res?.success ? res.body || [] : []
+  })
 
   const currentStepIdx = pr.currentStep ?? 0
 
@@ -242,7 +277,7 @@ export default async function RequestDetailPage({
                     <CardTitle className="text-base font-medium text-frost-link leading-6">
                       {pr.title || "درخواست خرید"}
                     </CardTitle>
-                    <StatusBadge status={pr.status || "draft"} labelMap={statusMap} className="mt-1" />
+                    <StatusBadge status={pr.status || "Draft"} label={statusMap[pr.status?.toLowerCase() || "draft"] || pr.status} className="mt-1" />
                   </div>
                 </div>
               </div>
@@ -420,6 +455,104 @@ export default async function RequestDetailPage({
             </Card>
           )}
 
+          {tenders.length > 0 && (
+            <Card variant="glass">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex size-8 items-center justify-center rounded-lg bg-amber-500/10 ring-1 ring-inset ring-amber-500/15">
+                    <Gavel className="size-4 text-amber-400" />
+                  </div>
+                  <CardTitle className="text-sm font-medium text-moonlight">مناقصات</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {tenders.map((tender: Record<string, unknown>) => {
+                  const tId = String(tender._id || "")
+                  const offers = offersByTenderId[tId] || []
+                  const tenderStatus = String(tender.status || "")
+                  return (
+                    <div key={tId} className="rounded-lg border border-steel-border/20 p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-moonlight">{String(tender.title || "—")}</p>
+                          <p className="text-xs text-fog/50 mt-0.5">
+                            {tender.deadline
+                              ? `مهلت: ${new Date(String(tender.deadline)).toLocaleDateString("fa-IR")}`
+                              : ""}
+                          </p>
+                        </div>
+                        <StatusBadge
+                          status={tenderStatus}
+                          label={
+                            tenderStatus === "open" ? "باز" :
+                            tenderStatus === "closed" ? "بسته شده" :
+                            tenderStatus === "awarded" ? "اعطا شده" :
+                            tenderStatus === "cancelled" ? "لغو شده" : tenderStatus
+                          }
+                        />
+                      </div>
+                      {tender.description && (
+                        <p className="text-xs text-fog/60">{String(tender.description)}</p>
+                      )}
+                      {offers.length > 0 && (
+                        <div className="space-y-2 pt-2 border-t border-steel-border/10">
+                          <p className="text-xs font-medium text-fog">پیشنهادات</p>
+                          <div className="divide-y divide-steel-border/10">
+                            {offers.map((offer: Record<string, unknown>) => {
+                              const oId = String(offer._id || "")
+                              const isSelected = selectedTenderOfferId === oId
+                              const storeName = (offer.store as { name?: string })?.name || "—"
+                              return (
+                                <div
+                                  key={oId}
+                                  className={cn(
+                                    "py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3",
+                                    isSelected && "px-3 -mx-3 rounded-lg bg-emerald-500/5 border border-emerald-500/20"
+                                  )}
+                                >
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    {isSelected && (
+                                      <BadgeCheck className="size-4 shrink-0 text-emerald-400" />
+                                    )}
+                                    <div className="min-w-0">
+                                      <p className="text-sm text-moonlight truncate">{storeName}</p>
+                                      <p className="text-xs text-fog/50">
+                                        {Number(offer.price || 0).toLocaleString("fa-IR")} تومان
+                                        {offer.deliveryTime != null && ` · ${offer.deliveryTime} روز`}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    <StatusBadge
+                                      status={String(offer.status || "")}
+                                      label={
+                                        String(offer.status) === "submitted" ? "ارسال شده" :
+                                        String(offer.status) === "accepted" ? "پذیرفته شده" :
+                                        String(offer.status) === "rejected" ? "رد شده" : String(offer.status)
+                                      }
+                                    />
+                                    {isSelected && (
+                                      <span className="text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                                        انتخاب شده
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+                      {offers.length === 0 && (
+                        <p className="text-xs text-fog/40 pt-1">هیچ پیشنهادی ثبت نشده است</p>
+                      )}
+                    </div>
+                  )
+                })}
+              </CardContent>
+            </Card>
+          )}
+
           {paymentOrders.length > 0 && (
             <Card variant="glass">
               <CardHeader className="pb-3">
@@ -466,7 +599,7 @@ export default async function RequestDetailPage({
             <CardContent className="space-y-3 text-sm">
               <div>
                 <p className="text-xs text-fog">وضعیت</p>
-                <StatusBadge status={pr.status || "draft"} labelMap={statusMap} className="mt-1" />
+                <StatusBadge status={pr.status || "Draft"} label={statusMap[pr.status?.toLowerCase() || "draft"] || pr.status} className="mt-1" />
               </div>
               {pr.requester && (
                 <div>
@@ -567,25 +700,6 @@ export default async function RequestDetailPage({
                 {pr.store.address && (
                   <p className="text-xs text-fog/50">{pr.store.address}</p>
                 )}
-              </CardContent>
-            </Card>
-          )}
-
-          {pr.status === "Draft" && (
-            <Card variant="glass">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-fog">ارسال درخواست</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xs text-fog mb-3">
-                  با ارسال این درخواست، فرآیند خرید آغاز می‌شود.
-                </p>
-                <SubmitPRButton
-                  purchasingRequestId={pr._id}
-                  title={pr.title}
-                  quantity={pr.quantity}
-                  wareModelName={pr.wareModel?.name}
-                />
               </CardContent>
             </Card>
           )}

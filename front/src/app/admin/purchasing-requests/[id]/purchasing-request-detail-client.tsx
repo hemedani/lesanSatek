@@ -71,6 +71,7 @@ interface PurchasingRequest {
   currentStep?: number;
   quantity?: number;
   estimatedAmount?: number;
+  selectionType?: string;
   stuffStatus?: string;
   createdAt?: string;
   process?: Process;
@@ -119,7 +120,7 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
     );
   }
 
-  const isDraft = pr.status === "Draft";
+  const isDraft = pr.status === "draft";
   const currentStep = pr.currentStep || 0;
   const totalSteps = pr.process?.steps?.length || 0;
   const isStuffAssigned = pr.stuffStatus === "assigned" || pr.stuffStatus === "received";
@@ -328,6 +329,22 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
                     icon={Store}
                     label="مبلغ برآوردی"
                     value={`${pr.estimatedAmount.toLocaleString("fa-IR")} ریال`}
+                  />
+                )}
+                {pr.selectionType && pr.selectionType !== "none" && (
+                  <InfoRow
+                    icon={ShoppingCart}
+                    label="نحوه تأمین"
+                    value={
+                      <Badge className={cn(
+                        "text-[10px]",
+                        pr.selectionType === "stuff"
+                          ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                          : "bg-violet-500/10 text-violet-400 border-violet-500/20"
+                      )}>
+                        {pr.selectionType === "stuff" ? "تخصیص کالا" : "مناقصه"}
+                      </Badge>
+                    }
                   />
                 )}
                 <InfoRow
