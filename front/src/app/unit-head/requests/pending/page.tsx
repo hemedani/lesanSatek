@@ -1,27 +1,43 @@
 import { PageHeader } from "@/components/ui/page-header"
-import { gets as getApprovals } from "@/app/actions/stepApproval/gets"
-import { cookies } from "next/headers"
-import { getUser } from "@/app/actions/user/getUser"
+import { getPendingByUnit } from "@/app/actions/purchasingRequest/getPendingByUnit"
 import { PendingClient } from "./pending-client"
 
-interface PendingApprovalItem {
+interface PendingPRItem {
   _id: string
+  title?: string
+  description?: string
+  quantity?: number
   status?: string
-  comment?: string
+  currentStep?: number
   createdAt?: string
-  purchasingRequest?: {
-    _id: string
-    title?: string
-    status?: string
-    quantity?: number
-    currentStep?: number
-    requester?: { _id: string; first_name?: string; last_name?: string }
-  }
-  processStep?: {
-    _id: string
+  requester?: { _id?: string; first_name?: string; last_name?: string }
+  process?: {
+    _id?: string
     name?: string
-    order?: number
+    steps?: {
+      _id?: string
+      name?: string
+      order?: number
+      stepType?: string
+      assigneeGroups?: { operator?: string; unitIds?: string[] }[]
+      approvals?: {
+        _id?: string
+        status?: string
+        comment?: string
+        decidedAt?: string
+        unit?: { _id?: string; name?: string; head?: { _id?: string; first_name?: string; last_name?: string } }
+        decidedBy?: { _id?: string; first_name?: string; last_name?: string }
+      }[]
+    }[]
   }
+  stepApprovals?: {
+    _id?: string
+    status?: string
+    comment?: string
+    processStep?: { _id?: string; name?: string }
+    unit?: { _id?: string; name?: string }
+    decidedBy?: { _id?: string; first_name?: string; last_name?: string }
+  }[]
 }
 
 export default async function PendingApprovalsPage({
@@ -33,41 +49,34 @@ export default async function PendingApprovalsPage({
   const page = Number(resolvedSearchParams.page) || 1
   const limit = 20
 
-  const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value
-  let unitId: string | undefined
-
-  if (activeRoleId) {
-    const userRes = await getUser({}, {
-      _id: 1,
-      roles: { roleId: 1, scopeId: 1, scopeType: 1, name: 1 },
-    }).catch(() => ({ success: false, body: null }))
-    const user = userRes.success ? userRes.body : null
-    const activeRole = user?.roles?.find((r: { roleId?: string }) => r.roleId === activeRoleId)
-    if (activeRole?.scopeType === "unit" && activeRole.scopeId) {
-      unitId = activeRole.scopeId
-    }
-  }
-
-  const result = await getApprovals(
-    { page, limit, unitId, status: "pending", activeRoleId: activeRoleId! },
+  const result = await getPendingByUnit(
+    { page, limit },
     {
       _id: 1,
+      title: 1,
+      description: 1,
+      quantity: 1,
       status: 1,
-      comment: 1,
-      purchasingRequest: {
-        _id: 1,
-        title: 1,
-        status: 1,
-        quantity: 1,
-        currentStep: 1,
-        requester: { _id: 1, first_name: 1, last_name: 1 },
+      currentStep: 1,
+      createdAt: 1,
+      requester: { _id: 1, first_name: 1, last_name: 1 },
+      process: {
+        _id: 1, name: 1,
+        steps: {
+          _id: 1, name: 1, order: 1, stepType: 1,
+          assigneeGroups: 1,
+        },
       },
-      processStep: { _id: 1, name: 1, order: 1 },
+      stepApprovals: {
+        _id: 1, status: 1, comment: 1,
+        processStep: { _id: 1, name: 1 },
+        unit: { _id: 1, name: 1 },
+        decidedBy: { _id: 1, first_name: 1, last_name: 1 },
+      },
     },
   )
 
-  const items: PendingApprovalItem[] = result.success ? result.body || [] : []
+  const items: PendingPRItem[] = result.success ? result.body || [] : []
   const prevPageUrl = page > 1 ? `/unit-head/requests/pending?page=${page - 1}` : ""
   const nextPageUrl = items.length >= limit ? `/unit-head/requests/pending?page=${page + 1}` : ""
 
@@ -75,7 +84,7 @@ export default async function PendingApprovalsPage({
     <div className="space-y-6">
       <PageHeader
         title="نیازمند تایید"
-        description="درخواست‌های خریدی که به واحد شما ارجاع شده‌اند"
+        description="درخواست‌های خریدی که نیاز به تایید شما دارند"
       />
       <PendingClient
         items={items}

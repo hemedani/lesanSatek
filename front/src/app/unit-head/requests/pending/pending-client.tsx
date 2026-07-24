@@ -1,37 +1,43 @@
 "use client"
 
 import Link from "next/link"
-import { Clock, ShoppingCart } from "lucide-react"
+import { Clock } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { RequestStatusBadge } from "@/components/purchasing/request-status-badge"
 import { Pagination } from "@/components/ui/pagination"
 import { EmptyState } from "@/components/ui/empty-state"
 
-interface PendingApprovalItem {
+interface PendingPRItem {
   _id: string
+  title?: string
+  quantity?: number
   status?: string
-  comment?: string
+  currentStep?: number
   createdAt?: string
-  purchasingRequest?: {
-    _id: string
-    title?: string
-    status?: string
-    quantity?: number
-    currentStep?: number
-    requester?: { _id: string; first_name?: string; last_name?: string }
-  }
-  processStep?: {
-    _id: string
+  requester?: { _id?: string; first_name?: string; last_name?: string }
+  process?: {
+    _id?: string
     name?: string
-    order?: number
+    steps?: {
+      _id?: string
+      name?: string
+      order?: number
+      stepType?: string
+    }[]
   }
 }
 
 interface PendingClientProps {
-  items: PendingApprovalItem[]
+  items: PendingPRItem[]
   prevUrl: string
   nextUrl: string
   page: number
+}
+
+function currentStepName(item: PendingPRItem): string | undefined {
+  const idx = item.currentStep ?? 0
+  const step = item.process?.steps?.find((s) => s.order === idx) || item.process?.steps?.[idx]
+  return step?.name
 }
 
 function PendingClient({ items, prevUrl, nextUrl, page }: PendingClientProps) {
@@ -53,10 +59,9 @@ function PendingClient({ items, prevUrl, nextUrl, page }: PendingClientProps) {
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {items.map((item) => {
-          const pr = item.purchasingRequest
-          const step = item.processStep
+          const stepName = currentStepName(item)
           return (
-            <Link key={item._id} href={`/unit-head/requests/${pr?._id || ""}`}>
+            <Link key={item._id} href={`/unit-head/requests/${item._id}`}>
               <div className="glass-card glass-card-hover-active rounded-xl p-5 transition-all duration-200 cursor-pointer h-full">
                 <div className="flex items-start gap-3">
                   <div className="size-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0 mt-0.5">
@@ -64,24 +69,24 @@ function PendingClient({ items, prevUrl, nextUrl, page }: PendingClientProps) {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-base font-semibold text-moonlight leading-6 truncate">
-                      {pr?.title || "—"}
+                      {item.title || "—"}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
-                      {pr?.status && <RequestStatusBadge status={pr.status} />}
-                      {step?.name && (
-                        <span className="text-xs text-fog/50 truncate">{step.name}</span>
+                      {item.status && <RequestStatusBadge status={item.status} />}
+                      {stepName && (
+                        <span className="text-xs text-fog/50 truncate">{stepName}</span>
                       )}
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-xs text-fog/50">
-                  {pr?.requester && (
+                  {item.requester && (
                     <span>
-                      {pr.requester.first_name || ""} {pr.requester.last_name || ""}
+                      {item.requester.first_name || ""} {item.requester.last_name || ""}
                     </span>
                   )}
-                  {pr?.quantity != null && (
-                    <span>{pr.quantity.toLocaleString("fa-IR")} عدد</span>
+                  {item.quantity != null && (
+                    <span>{item.quantity.toLocaleString("fa-IR")} عدد</span>
                   )}
                   {item.createdAt && (
                     <span className="ms-auto">{new Date(item.createdAt).toLocaleDateString("fa-IR")}</span>
