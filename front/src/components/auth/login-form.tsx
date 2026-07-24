@@ -40,10 +40,10 @@ function LoginForm() {
 
     if (result.success && result.body?.user) {
       const user = result.body.user
-      const { getDefaultPanel, getAccessiblePanels } = await import("@/lib/roles")
+      const { getDefaultPanel, getAccessiblePanels, getHighestRole } = await import("@/lib/roles")
       const panels = getAccessiblePanels(user)
       setUser(user, panels)
-      const firstRole = user.roles?.[0]
+      const firstRole = getHighestRole(user.roles) || user.roles?.[0]
       if (firstRole) {
         setActiveRoleId(firstRole.roleId)
         setActiveRoleCookie(firstRole.roleId)

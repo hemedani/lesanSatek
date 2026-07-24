@@ -4,6 +4,7 @@ import { AppApi } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 import { cookies } from "next/headers";
+import { getHighestRole } from "@/lib/roles";
 
 export const getMe = async (
   getSelection?: DeepPartial<ReqType["main"]["user"]["getMe"]["get"]>
@@ -44,7 +45,8 @@ export const getMe = async (
       const cookieStore = await cookies();
       const currentActiveRoleId = cookieStore.get("activeRoleId")?.value;
       if (!currentActiveRoleId && result.body.roles?.length > 0) {
-        cookieStore.set("activeRoleId", result.body.roles[0].roleId, {
+        const highest = getHighestRole(result.body.roles);
+        cookieStore.set("activeRoleId", highest ? highest.roleId : result.body.roles[0].roleId, {
           httpOnly: false,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",

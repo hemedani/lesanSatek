@@ -148,3 +148,16 @@ export function getPanelForRole(
   }
   return null
 }
+
+const ROLE_HIERARCHY = ["Ghost", "Admin", "Manager", "OrgHead", "StoreHead", "UnitHead", "Employee", "Ordinary"]
+
+export function getHighestRole(
+  roles: { roleId: string; name: string }[],
+): { roleId: string; name: string } | null {
+  if (!roles?.length) return null
+  for (const rank of ROLE_HIERARCHY) {
+    const found = roles.find((r) => r.name === rank)
+    if (found) return found
+  }
+  return roles[0]
+}
