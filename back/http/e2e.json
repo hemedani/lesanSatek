@@ -96,7 +96,7 @@
   },
   {
     "id": "gen-unit-finance",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"واحد مالی\", \"enName\": \"واحد مالی\", \"description\": \"مدیریت مالی\", \"type\": \"Administration\", \"organizationId\": \"{orgId}\", \"headId\": \"{userId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"واحد مالی\", \"enName\": \"واحد مالی\", \"description\": \"مدیریت مالی\", \"type\": \"Finance\", \"organizationId\": \"{orgId}\", \"headId\": \"{userId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,
     "captures": [
       {
@@ -1018,13 +1018,46 @@
   },
   {
     "id": "gen-decision-step3",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prId}\", \"processStepId\": \"{stepUnit3Id}\", \"unitId\": \"{financeUnitId}\", \"status\": \"approved\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prId}\", \"processStepId\": \"{stepUnit3Id}\", \"unitId\": \"{financeUnitId}\", \"status\": \"approved\", \"budgetLineId\": \"{budgetLineId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
   {
     "id": "gen-orghead-finalize",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"finalize\", \"details\": {\"set\": {\"_id\": \"{prId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"status\": 1, \"finalizedAt\": 1, \"completedAt\": 1, \"postCompletionSteps\": 1, \"history\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-storehead-login",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"login\", \"details\": {\"set\": {\"email\": \"sara@lesansatek.com\", \"password\": \"password123\"}, \"get\": {\"token\": 1, \"user\": {\"_id\": 1, \"email\": 1, \"roles\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "saraToken",
+        "value": "[body][token]"
+      },
+      {
+        "key": "storeHeadRoleId",
+        "value": "[body][user][roles][3][roleId]"
+      }
+    ]
+  },
+  {
+    "id": "gen-storehead-ship-1",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"updateStuffStatus\", \"details\": {\"set\": {\"_id\": \"{prId}\", \"stuffStatus\": \"ready_to_ship\", \"activeRoleId\": \"{storeHeadRoleId}\"}, \"get\": {\"_id\": 1, \"stuffStatus\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-storehead-ship-2",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"updateStuffStatus\", \"details\": {\"set\": {\"_id\": \"{prId}\", \"stuffStatus\": \"shipped\", \"activeRoleId\": \"{storeHeadRoleId}\"}, \"get\": {\"_id\": 1, \"stuffStatus\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-storehead-ship-3",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"updateStuffStatus\", \"details\": {\"set\": {\"_id\": \"{prId}\", \"stuffStatus\": \"delivered\", \"activeRoleId\": \"{storeHeadRoleId}\"}, \"get\": {\"_id\": 1, \"stuffStatus\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
@@ -1036,7 +1069,7 @@
   },
   {
     "id": "gen-goods-receipt",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"goodsReceipt\", \"act\": \"add\", \"details\": {\"set\": {\"receiptNumber\": \"رسید-۰۰۱\", \"description\": \"رسید اولین محموله\", \"receivedAt\": \"2026-04-01\", \"items\": [{\"wareModelId\": \"{wareModelId}\", \"quantityReceived\": 10, \"quantityAccepted\": 10, \"quantityRejected\": 0}], \"purchasingRequestId\": \"{prId}\", \"receivedById\": \"{userId}\", \"receivingUnitId\": \"{warehouseUnitId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"receiptNumber\": 1, \"status\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"goodsReceipt\", \"act\": \"add\", \"details\": {\"set\": {\"receiptNumber\": \"رسید-۰۰۱\", \"description\": \"رسید اولین محموله\", \"receivedAt\": \"2026-04-01\", \"items\": [{\"wareModelId\": \"{wareModelId}\", \"quantityReceived\": 10, \"quantityAccepted\": 10, \"quantityRejected\": 0}], \"purchasingRequestId\": \"{prId}\", \"receivedById\": \"{userId}\", \"receivingUnitId\": \"{unitId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"receiptNumber\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": [
       {
@@ -1061,6 +1094,21 @@
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"paymentOrder\", \"act\": \"markPaid\", \"details\": {\"set\": {\"_id\": \"{paymentOrderId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1, \"paidAt\": 1}}}}",
     "repeat": 1,
     "captures": []
+  },
+  {
+    "id": "gen-budget-line-check-after-payment",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"get\", \"details\": {\"set\": {\"_id\": \"{budgetLineId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"totalAllocated\": 1, \"totalEncumbered\": 1, \"totalSpent\": 1, \"remainingBudget\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "totalAllocatedAfterPayment",
+        "value": "[body][totalAllocated]"
+      },
+      {
+        "key": "remainingBudgetAfterPayment",
+        "value": "[body][remainingBudget]"
+      }
+    ]
   },
   {
     "id": "gen-inventory-add",
