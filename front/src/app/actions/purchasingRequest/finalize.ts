@@ -13,6 +13,7 @@ interface PostCompletionStepInput {
 interface FinalizeSet {
   _id: string;
   finalWinner?: "stuff" | "tender";
+  budgetLineId?: string;
   postCompletionSteps?: PostCompletionStepInput[];
 }
 

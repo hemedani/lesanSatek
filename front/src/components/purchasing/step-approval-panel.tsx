@@ -8,7 +8,10 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
 import { submitDecision } from "@/app/actions/stepApproval/submitDecision"
+import { SearchSelect } from "@/components/form/form-search-select"
+import { gets as getBudgetLines } from "@/app/actions/budgetLine/gets"
 import { confirmDialog } from "@/components/ui/confirm-dialog"
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
 
 interface StepApprovalPanelProps {
   purchasingRequestId: string
@@ -19,6 +22,7 @@ interface StepApprovalPanelProps {
     assigneeGroups?: { operator?: string; unitIds?: string[] }[]
   }
   unitId: string
+  unitType?: string
   existingApprovals?: { _id: string; status: string; comment?: string; unit?: { _id?: string } }[]
   onDecision?: () => void
 }
@@ -27,6 +31,7 @@ function StepApprovalPanel({
   purchasingRequestId,
   processStep,
   unitId,
+  unitType,
   existingApprovals = [],
   onDecision,
 }: StepApprovalPanelProps) {
@@ -34,7 +39,9 @@ function StepApprovalPanel({
   const [comment, setComment] = useState("")
   const [submitting, setSubmitting] = useState<string | null>(null)
   const [localDecision, setLocalDecision] = useState<{ status: string } | null>(null)
+  const [budgetLineId, setBudgetLineId] = useState("")
 
+  const isFinance = unitType === "Finance"
   const isAssignedToStep = !!(
     unitId &&
     processStep &&
@@ -44,6 +51,8 @@ function StepApprovalPanel({
   const myApproval = existingApprovals?.find((a) => a.unit?._id === unitId && (a.status === "approved" || a.status === "rejected"))
   const userDecision = myApproval || localDecision
   const hasDecided = !!userDecision
+
+  const canApprove = !isFinance || !!budgetLineId
 
   const handleDecision = async (decision: "approved" | "rejected") => {
     const confirmed = await confirmDialog({
@@ -66,6 +75,7 @@ function StepApprovalPanel({
           unitId,
           status: decision,
           comment,
+          ...(decision === "approved" && budgetLineId ? { budgetLineId } : {}),
         },
         { _id: 1, status: 1 },
       )
@@ -143,11 +153,38 @@ function StepApprovalPanel({
               />
             </div>
 
+            {isFinance && (
+              <div className="space-y-2">
+                <SearchSelect
+                  value={budgetLineId}
+                  onChange={setBudgetLineId}
+                  label="ردیف بودجه"
+                  placeholder="جستجوی ردیف بودجه..."
+                  fetcher={async (search?: string) => {
+                    const result = await getBudgetLines(
+                      { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, title: search || undefined } as any,
+                      { _id: 1, code: 1, title: 1, remainingBudget: 1, totalAllocated: 1 }
+                    )
+                    if (!result.success || !result.body) return []
+                    return result.body.map((b: { _id?: string; code?: string; title?: string; remainingBudget?: number; totalAllocated?: number }) => ({
+                      _id: b._id || "",
+                      name: `${b.code || ""} ${b.title || ""}`.trim(),
+                      sublabel: b.remainingBudget != null ? `${b.remainingBudget.toLocaleString("fa-IR")} ریال` : undefined,
+                    }))
+                  }}
+                  hasError={!budgetLineId && submitting === "approved"}
+                />
+                {!budgetLineId && submitting === "approved" && (
+                  <p className="text-xs text-rose-400">انتخاب ردیف بودجه برای تایید الزامی است</p>
+                )}
+              </div>
+            )}
+
             <div className="flex gap-3">
               <Button
                 variant="default"
                 onClick={() => handleDecision("approved")}
-                disabled={submitting !== null}
+                disabled={submitting !== null || !canApprove}
                 className="flex-1 gap-2"
               >
                 {submitting === "approved" ? (

@@ -2,16 +2,17 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Clock, CheckCircle, List, Eye, ShieldCheck } from "lucide-react";
+import { Clock, ShoppingCart, Building2, Package, DollarSign, Calendar, CheckCircle, ShieldCheck, Store } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
-import { DataTable } from "@/components/ui/data-table";
-import type { Column } from "@/components/ui/data-table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Pagination } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { RequestStatusBadge } from "@/components/purchasing/request-status-badge";
-import { RequestCard } from "@/components/purchasing/request-card";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { FinalizeModal } from "@/components/orghead/finalize-modal";
+import { markPaid } from "@/app/actions/paymentOrder/markPaid";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface Unit {
   _id: string;
@@ -26,6 +27,13 @@ interface WareModel {
 interface Organization {
   _id: string;
   name?: string;
+}
+
+interface PaymentOrder {
+  _id: string;
+  title?: string;
+  amount?: number;
+  status?: string;
 }
 
 interface PurchasingRequest {
@@ -51,12 +59,14 @@ interface RequestsClientProps {
   nextPageUrl: string;
   page: number;
   activeTab: string;
+  paymentOrdersByPRId?: Record<string, PaymentOrder>;
 }
 
-const TAB_KEYS = ["pending", "completed", "all"] as const;
+const TAB_KEYS = ["pending", "payment", "completed", "all"] as const;
 
 const TAB_LABELS: Record<string, string> = {
   pending: "در انتظار تأیید",
+  payment: "نیازمند پرداخت",
   completed: "تکمیل شده",
   all: "همه درخواست‌ها",
 };
@@ -85,10 +95,12 @@ export function RequestsClient({
   nextPageUrl,
   page,
   activeTab,
+  paymentOrdersByPRId = {},
 }: RequestsClientProps) {
   const router = useRouter();
-  const [cardView, setCardView] = useState(false);
   const [finalizePR, setFinalizePR] = useState<PurchasingRequest | null>(null);
+  const [payPR, setPayPR] = useState<PurchasingRequest | null>(null);
+  const [paying, setPaying] = useState(false);
 
   const handleTabChange = useCallback(
     (value: string) => {
@@ -102,125 +114,42 @@ export function RequestsClient({
     router.refresh();
   }, [router]);
 
-  const columns: Column<PurchasingRequest>[] = [
-    {
-      key: "title",
-      label: "عنوان",
-      render: (item) => (
-        <div className="flex items-center gap-3">
-          <div className="size-6 rounded-lg bg-electric-iris/10 flex items-center justify-center shrink-0">
-            <ShieldCheck className="size-3.5 text-electric-iris" />
-          </div>
-          <div className="min-w-0">
-            <span className="text-moonlight font-medium">{item.title || "—"}</span>
-            {item.organization?.name && (
-              <p className="text-fog/50 text-xs mt-0.5">{item.organization.name}</p>
-            )}
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "requestingUnit",
-      label: "واحد درخواست‌کننده",
-      render: (item) => (
-        <span className="text-fog text-sm">{item.requestingUnit?.name || "—"}</span>
-      ),
-      hideOnCard: true,
-    },
-    {
-      key: "wareModel",
-      label: "مدل کالا",
-      render: (item) => (
-        <span className="text-fog text-sm">{item.wareModel?.name || "—"}</span>
-      ),
-      hideOnCard: true,
-    },
-    {
-      key: "quantity",
-      label: "مقدار",
-      render: (item) => (
-        <span className="text-fog text-sm font-mono" dir="ltr">
-          {item.quantity != null ? item.quantity.toLocaleString("fa-IR") : "—"}
-        </span>
-      ),
-    },
-    {
-      key: "selectionType",
-      label: "وضعیت انتخاب",
-      render: (item) => (
-        <span className={`text-sm ${getSelectionColor(item)}`}>
-          {getSelectionLabel(item)}
-        </span>
-      ),
-    },
-    {
-      key: "estimatedAmount",
-      label: "مبلغ تخمینی",
-      render: (item) => (
-        <span className="text-fog text-sm font-mono" dir="ltr">
-          {item.estimatedAmount != null ? `${item.estimatedAmount.toLocaleString("fa-IR")} ریال` : "—"}
-        </span>
-      ),
-      hideOnCard: true,
-    },
-    {
-      key: "createdAt",
-      label: "تاریخ ایجاد",
-      render: (item) => (
-        <span className="text-fog text-sm">
-          {item.createdAt ? new Date(item.createdAt).toLocaleDateString("fa-IR") : "—"}
-        </span>
-      ),
-      hideOnCard: true,
-    },
-    {
-      key: "finalizedAt",
-      label: "تاریخ نهایی‌سازی",
-      render: (item) => (
-        <span className="text-fog text-sm">
-          {item.finalizedAt ? new Date(item.finalizedAt).toLocaleDateString("fa-IR") : "—"}
-        </span>
-      ),
-      hideOnCard: true,
-    },
-    {
-      key: "actions",
-      label: "",
-      render: (item) => {
-        if (item.status === "PendingFinalization") {
-          return (
-            <Button
-              variant="outline"
-              size="xs"
-              className="gap-1.5 opacity-70 hover:opacity-100 transition-opacity"
-              onClick={(e) => {
-                e.stopPropagation();
-                setFinalizePR(item);
-              }}
-            >
-              <Clock className="size-3.5" />
-              تأیید نهایی
-            </Button>
-          );
-        }
-        return (
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            className="opacity-60 hover:opacity-100 transition-opacity"
-            onClick={() => router.push(`/orghead/requests/${item._id}`)}
-          >
-            <Eye className="size-3.5" />
-          </Button>
-        );
-      },
-    },
-  ];
+  const handlePay = useCallback(async () => {
+    if (!payPR) return;
+    const po = paymentOrdersByPRId[payPR._id];
+    if (!po) {
+      toast.error("دستور پرداختی برای این درخواست یافت نشد");
+      return;
+    }
+    setPaying(true);
+    try {
+      const result = await markPaid({ activeRoleId: "", _id: po._id });
+      if (result.success) {
+        toast.success("پرداخت با موفقیت ثبت شد");
+        setPayPR(null);
+        router.refresh();
+      } else {
+        toast.error(result.body?.message || "خطا در ثبت پرداخت");
+      }
+    } catch {
+      toast.error("خطا در ثبت پرداخت");
+    } finally {
+      setPaying(false);
+    }
+  }, [payPR, paymentOrdersByPRId, router]);
 
   const activeTabIndex = TAB_KEYS.indexOf(activeTab as typeof TAB_KEYS[number]) !== -1
     ? activeTab
     : "pending";
+
+  const getEmptyMessage = (key: string) => {
+    switch (key) {
+      case "pending": return "هیچ درخواستی در انتظار تأیید نهایی نیست.";
+      case "payment": return "هیچ درخواستی نیازمند پرداخت نیست.";
+      case "completed": return "هیچ درخواست تکمیل شده‌ای یافت نشد.";
+      default: return "هیچ درخواست خریدی برای سازمان شما یافت نشد.";
+    }
+  };
 
   return (
     <div className="space-y-6 relative">
@@ -242,40 +171,135 @@ export function RequestsClient({
 
         {TAB_KEYS.map((key) => (
           <TabsContent key={key} value={key} className="pt-4">
-            <DataTable
-              columns={columns.filter((col) => {
-                if (key !== "completed" && col.key === "finalizedAt") return false;
-                return true;
-              })}
-              data={items}
-              keyExtractor={(item) => item._id}
-              cardView={cardView}
-              onViewToggle={() => setCardView((v) => !v)}
-              renderCard={(item) => (
-                <RequestCard
-                  title={item.title}
-                  status={item.status}
-                  quantity={item.quantity}
-                  estimatedAmount={item.estimatedAmount}
-                  createdAt={item.createdAt}
-                  onClick={() => {
-                    if (item.status === "PendingFinalization") {
-                      setFinalizePR(item);
-                    } else {
-                      router.push(`/orghead/requests/${item._id}`);
-                    }
-                  }}
-                />
+            <div className="grid gap-3">
+              {items.length === 0 ? (
+                <div className="glass-card rounded-xl p-12 text-center">
+                  <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-white/[0.03] ring-1 ring-steel-border/15">
+                    <ShoppingCart className="size-6 text-fog/30" />
+                  </div>
+                  <p className="text-sm font-medium text-fog/50 mb-1">درخواستی یافت نشد</p>
+                  <p className="text-xs text-fog/30">{getEmptyMessage(key)}</p>
+                </div>
+              ) : (
+                items.map((item) => {
+                  const po = paymentOrdersByPRId[item._id];
+                  const isPayTab = key === "payment";
+
+                  return (
+                    <div
+                      key={item._id}
+                      className="glass-card glass-card-hover-active rounded-xl p-5 transition-all duration-200 cursor-pointer"
+                      onClick={() => {
+                        if (item.status === "PendingFinalization") {
+                          setFinalizePR(item);
+                        } else {
+                          router.push(`/orghead/requests/${item._id}`);
+                        }
+                      }}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-3 min-w-0 flex-1">
+                          <div className="size-10 rounded-xl bg-electric-iris/10 flex items-center justify-center shrink-0 mt-0.5">
+                            <ShieldCheck className="size-5 text-electric-iris" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-base font-semibold text-moonlight leading-6 truncate">
+                              {item.title || "—"}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1 flex-wrap">
+                              <RequestStatusBadge status={item.status} />
+                              {item.organization?.name && (
+                                <span className="text-xs text-fog/50 truncate flex items-center gap-1">
+                                  <Building2 className="size-3 shrink-0" />
+                                  {item.organization.name}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        {item.status === "PendingFinalization" && (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            className="gap-1.5 shrink-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFinalizePR(item);
+                            }}
+                          >
+                            <Clock className="size-4" />
+                            تأیید نهایی
+                          </Button>
+                        )}
+                        {isPayTab && po && (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            className="gap-1.5 shrink-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPayPR(item);
+                            }}
+                          >
+                            <DollarSign className="size-4" />
+                            پرداخت
+                          </Button>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-x-5 gap-y-2 mt-3 text-xs text-fog/60 flex-wrap">
+                        {item.requestingUnit?.name && (
+                          <span className="flex items-center gap-1.5">
+                            <Building2 className="size-3.5 text-fog/40" />
+                            {item.requestingUnit.name}
+                          </span>
+                        )}
+                        {item.wareModel?.name && (
+                          <span className="flex items-center gap-1.5">
+                            <Package className="size-3.5 text-fog/40" />
+                            {item.wareModel.name}
+                          </span>
+                        )}
+                        {item.quantity != null && (
+                          <span className="flex items-center gap-1.5" dir="ltr">
+                            <ShoppingCart className="size-3.5 text-fog/40" />
+                            {item.quantity.toLocaleString("fa-IR")} عدد
+                          </span>
+                        )}
+                        {item.estimatedAmount != null && (
+                          <span className="flex items-center gap-1.5" dir="ltr">
+                            <DollarSign className="size-3.5 text-fog/40" />
+                            {item.estimatedAmount.toLocaleString("fa-IR")} ریال
+                          </span>
+                        )}
+                        {isPayTab && po && po.amount != null && (
+                          <span className="flex items-center gap-1.5 text-amber-400" dir="ltr">
+                            <DollarSign className="size-3.5" />
+                            مبلغ پرداخت: {po.amount.toLocaleString("fa-IR")} ریال
+                          </span>
+                        )}
+                        <span className={cn("flex items-center gap-1.5", getSelectionColor(item))}>
+                          <Store className="size-3.5" />
+                          {getSelectionLabel(item)}
+                        </span>
+                        {item.createdAt && (
+                          <span className="flex items-center gap-1.5 ms-auto">
+                            <Calendar className="size-3.5 text-fog/40" />
+                            {new Date(item.createdAt).toLocaleDateString("fa-IR")}
+                          </span>
+                        )}
+                        {item.finalizedAt && key === "completed" && (
+                          <span className="flex items-center gap-1.5">
+                            <CheckCircle className="size-3.5 text-emerald-400" />
+                            {new Date(item.finalizedAt).toLocaleDateString("fa-IR")}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
               )}
-              emptyTitle="درخواستی یافت نشد"
-              emptyDescription={
-                key === "pending"
-                  ? "هیچ درخواستی در انتظار تأیید نهایی نیست."
-                  : key === "completed"
-                    ? "هیچ درخواست تکمیل شده‌ای یافت نشد."
-                    : "هیچ درخواست خریدی برای سازمان شما یافت نشد."
-              }
-            />
+            </div>
           </TabsContent>
         ))}
       </Tabs>
@@ -287,6 +311,20 @@ export function RequestsClient({
         onOpenChange={(open) => { if (!open) setFinalizePR(null); }}
         pr={finalizePR}
         onSuccess={handleFinalizeSuccess}
+      />
+
+      <ConfirmDialog
+        open={!!payPR}
+        onOpenChange={(open) => { if (!open) setPayPR(null); }}
+        title="تأیید پرداخت"
+        description={
+          payPR && paymentOrdersByPRId[payPR._id]
+            ? `آیا از پرداخت "${payPR.title || "بدون عنوان"}" به مبلغ ${Number(paymentOrdersByPRId[payPR._id].amount || 0).toLocaleString("fa-IR")} ریال اطمینان دارید؟`
+            : ""
+        }
+        confirmLabel="تأیید پرداخت"
+        onConfirm={handlePay}
+        loading={paying}
       />
     </div>
   );

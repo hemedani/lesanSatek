@@ -1,9 +1,11 @@
 import Link from "next/link"
-import { ShoppingCart, CheckCircle, XCircle, Clock, Plus } from "lucide-react"
+import { ShoppingCart, CheckCircle, XCircle, Clock, Package, Plus } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
+import { getMe } from "@/app/actions/user/getMe"
+import { cookies } from "next/headers"
 
 const statusMap: Record<string, string> = {
   draft: "پیش‌نویس",
@@ -15,26 +17,46 @@ const statusMap: Record<string, string> = {
 }
 
 export default async function RequestsDashboard() {
-  const prsRes = await getPRs(
-    { page: 1, limit: 5 },
-    {
+  const cookieStore = await cookies()
+  const activeRoleId = cookieStore.get("activeRoleId")?.value
+  let currentUserId: string | undefined
+
+  if (activeRoleId) {
+    const userRes = await getMe({
       _id: 1,
-      title: 1,
-      status: 1,
-      createdAt: 1,
-    },
-  )
+      roles: 1,
+    }).catch(() => ({ success: false, body: null }))
+    const user = userRes.success ? userRes.body : null
+    currentUserId = user?._id
+  }
+
+  const [prsRes, receiptRes] = await Promise.all([
+    getPRs(
+      { page: 1, limit: 5 },
+      { _id: 1, title: 1, status: 1, createdAt: 1 },
+    ),
+    currentUserId
+      ? getPRs(
+          { page: 1, limit: 1, requesterId: currentUserId, stuffStatus: "delivered" },
+          { _id: 1, title: 1 },
+        )
+      : Promise.resolve({ success: false, body: [] }),
+  ])
+
   const prs = prsRes.success ? prsRes.body || [] : []
+  const receiptCount = receiptRes.success ? (receiptRes.body || []).length : 0
+
   const total = prs.length
   const pending = prs.filter((p: { status?: string }) => p.status === "pending" || p.status === "draft").length
   const approved = prs.filter((p: { status?: string }) => p.status === "approved").length
   const rejected = prs.filter((p: { status?: string }) => p.status === "rejected").length
 
   const stats = [
-    { label: "کل درخواست‌ها", value: total, icon: ShoppingCart, color: "text-electric-iris", bg: "bg-electric-iris/10" },
-    { label: "در انتظار", value: pending, icon: Clock, color: "text-amber-400", bg: "bg-amber-400/10" },
-    { label: "تایید شده", value: approved, icon: CheckCircle, color: "text-emerald-400", bg: "bg-emerald-400/10" },
-    { label: "رد شده", value: rejected, icon: XCircle, color: "text-ember", bg: "bg-ember/10" },
+    { label: "کل درخواست‌ها", value: total, icon: ShoppingCart, color: "text-electric-iris", bg: "bg-electric-iris/10", href: "/requests/my-requests" },
+    { label: "در انتظار", value: pending, icon: Clock, color: "text-amber-400", bg: "bg-amber-400/10", href: "/requests/my-requests" },
+    { label: "تایید شده", value: approved, icon: CheckCircle, color: "text-emerald-400", bg: "bg-emerald-400/10", href: "/requests/my-requests" },
+    { label: "آماده تحویل", value: receiptCount, icon: Package, color: "text-emerald-400", bg: "bg-emerald-400/10", href: "/requests/my-requests?tab=receipt" },
+    { label: "رد شده", value: rejected, icon: XCircle, color: "text-ember", bg: "bg-ember/10", href: "/requests/my-requests" },
   ]
 
   return (
@@ -52,26 +74,28 @@ export default async function RequestsDashboard() {
         </Link>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
         {stats.map((stat) => {
           const Icon = stat.icon
           return (
-            <Card key={stat.label} variant="glass">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <div className={`flex size-10 items-center justify-center rounded-lg ${stat.bg} ring-1 ring-inset ring-${stat.color.replace("text-", "")}/15`}>
-                    <Icon className={`size-5 ${stat.color}`} />
+            <Link key={stat.label} href={stat.href}>
+              <Card variant="glass" className="cursor-pointer transition-all duration-200 hover:border-frost-link/30">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`flex size-10 items-center justify-center rounded-lg ${stat.bg} ring-1 ring-inset ring-white/[0.06]`}>
+                      <Icon className={`size-5 ${stat.color}`} />
+                    </div>
+                    <CardTitle className="text-sm font-medium text-fog leading-5">
+                      {stat.label}
+                    </CardTitle>
                   </div>
-                  <CardTitle className="text-sm font-medium text-fog leading-5">
-                    {stat.label}
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-semibold text-glacier leading-8">{stat.value}</p>
-                <div className="mt-4 h-px bg-gradient-to-r from-transparent via-frost-link/15 to-transparent" />
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-semibold text-glacier leading-8">{stat.value}</p>
+                  <div className="mt-4 h-px bg-gradient-to-r from-transparent via-frost-link/15 to-transparent" />
+                </CardContent>
+              </Card>
+            </Link>
           )
         })}
       </div>
@@ -90,6 +114,9 @@ export default async function RequestsDashboard() {
             </Link>
             <Link href="/requests/my-requests">
               <Button variant="outline" size="sm">درخواست‌های من</Button>
+            </Link>
+            <Link href="/requests/my-requests?tab=receipt">
+              <Button variant="outline" size="sm">دریافت کالا</Button>
             </Link>
             <Link href="/requests/inventory">
               <Button variant="outline" size="sm">انبار واحد</Button>

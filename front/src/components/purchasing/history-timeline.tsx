@@ -45,6 +45,8 @@ const actionConfig: Record<string, { icon: typeof History; label: string; color:
   tender_offer_selected: { icon: Check, label: "پیشنهاد مناقصه انتخاب شد", color: "bg-emerald-500/15 text-emerald-400 ring-emerald-500/20" },
   tender_awarded: { icon: Award, label: "مناقصه اعطا شد", color: "bg-amber-500/15 text-amber-400 ring-amber-500/20" },
   tender_offer_removed: { icon: X, label: "انتخاب مناقصه لغو شد", color: "bg-rose-500/15 text-rose-400 ring-rose-500/20" },
+  all_steps_approved: { icon: Check, label: "همه گام‌ها تأیید شد", color: "bg-emerald-500/15 text-emerald-400 ring-emerald-500/20" },
+  finalized: { icon: FileCheck, label: "نهایی‌سازی شد", color: "bg-violet-500/15 text-violet-400 ring-violet-500/20" },
 };
 
 function getConfig(action?: string) {
@@ -92,11 +94,21 @@ function renderDetails(entry: HistoryEntry) {
     if (d.assignedFromId) items.push(`فروشگاه: ${String(d.assignedFromId)}`);
     if (d.storeId && !d.assignedFromId) items.push(`فروشگاه: ${String(d.storeId)}`);
     if (d.tenderOfferId) items.push(`پیشنهاد: ${String(d.tenderOfferId)}`);
-  } else if (action === "step_approved" || action === "Approved") {
+  } else if (action === "step_approved" || action === "Approved" || action === "all_steps_approved") {
     if (d.stepName) items.push(`گام: ${d.stepName}`);
     if (d.unitId && entry.unit?.name) items.push(`واحد: ${entry.unit.name}`);
     if (d.comment) items.push(`نظر: ${d.comment}`);
     if (d.completed) items.push("تکمیل نهایی");
+    if (d.budgetLine) {
+      const bl = d.budgetLine as { code?: string; title?: string };
+      if (bl.code || bl.title) items.push(`ردیف بودجه: ${bl.code || ""} ${bl.title || ""}`.trim());
+    }
+  } else if (action === "finalized") {
+    if (d.comment) items.push(`نظر: ${d.comment}`);
+    if (d.budgetLine) {
+      const bl = d.budgetLine as { code?: string; title?: string };
+      if (bl.code || bl.title) items.push(`ردیف بودجه: ${bl.code || ""} ${bl.title || ""}`.trim());
+    }
   } else if (action === "goods_received" || action === "Receive") {
     if (d.goodsReceiptId) items.push(`رسید: ${String(d.goodsReceiptId)}`);
     if (d.itemCount) items.push(`تعداد اقلام: ${Number(d.itemCount).toLocaleString("fa-IR")}`);
@@ -134,7 +146,7 @@ function renderDetails(entry: HistoryEntry) {
   }
 
   for (const [key, val] of Object.entries(d)) {
-    if (["wareModelName", "quantity", "unitPrice", "storeId", "assignedFromId", "stepName", "comment", "itemCount", "storeName", "amount", "wareModelId", "goodsReceiptId", "consumptionRecordId", "tenderOfferId", "receivingUnitId", "stepIndex", "_id", "status", "currentStep", "completed", "tenderId", "title", "deadline", "offerPrice", "estimatedAmount", "tenderTitle", "previousTenderOfferId", "tenderOfferId", "storeName", "wareModelName"].includes(key)) continue;
+    if (["wareModelName", "quantity", "unitPrice", "storeId", "assignedFromId", "stepName", "comment", "itemCount", "storeName", "amount", "wareModelId", "goodsReceiptId", "consumptionRecordId", "tenderOfferId", "receivingUnitId", "stepIndex", "_id", "status", "currentStep", "completed", "tenderId", "title", "deadline", "offerPrice", "estimatedAmount", "tenderTitle", "previousTenderOfferId", "tenderOfferId", "storeName", "wareModelName", "budgetLine"].includes(key)) continue;
     if (typeof val === "string" && val.length < 80) {
       items.push(`${key}: ${val}`);
     } else if (typeof val === "number") {

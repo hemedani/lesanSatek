@@ -84,7 +84,7 @@ export function WorkflowVisualizer({
   stepResponsibleUnits,
 }: WorkflowVisualizerProps) {
   const s = (status || "").toLowerCase()
-  const isComplete = s === "completed" || s === "approved"
+  const isComplete = s === "completed" || s === "approved" || s === "pendingfinalization"
   const isRejected = s === "rejected" || s === "cancelled"
   const sortedSteps = [...steps].sort((a, b) => (a.order || 0) - (b.order || 0))
 

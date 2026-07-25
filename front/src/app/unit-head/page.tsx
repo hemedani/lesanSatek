@@ -1,9 +1,10 @@
 import Link from "next/link"
-import { FileEdit, Clock, ShoppingCart, CheckCircle, XCircle, AlertCircle } from "lucide-react"
+import { FileEdit, Clock, ShoppingCart, Package, CheckCircle, XCircle, AlertCircle } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
 import { gets as getApprovals } from "@/app/actions/stepApproval/gets"
+import { gets as getUnits } from "@/app/actions/unit/gets"
 import { cookies } from "next/headers"
 import { getMe } from "@/app/actions/user/getMe"
 
@@ -11,6 +12,7 @@ export default async function UnitHeadDashboard() {
   const cookieStore = await cookies()
   const activeRoleId = cookieStore.get("activeRoleId")?.value
   let unitId: string | undefined
+  let currentUserId: string | undefined
 
   if (activeRoleId) {
     const userRes = await getMe({
@@ -18,17 +20,40 @@ export default async function UnitHeadDashboard() {
       roles: 1,
     }).catch(() => ({ success: false, body: null }))
     const user = userRes.success ? userRes.body : null
+    currentUserId = user?._id
     const activeRole = user?.roles?.find((r: { roleId?: string }) => r.roleId === activeRoleId)
     if (activeRole?.scopeType === "unit" && activeRole.scopeId) {
       unitId = activeRole.scopeId
     }
   }
 
-  const [draftsRes, pendingRes, allRes, approvalsRes] = await Promise.all([
+  let isWarehouseHead = false
+  let warehouseUnitId: string | undefined
+
+  if (currentUserId) {
+    const warehouseUnitsRes = await getUnits(
+      { page: 1, limit: 50, type: "Warehouse" } as any,
+      { _id: 1, name: 1, head: { _id: 1 } } as any
+    ).catch(() => ({ success: false, body: null }))
+    if (warehouseUnitsRes.success && warehouseUnitsRes.body) {
+      const userWarehouse = warehouseUnitsRes.body.find(
+        (u: { head?: { _id?: string } }) => u.head?._id === currentUserId
+      )
+      if (userWarehouse) {
+        isWarehouseHead = true
+        warehouseUnitId = userWarehouse._id
+      }
+    }
+  }
+
+  const [draftsRes, pendingRes, allRes, approvalsRes, receiptRes] = await Promise.all([
     getPRs({ page: 1, limit: 1, unitId, status: "Draft" }, { _id: 1, status: 1 }).catch(() => ({ success: false, body: [] })),
     getApprovals({ page: 1, limit: 1, unitId, status: "pending" }, { _id: 1, status: 1 }).catch(() => ({ success: false, body: [] })),
     getPRs({ page: 1, limit: 50, unitId }, { _id: 1, status: 1 }).catch(() => ({ success: false, body: [] })),
     getApprovals({ page: 1, limit: 5, unitId, status: "pending" }, { _id: 1, status: 1, createdAt: 1 }).catch(() => ({ success: false, body: [] })),
+    isWarehouseHead && warehouseUnitId
+      ? getPRs({ page: 1, limit: 1, unitId: warehouseUnitId, stuffStatus: "delivered" }, { _id: 1, title: 1 }).catch(() => ({ success: false, body: [] }))
+      : Promise.resolve({ success: false, body: [] }),
   ])
 
   const allPRs: { status?: string }[] = allRes.success ? allRes.body || [] : []
@@ -41,6 +66,7 @@ export default async function UnitHeadDashboard() {
   const pendingPRs = allPRs.filter((p) => p.status === "Pending").length
   const approvedPRs = allPRs.filter((p) => p.status === "Approved").length
   const rejectedPRs = allPRs.filter((p) => p.status === "Rejected").length
+  const receiptCount = receiptRes.success ? (receiptRes.body || []).length : 0
 
   const navCards = [
     {
@@ -61,6 +87,15 @@ export default async function UnitHeadDashboard() {
       bg: "bg-amber-400/10",
       href: "/unit-head/requests/pending",
     },
+    ...(isWarehouseHead ? [{
+      title: "تحویل کالا",
+      description: "دریافت کالا در انبار",
+      value: receiptCount,
+      icon: Package,
+      color: "text-emerald-400",
+      bg: "bg-emerald-400/10",
+      href: "/unit-head/goods-receipt",
+    }] : []),
     {
       title: "همه درخواست‌ها",
       description: "لیست کامل درخواست‌های خرید",

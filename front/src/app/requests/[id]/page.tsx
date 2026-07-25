@@ -70,6 +70,7 @@ export default async function RequestDetailPage({
       updatedAt: 1,
       stuff: { _id: 1, quantity: 1, price: 1 },
       stuffStatus: 1,
+      completedAt: 1,
       estimatedAmount: 1,
       requester: { _id: 1, first_name: 1, last_name: 1 },
       process: {
@@ -127,12 +128,17 @@ export default async function RequestDetailPage({
   let userUnitId: string | undefined
   let isCurrentUserRequester = false
 
+  let currentUserId: string | undefined
+  let isWarehouseHead = false
+  let warehouseUnitId: string | undefined
+
   if (activeRoleId) {
     const userRes = await getMe({
       _id: 1,
       roles: 1,
     }).catch(() => ({ success: false, body: null }))
     const currentUser = userRes.success ? userRes.body : null
+    currentUserId = currentUser?._id
     const activeRole = currentUser?.roles?.find((r: { roleId?: string }) => r.roleId === activeRoleId)
     if (activeRole?.scopeType === "unit" && activeRole.scopeId) {
       userUnitId = activeRole.scopeId
@@ -140,7 +146,24 @@ export default async function RequestDetailPage({
     isCurrentUserRequester = currentUser?._id === pr.requester?._id
   }
 
-  const canReceive = pr.status === "approved" && isCurrentUserRequester && pr.wareModel?._id && userUnitId
+  if (currentUserId) {
+    const warehouseUnitsRes = await getUnits(
+      { page: 1, limit: 50, type: "Warehouse" } as any,
+      { _id: 1, name: 1, head: { _id: 1 } } as any
+    ).catch(() => ({ success: false, body: null }))
+    if (warehouseUnitsRes.success && warehouseUnitsRes.body) {
+      const userWarehouse = warehouseUnitsRes.body.find(
+        (u: { head?: { _id?: string } }) => u.head?._id === currentUserId
+      )
+      if (userWarehouse) {
+        isWarehouseHead = true
+        warehouseUnitId = userWarehouse._id
+      }
+    }
+  }
+
+  const receiveUnitId = isCurrentUserRequester ? pr.requestingUnit?._id : warehouseUnitId
+  const canReceive = pr.stuffStatus === "delivered" && pr.wareModel?._id && ((isCurrentUserRequester && pr.requestingUnit?._id) || (isWarehouseHead && warehouseUnitId))
 
   const [approvalsRes, grRes, poRes] = await Promise.all([
     getApprovals(
@@ -157,7 +180,12 @@ export default async function RequestDetailPage({
     ),
     getGoodsReceipts(
       { page: 1, limit: 20, purchasingRequestId: id },
-      { _id: 1, receiptNumber: 1, quantityReceived: 1, receivedAt: 1, status: 1, notes: 1 },
+      {
+        _id: 1, receiptNumber: 1, receivedAt: 1, status: 1, notes: 1,
+        items: 1,
+        receivingUnit: { _id: 1, name: 1 },
+        receivedBy: { _id: 1, first_name: 1, last_name: 1 },
+      },
     ),
     getPaymentOrders(
       { page: 1, limit: 20, purchasingRequestId: id },
@@ -388,25 +416,51 @@ export default async function RequestDetailPage({
               </CardHeader>
               <CardContent>
                 <div className="divide-y divide-steel-border/10">
-                  {goodsReceipts.map((gr: Record<string, unknown>) => (
-                    <div key={String(gr._id)} className="py-3 first:pt-0 last:pb-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-moonlight">
-                          {String(gr.receiptNumber || "—")}
-                        </span>
-                        <StatusBadge status={String(gr.status || "")} />
-                      </div>
-                      <div className="flex items-center gap-4 text-xs text-fog/50">
-                        <span>تعداد: {Number(gr.quantityReceived || 0).toLocaleString("fa-IR")}</span>
-                        {gr.receivedAt && (
-                          <span>{new Date(String(gr.receivedAt)).toLocaleDateString("fa-IR")}</span>
+                  {goodsReceipts.map((gr: Record<string, unknown>) => {
+                    const items = (Array.isArray(gr.items) ? gr.items : []) as Array<Record<string, unknown>>
+                    const totalQty = items.reduce((sum, item) => sum + Number(item.quantityReceived || 0), 0)
+                    const receivingUnit = gr.receivingUnit as Record<string, unknown> | undefined
+                    const receivedBy = gr.receivedBy as Record<string, unknown> | undefined
+                    return (
+                      <div key={String(gr._id)} className="py-3 first:pt-0 last:pb-0 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-moonlight">
+                            {String(gr.receiptNumber || "—")}
+                          </span>
+                          <StatusBadge status={String(gr.status || "")} />
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-fog/50">
+                          <span>مجموع: {totalQty.toLocaleString("fa-IR")}</span>
+                          {gr.receivedAt && (
+                            <span>{new Date(String(gr.receivedAt)).toLocaleDateString("fa-IR")}</span>
+                          )}
+                        </div>
+                        {receivingUnit && (
+                          <p className="text-xs text-fog/40">
+                            واحد دریافت‌کننده: {String(receivingUnit.name || "—")}
+                          </p>
+                        )}
+                        {receivedBy && (
+                          <p className="text-xs text-fog/40">
+                            دریافت‌کننده: {String(receivedBy.first_name || "")} {String(receivedBy.last_name || "")}
+                          </p>
+                        )}
+                        {items.length > 0 && (
+                          <div className="text-xs text-fog/40 space-y-1 pt-1 border-t border-steel-border/10">
+                            {items.map((item, i) => (
+                              <div key={i} className="flex justify-between">
+                                <span>{String(item.wareModelName || item.wareName || "کالا")}</span>
+                                <span>{Number(item.quantityReceived || 0).toLocaleString("fa-IR")} عدد</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {gr.notes && (
+                          <p className="text-xs text-fog/40">{String(gr.notes)}</p>
                         )}
                       </div>
-                      {gr.notes && (
-                        <p className="text-xs text-fog/40 mt-1">{String(gr.notes)}</p>
-                      )}
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -432,11 +486,17 @@ export default async function RequestDetailPage({
                       <span className={cn(
                         "text-[11px] px-2 py-0.5 rounded-full font-medium",
                         pr.stuffStatus === "assigned" ? "bg-blue-500/10 text-blue-400 border border-blue-500/20" :
+                        pr.stuffStatus === "ready_to_ship" ? "bg-violet-500/10 text-violet-400 border border-violet-500/20" :
+                        pr.stuffStatus === "shipped" ? "bg-orange-500/10 text-orange-400 border border-orange-500/20" :
+                        pr.stuffStatus === "delivered" ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20" :
                         pr.stuffStatus === "received" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" :
                         pr.stuffStatus === "cancelled" ? "bg-rose-500/10 text-rose-400 border border-rose-500/20" :
                         "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20"
                       )}>
                         {pr.stuffStatus === "assigned" ? "تخصیص داده شده" :
+                         pr.stuffStatus === "ready_to_ship" ? "آماده ارسال" :
+                         pr.stuffStatus === "shipped" ? "ارسال شده" :
+                         pr.stuffStatus === "delivered" ? "تحویل داده شده" :
                          pr.stuffStatus === "received" ? "دریافت شده" :
                          pr.stuffStatus === "cancelled" ? "لغو شده" : "—"}
                       </span>
@@ -638,6 +698,42 @@ export default async function RequestDetailPage({
             </Card>
           )}
 
+          {pr.stuffStatus === "received" && (
+            <Card variant="glass">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <BadgeCheck className="size-4 text-emerald-400" />
+                  <CardTitle className="text-sm font-medium text-emerald-400">دریافت و تکمیل شده</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                {pr.completedAt && (
+                  <div>
+                    <p className="text-xs text-fog">تاریخ تکمیل</p>
+                    <p className="text-moonlight">{new Date(pr.completedAt).toLocaleDateString("fa-IR")}</p>
+                  </div>
+                )}
+                {goodsReceipts.length > 0 && (
+                  <div>
+                    <p className="text-xs text-fog">تعداد رسید</p>
+                    <p className="text-moonlight font-medium">{goodsReceipts.length.toLocaleString("fa-IR")} رسید</p>
+                    {(() => {
+                      const totalReceived = goodsReceipts.reduce((sum, gr: Record<string, unknown>) => {
+                        const items = (Array.isArray(gr.items) ? gr.items : []) as Array<Record<string, unknown>>
+                        return sum + items.reduce((s, item) => s + Number(item.quantityReceived || 0), 0)
+                      }, 0)
+                      return (
+                        <p className="text-xs text-fog/70 mt-1">
+                          مجموع کالای دریافت شده: {totalReceived.toLocaleString("fa-IR")}
+                        </p>
+                      )
+                    })()}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {pr.budgetLine && (
             <Card variant="glass">
               <CardHeader className="pb-3">
@@ -717,7 +813,8 @@ export default async function RequestDetailPage({
                   purchasingRequestId={pr._id}
                   wareModelId={pr.wareModel._id}
                   quantity={pr.quantity || 1}
-                  unitId={userUnitId || ""}
+                  receivingUnitId={receiveUnitId || ""}
+                  receivedById={currentUserId || ""}
                 />
               </CardContent>
             </Card>

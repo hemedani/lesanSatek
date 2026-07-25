@@ -5,17 +5,20 @@ import { useRouter } from "next/navigation";
 import {
   ArrowRight, ShoppingCart, Building2, Package, Calendar, FileText,
   BarChart3, Store, Gavel, BadgeCheck, User, Clock, DollarSign, Receipt,
-  CreditCard, ShieldCheck, CheckCircle
+  CreditCard, ShieldCheck, CheckCircle, Wallet, Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { RequestStatusBadge } from "@/components/purchasing/request-status-badge";
 import { WorkflowVisualizer } from "@/components/purchasing/workflow-visualizer";
 import { HistoryTimeline } from "@/components/purchasing/history-timeline";
 import { SelectionInfo } from "@/components/orghead/selection-info";
 import { PostCompletionSteps } from "@/components/orghead/post-completion-steps";
 import { FinalizeModal } from "@/components/orghead/finalize-modal";
+import { markPaid } from "@/app/actions/paymentOrder/markPaid";
+import { toast } from "sonner";
 
 interface StoreInfo { _id: string; name?: string; }
 interface UnitInfo { _id: string; name?: string; head?: { _id: string; first_name?: string; last_name?: string }; }
@@ -107,11 +110,20 @@ export function OrgHeadPRDetailClient({ pr }: OrgHeadPRDetailClientProps) {
   const isPendingFinalization = pr.status === "PendingFinalization";
 
   const stuffStatusLabel: Record<string, string> = {
-    none: "بدون کالا", assigned: "تخصیص داده شده", received: "دریافت شده", cancelled: "لغو شده",
+    none: "بدون کالا",
+    assigned: "تخصیص داده شده",
+    ready_to_ship: "آماده ارسال",
+    shipped: "ارسال شده",
+    delivered: "تحویل داده شده",
+    received: "دریافت شده",
+    cancelled: "لغو شده",
   };
   const stuffStatusColor: Record<string, string> = {
     none: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
     assigned: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    ready_to_ship: "bg-violet-500/10 text-violet-400 border-violet-500/20",
+    shipped: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+    delivered: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
     received: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
     cancelled: "bg-rose-500/10 text-rose-400 border-rose-500/20",
   };
@@ -119,6 +131,29 @@ export function OrgHeadPRDetailClient({ pr }: OrgHeadPRDetailClientProps) {
   const handleFinalizeSuccess = () => {
     setShowFinalize(false);
     router.refresh();
+  };
+
+  const draftPaymentOrder = pr.paymentOrders?.find((po) => po.status === "draft");
+  const [showPayConfirm, setShowPayConfirm] = useState(false);
+  const [paying, setPaying] = useState(false);
+
+  const handleMarkPaid = async () => {
+    if (!draftPaymentOrder) return;
+    setPaying(true);
+    setShowPayConfirm(false);
+    try {
+      const result = await markPaid({ _id: draftPaymentOrder._id });
+      if (result.success) {
+        toast.success("پرداخت با موفقیت ثبت شد");
+        router.refresh();
+      } else {
+        toast.error(result.body?.message || "خطا در ثبت پرداخت");
+      }
+    } catch {
+      toast.error("خطا در ثبت پرداخت");
+    } finally {
+      setPaying(false);
+    }
   };
 
   return (
@@ -454,6 +489,44 @@ export function OrgHeadPRDetailClient({ pr }: OrgHeadPRDetailClientProps) {
             </CardContent>
           </Card>
 
+          {/* Payment */}
+          {pr.stuffStatus === "received" && draftPaymentOrder && (
+            <Card variant="glass">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="size-8 rounded-xl bg-rose-500/10 flex items-center justify-center">
+                    <Wallet className="size-4 text-rose-400" />
+                  </div>
+                  <div>
+                    <CardTitle>پرداخت</CardTitle>
+                    <CardDescription>
+                      {draftPaymentOrder.title || "دستور پرداخت"}
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {draftPaymentOrder.amount != null && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-fog">مبلغ</span>
+                    <span className="text-sm font-semibold text-moonlight">
+                      {draftPaymentOrder.amount.toLocaleString("fa-IR")} ریال
+                    </span>
+                  </div>
+                )}
+                <Button
+                  className="w-full gap-2"
+                  size="sm"
+                  onClick={() => setShowPayConfirm(true)}
+                  disabled={paying}
+                >
+                  {paying ? <Loader2 className="size-4 animate-spin" /> : <CreditCard className="size-4" />}
+                  {paying ? "در حال ثبت..." : "تأیید پرداخت"}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Actions */}
           <div className="flex flex-col gap-2">
             {isPendingFinalization && (
@@ -475,6 +548,16 @@ export function OrgHeadPRDetailClient({ pr }: OrgHeadPRDetailClientProps) {
         onOpenChange={setShowFinalize}
         pr={pr}
         onSuccess={handleFinalizeSuccess}
+      />
+
+      <ConfirmDialog
+        open={showPayConfirm}
+        onOpenChange={(open) => { if (!open) setShowPayConfirm(false) }}
+        title="تأیید پرداخت"
+        description={`آیا از ثبت پرداخت به مبلغ ${draftPaymentOrder?.amount?.toLocaleString("fa-IR") || "—"} ریال اطمینان دارید؟`}
+        confirmLabel="تأیید پرداخت"
+        onConfirm={handleMarkPaid}
+        loading={paying}
       />
     </div>
   );

@@ -1,20 +1,29 @@
 import Link from "next/link"
-import { Clock, CheckCircle, ShoppingCart, Building2 } from "lucide-react"
+import { Clock, CheckCircle, ShoppingCart, Building2, Wallet } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { count } from "@/app/actions/purchasingRequest/count"
 import { gets } from "@/app/actions/purchasingRequest/gets"
+import { gets as getPaymentOrders } from "@/app/actions/paymentOrder/gets"
 import { getMe } from "@/app/actions/auth/getMe"
 
 export default async function OrgHeadDashboard() {
-  const [me, pendingRes, completedRes, totalRes, recentPRs] = await Promise.all([
+  const [me, pendingRes, completedRes, totalRes, recentPRs, receivedPRs, draftPOs] = await Promise.all([
     getMe({ _id: 1, organizations: { _id: 1, name: 1 }, roles: 1 }).catch(() => ({ success: false, body: null })),
-    count({ activeRoleId: "", filter: { status: "PendingFinalization" } }).catch(() => ({ success: false, body: { qty: 0 } })),
-    count({ activeRoleId: "", filter: { status: "Completed" } }).catch(() => ({ success: false, body: { qty: 0 } })),
-    count({ activeRoleId: "" }).catch(() => ({ success: false, body: { qty: 0 } })),
+    count({ status: "PendingFinalization" }).catch(() => ({ success: false, body: { qty: 0 } })),
+    count({ status: "Completed" }).catch(() => ({ success: false, body: { qty: 0 } })),
+    count({}).catch(() => ({ success: false, body: { qty: 0 } })),
     gets(
       { activeRoleId: "", page: 1, limit: 10 },
       { _id: 1, title: 1, status: 1, estimatedAmount: 1, createdAt: 1, requestingUnit: { _id: 1, name: 1 }, wareModel: { _id: 1, name: 1 } }
+    ).catch(() => ({ success: false, body: [] })),
+    gets(
+      { activeRoleId: "", page: 1, limit: 200, stuffStatus: "received" },
+      { _id: 1 }
+    ).catch(() => ({ success: false, body: [] })),
+    getPaymentOrders(
+      { activeRoleId: "", page: 1, limit: 200, status: "draft" },
+      { _id: 1, purchasingRequest: { _id: 1 } }
     ).catch(() => ({ success: false, body: [] })),
   ])
 
@@ -24,6 +33,15 @@ export default async function OrgHeadDashboard() {
   const totalCount = totalRes.success ? totalRes.body?.qty ?? 0 : 0
   const recentItems = recentPRs.success ? recentPRs.body || [] : []
 
+  const receivedPRsList = receivedPRs.success ? receivedPRs.body || [] : []
+  const draftPOList = draftPOs.success ? draftPOs.body || [] : []
+  const draftPOByPRId = new Set(
+    draftPOList
+      .filter((po: any) => po.purchasingRequest?._id)
+      .map((po: any) => po.purchasingRequest._id)
+  )
+  const paymentCount = receivedPRsList.filter((pr: any) => draftPOByPRId.has(pr._id)).length
+
   const stats = [
     {
       label: "در انتظار تأیید نهایی",
@@ -32,6 +50,14 @@ export default async function OrgHeadDashboard() {
       color: "text-indigo-400",
       bg: "bg-indigo-500/10",
       href: "/orghead/requests?tab=pending",
+    },
+    {
+      label: "نیازمند پرداخت",
+      value: paymentCount,
+      icon: Wallet,
+      color: "text-amber-400",
+      bg: "bg-amber-500/10",
+      href: "/orghead/requests?tab=payment",
     },
     {
       label: "تکمیل شده",
@@ -72,7 +98,7 @@ export default async function OrgHeadDashboard() {
       )}
 
       {/* Stats */}
-      <div className="grid gap-6 sm:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon
           return (
@@ -106,6 +132,12 @@ export default async function OrgHeadDashboard() {
           <Button variant="outline" className="gap-2">
             <Clock className="size-4" />
             درخواست‌های در انتظار تأیید
+          </Button>
+        </Link>
+        <Link href="/orghead/requests?tab=payment">
+          <Button variant="outline" className="gap-2">
+            <Wallet className="size-4" />
+            درخواست‌های نیازمند پرداخت
           </Button>
         </Link>
         <Link href="/orghead/requests?tab=completed">

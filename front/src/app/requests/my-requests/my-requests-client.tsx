@@ -3,9 +3,8 @@
 import Link from "next/link"
 import { ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { StatusBadge } from "@/components/ui/status-badge"
-import { DataTable } from "@/components/ui/data-table"
 import { Pagination } from "@/components/ui/pagination"
 import { EmptyState } from "@/components/ui/empty-state"
 
@@ -33,54 +32,33 @@ interface PRItem {
   createdAt?: string
 }
 
-const columns = [
-  {
-    key: "title",
-    label: "عنوان",
-    render: (item: PRItem) => (
-      <Link href={`/requests/${item._id}`} className="text-frost-link hover:underline font-medium">
-        {item.title || "—"}
-      </Link>
-    ),
-  },
-  {
-    key: "quantity",
-    label: "تعداد",
-    render: (item: PRItem) => item.quantity?.toLocaleString("fa-IR") || "—",
-  },
-  {
-    key: "status",
-    label: "وضعیت",
-    render: (item: PRItem) => <StatusBadge status={item.status || "draft"} labelMap={statusMap} />,
-  },
-  { key: "currentStep", label: "مرحله", render: (item: PRItem) => item.currentStep || "—" },
-  {
-    key: "createdAt",
-    label: "تاریخ",
-    render: (item: PRItem) => (item.createdAt ? new Date(item.createdAt).toLocaleDateString("fa-IR") : "—"),
-  },
-]
-
 interface MyRequestsClientProps {
   items: PRItem[]
   prevUrl: string
   nextUrl: string
   page: number
+  tab?: string
 }
 
-function MyRequestsClient({ items, prevUrl, nextUrl, page }: MyRequestsClientProps) {
+function MyRequestsClient({ items, prevUrl, nextUrl, page, tab }: MyRequestsClientProps) {
   if (items.length === 0) {
     return (
       <Card variant="glass">
         <CardContent className="py-12">
           <EmptyState
             icon={ShoppingCart}
-            title="درخواستی یافت نشد"
-            description="شما هنوز هیچ درخواست خریدی ثبت نکرده‌اید"
+            title={tab === "receipt" ? "کالایی برای تحویل نیست" : "درخواستی یافت نشد"}
+            description={tab === "receipt" ? "همه کالاهای شما تحویل داده شده‌اند" : "شما هنوز هیچ درخواست خریدی ثبت نکرده‌اید"}
             action={
-              <Link href="/requests/new">
-                <Button variant="default">ثبت درخواست جدید</Button>
-              </Link>
+              tab === "receipt" ? (
+                <Link href="/requests/my-requests">
+                  <Button variant="outline">مشاهده همه درخواست‌ها</Button>
+                </Link>
+              ) : (
+                <Link href="/requests/new">
+                  <Button variant="default">ثبت درخواست جدید</Button>
+                </Link>
+              )
             }
           />
         </CardContent>
@@ -90,26 +68,40 @@ function MyRequestsClient({ items, prevUrl, nextUrl, page }: MyRequestsClientPro
 
   return (
     <>
-      <Card variant="glass">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-fog">
-            {items.length} درخواست
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <DataTable
-            columns={columns}
-            data={items}
-            keyExtractor={(item: PRItem) => item._id}
-          />
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {items.map((item) => (
+          <Link key={item._id} href={`/requests/${item._id}`}>
+            <div className="glass-card glass-card-hover-active rounded-xl p-5 transition-all duration-200 cursor-pointer h-full">
+              <div className="flex items-start gap-3">
+                <div className="size-10 rounded-xl bg-electric-iris/10 flex items-center justify-center shrink-0 mt-0.5">
+                  <ShoppingCart className="size-5 text-electric-iris" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-base font-semibold text-moonlight leading-6 truncate">
+                    {item.title || "—"}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <StatusBadge status={item.status || "draft"} labelMap={statusMap} />
+                    {item.currentStep && (
+                      <span className="text-xs text-fog/50 truncate">مرحله {item.currentStep}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-xs text-fog/50">
+                {item.quantity != null && (
+                  <span>{item.quantity.toLocaleString("fa-IR")} عدد</span>
+                )}
+                {item.createdAt && (
+                  <span className="ms-auto">{new Date(item.createdAt).toLocaleDateString("fa-IR")}</span>
+                )}
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
 
-      <Pagination
-        prevUrl={prevUrl}
-        nextUrl={nextUrl}
-        page={page}
-      />
+      <Pagination prevUrl={prevUrl} nextUrl={nextUrl} page={page} />
     </>
   )
 }

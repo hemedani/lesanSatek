@@ -49,6 +49,7 @@ const unitTypeOptions = [
   { value: "Logistics", label: "تدارکات" },
   { value: "Production", label: "تولید" },
   { value: "Administration", label: "اداری" },
+  { value: "Finance", label: "مالی" },
   { value: "Expert", label: "کارشناسی" },
 ];
 

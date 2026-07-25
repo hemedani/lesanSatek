@@ -1,10 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { Pencil } from "lucide-react"
+import { Package, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { DataTable } from "@/components/ui/data-table"
-import type { Column } from "@/components/ui/data-table"
 import { Pagination } from "@/components/ui/pagination"
 
 interface StuffItem {
@@ -17,65 +15,6 @@ interface StuffItem {
   ware?: { _id?: string; name?: string }
 }
 
-const columns: Column<StuffItem>[] = [
-  {
-    key: "ware",
-    label: "کالا",
-    render: (item) => <span className="text-fog text-sm">{item.ware?.name || "—"}</span>,
-  },
-  {
-    key: "quantity",
-    label: "تعداد",
-    render: (item) => (
-      <span className="text-moonlight font-medium font-mono text-sm" dir="ltr">
-        {item.quantity != null ? item.quantity.toLocaleString("fa-IR") : "—"}
-      </span>
-    ),
-  },
-  {
-    key: "price",
-    label: "قیمت (ریال)",
-    render: (item) => (
-      <span className="text-fog text-sm font-mono" dir="ltr">
-        {item.price != null ? item.price.toLocaleString("fa-IR") : "—"}
-      </span>
-    ),
-  },
-  {
-    key: "expiration",
-    label: "انقضا",
-    render: (item) => (
-      <span className="text-fog text-sm">
-        {item.expiration ? new Date(item.expiration).toLocaleDateString("fa-IR") : "—"}
-      </span>
-    ),
-    hideOnCard: true,
-  },
-  {
-    key: "createdAt",
-    label: "تاریخ ایجاد",
-    render: (item) => (
-      <span className="text-fog text-sm">
-        {item.createdAt ? new Date(item.createdAt).toLocaleDateString("fa-IR") : "—"}
-      </span>
-    ),
-    hideOnCard: true,
-  },
-  {
-    key: "actions",
-    label: "",
-    render: (item) => (
-      <div className="flex items-center gap-1">
-        <Link href={`/storehead/stuff/${item._id}`}>
-          <Button variant="ghost" size="icon-xs">
-            <Pencil className="size-3.5" />
-          </Button>
-        </Link>
-      </div>
-    ),
-  },
-]
-
 interface StuffListClientProps {
   items: StuffItem[]
   prevPageUrl: string
@@ -87,8 +26,46 @@ interface StuffListClientProps {
 export function StuffListClient({ items, prevPageUrl, nextPageUrl, page, search }: StuffListClientProps) {
   return (
     <>
-      <div className="relative z-[1]">
-        <DataTable columns={columns} data={items} keyExtractor={(item) => item._id} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {items.map((item) => (
+          <div key={item._id} className="glass-card glass-card-hover-active rounded-xl p-5 transition-all duration-200 h-full">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3 min-w-0 flex-1">
+                <div className="size-10 rounded-xl bg-electric-iris/10 flex items-center justify-center shrink-0 mt-0.5">
+                  <Package className="size-5 text-electric-iris" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-base font-semibold text-moonlight leading-6 truncate">
+                    {item.ware?.name || "—"}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    {item.quantity != null && (
+                      <span className="text-sm font-mono text-fog" dir="ltr">
+                        {item.quantity.toLocaleString("fa-IR")} عدد
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <Link href={`/storehead/stuff/${item._id}`}>
+                <Button variant="ghost" size="icon-xs" className="shrink-0">
+                  <Pencil className="size-3.5" />
+                </Button>
+              </Link>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-xs text-fog/50">
+              {item.price != null && (
+                <span>{item.price.toLocaleString("fa-IR")} ریال</span>
+              )}
+              {item.expiration && (
+                <span>انقضا: {new Date(item.expiration).toLocaleDateString("fa-IR")}</span>
+              )}
+              {item.createdAt && (
+                <span className="ms-auto">{new Date(item.createdAt).toLocaleDateString("fa-IR")}</span>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
       <Pagination prevUrl={prevPageUrl} nextUrl={nextPageUrl} page={page} />
     </>

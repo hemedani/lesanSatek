@@ -57,7 +57,7 @@ const CONFIRM_MESSAGES: Record<string, { title: string; description: string }> =
   },
   delivered: {
     title: "تأیید تحویل",
-    description: "آیا از تحویل کالا به واحد درخواست‌کننده اطمینان دارید؟ با تأیید، موجودی کالا در فروشگاه کاهش می‌یابد.",
+    description: "آیا از تحویل کالا به مقصد اطمینان دارید؟",
   },
 }
 

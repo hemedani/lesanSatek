@@ -2,12 +2,11 @@
 
 import { AppApi } from "@/lib/api";
 import { getToken, getActiveRoleId } from "@/lib/auth";
+import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 
 export const count = async (
-  data: {
-    activeRoleId: string;
-    filter?: Record<string, unknown>;
-  }
+  data: Omit<ReqType["main"]["purchasingRequest"]["count"]["set"], "activeRoleId"> & { activeRoleId?: string },
+  getSelection?: DeepPartial<ReqType["main"]["purchasingRequest"]["count"]["get"]>
 ) => {
   try {
     const token = await getToken();
@@ -18,7 +17,7 @@ export const count = async (
       act: "count",
       details: {
         set: { ...data, activeRoleId },
-        get: { qty: 1 as const },
+        get: getSelection || { qty: 1 },
       },
     });
     return result;

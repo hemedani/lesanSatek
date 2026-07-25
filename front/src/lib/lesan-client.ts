@@ -56,7 +56,24 @@ export const lesanApi = (
       body: JSON.stringify(body),
     });
 
-    return await req.json();
+    const data = await req.json();
+
+    if (
+      data?.success === false &&
+      data?.body?.message === "user not exist" &&
+      (getSetting().headers as Record<string, string>)?.token
+    ) {
+      try {
+        const { cookies } = await import("next/headers");
+        const cookieStore = await cookies();
+        cookieStore.delete("token");
+        cookieStore.delete("activeRoleId");
+      } catch {
+        // Not in a server context — safe to ignore
+      }
+    }
+
+    return data;
   };
 
   return { send, setHeaders };

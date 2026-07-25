@@ -17,7 +17,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { SearchSelect } from "@/components/form/form-search-select";
 import { finalize } from "@/app/actions/purchasingRequest/finalize";
+import { gets as getBudgetLines } from "@/app/actions/budgetLine/gets";
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -78,6 +81,7 @@ export function FinalizeModal({ open, onOpenChange, pr, onSuccess }: FinalizeMod
   const [loading, setLoading] = useState(false);
   const [finalWinner, setFinalWinner] = useState<"stuff" | "tender" | null>(null);
   const [postSteps, setPostSteps] = useState<PostCompletionStepInput[]>([]);
+  const [budgetLineId, setBudgetLineId] = useState("");
 
   if (!pr) return null;
 
@@ -114,6 +118,7 @@ export function FinalizeModal({ open, onOpenChange, pr, onSuccess }: FinalizeMod
         {
           _id: pr._id,
           ...(needsWinnerSelection && finalWinner ? { finalWinner } : {}),
+          ...(budgetLineId ? { budgetLineId } : {}),
           ...(validSteps.length > 0 ? { postCompletionSteps: validSteps } : {}),
         },
         { _id: 1, title: 1, status: 1, finalizedAt: 1, completedAt: 1 }
@@ -280,6 +285,32 @@ export function FinalizeModal({ open, onOpenChange, pr, onSuccess }: FinalizeMod
               </p>
             </div>
           ) : null}
+
+          {/* Budget Line Override */}
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-moonlight">ردیف بودجه (اختیاری)</p>
+            <p className="text-xs text-fog/50">
+              در صورت نیاز می‌توانید ردیف بودجه متفاوتی را جایگزین کنید. بودجه جدید باید مانده کافی داشته باشد.
+            </p>
+            <SearchSelect
+              value={budgetLineId}
+              onChange={setBudgetLineId}
+              label="ردیف بودجه"
+              placeholder="جستجوی ردیف بودجه..."
+              fetcher={async (search?: string) => {
+                const result = await getBudgetLines(
+                  { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, title: search || undefined } as any,
+                  { _id: 1, code: 1, title: 1, remainingBudget: 1, totalAllocated: 1 }
+                )
+                if (!result.success || !result.body) return []
+                return result.body.map((b: { _id?: string; code?: string; title?: string; remainingBudget?: number; totalAllocated?: number }) => ({
+                  _id: b._id || "",
+                  name: `${b.code || ""} ${b.title || ""}`.trim(),
+                  sublabel: b.remainingBudget != null ? `${b.remainingBudget.toLocaleString("fa-IR")} ریال` : undefined,
+                }))
+              }}
+            />
+          </div>
 
           {/* Post-completion Steps */}
           <div className="space-y-3">
