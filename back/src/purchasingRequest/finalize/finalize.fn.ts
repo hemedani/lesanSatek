@@ -4,6 +4,7 @@ import {
   tender,
   tenderOffer,
   stuff,
+  budgetLine,
   coreApp,
 } from "../../../mod.ts";
 import type { MyContext } from "@lib";
@@ -14,7 +15,7 @@ export const finalizeFn: ActFn = async (body) => {
   const { user }: MyContext = coreApp.contextFns
     .getContextModel() as MyContext;
 
-  const { activeRoleId, _id, finalWinner, postCompletionSteps } = set;
+  const { activeRoleId, _id, finalWinner, budgetLineId, postCompletionSteps } = set;
 
   const activeRole = (user.roles || []).find(
     (r: { roleId: string }) => r.roleId === activeRoleId,
@@ -34,6 +35,7 @@ export const finalizeFn: ActFn = async (body) => {
       stuffStatus: 1,
       stuff: { _id: 1 },
       store: { _id: 1 },
+      estimatedAmount: 1,
       wareModel: { _id: 1, name: 1, enName: 1 },
       process: { _id: 1 },
     },
@@ -259,6 +261,47 @@ export const finalizeFn: ActFn = async (body) => {
     updateData.postCompletionSteps = postSteps;
   }
 
+  // Budget line override by OrgHead
+  let finalBudgetLineDoc: Record<string, unknown> | undefined;
+  if (budgetLineId) {
+    const blDocs = await budgetLine.aggregation({
+      pipeline: [{ $match: { _id: new ObjectId(budgetLineId as string) } }],
+      projection: { _id: 1, code: 1, title: 1, remainingBudget: 1 },
+    }).toArray();
+
+    if (blDocs.length === 0) {
+      throwError("Budget line not found");
+    }
+
+    const bl = blDocs[0];
+    const estimatedAmount = (req.estimatedAmount as number) || 0;
+    const remainingBudget = (bl.remainingBudget as number) || 0;
+
+    if (remainingBudget < estimatedAmount) {
+      throwError(
+        `Insufficient budget: remaining (${remainingBudget}) is less than required (${estimatedAmount})`,
+      );
+    }
+
+    await purchasingRequest.addRelation({
+      filters: { _id: prId },
+      relations: {
+        budgetLine: {
+          _ids: new ObjectId(budgetLineId as string),
+          relatedRelations: { purchasingRequests: true },
+        },
+      },
+      projection: { _id: 1 },
+      replace: true,
+    });
+
+    finalBudgetLineDoc = {
+      _id: bl._id.toString(),
+      code: bl.code as string,
+      title: bl.title as string,
+    };
+  }
+
   const historyPush: Record<string, unknown> = {
     action: "finalized",
     performed: {
@@ -278,6 +321,7 @@ export const finalizeFn: ActFn = async (body) => {
       finalWinner: resolvedFinalWinner,
       winningStoreId,
       ...(tenderAwardDetails || {}),
+      ...(finalBudgetLineDoc ? { budgetLine: finalBudgetLineDoc } : {}),
     },
   };
 

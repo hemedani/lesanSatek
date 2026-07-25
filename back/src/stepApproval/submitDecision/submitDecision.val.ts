@@ -13,6 +13,7 @@ export const submitDecisionValidator = () => {
       unitId: optional(objectIdValidation),
       status: enums(decision_status_array),
       comment: optional(string()),
+      budgetLineId: optional(objectIdValidation),
     }),
     get: selectStruct("stepApproval", 2),
   });

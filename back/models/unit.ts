@@ -71,7 +71,7 @@ import {
 } from "./excludes.ts";
 import { feature_enums } from "./featureConstants.ts";
 
-export const unit_type_array = ["General", "Warehouse", "Logistics", "Production", "Administration", "Expert"];
+export const unit_type_array = ["General", "Warehouse", "Logistics", "Production", "Administration", "Finance", "Expert"];
 export const unit_type_emums = enums(unit_type_array);
 
 export const unit_pure = {

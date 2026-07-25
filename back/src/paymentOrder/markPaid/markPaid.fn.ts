@@ -1,5 +1,5 @@
 import { type ActFn, ObjectId } from "lesan";
-import { paymentOrder, budgetEncumbrance, budgetLine } from "../../../mod.ts";
+import { paymentOrder, budgetEncumbrance, budgetLine, purchasingRequest } from "../../../mod.ts";
 
 export const markPaidFn: ActFn = async (body) => {
   const { set, get } = body.details;
@@ -75,6 +75,44 @@ export const markPaidFn: ActFn = async (body) => {
               projection: { _id: 1 },
             });
           }
+        }
+      }
+    }
+  }
+
+  // Deduct payment amount from budget line's totalAllocated
+  if (order) {
+    const prRef = (order.purchasingRequest as Record<string, unknown>)?._id as string;
+    if (prRef) {
+      const prDoc = await purchasingRequest.findOne({
+        filters: { _id: new ObjectId(prRef) },
+        projection: { budgetLine: { _id: 1 } },
+      }) as Record<string, unknown> | null;
+
+      const prBlId = (prDoc?.budgetLine as Record<string, unknown>)?._id as string;
+      const paymentAmount = (order.amount as number) || 0;
+
+      if (prBlId && paymentAmount > 0) {
+        const bl = await budgetLine.findOne({
+          filters: { _id: new ObjectId(prBlId) },
+          projection: { _id: 1, totalAllocated: 1, totalEncumbered: 1, totalSpent: 1 },
+        }) as Record<string, unknown>;
+
+        if (bl) {
+          const currentAllocated = (bl.totalAllocated as number) || 0;
+          const currentEncumbered = (bl.totalEncumbered as number) || 0;
+          const currentSpent = (bl.totalSpent as number) || 0;
+          await budgetLine.findOneAndUpdate({
+            filter: { _id: new ObjectId(prBlId) },
+            update: {
+              $inc: { totalAllocated: -paymentAmount },
+              $set: {
+                remainingBudget: (currentAllocated - paymentAmount) - currentEncumbered - currentSpent,
+                updatedAt: new Date(),
+              },
+            },
+            projection: { _id: 1 },
+          });
         }
       }
     }

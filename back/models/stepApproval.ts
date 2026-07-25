@@ -39,6 +39,7 @@ import {
   string,
 } from "lesan";
 import {
+  budgetLine_excludes,
   purchasingRequest_excludes,
   processStep_excludes,
   unit_excludes,
@@ -109,6 +110,13 @@ export const stepApproval_relations = {
         },
       },
     },
+  },
+  budgetLine: {
+    schemaName: "budgetLine",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: budgetLine_excludes,
+    relatedRelations: {},
   },
   decidedBy: {
     schemaName: "user",

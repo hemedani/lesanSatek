@@ -8,6 +8,7 @@ export const finalizeValidator = () => {
       ...activeRoleMixin,
       _id: objectIdValidation,
       finalWinner: optional(enums(["stuff", "tender"])),
+      budgetLineId: optional(objectIdValidation),
       postCompletionSteps: optional(array(object({
         name: string(),
         unitId: objectIdValidation,
