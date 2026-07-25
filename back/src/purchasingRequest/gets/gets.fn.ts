@@ -51,6 +51,12 @@ export const getsFn: ActFn = async (body) => {
         $match: { "requestingUnit._id": new ObjectId(activeRole.scopeId) },
       });
     }
+  } else if (activeRole.name === "OrgHead") {
+    if (activeRole.scopeType === "organization" && activeRole.scopeId) {
+      pipeline.push({
+        $match: { "organization._id": new ObjectId(activeRole.scopeId) },
+      });
+    }
   } else if (activeRole.name === "StoreHead") {
     if (activeRole.scopeType === "store" && activeRole.scopeId) {
       pipeline.push({
@@ -111,9 +117,8 @@ export const getsFn: ActFn = async (body) => {
 
   if (unitId) {
     if (!["Manager", "Admin", "OrgHead"].includes(activeRole.name)) {
-      const uId = new ObjectId(unitId as string);
       const unitDoc = await unit.aggregation({
-        pipeline: [{ $match: { _id: uId } }],
+        pipeline: [{ $match: { _id: new ObjectId(unitId as string) } }],
         projection: { head: { _id: 1 } },
       }).toArray();
 
@@ -125,32 +130,9 @@ export const getsFn: ActFn = async (body) => {
       }
     }
 
-    const unitObjId = new ObjectId(unitId as string);
-    pipeline.push(
-      {
-        $lookup: {
-          from: "stepApproval",
-          let: { prId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$purchasingRequest._id", "$$prId"] },
-                    { $eq: ["$unit._id", unitObjId] },
-                    { $eq: ["$status", "pending"] },
-                  ],
-                },
-              },
-            },
-            { $limit: 1 },
-          ],
-          as: "_unitPendingApprovals",
-        },
-      },
-      { $match: { $or: [{ _unitPendingApprovals: { $ne: [] } }, { status: "Draft" }] } },
-      { $project: { _unitPendingApprovals: 0 } },
-    );
+    pipeline.push({
+      $match: { "requestingUnit._id": new ObjectId(unitId as string) },
+    });
   }
 
   if (search && (!sortBy || sortBy === "relevance")) {
