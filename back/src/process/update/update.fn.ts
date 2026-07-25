@@ -23,7 +23,7 @@ export const updateFn: ActFn = async (body) => {
     const activeRequestCount = await purchasingRequest.countDocument({
       filter: {
         process: new ObjectId(_id as string),
-        status: { $in: ["Pending", "InProgress", "Approved"] },
+        status: { $in: ["Pending", "InProgress", "Approved", "PendingFinalization"] },
       },
     });
 

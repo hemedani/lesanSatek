@@ -37,7 +37,7 @@ export const getPendingByUnitFn: ActFn = async (body) => {
   const pipeline: Document[] = [
     {
       $match: {
-        status: { $nin: ["Completed", "Rejected", "Cancelled"] },
+        status: { $nin: ["PendingFinalization", "Completed", "Rejected", "Cancelled"] },
       },
     },
   ];

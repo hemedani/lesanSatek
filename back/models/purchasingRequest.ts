@@ -4,7 +4,8 @@
  * The core procurement document. Created as Draft, then submitted (Pending) to
  * begin the workflow. Each PR is for a single WareModel with a specific quantity.
  * The lifecycle: Draft → submit() → Pending → (step approvals) → InProgress →
- * Approved → (tender/award/PO) → goodsReceipt → Completed.
+ * Approved → (tender/award/PO) → goodsReceipt → PendingFinalization →
+ * OrgHead finalize() → Completed.
  * Also supports budget encumbrance auto-creation on submit and tender integration.
  *
  * Pure fields: title, description, estimatedAmount, quantity,
@@ -76,6 +77,7 @@ import {
   wareType_excludes,
   wareClass_excludes,
   wareGroup_excludes,
+  organization_excludes,
 } from "./excludes.ts";
 
 export const request_status_array = [
@@ -83,6 +85,7 @@ export const request_status_array = [
   "Pending",
   "InProgress",
   "Approved",
+  "PendingFinalization",
   "Rejected",
   "Completed",
   "Cancelled",
@@ -104,6 +107,17 @@ export const purchasingRequest_pure = {
   currentStep: defaulted(number(), 0),
   requestedAt: optional(coerce(date(), string(), (value) => new Date(value))),
   completedAt: optional(coerce(date(), string(), (value) => new Date(value))),
+  finalizedAt: optional(coerce(date(), string(), (value) => new Date(value))),
+  postCompletionSteps: defaulted(
+    array(object({
+      name: string(),
+      description: optional(string()),
+      unitId: string(),
+      comment: optional(string()),
+      status: defaulted(string(), "pending"),
+    })),
+    [],
+  ),
   quantity: number(),
   stuffStatus: defaulted(string(), "none"),
   selectionType: defaulted(string(), "none"),
@@ -171,6 +185,22 @@ export const purchasingRequest_relations = {
     type: "single" as RelationDataType,
     optional: true,
     excludes: unit_excludes,
+    relatedRelations: {
+      purchaseRequests: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  organization: {
+    schemaName: "organization",
+    type: "single" as RelationDataType,
+    optional: true,
+    excludes: organization_excludes,
     relatedRelations: {
       purchaseRequests: {
         type: "multiple" as RelationDataType,

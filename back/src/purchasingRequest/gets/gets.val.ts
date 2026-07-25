@@ -17,6 +17,8 @@ export const getsValidator = () => {
         "submitted",
         "step_approved",
         "step_rejected",
+        "all_steps_approved",
+        "finalized",
         "goods_received",
         "payment_ordered",
         "goods_consumed",

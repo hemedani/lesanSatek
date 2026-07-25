@@ -4,9 +4,6 @@ import {
   purchasingRequest,
   processStep,
   unit,
-  tender,
-  tenderOffer,
-  stuff,
   coreApp,
 } from "../../../mod.ts";
 import type { MyContext } from "@lib";
@@ -259,13 +256,12 @@ export const submitDecisionFn: ActFn = async (body) => {
         filter: { _id: prId },
         update: {
           $set: {
-            status: "Completed",
-            completedAt: now,
+            status: "PendingFinalization",
             updatedAt: now,
           },
           $push: {
             history: {
-              action: "step_approved",
+              action: "all_steps_approved",
               performed: {
                 by: user._id.toString(),
                 name: `${user.first_name} ${user.last_name}`,
@@ -284,165 +280,13 @@ export const submitDecisionFn: ActFn = async (body) => {
                 stepType,
                 unitId,
                 comment: comment || "",
-                completed: true,
+                pendingFinalization: true,
               },
             },
           },
         },
         projection: { _id: 1 },
       });
-
-      // --- Deferred Tender Award ---
-      // If the PR used the tender path and has a selected offer, award the tender now
-      if (req.selectionType === "tender" && req.selectedTenderOfferId) {
-        const selectedTenderOfferId = req.selectedTenderOfferId as string;
-        const prQuantity = (req.quantity as number) || 0;
-        const prWareModel = req.wareModel as Record<string, unknown> | undefined;
-        const wareModelId = prWareModel?._id?.toString();
-
-        const awardOfferDocs = await tenderOffer.aggregation({
-          pipeline: [
-            { $match: { _id: new ObjectId(selectedTenderOfferId) } },
-            { $limit: 1 },
-          ],
-          projection: {
-            _id: 1, price: 1,
-            store: { _id: 1, name: 1 },
-            tender: { _id: 1, title: 1, status: 1 },
-          },
-        }).toArray();
-
-        if (
-          awardOfferDocs.length > 0 &&
-          (awardOfferDocs[0].tender as Record<string, unknown> | undefined)?.status === "closed"
-        ) {
-          const winningOffer = awardOfferDocs[0] as Record<string, unknown>;
-          const tenderRef = winningOffer.tender as Record<string, unknown> | undefined;
-          const tenderId = tenderRef?._id as ObjectId;
-          const winningStoreId = (winningOffer.store as Record<string, unknown>)?._id?.toString();
-          const offerPrice = (winningOffer.price as number) || 0;
-
-          // Set tender status to "awarded"
-          await tender.findOneAndUpdate({
-            filter: { _id: tenderId },
-            update: { $set: { status: "awarded", updatedAt: now } },
-            projection: { _id: 1 },
-          });
-
-          // Accept winning offer
-          await tenderOffer.findOneAndUpdate({
-            filter: { _id: new ObjectId(selectedTenderOfferId) },
-            update: { $set: { status: "accepted", updatedAt: now } },
-            projection: { _id: 1 },
-          });
-
-          // Reject all other offers on this tender
-          const otherOffers = await tenderOffer.aggregation({
-            pipeline: [
-              {
-                $match: {
-                  "tender._id": tenderId,
-                  _id: { $ne: new ObjectId(selectedTenderOfferId) },
-                },
-              },
-            ],
-            projection: { _id: 1 },
-          }).toArray();
-
-          for (const o of otherOffers) {
-            await tenderOffer.findOneAndUpdate({
-              filter: { _id: o._id as ObjectId },
-              update: { $set: { status: "rejected", updatedAt: now } },
-              projection: { _id: 1 },
-            });
-          }
-
-          // Find a Stuff matching winning store + PR's wareModel
-          let stuffId: string | undefined;
-          if (winningStoreId && wareModelId) {
-            const stuffDocs = await stuff.aggregation({
-              pipeline: [
-                {
-                  $match: {
-                    "store._id": new ObjectId(winningStoreId),
-                    "wareModel._id": new ObjectId(wareModelId),
-                  },
-                },
-                { $limit: 1 },
-              ],
-              projection: { _id: 1 },
-            }).toArray();
-            if (stuffDocs.length > 0) {
-              stuffId = stuffDocs[0]._id.toString();
-            }
-          }
-
-          const awardEstimatedAmount = Math.round(offerPrice * prQuantity * 100) / 100;
-
-          // Link stuff + store on the PR
-          const prRel: Record<string, unknown> = {};
-          if (stuffId) {
-            prRel.stuff = {
-              _ids: new ObjectId(stuffId),
-              relatedRelations: { purchasingRequests: true },
-            };
-          }
-          if (winningStoreId) {
-            prRel.store = {
-              _ids: new ObjectId(winningStoreId),
-              relatedRelations: { purchasingRequests: true },
-            };
-          }
-          if (Object.keys(prRel).length > 0) {
-            await purchasingRequest.addRelation({
-              filters: { _id: prId },
-              relations: prRel,
-              projection: { _id: 1 },
-              replace: true,
-            });
-          }
-
-          await purchasingRequest.findOneAndUpdate({
-            filter: { _id: prId },
-            update: {
-              $set: {
-                stuffStatus: "assigned",
-                estimatedAmount: awardEstimatedAmount,
-                updatedAt: now,
-              },
-              $push: {
-                history: {
-                  action: "tender_awarded",
-                  performed: {
-                    by: user._id.toString(),
-                    name: `${user.first_name} ${user.last_name}`,
-                    at: now,
-                    role: activeRole
-                      ? {
-                        id: activeRole.roleId,
-                        name: activeRole.name,
-                        scopeType: activeRole.scopeType,
-                        scopeId: activeRole.scopeId,
-                      }
-                      : { id: "", name: "" },
-                  },
-                  details: {
-                    tenderId: tenderId.toString(),
-                    tenderOfferId: selectedTenderOfferId,
-                    offerPrice,
-                    storeId: winningStoreId,
-                    stuffId,
-                    wareModelId,
-                    quantity: prQuantity,
-                    estimatedAmount: awardEstimatedAmount,
-                  },
-                },
-              },
-            },
-            projection: { _id: 1 },
-          });
-        }
-      }
     }
   } else if (overallStatus === "rejected") {
     await purchasingRequest.findOneAndUpdate({
