@@ -464,6 +464,21 @@
     "captures": []
   },
   {
+    "id": "gen-orghead-login",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"login\", \"details\": {\"set\": {\"email\": \"dr.ahmadi@lesansatek.com\", \"password\": \"password123\"}, \"get\": {\"token\": 1, \"user\": {\"_id\": 1, \"email\": 1, \"roles\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "orgHeadToken",
+        "value": "[body][token]"
+      },
+      {
+        "key": "orgHeadRoleId",
+        "value": "[body][user][roles][1][roleId]"
+      }
+    ]
+  },
+  {
     "id": "gen-mfr",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"manufacturer\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"تولیدکننده نمونه\", \"enName\": \"تولیدکننده نمونه\", \"country\": \"ایران\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,
@@ -1008,6 +1023,12 @@
     "captures": []
   },
   {
+    "id": "gen-orghead-finalize",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"finalize\", \"details\": {\"set\": {\"_id\": \"{prId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"status\": 1, \"finalizedAt\": 1, \"completedAt\": 1, \"postCompletionSteps\": 1, \"history\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
     "id": "gen-history",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"getHistory\", \"details\": {\"set\": {\"_id\": \"{prId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {}}}}",
     "repeat": 1,
@@ -1133,7 +1154,6 @@
     "repeat": 1,
     "captures": []
   },
-
   {
     "id": "gen-tag",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"tag\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"فوری\", \"color\": \"#FF0000\", \"description\": \"موارد فوری\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
@@ -1270,7 +1290,7 @@
     ]
   },
   {
-        "id": "storehead-stuff-gets",
+    "id": "storehead-stuff-gets",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{saraRoleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"price\": 1}}}}",
     "repeat": 1,
     "captures": []
