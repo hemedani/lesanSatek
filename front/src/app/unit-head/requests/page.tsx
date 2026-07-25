@@ -3,6 +3,7 @@ import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
 import { cookies } from "next/headers"
 import { getMe } from "@/app/actions/user/getMe"
 import { RequestsClient } from "./requests-client"
+import { ReqType } from "@/types/declarations/selectInp"
 
 interface PRItem {
   _id: string
@@ -44,7 +45,7 @@ export default async function UnitHeadRequestsPage({
   }
 
   const result = await getPRs(
-    { page, limit, unitId, search, status },
+    { page, limit, unitId, search, status: status as ReqType["main"]["purchasingRequest"]["gets"]["set"]["status"] || undefined },
     {
       _id: 1,
       title: 1,
