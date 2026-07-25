@@ -6,6 +6,7 @@ import {
   ShoppingBag,
   Store,
   Package,
+  Building2,
   type LucideIcon,
 } from "lucide-react"
 
@@ -76,6 +77,14 @@ export const PANEL_DEFINITIONS: PanelDef[] = [
     description: "مدیریت فروشگاه، کالاها و مناقصات",
     requiredRole: ["StoreHead"],
   },
+  {
+    id: "orghead",
+    path: "/orghead",
+    label: "داشبورد سازمان",
+    icon: Building2,
+    description: "تأیید نهایی درخواست‌های خرید",
+    requiredRole: ["OrgHead"],
+  },
 ]
 
 function getUserRoleNames(
@@ -113,7 +122,10 @@ export function getDefaultPanel(
   const roleNames = getUserRoleNames(user)
   const featureNames = getUserFeatures(user)
 
-  if (roleNames.some((r) => ["Manager", "Admin", "OrgHead"].includes(r))) {
+  if (roleNames.includes("OrgHead")) {
+    return "/orghead"
+  }
+  if (roleNames.some((r) => ["Manager", "Admin"].includes(r))) {
     return "/admin"
   }
   if (roleNames.includes("UnitHead")) {

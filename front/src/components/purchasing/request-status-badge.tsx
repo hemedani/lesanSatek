@@ -7,6 +7,7 @@ const statusConfig: Record<string, { label: string; className: string }> = {
   InProgress: { label: "در حال انجام", className: "bg-sky-500/10 text-sky-400 border-sky-500/20" },
   Approved: { label: "تأیید شده", className: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
   Rejected: { label: "رد شده", className: "bg-rose-500/10 text-rose-400 border-rose-500/20" },
+  PendingFinalization: { label: "در انتظار تأیید نهایی", className: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" },
   Completed: { label: "تکمیل شده", className: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
   Cancelled: { label: "لغو شده", className: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20" },
 };

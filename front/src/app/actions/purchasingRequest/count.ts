@@ -6,6 +6,7 @@ import { getToken, getActiveRoleId } from "@/lib/auth";
 export const count = async (
   data: {
     activeRoleId: string;
+    filter?: Record<string, unknown>;
   }
 ) => {
   try {

@@ -10,6 +10,8 @@ const panelRoutes = [
   "/requests",
   "/finance",
   "/vendor",
+  "/storehead",
+  "/orghead",
 ]
 
 export function middleware(request: NextRequest) {
