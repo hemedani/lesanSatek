@@ -8,6 +8,7 @@ export const updateRelationsValidator = () => {
       ...activeRoleMixin,
       _id: objectIdValidation,
       requestingUnitId: optional(objectIdValidation),
+      organizationId: optional(objectIdValidation),
       attachmentIds: optional(array(objectIdValidation)),
       tenderId: optional(string()),
       stepApprovalIds: optional(array(objectIdValidation)),

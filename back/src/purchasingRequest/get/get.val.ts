@@ -9,6 +9,7 @@ export const getValidator = () => {
       _id: objectIdValidation,
     }),
     get: selectStruct("purchasingRequest", {
+      organization: { _id: 1, name: 1, enName: 1 },
       stuff: { _id: 1, quantity: 1, price: 1 },
       requester: { _id: 1, first_name: 1, last_name: 1 },
       requestingUnit: { _id: 1, name: 1 },

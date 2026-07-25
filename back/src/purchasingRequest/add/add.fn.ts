@@ -35,6 +35,7 @@ export const addFn: ActFn = async (body) => {
     throwError("Could not determine organization. Please ensure you belong to an organization.");
     return;
   }
+  const orgId = userOrgs[0]._id as ObjectId;
 
   const result = await purchasingRequest.insertOne({
     doc: {
@@ -71,6 +72,10 @@ export const addFn: ActFn = async (body) => {
       },
       requestingUnit: {
         _ids: new ObjectId(requestingUnitId),
+        relatedRelations: { purchaseRequests: true },
+      },
+      organization: {
+        _ids: orgId,
         relatedRelations: { purchaseRequests: true },
       },
     },

@@ -12,7 +12,7 @@ import { throwError } from "../../../utils/throwError.ts";
 
 export const updateRelationsFn: ActFn = async (body) => {
   const {
-    set: { _id, requestingUnitId, attachmentIds, tenderId, stepApprovalIds, goodsReceiptIds, paymentOrderIds, budgetLineId, storeId, wareId, wareTypeId, wareClassId, wareGroupId },
+    set: { _id, requestingUnitId, organizationId, attachmentIds, tenderId, stepApprovalIds, goodsReceiptIds, paymentOrderIds, budgetLineId, storeId, wareId, wareTypeId, wareClassId, wareGroupId },
     get,
   } = body.details;
 
@@ -35,6 +35,28 @@ export const updateRelationsFn: ActFn = async (body) => {
       projection: get,
       replace: true,
     });
+  }
+
+  if (organizationId !== undefined) {
+    if (organizationId) {
+      await purchasingRequest.addRelation({
+        filters: { _id: requestId },
+        relations: {
+          organization: {
+            _ids: new ObjectId(organizationId as string),
+            relatedRelations: { purchaseRequests: true },
+          },
+        },
+        projection: get,
+        replace: true,
+      });
+    } else {
+      await purchasingRequest.findOneAndUpdate({
+        filter: { _id: requestId },
+        update: { $unset: { organization: "" } },
+        projection: get,
+      });
+    }
   }
 
   if (attachmentIds !== undefined) {
