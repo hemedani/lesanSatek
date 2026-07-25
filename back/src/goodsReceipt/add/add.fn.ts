@@ -1,6 +1,7 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { goodsReceipt, purchasingRequest, paymentOrder, processStep, stepApproval, budgetEncumbrance, budgetLine, coreApp } from "../../../mod.ts";
+import { goodsReceipt, purchasingRequest, paymentOrder, processStep, stepApproval, budgetEncumbrance, budgetLine, unit, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
+import { throwError } from "../../../utils/throwError.ts";
 import { addStock } from "../../../utils/inventoryManager.ts";
 import { evaluateStepStatus } from "../../../utils/stepEvaluator.ts";
 
@@ -47,6 +48,60 @@ export const addFn: ActFn = async (body) => {
     };
   }
 
+  // Fetch PR for authorization check + data extraction
+  let prDoc: Record<string, unknown> | null = null;
+  let prStoreId: string | undefined;
+  let prEstimatedAmount = 0;
+  let prQuantity = 0;
+  if (purchasingRequestId) {
+    prDoc = await purchasingRequest.findOne({
+      filters: { _id: new ObjectId(purchasingRequestId as string) },
+      projection: {
+        store: { _id: 1 }, estimatedAmount: 1, quantity: 1, stuffStatus: 1,
+        requester: { _id: 1 }, requestingUnit: { _id: 1 },
+      },
+    }) as Record<string, unknown> | null;
+
+    if (!prDoc) {
+      throwError("Purchasing request not found");
+      return;
+    }
+    const pr = prDoc as Record<string, unknown>;
+
+    // Authorization: only the requester or a warehouse head can confirm goods delivery
+    const isRequester = pr.requester &&
+      (pr.requester as Record<string, unknown>)._id?.toString() === user._id.toString();
+
+    let isWarehouseHead = false;
+    if (!isRequester) {
+      const warehouseUnits = await unit.aggregation({
+        pipeline: [
+          { $match: { type: "Warehouse", "head._id": user._id } },
+          { $limit: 1 },
+        ],
+        projection: { _id: 1 },
+      }).toArray();
+      isWarehouseHead = warehouseUnits.length > 0;
+    }
+
+    if (!isRequester && !isWarehouseHead) {
+      throwError("Only the requester or the central warehouse head can confirm goods delivery");
+    }
+
+    // Validate receivingUnitId matches the appropriate unit
+    const prRequestingUnitId = (pr.requestingUnit as Record<string, unknown>)?._id?.toString();
+    if (isRequester && receivingUnitId !== prRequestingUnitId) {
+      throwError("As the requester, goods must be received into your requesting unit");
+    }
+
+    // Extract store/pricing data
+    if (pr.store) {
+      prStoreId = ((pr.store as Record<string, unknown>)._id as ObjectId).toString();
+    }
+    prEstimatedAmount = (pr.estimatedAmount as number) || 0;
+    prQuantity = (pr.quantity as number) || 0;
+  }
+
   const result = await goodsReceipt.insertOne({
     doc: rest,
     relations,
@@ -68,22 +123,6 @@ export const addFn: ActFn = async (body) => {
   }>) || [];
 
   const userId = receivedById ? (receivedById as string) : `${user._id}`;
-
-  // Get PR's store + pricing info for inventory traceability and auto-payment
-  let prStoreId: string | undefined;
-  let prEstimatedAmount = 0;
-  let prQuantity = 0;
-  if (purchasingRequestId) {
-    const prDoc = await purchasingRequest.findOne({
-      filters: { _id: new ObjectId(purchasingRequestId as string) },
-      projection: { store: { _id: 1 }, estimatedAmount: 1, quantity: 1, stuffStatus: 1 },
-    }) as Record<string, unknown> | null;
-    if (prDoc?.store) {
-      prStoreId = ((prDoc.store as Record<string, unknown>)._id as ObjectId).toString();
-    }
-    prEstimatedAmount = (prDoc?.estimatedAmount as number) || 0;
-    prQuantity = (prDoc?.quantity as number) || 0;
-  }
 
   // Calculate order total from PR's estimatedAmount (prorated by accepted quantity)
   let orderTotal = 0;

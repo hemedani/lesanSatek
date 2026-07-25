@@ -42,6 +42,9 @@ export const getsValidator = () => {
       wareClassId: optional(objectIdValidation),
       wareGroupId: optional(objectIdValidation),
       unitId: optional(objectIdValidation),
+      stuffStatus: optional(enums([
+        "none", "assigned", "ready_to_ship", "shipped", "delivered", "received", "cancelled",
+      ])),
     }),
     get: selectStruct("purchasingRequest", 2),
   });

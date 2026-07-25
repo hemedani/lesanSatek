@@ -1,8 +1,7 @@
 import { type ActFn, ObjectId } from "lesan";
-import { purchasingRequest, stuff, coreApp } from "../../../mod.ts";
+import { purchasingRequest, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
-import { addStock } from "../../../utils/inventoryManager.ts";
 
 const validStatuses = ["assigned", "ready_to_ship", "shipped", "delivered"];
 
@@ -87,54 +86,6 @@ export const updateStuffStatusFn: ActFn = async (body) => {
     },
     projection: { _id: 1 },
   });
-
-  if (stuffStatus === "delivered") {
-    const prStuff = pr.stuff as Record<string, unknown> | undefined;
-    const prQuantity = pr.quantity as number || 0;
-    const prWareModel = pr.wareModel as Record<string, unknown> | undefined;
-    const prRequestingUnit = pr.requestingUnit as Record<string, unknown> | undefined;
-
-    const prWareModelId = prWareModel?._id?.toString();
-    const prRequestingUnitId = prRequestingUnit?._id?.toString();
-
-    if (prStuff?._id && prQuantity > 0) {
-      const stuffId = new ObjectId(prStuff._id.toString());
-      const stuffDoc = await stuff.aggregation({
-        pipeline: [
-          { $match: { _id: stuffId } },
-          { $limit: 1 },
-        ],
-        projection: { _id: 1, quantity: 1 },
-      }).toArray();
-
-      if (stuffDoc.length > 0) {
-        const currentQty = (stuffDoc[0] as Record<string, unknown>).quantity as number || 0;
-        const newQty = Math.max(0, currentQty - prQuantity);
-
-        await stuff.findOneAndUpdate({
-          filter: { _id: stuffId },
-          update: { $set: { quantity: newQty, updatedAt: now } },
-          projection: { _id: 1 },
-        });
-      }
-    }
-
-    if (prRequestingUnitId && prWareModelId && prQuantity > 0) {
-      await addStock(
-        prRequestingUnitId,
-        prWareModelId,
-        prQuantity,
-        "goods_receipt",
-        user._id.toString(),
-        {
-          referenceType: "purchasingRequest",
-          referenceId: prId.toString(),
-          description: `Store delivery for PR ${prId}`,
-          storeId: (pr.store as Record<string, unknown>)?._id?.toString(),
-        },
-      );
-    }
-  }
 
   return await purchasingRequest.findOne({
     filters: { _id: prId },

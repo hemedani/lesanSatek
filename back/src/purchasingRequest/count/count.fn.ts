@@ -29,6 +29,11 @@ export const countFn: ActFn = async (body) => {
     if (activeRole.scopeType === "unit" && activeRole.scopeId) {
       filters["requestingUnit._id"] = new ObjectId(activeRole.scopeId);
     }
+  } else if (activeRole.name === "StoreHead") {
+    if (activeRole.scopeType === "store" && activeRole.scopeId) {
+      filters["store._id"] = new ObjectId(activeRole.scopeId);
+      filters["finalizedAt"] = { $exists: true };
+    }
   }
 
   status && (filters["status"] = status);

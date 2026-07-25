@@ -23,6 +23,7 @@ export const getsFn: ActFn = async (body) => {
       wareClassId,
       wareGroupId,
       unitId,
+      stuffStatus,
       activeRoleId,
     },
     get,
@@ -60,7 +61,10 @@ export const getsFn: ActFn = async (body) => {
   } else if (activeRole.name === "StoreHead") {
     if (activeRole.scopeType === "store" && activeRole.scopeId) {
       pipeline.push({
-        $match: { "store._id": new ObjectId(activeRole.scopeId) },
+        $match: {
+          "store._id": new ObjectId(activeRole.scopeId),
+          finalizedAt: { $exists: true },
+        },
       });
     }
   }
@@ -113,6 +117,11 @@ export const getsFn: ActFn = async (body) => {
   wareGroupId &&
     pipeline.push({
       $match: { "wareGroup._id": new ObjectId(wareGroupId as string) },
+    });
+
+  stuffStatus &&
+    pipeline.push({
+      $match: { stuffStatus },
     });
 
   if (unitId) {

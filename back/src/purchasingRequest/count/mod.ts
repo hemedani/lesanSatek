@@ -13,7 +13,7 @@ export const countSetup = () =>
       setUser,
       grantAccess([
         { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead", "UnitHead", "Employee"] },
+        { roles: ["OrgHead", "UnitHead", "Employee", "StoreHead"] },
       ]),
     ],
     validator: countValidator(),
