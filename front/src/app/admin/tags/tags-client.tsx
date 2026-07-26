@@ -99,7 +99,7 @@ const tagSchema = z.object({
   description: z.string().optional(),
 });
 
-type TagData = z.input<typeof tagSchema>;
+type TagData = z.infer<typeof tagSchema>;
 
 const TAG_COLORS = [
   { value: "#ef4444", label: "قرمز" },

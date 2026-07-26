@@ -24,7 +24,7 @@ const schema = z.object({
   fiscalYearId: z.string().min(1, "انتخاب سال مالی الزامی است"),
 });
 
-type FormData = z.input<typeof schema>;
+type FormData = z.infer<typeof schema>;
 
 interface FiscalYearOption {
   _id: string;

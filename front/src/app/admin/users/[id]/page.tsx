@@ -38,7 +38,7 @@ const userSchema = z.object({
   birth_date: z.string().optional(),
 });
 
-type UserData = z.input<typeof userSchema>;
+type UserData = z.infer<typeof userSchema>;
 
 export default function EditUserPage({
   params,

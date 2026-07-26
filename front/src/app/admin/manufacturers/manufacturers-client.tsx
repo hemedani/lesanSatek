@@ -44,7 +44,7 @@ const manufacturerSchema = z.object({
   country: z.string().optional(),
 });
 
-type ManufacturerData = z.input<typeof manufacturerSchema>;
+type ManufacturerData = z.infer<typeof manufacturerSchema>;
 
 export function ManufacturersClient({
   items,

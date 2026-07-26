@@ -64,7 +64,7 @@ const inventorySchema = z.object({
   wareId: z.string().optional(),
 });
 
-type InventoryData = z.input<typeof inventorySchema>;
+type InventoryData = z.infer<typeof inventorySchema>;
 
 const unitFetcher = async (q?: string): Promise<SearchSelectOption[]> => {
   const result = await getUnits({ activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 100, search: q }, { _id: 1, name: 1 });

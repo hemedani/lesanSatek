@@ -47,7 +47,7 @@ const storeSchema = z.object({
   cityId: z.string().optional(),
 });
 
-type StoreData = z.input<typeof storeSchema>;
+type StoreData = z.infer<typeof storeSchema>;
 
 export default function AddStorePage() {
   const router = useRouter();

@@ -37,7 +37,7 @@ const formSchema = z.object({
   steps: z.array(stepSchema),
 });
 
-type FormData = z.input<typeof formSchema>;
+type FormData = z.infer<typeof formSchema>;
 
 export default function EditProcessStepsPage({
   params,

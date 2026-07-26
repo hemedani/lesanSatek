@@ -54,7 +54,7 @@ const stuffSchema = z.object({
   storeId: z.string().min(1, "انتخاب فروشگاه الزامی است"),
 });
 
-type StuffData = z.input<typeof stuffSchema>;
+type StuffData = z.infer<typeof stuffSchema>;
 
 const wareFetcher = async (q?: string): Promise<SearchSelectOption[]> => {
   const result = await getWares({ activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 100, search: q }, { _id: 1, name: 1 });

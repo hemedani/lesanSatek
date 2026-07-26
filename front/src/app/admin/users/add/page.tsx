@@ -47,7 +47,7 @@ const userSchema = z.object({
   is_verified: z.boolean(),
 });
 
-type UserData = z.input<typeof userSchema>;
+type UserData = z.infer<typeof userSchema>;
 
 interface RoleEntry {
   name: string;

@@ -29,7 +29,7 @@ const relationsSchema = z.object({
   removeCity: z.boolean().optional(),
 });
 
-type RelationsData = z.input<typeof relationsSchema>;
+type RelationsData = z.infer<typeof relationsSchema>;
 
 export default function OrgRelationsPage({
   params,

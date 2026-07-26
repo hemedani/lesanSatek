@@ -48,7 +48,7 @@ const addSchema = z.object({
   endDate: z.string().min(1, "تاریخ پایان الزامی است"),
 })
 
-type AddFormData = z.input<typeof addSchema>
+type AddFormData = z.infer<typeof addSchema>
 
 export default function UnitHeadFinanceFiscalYearsPage() {
   const [items, setItems] = useState<FiscalYearItem[]>([])

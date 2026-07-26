@@ -55,7 +55,7 @@ const processSchema = z.object({
   steps: z.array(stepSchema),
 });
 
-type ProcessData = z.input<typeof processSchema>;
+type ProcessData = z.infer<typeof processSchema>;
 
 export default function AddProcessPage() {
   const router = useRouter();

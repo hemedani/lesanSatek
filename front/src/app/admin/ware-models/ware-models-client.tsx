@@ -60,7 +60,7 @@ const wareModelSchema = z.object({
   wareGroupId: z.string().min(1, "انتخاب گروه کالا الزامی است"),
 });
 
-type WareModelData = z.input<typeof wareModelSchema>;
+type WareModelData = z.infer<typeof wareModelSchema>;
 
 const wareTypeFetcher = async (q?: string): Promise<SearchSelectOption[]> => {
   const result = await getWareTypes(

@@ -42,7 +42,7 @@ const wareTypeSchema = z.object({
   enName: z.string().optional(),
 });
 
-type WareTypeData = z.input<typeof wareTypeSchema>;
+type WareTypeData = z.infer<typeof wareTypeSchema>;
 
 export function WareTypesClient({
   items,

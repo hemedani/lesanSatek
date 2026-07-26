@@ -32,7 +32,7 @@ const orgSchema = z.object({
   isActive: z.boolean(),
 });
 
-type OrgData = z.input<typeof orgSchema>;
+type OrgData = z.infer<typeof orgSchema>;
 
 export default function EditOrganizationPage({
   params,

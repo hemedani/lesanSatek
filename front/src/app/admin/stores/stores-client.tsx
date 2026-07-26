@@ -53,7 +53,7 @@ const storeSchema = z.object({
   status: z.string().optional(),
 });
 
-type StoreData = z.input<typeof storeSchema>;
+type StoreData = z.infer<typeof storeSchema>;
 
 const cityFetcher = async (q?: string): Promise<SearchSelectOption[]> => {
   const result = await getCities(

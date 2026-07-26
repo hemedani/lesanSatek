@@ -25,7 +25,7 @@ const newPRSchema = z.object({
   wareModelId: z.string().min(1, "انتخاب مدل کالا الزامی است"),
 });
 
-type NewPRData = z.input<typeof newPRSchema>;
+type NewPRData = z.infer<typeof newPRSchema>;
 
 export function NewPurchasingRequestForm() {
   const router = useRouter();

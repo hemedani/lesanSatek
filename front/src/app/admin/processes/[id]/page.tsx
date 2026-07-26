@@ -30,7 +30,7 @@ const processSchema = z.object({
   description: z.string().optional(),
 });
 
-type ProcessData = z.input<typeof processSchema>;
+type ProcessData = z.infer<typeof processSchema>;
 
 const statusLabels: Record<string, { label: string; variant: "active" | "inactive" | "pending" | "info" }> = {
   Draft: { label: "پیش‌نویس", variant: "inactive" },

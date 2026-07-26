@@ -42,7 +42,7 @@ const recordSchema = z.object({
   wareModelId: z.string().optional(),
 });
 
-type RecordData = z.input<typeof recordSchema>;
+type RecordData = z.infer<typeof recordSchema>;
 
 const invFetcher = async (q?: string): Promise<SearchSelectOption[]> => {
   const r = await getInventories({ activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: q }, { _id: 1, wareModel: { _id: 1, name: 1 }, quantity: 1 });

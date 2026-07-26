@@ -54,7 +54,7 @@ const citySchema = z.object({
   stateId: z.string().min(1, "انتخاب استان الزامی است"),
 });
 
-type CityData = z.input<typeof citySchema>;
+type CityData = z.infer<typeof citySchema>;
 
 const stateFetcher = async (q?: string): Promise<SearchSelectOption[]> => {
   const result = await getStates(

@@ -36,7 +36,7 @@ const goodsReceiptSchema = z.object({
   items: z.array(itemSchema).min(1, "حداقل یک آیتم کالا باید وارد شود"),
 });
 
-type GoodsReceiptData = z.input<typeof goodsReceiptSchema>;
+type GoodsReceiptData = z.infer<typeof goodsReceiptSchema>;
 
 export function GoodsReceiptForm() {
   const router = useRouter();

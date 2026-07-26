@@ -36,7 +36,7 @@ const storeSchema = z.object({
   bankName: z.string().optional(),
 })
 
-type StoreData = z.input<typeof storeSchema>
+type StoreData = z.infer<typeof storeSchema>
 
 export default function StoreProfilePage() {
   const router = useRouter()

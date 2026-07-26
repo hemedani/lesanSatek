@@ -49,7 +49,7 @@ const storeSchema = z.object({
   status: z.string().min(1, "وضعیت الزامی است"),
 });
 
-type StoreData = z.input<typeof storeSchema>;
+type StoreData = z.infer<typeof storeSchema>;
 
 export default function EditStorePage() {
   const router = useRouter();
@@ -188,7 +188,7 @@ export default function EditStorePage() {
   const handleDelete = async () => {
     setDeleting(true);
     try {
-      const result = await remove({ activeRoleId: getActiveRoleIdFromStore(), _id: id }, { _id: 1 });
+      const result = await remove({ activeRoleId: getActiveRoleIdFromStore(), _id: id });
       if (result.success) {
         toast.success("فروشگاه حذف شد.");
         router.push("/admin/stores");
@@ -381,7 +381,7 @@ export default function EditStorePage() {
         description="آیا از حذف این فروشگاه اطمینان دارید؟ این عمل قابل بازگشت نیست."
         confirmLabel={deleting ? "در حال حذف..." : "حذف"}
         onConfirm={handleDelete}
-        variant="danger"
+        variant="destructive"
       />
     </div>
   );

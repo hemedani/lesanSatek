@@ -72,7 +72,7 @@ const wareSchema = z.object({
   manufacturerId: z.string().optional(),
 });
 
-type WareData = z.input<typeof wareSchema>;
+type WareData = z.infer<typeof wareSchema>;
 
 const wareTypeFetcher = async (q?: string): Promise<SearchSelectOption[]> => {
   const result = await getWareTypes({ activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 100, search: q }, { _id: 1, name: 1 });

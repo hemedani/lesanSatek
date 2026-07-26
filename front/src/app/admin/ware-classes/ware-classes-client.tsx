@@ -54,7 +54,7 @@ const wareClassSchema = z.object({
   wareTypeId: z.string().min(1, "انتخاب نوع کالا الزامی است"),
 });
 
-type WareClassData = z.input<typeof wareClassSchema>;
+type WareClassData = z.infer<typeof wareClassSchema>;
 
 const wareTypeFetcher = async (q?: string): Promise<SearchSelectOption[]> => {
   const result = await getWareTypes(

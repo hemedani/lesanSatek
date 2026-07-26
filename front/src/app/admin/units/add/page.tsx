@@ -43,7 +43,7 @@ const unitSchema = z.object({
   serviceRadius: z.number().optional(),
 });
 
-type UnitData = z.input<typeof unitSchema>;
+type UnitData = z.infer<typeof unitSchema>;
 
 const unitTypeOptions = [
   { value: "General", label: "عمومی" },

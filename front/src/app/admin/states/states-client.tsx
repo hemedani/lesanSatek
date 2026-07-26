@@ -42,7 +42,7 @@ const stateSchema = z.object({
   enName: z.string().optional(),
 });
 
-type StateData = z.input<typeof stateSchema>;
+type StateData = z.infer<typeof stateSchema>;
 
 export function StatesClient({
   items,

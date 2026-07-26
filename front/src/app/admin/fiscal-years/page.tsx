@@ -38,7 +38,7 @@ const fySchema = z.object({
   status: z.string().default("open"),
 });
 
-type FYData = z.input<typeof fySchema>;
+type FYData = z.infer<typeof fySchema>;
 
 export default function FiscalYearsPage() {
   const router = useRouter();
