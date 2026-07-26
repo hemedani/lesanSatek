@@ -8,6 +8,7 @@ import { updateRelationsSetup } from "./updateRelations/mod.ts";
 
 import { getBudgetReportSetup } from "./getBudgetReport/mod.ts";
 import { getYearEndReportSetup } from "./getYearEndReport/mod.ts";
+import { deductDirectSetup } from "./deductDirect/mod.ts";
 
 export const budgetLineSetup = () => {
   addSetup();
@@ -19,4 +20,5 @@ export const budgetLineSetup = () => {
   updateRelationsSetup();
   getBudgetReportSetup();
   getYearEndReportSetup();
+  deductDirectSetup();
 };
