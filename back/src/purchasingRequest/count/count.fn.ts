@@ -1,12 +1,16 @@
 import type { ActFn, Document } from "lesan";
 import { ObjectId } from "lesan";
-import { coreApp, purchasingRequest } from "../../../mod.ts";
+import { coreApp, purchasingRequest, unit } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
 
 export const countFn: ActFn = async (body) => {
   const {
-    set: { status, processId, requesterId, storeId, wareId, wareTypeId, wareClassId, wareGroupId, activeRoleId },
+    set: {
+      status, processId, requesterId, storeId, wareId, wareTypeId,
+      wareClassId, wareGroupId, unitId, createdBy, stuffStatus,
+      fromDate, toDate, search, activeRoleId,
+    },
     get,
   } = body.details;
 
@@ -25,7 +29,7 @@ export const countFn: ActFn = async (body) => {
 
   if (activeRole.name === "Employee" || activeRole.name === "Ordinary") {
     filters["requester._id"] = user._id;
-  } else if (activeRole.name === "UnitHead") {
+  } else if (activeRole.name === "UnitHead" && !unitId) {
     if (activeRole.scopeType === "unit" && activeRole.scopeId) {
       filters["requestingUnit._id"] = new ObjectId(activeRole.scopeId);
     }
@@ -36,6 +40,24 @@ export const countFn: ActFn = async (body) => {
     }
   }
 
+  if (unitId) {
+    if (!["Manager", "Admin", "OrgHead"].includes(activeRole.name)) {
+      const uId = new ObjectId(unitId as string);
+      const unitDoc = await unit.aggregation({
+        pipeline: [{ $match: { _id: uId } }],
+        projection: { head: { _id: 1 } },
+      }).toArray();
+
+      if (
+        unitDoc.length === 0 || !unitDoc[0].head ||
+        unitDoc[0].head._id.toString() !== user._id.toString()
+      ) {
+        throwError("You can only view requests for your own unit");
+      }
+    }
+    filters["requestingUnit._id"] = new ObjectId(unitId as string);
+  }
+
   status && (filters["status"] = status);
   processId && (filters["process._id"] = new ObjectId(processId as string));
   requesterId && (filters["requester._id"] = new ObjectId(requesterId as string));
@@ -44,6 +66,26 @@ export const countFn: ActFn = async (body) => {
   wareTypeId && (filters["wareType._id"] = new ObjectId(wareTypeId as string));
   wareClassId && (filters["wareClass._id"] = new ObjectId(wareClassId as string));
   wareGroupId && (filters["wareGroup._id"] = new ObjectId(wareGroupId as string));
+  createdBy && (filters["requester._id"] = new ObjectId(createdBy as string));
+  stuffStatus && (filters["stuffStatus"] = stuffStatus);
+
+  if (fromDate || toDate) {
+    const createdAtFilter: Document = {};
+    fromDate && (createdAtFilter["$gte"] = new Date(fromDate as string));
+    toDate && (createdAtFilter["$lte"] = new Date(toDate as string));
+    filters["createdAt"] = createdAtFilter;
+  }
+
+  if (search) {
+    const pipeline: Document[] = [
+      { $match: { ...filters, $text: { $search: search } } },
+      { $count: "count" },
+    ];
+    const result = await purchasingRequest
+      .aggregation({ pipeline, projection: { count: 1 } })
+      .toArray();
+    return { qty: result.length > 0 ? result[0].count : 0 };
+  }
 
   const foundedItemsLength = await purchasingRequest.countDocument({
     filter: filters,
