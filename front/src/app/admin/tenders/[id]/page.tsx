@@ -21,7 +21,7 @@ interface TenderOffer {
   status?: string;
   description?: string;
   submittedAt?: string;
-  vendor?: { _id: string; name?: string };
+  store?: { _id: string; name?: string };
 }
 
 interface TenderData {
@@ -68,7 +68,7 @@ export default function TenderDetailPage() {
       const result = await getOffers(
         { filter: { tenderId: id }, page: 1, limit: 100 },
         { _id: 1, price: 1, deliveryTime: 1, paymentTerms: 1, status: 1, description: 1, submittedAt: 1,
-          vendor: { _id: 1, name: 1 } }
+          store: { _id: 1, name: 1 } }
       );
       if (result.success && Array.isArray(result.body)) {
         setOffers(result.body);
@@ -147,7 +147,7 @@ export default function TenderDetailPage() {
                 offers.map((offer) => (
                   <div key={offer._id} className="p-4 rounded-lg border border-steel-border/20 space-y-2">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-moonlight">{offer.vendor?.name || "فروشنده"}</p>
+                      <p className="text-sm font-medium text-moonlight">{offer.store?.name || "فروشنده"}</p>
                       <Badge variant="outline" className={cn(
                         "text-[10px]",
                         offer.status === "pending" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
@@ -206,6 +206,7 @@ export default function TenderDetailPage() {
       <TenderAwardDialog
         open={showAward}
         onOpenChange={setShowAward}
+        purchasingRequestId={tender.purchasingRequest?._id || ""}
         tenderId={tender._id}
         offers={offers}
       />

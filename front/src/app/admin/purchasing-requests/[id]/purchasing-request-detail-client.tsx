@@ -192,7 +192,7 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
               <CardContent>
                 <WorkflowVisualizer
                   steps={pr.process.steps}
-                  currentStep={currentStep}
+                  currentStepIndex={currentStep}
                   status={pr.status}
                 />
               </CardContent>

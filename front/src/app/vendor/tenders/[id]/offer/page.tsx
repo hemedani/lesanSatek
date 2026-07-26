@@ -17,8 +17,8 @@ import { submit as submitOffer } from "@/app/actions/tenderOffer/submit"
 const offerSchema = z.object({
   price: z.string().min(1, "قیمت پیشنهادی الزامی است"),
   deliveryTime: z.string().min(1, "زمان تحویل الزامی است"),
-  terms: z.string().optional(),
-  notes: z.string().optional(),
+  paymentTerms: z.string().optional(),
+  description: z.string().optional(),
 })
 
 type OfferData = z.infer<typeof offerSchema>
@@ -37,8 +37,8 @@ export default function SubmitOfferPage({
     defaultValues: {
       price: "",
       deliveryTime: "",
-      terms: "",
-      notes: "",
+      paymentTerms: "",
+      description: "",
     },
   })
 
@@ -50,9 +50,10 @@ export default function SubmitOfferPage({
         {
           tenderId,
           price: Number(data.price),
-          deliveryTime: data.deliveryTime,
-          terms: data.terms || "",
-          notes: data.notes || "",
+          deliveryTime: Number(data.deliveryTime),
+          paymentTerms: data.paymentTerms || "",
+          description: data.description || "",
+          submittedAt: new Date(),
         },
         { _id: 1, status: 1 },
       )
@@ -116,7 +117,7 @@ export default function SubmitOfferPage({
 
               <FormField
                 control={form.control}
-                name="terms"
+                name="paymentTerms"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>شرایط</FormLabel>
@@ -130,7 +131,7 @@ export default function SubmitOfferPage({
 
               <FormField
                 control={form.control}
-                name="notes"
+                name="description"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>توضیحات</FormLabel>
