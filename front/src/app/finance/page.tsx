@@ -7,15 +7,15 @@ import { gets as getPaymentOrders } from "@/app/actions/paymentOrder/gets"
 
 export default async function FinanceDashboard() {
   const [blRes, poRes] = await Promise.all([
-    getBudgetLines({ page: 1, limit: 1 }, { _id: 1, totalAmount: 1, remainingAmount: 1 }).catch(() => ({ success: false, body: [] })),
+    getBudgetLines({ page: 1, limit: 1 }, { _id: 1, totalAllocated: 1, remainingBudget: 1 }).catch(() => ({ success: false, body: [] })),
     getPaymentOrders({ page: 1, limit: 1, filter: { status: "pending" } }, { _id: 1 }).catch(() => ({ success: false, body: [] })),
   ])
 
   const budgetLines = blRes.success ? blRes.body || [] : []
   const pendingPayments = poRes.success ? poRes.body || [] : []
 
-  const totalBudget = budgetLines.reduce((sum: number, bl: { totalAmount?: number }) => sum + (bl.totalAmount || 0), 0)
-  const remainingBudget = budgetLines.reduce((sum: number, bl: { remainingAmount?: number }) => sum + (bl.remainingAmount || 0), 0)
+  const totalBudget = budgetLines.reduce((sum: number, bl: { totalAllocated?: number }) => sum + (bl.totalAllocated || 0), 0)
+  const remainingBudget = budgetLines.reduce((sum: number, bl: { remainingBudget?: number }) => sum + (bl.remainingBudget || 0), 0)
 
   const stats = [
     {

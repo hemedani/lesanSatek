@@ -1,26 +1,19 @@
 import Link from "next/link"
 import { Calculator } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { StatusBadge } from "@/components/ui/status-badge"
+
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable } from "@/components/ui/data-table"
 import { Pagination } from "@/components/ui/pagination"
 import { EmptyState } from "@/components/ui/empty-state"
 import { gets as getBudgetLines } from "@/app/actions/budgetLine/gets"
 
-const statusMap: Record<string, string> = {
-  active: "فعال",
-  consumed: "مصرف شده",
-  closed: "بسته شده",
-}
-
 interface BudgetLineItem {
   _id: string
   code?: string
   description?: string
-  totalAmount?: number
-  remainingAmount?: number
-  status?: string
+  totalAllocated?: number
+  remainingBudget?: number
   fiscalYear?: { _id: string; name?: string }
 }
 
@@ -42,24 +35,17 @@ const columns = [
   },
   { key: "description", label: "شرح", render: (item: BudgetLineItem) => item.description || "—" },
   {
-    key: "totalAmount",
+    key: "totalAllocated",
     label: "مبلغ کل",
-    render: (item: BudgetLineItem) => `${(item.totalAmount || 0).toLocaleString("fa-IR")} تومان`,
+    render: (item: BudgetLineItem) => `${(item.totalAllocated || 0).toLocaleString("fa-IR")} تومان`,
   },
   {
-    key: "remainingAmount",
+    key: "remainingBudget",
     label: "باقی‌مانده",
     render: (item: BudgetLineItem) => (
-      <span className={`font-medium ${remainingColor(item.remainingAmount, item.totalAmount)}`}>
-        {(item.remainingAmount || 0).toLocaleString("fa-IR")} تومان
+      <span className={`font-medium ${remainingColor(item.remainingBudget, item.totalAllocated)}`}>
+        {(item.remainingBudget || 0).toLocaleString("fa-IR")} تومان
       </span>
-    ),
-  },
-  {
-    key: "status",
-    label: "وضعیت",
-    render: (item: BudgetLineItem) => (
-      <StatusBadge status={item.status || "active"} labelMap={statusMap} />
     ),
   },
   {
@@ -84,9 +70,8 @@ export default async function FinanceBudgetLinesPage({
       _id: 1,
       code: 1,
       description: 1,
-      totalAmount: 1,
-      remainingAmount: 1,
-      status: 1,
+      totalAllocated: 1,
+      remainingBudget: 1,
       fiscalYear: { _id: 1, name: 1 },
     },
   )

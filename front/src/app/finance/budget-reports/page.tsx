@@ -1,16 +1,19 @@
-import { Calculator, Wallet, TrendingDown, FileSpreadsheet } from "lucide-react"
+"use client";
+
+import { useState, useEffect } from "react"
+import { Calculator, Wallet, TrendingDown, FileSpreadsheet, Loader2 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable } from "@/components/ui/data-table"
+import { Skeleton } from "@/components/ui/skeleton"
 import { gets as getBudgetLines } from "@/app/actions/budgetLine/gets"
 
 interface BudgetLineItem {
   _id: string
   code?: string
   description?: string
-  totalAmount?: number
-  remainingAmount?: number
-  status?: string
+  totalAllocated?: number
+  remainingBudget?: number
 }
 
 const columns = [
@@ -21,16 +24,16 @@ const columns = [
   },
   { key: "description", label: "شرح", render: (item: BudgetLineItem) => item.description || "—" },
   {
-    key: "totalAmount",
+    key: "totalAllocated",
     label: "مبلغ کل",
-    render: (item: BudgetLineItem) => `${(item.totalAmount || 0).toLocaleString("fa-IR")} تومان`,
+    render: (item: BudgetLineItem) => `${(item.totalAllocated || 0).toLocaleString("fa-IR")} تومان`,
   },
   {
-    key: "remainingAmount",
+    key: "remainingBudget",
     label: "باقی‌مانده",
     render: (item: BudgetLineItem) => (
-      <span className={`font-medium ${(item.remainingAmount || 0) <= 0 ? "text-ember" : "text-emerald-400"}`}>
-        {(item.remainingAmount || 0).toLocaleString("fa-IR")} تومان
+      <span className={`font-medium ${(item.remainingBudget || 0) <= 0 ? "text-ember" : "text-emerald-400"}`}>
+        {(item.remainingBudget || 0).toLocaleString("fa-IR")} تومان
       </span>
     ),
   },
@@ -38,22 +41,46 @@ const columns = [
     key: "consumptionRate",
     label: "نرخ مصرف",
     render: (item: BudgetLineItem) => {
-      if (!item.totalAmount || item.totalAmount === 0) return "—"
-      const rate = ((item.totalAmount - (item.remainingAmount || 0)) / item.totalAmount) * 100
+      if (!item.totalAllocated || item.totalAllocated === 0) return "—"
+      const rate = ((item.totalAllocated - (item.remainingBudget || 0)) / item.totalAllocated) * 100
       return `${rate.toFixed(1)}%`
     },
   },
 ]
 
-export default async function FinanceBudgetReportsPage() {
-  const result = await getBudgetLines(
-    { page: 1, limit: 100 },
-    { _id: 1, code: 1, description: 1, totalAmount: 1, remainingAmount: 1, status: 1 },
-  )
+export default function FinanceBudgetReportsPage() {
+  const [items, setItems] = useState<BudgetLineItem[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const items: BudgetLineItem[] = result.success ? result.body || [] : []
-  const totalBudget = items.reduce((s: number, i: BudgetLineItem) => s + (i.totalAmount || 0), 0)
-  const totalRemaining = items.reduce((s: number, i: BudgetLineItem) => s + (i.remainingAmount || 0), 0)
+  useEffect(() => {
+    (async () => {
+      const result = await getBudgetLines(
+        { page: 1, limit: 100 },
+        { _id: 1, code: 1, description: 1, totalAllocated: 1, remainingBudget: 1 },
+      )
+      if (result.success) setItems(result.body || [])
+      setLoading(false)
+    })()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="space-y-8">
+        <PageHeader title="گزارش بودجه" description="خلاصه وضعیت بودجه" />
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} variant="glass">
+              <CardContent className="p-6"><Skeleton className="h-24 rounded-lg" /></CardContent>
+            </Card>
+          ))}
+        </div>
+        <Skeleton className="h-64 rounded-xl" />
+      </div>
+    )
+  }
+
+  const totalBudget = items.reduce((s: number, i: BudgetLineItem) => s + (i.totalAllocated || 0), 0)
+  const totalRemaining = items.reduce((s: number, i: BudgetLineItem) => s + (i.remainingBudget || 0), 0)
   const totalSpent = totalBudget - totalRemaining
   const consumptionRate = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0
 
