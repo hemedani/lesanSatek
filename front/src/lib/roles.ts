@@ -147,7 +147,7 @@ export function getDefaultPanel(
     return "/vendor"
   }
 
-  return "/admin"
+  return "/"
 }
 
 export function getPanelForRole(

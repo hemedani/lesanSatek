@@ -12935,17 +12935,20 @@ updatedAt?: (0 | 1 );
           
             dashboardStatistic: {
 set: {
+activeRoleId: string;
+type: ("unitHead" );
+unitId?: string;
+orgId?: string;
 };
 get: {
-files?: (0 | 1 );
-organizations?: (0 | 1 );
-processes?: (0 | 1 );
-processSteps?: (0 | 1 );
-purchasingRequests?: (0 | 1 );
-tags?: (0 | 1 );
-units?: (0 | 1 );
-users?: (0 | 1 );
-userByLevel?: (0 | 1 );
+unit?: (0 | 1 );
+purchasingRequestCounts?: (0 | 1 );
+pendingApprovalCount?: (0 | 1 );
+recentApprovals?: (0 | 1 );
+finance?: (0 | 1 );
+receiptCount?: (0 | 1 );
+fiscalYear?: (0 | 1 );
+paymentOrders?: (0 | 1 );
 };
 };
 
@@ -46497,6 +46500,12 @@ wareId?: string;
 wareTypeId?: string;
 wareClassId?: string;
 wareGroupId?: string;
+unitId?: string;
+createdBy?: string;
+stuffStatus?: ("none" | "assigned" | "ready_to_ship" | "shipped" | "delivered" | "received" | "cancelled" );
+fromDate?: string;
+toDate?: string;
+search?: string;
 };
 get: {
 qty?: (0 | 1 );
@@ -131347,6 +131356,21 @@ success?: (0 | 1 );
 };
 
           
+            count: {
+set: {
+activeRoleId: string;
+unitId?: string;
+status?: ("pending" | "approved" | "rejected" );
+stepId?: string;
+fromDate?: string;
+toDate?: string;
+};
+get: {
+qty?: (0 | 1 );
+};
+};
+
+          
           }
 
         
@@ -155240,6 +155264,107 @@ fiscalYearId: string;
 organizationId?: string;
 };
 get: {
+};
+};
+
+          
+            deductDirect: {
+set: {
+activeRoleId: string;
+_id: string;
+amount: number;
+description?: string;
+};
+get: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+fiscalYear?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+};
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+location?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+finalizedAt?: (0 | 1 );
+postCompletionSteps?: (0 | 1 );
+quantity?: (0 | 1 );
+stuffStatus?: (0 | 1 );
+selectionType?: (0 | 1 );
+selectedTenderOfferId?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+allocations?: {
+_id?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+allocatedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+encumbrances?: {
+_id?: (0 | 1 );
+amount?: (0 | 1 );
+status?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 };
 

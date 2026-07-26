@@ -47,6 +47,7 @@ function PanelGuard({ children, requiredRoles, requiredFeatures }: PanelGuardPro
 
     const roleNames = user.roles?.map((r) => r.name) ?? []
     const featureNames = user.features?.map((f) => f.feature) ?? []
+    const isPrivileged = roleNames.some((r) => ["Manager", "Admin", "OrgHead"].includes(r))
 
     let authorized = false
 
@@ -54,7 +55,7 @@ function PanelGuard({ children, requiredRoles, requiredFeatures }: PanelGuardPro
       authorized = requiredRoles.some((r) => roleNames.includes(r))
     }
     if (!authorized && requiredFeatures && requiredFeatures.length > 0) {
-      authorized = requiredFeatures.some((f) => featureNames.includes(f))
+      authorized = isPrivileged || requiredFeatures.some((f) => featureNames.includes(f))
     }
 
     if (!authorized) {

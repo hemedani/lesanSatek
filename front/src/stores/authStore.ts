@@ -42,7 +42,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isLoading: true,
   activeRoleId: "",
   accessiblePanels: [],
-  activePanel: "/admin",
+  activePanel: "/",
   setUser: (user, panels) =>
     set({
       user,
@@ -60,7 +60,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       isLoading: false,
       activeRoleId: "",
       accessiblePanels: [],
-      activePanel: "/admin",
+      activePanel: "/",
     }),
   isFeatureEnabled: (feature) => {
     const { user } = get();
