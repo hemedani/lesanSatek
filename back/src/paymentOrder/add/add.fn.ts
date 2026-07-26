@@ -1,8 +1,10 @@
 import { type ActFn, ObjectId } from "lesan";
 import { paymentOrder, purchasingRequest, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
+import { checkFinanceUnitAccess } from "../../../utils/checkFinanceUnitAccess.ts";
 
 export const addFn: ActFn = async (body) => {
+  await checkFinanceUnitAccess();
   const { set, get } = body.details;
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
 

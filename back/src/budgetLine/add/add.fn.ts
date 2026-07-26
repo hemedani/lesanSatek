@@ -1,10 +1,17 @@
 import { type ActFn, ObjectId } from "lesan";
 import { budgetLine } from "../../../mod.ts";
+import { checkFinanceUnitAccess } from "../../../utils/checkFinanceUnitAccess.ts";
 
 export const addFn: ActFn = async (body) => {
+  await checkFinanceUnitAccess();
   const { set, get } = body.details;
 
   const { activeRoleId, fiscalYearId, organizationId, unitId, wareTypeId, ...rest } = set;
+
+  const totalAlloc = (rest.totalAllocated as number) || 0;
+  const totalEnc = (rest.totalEncumbered as number) || 0;
+  const totalSpent = (rest.totalSpent as number) || 0;
+  rest.remainingBudget = totalAlloc - totalEnc - totalSpent;
 
   const relations: Record<string, unknown> = {};
 

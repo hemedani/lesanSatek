@@ -1,7 +1,9 @@
 import { type ActFn, ObjectId } from "lesan";
 import { budgetEncumbrance, budgetLine } from "../../../mod.ts";
+import { checkFinanceUnitAccess } from "../../../utils/checkFinanceUnitAccess.ts";
 
 export const convertToSpendFn: ActFn = async (body) => {
+  await checkFinanceUnitAccess();
   const { set, get } = body.details;
   const { _id } = set;
 

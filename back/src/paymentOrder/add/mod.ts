@@ -13,7 +13,9 @@ export const addSetup = () =>
       setUser,
       grantAccess([
         { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead", "UnitHead", "Employee"] },
+        { roles: ["OrgHead"] },
+        { roles: ["UnitHead"], features: ["canIssuePaymentOrder"] },
+        { roles: ["Employee"], features: ["canIssuePaymentOrder"] },
       ]),
     ],
     validator: addValidator(),

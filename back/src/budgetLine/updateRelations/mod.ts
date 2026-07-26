@@ -8,6 +8,9 @@ export const updateRelationsSetup = () =>
     schema: "budgetLine",
     fn: updateRelationsFn,
     actName: "updateRelations",
-    preAct: [setTokens, setUser, grantAccess([{ roles: ["Manager", "Admin"] }])],
+    preAct: [setTokens, setUser, grantAccess([
+      { roles: ["Manager", "Admin"] },
+      { roles: ["UnitHead"], features: ["canManageBudget"] },
+    ])],
     validator: updateRelationsValidator(),
   });

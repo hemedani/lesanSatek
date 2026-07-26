@@ -11,7 +11,10 @@ export const removeSetup = () =>
     preAct: [
       setTokens,
       setUser,
-      grantAccess([{ roles: ["Manager", "Admin"] }]),
+      grantAccess([
+        { roles: ["Manager", "Admin"] },
+        { roles: ["UnitHead"], features: ["canManageBudget"] },
+      ]),
     ],
     validator: removeValidator(),
   });

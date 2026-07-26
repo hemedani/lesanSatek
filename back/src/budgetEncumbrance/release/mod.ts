@@ -14,6 +14,7 @@ export const releaseSetup = () =>
       grantAccess([
         { roles: ["Manager", "Admin"] },
         { roles: ["OrgHead"] },
+        { roles: ["UnitHead"], features: ["canManageBudget"] },
       ]),
     ],
     validator: releaseValidator(),

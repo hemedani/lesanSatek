@@ -11,7 +11,11 @@ export const updateSetup = () =>
     preAct: [
       setTokens,
       setUser,
-      grantAccess([{ roles: ["Manager", "Admin"] }]),
+      grantAccess([
+        { roles: ["Manager", "Admin"] },
+        { roles: ["OrgHead"] },
+        { roles: ["UnitHead"], features: ["canIssuePaymentOrder"] },
+      ]),
     ],
     validator: updateValidator(),
   });
