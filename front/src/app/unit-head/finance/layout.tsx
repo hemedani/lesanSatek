@@ -1,16 +1,13 @@
-import { PanelLayout } from "@/components/layout/panel-layout"
 import { PanelGuard } from "@/components/auth/panel-guard"
 
-export default function FinanceLayout({
+export default function UnitHeadFinanceLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
     <PanelGuard requiredFeatures={["canManageBudget", "canIssuePaymentOrder", "canViewBudgetReports"]}>
-      <PanelLayout title="پنل مالی" description="مدیریت بودجه و پرداخت‌ها">
-        {children}
-      </PanelLayout>
+      {children}
     </PanelGuard>
   )
 }
