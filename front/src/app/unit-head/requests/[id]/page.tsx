@@ -438,11 +438,11 @@ export default async function UnitHeadRequestDetailPage({
               </CardHeader>
               <CardContent>
                 <div className="divide-y divide-steel-border/10">
-                  {goodsReceipts.map((gr: Record<string, unknown>) => {
-                    const items = (Array.isArray(gr.items) ? gr.items : []) as Array<Record<string, unknown>>
+                  {goodsReceipts.map((gr: any) => {
+                    const items = (Array.isArray(gr.items) ? gr.items : []) as Array<any>
                     const totalQty = items.reduce((sum, item) => sum + Number(item.quantityReceived || 0), 0)
-                    const receivingUnit = gr.receivingUnit as Record<string, unknown> | undefined
-                    const receivedBy = gr.receivedBy as Record<string, unknown> | undefined
+                    const receivingUnit = gr.receivingUnit as any | undefined
+                    const receivedBy = gr.receivedBy as any | undefined
                     return (
                       <div key={String(gr._id)} className="py-3 first:pt-0 last:pb-0 space-y-2">
                         <div className="flex items-center justify-between">
@@ -500,7 +500,7 @@ export default async function UnitHeadRequestDetailPage({
               </CardHeader>
               <CardContent>
                 <div className="divide-y divide-steel-border/10">
-                  {paymentOrders.map((po: Record<string, unknown>) => (
+                  {paymentOrders.map((po: any) => (
                     <div key={String(po._id)} className="py-3 first:pt-0 last:pb-0">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-medium text-moonlight">
@@ -597,8 +597,8 @@ export default async function UnitHeadRequestDetailPage({
                     <p className="text-xs text-fog">تعداد رسید</p>
                     <p className="text-moonlight font-medium">{goodsReceipts.length.toLocaleString("fa-IR")} رسید</p>
                     {(() => {
-                      const totalReceived = goodsReceipts.reduce((sum: number, gr: Record<string, unknown>) => {
-                        const items = (Array.isArray(gr.items) ? gr.items : []) as Array<Record<string, unknown>>
+                      const totalReceived = goodsReceipts.reduce((sum: number, gr: any) => {
+                        const items = (Array.isArray(gr.items) ? gr.items : []) as Array<any>
                         return sum + items.reduce((s, item) => s + Number(item.quantityReceived || 0), 0)
                       }, 0)
                       return (

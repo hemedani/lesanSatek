@@ -129,8 +129,8 @@ export default async function UnitHeadFinanceBudgetLineDetailPage({
                 <p className="text-sm text-fog/50">هیچ تخصیصی ثبت نشده است.</p>
               ) : (
                 <div className="divide-y divide-steel-border/10">
-                  {allocations.map((a: Record<string, unknown>) => {
-                    const allocatedBy = a.allocatedBy as Record<string, unknown> | undefined
+                  {allocations.map((a: any) => {
+                    const allocatedBy = a.allocatedBy as any | undefined
                     return (
                       <div key={String(a._id)} className="py-3 first:pt-0 last:pb-0 flex items-center justify-between">
                         <div>
@@ -172,7 +172,7 @@ export default async function UnitHeadFinanceBudgetLineDetailPage({
                 <p className="text-sm text-fog/50">هیچ تعهدی ثبت نشده است.</p>
               ) : (
                 <div className="divide-y divide-steel-border/10">
-                  {encumbrances.map((e: Record<string, unknown>) => (
+                  {encumbrances.map((e: any) => (
                     <div key={String(e._id)} className="py-3 first:pt-0 last:pb-0 flex items-center justify-between">
                       <div>
                         <p className="text-sm text-moonlight" dir="ltr">

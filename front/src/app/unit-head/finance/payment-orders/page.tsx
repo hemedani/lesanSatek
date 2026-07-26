@@ -43,7 +43,7 @@ export default async function UnitHeadFinancePaymentOrdersPage({
   const limit = 20
 
   const result = await getPaymentOrders(
-    { page, limit, status },
+    { page, limit, status: status as "draft" | "sent_to_finance" | "paid" | "cancelled" },
     {
       _id: 1,
       title: 1,

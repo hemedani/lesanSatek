@@ -175,7 +175,7 @@ export default async function RequestDetailPage({
         decidedAt: 1,
         processStep: { _id: 1, name: 1 },
         unit: { _id: 1, name: 1 },
-        decidedBy: { _id: 1, first_name: 1, last_name: 1, position: 1, roles: { name: 1 } },
+        decidedBy: { _id: 1, first_name: 1, last_name: 1, position: 1, roles: 1 },
       },
     ),
     getGoodsReceipts(
@@ -416,11 +416,11 @@ export default async function RequestDetailPage({
               </CardHeader>
               <CardContent>
                 <div className="divide-y divide-steel-border/10">
-                  {goodsReceipts.map((gr: Record<string, unknown>) => {
-                    const items = (Array.isArray(gr.items) ? gr.items : []) as Array<Record<string, unknown>>
+                  {goodsReceipts.map((gr: any) => {
+                    const items = (Array.isArray(gr.items) ? gr.items : []) as Array<any>
                     const totalQty = items.reduce((sum, item) => sum + Number(item.quantityReceived || 0), 0)
-                    const receivingUnit = gr.receivingUnit as Record<string, unknown> | undefined
-                    const receivedBy = gr.receivedBy as Record<string, unknown> | undefined
+                    const receivingUnit = gr.receivingUnit as any | undefined
+                    const receivedBy = gr.receivedBy as any | undefined
                     return (
                       <div key={String(gr._id)} className="py-3 first:pt-0 last:pb-0 space-y-2">
                         <div className="flex items-center justify-between">
@@ -526,7 +526,7 @@ export default async function RequestDetailPage({
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {tenders.map((tender: Record<string, unknown>) => {
+                {tenders.map((tender: any) => {
                   const tId = String(tender._id || "")
                   const offers = offersByTenderId[tId] || []
                   const tenderStatus = String(tender.status || "")
@@ -558,7 +558,7 @@ export default async function RequestDetailPage({
                         <div className="space-y-2 pt-2 border-t border-steel-border/10">
                           <p className="text-xs font-medium text-fog">پیشنهادات</p>
                           <div className="divide-y divide-steel-border/10">
-                            {offers.map((offer: Record<string, unknown>) => {
+                            {offers.map((offer: any) => {
                               const oId = String(offer._id || "")
                               const isSelected = selectedTenderOfferId === oId
                               const storeName = (offer.store as { name?: string })?.name || "—"
@@ -625,7 +625,7 @@ export default async function RequestDetailPage({
               </CardHeader>
               <CardContent>
                 <div className="divide-y divide-steel-border/10">
-                  {paymentOrders.map((po: Record<string, unknown>) => (
+                  {paymentOrders.map((po: any) => (
                     <div key={String(po._id)} className="py-3 first:pt-0 last:pb-0">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-medium text-moonlight">
@@ -718,8 +718,8 @@ export default async function RequestDetailPage({
                     <p className="text-xs text-fog">تعداد رسید</p>
                     <p className="text-moonlight font-medium">{goodsReceipts.length.toLocaleString("fa-IR")} رسید</p>
                     {(() => {
-                      const totalReceived = goodsReceipts.reduce((sum, gr: Record<string, unknown>) => {
-                        const items = (Array.isArray(gr.items) ? gr.items : []) as Array<Record<string, unknown>>
+                      const totalReceived = goodsReceipts.reduce((sum: number, gr: any) => {
+                        const items = (Array.isArray(gr.items) ? gr.items : []) as Array<any>
                         return sum + items.reduce((s, item) => s + Number(item.quantityReceived || 0), 0)
                       }, 0)
                       return (
