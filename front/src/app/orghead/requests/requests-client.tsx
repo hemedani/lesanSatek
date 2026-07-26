@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { RequestStatusBadge } from "@/components/purchasing/request-status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { FinalizeModal } from "@/components/orghead/finalize-modal";
-import { markPaid } from "@/app/actions/paymentOrder/markPaid";
+import { update as updatePaymentOrder } from "@/app/actions/paymentOrder/update";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -114,7 +114,7 @@ export function RequestsClient({
     router.refresh();
   }, [router]);
 
-  const handlePay = useCallback(async () => {
+  const handleSendToFinance = useCallback(async () => {
     if (!payPR) return;
     const po = paymentOrdersByPRId[payPR._id];
     if (!po) {
@@ -123,16 +123,16 @@ export function RequestsClient({
     }
     setPaying(true);
     try {
-      const result = await markPaid({ activeRoleId: "", _id: po._id });
+      const result = await updatePaymentOrder({ _id: po._id, status: "sent_to_finance" });
       if (result.success) {
-        toast.success("پرداخت با موفقیت ثبت شد");
+        toast.success("دستور پرداخت به واحد مالی ارسال شد");
         setPayPR(null);
         router.refresh();
       } else {
-        toast.error(result.body?.message || "خطا در ثبت پرداخت");
+        toast.error(result.body?.message || "خطا در ارسال به واحد مالی");
       }
     } catch {
-      toast.error("خطا در ثبت پرداخت");
+      toast.error("خطا در ارسال به واحد مالی");
     } finally {
       setPaying(false);
     }
@@ -242,7 +242,7 @@ export function RequestsClient({
                             }}
                           >
                             <DollarSign className="size-4" />
-                            پرداخت
+                            ارسال به مالی
                           </Button>
                         )}
                       </div>
@@ -316,14 +316,14 @@ export function RequestsClient({
       <ConfirmDialog
         open={!!payPR}
         onOpenChange={(open) => { if (!open) setPayPR(null); }}
-        title="تأیید پرداخت"
+        title="ارسال به واحد مالی"
         description={
           payPR && paymentOrdersByPRId[payPR._id]
-            ? `آیا از پرداخت "${payPR.title || "بدون عنوان"}" به مبلغ ${Number(paymentOrdersByPRId[payPR._id].amount || 0).toLocaleString("fa-IR")} ریال اطمینان دارید؟`
+            ? `آیا از ارسال "${payPR.title || "بدون عنوان"}" به واحد مالی برای پرداخت ${Number(paymentOrdersByPRId[payPR._id].amount || 0).toLocaleString("fa-IR")} ریال اطمینان دارید؟`
             : ""
         }
-        confirmLabel="تأیید پرداخت"
-        onConfirm={handlePay}
+        confirmLabel="ارسال به مالی"
+        onConfirm={handleSendToFinance}
         loading={paying}
       />
     </div>

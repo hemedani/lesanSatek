@@ -17,7 +17,7 @@ import { HistoryTimeline } from "@/components/purchasing/history-timeline";
 import { SelectionInfo } from "@/components/orghead/selection-info";
 import { PostCompletionSteps } from "@/components/orghead/post-completion-steps";
 import { FinalizeModal } from "@/components/orghead/finalize-modal";
-import { markPaid } from "@/app/actions/paymentOrder/markPaid";
+import { update as updatePaymentOrder } from "@/app/actions/paymentOrder/update";
 import { toast } from "sonner";
 
 interface StoreInfo { _id: string; name?: string; }
@@ -137,20 +137,20 @@ export function OrgHeadPRDetailClient({ pr }: OrgHeadPRDetailClientProps) {
   const [showPayConfirm, setShowPayConfirm] = useState(false);
   const [paying, setPaying] = useState(false);
 
-  const handleMarkPaid = async () => {
+  const handleSendToFinance = async () => {
     if (!draftPaymentOrder) return;
     setPaying(true);
     setShowPayConfirm(false);
     try {
-      const result = await markPaid({ _id: draftPaymentOrder._id });
+      const result = await updatePaymentOrder({ _id: draftPaymentOrder._id, status: "sent_to_finance" });
       if (result.success) {
-        toast.success("پرداخت با موفقیت ثبت شد");
+        toast.success("دستور پرداخت به واحد مالی ارسال شد");
         router.refresh();
       } else {
-        toast.error(result.body?.message || "خطا در ثبت پرداخت");
+        toast.error(result.body?.message || "خطا در ارسال به واحد مالی");
       }
     } catch {
-      toast.error("خطا در ثبت پرداخت");
+      toast.error("خطا در ارسال به واحد مالی");
     } finally {
       setPaying(false);
     }
@@ -498,7 +498,7 @@ export function OrgHeadPRDetailClient({ pr }: OrgHeadPRDetailClientProps) {
                     <Wallet className="size-4 text-rose-400" />
                   </div>
                   <div>
-                    <CardTitle>پرداخت</CardTitle>
+                    <CardTitle>ارسال به مالی</CardTitle>
                     <CardDescription>
                       {draftPaymentOrder.title || "دستور پرداخت"}
                     </CardDescription>
@@ -521,7 +521,7 @@ export function OrgHeadPRDetailClient({ pr }: OrgHeadPRDetailClientProps) {
                   disabled={paying}
                 >
                   {paying ? <Loader2 className="size-4 animate-spin" /> : <CreditCard className="size-4" />}
-                  {paying ? "در حال ثبت..." : "تأیید پرداخت"}
+                  {paying ? "در حال ارسال..." : "ارسال به مالی"}
                 </Button>
               </CardContent>
             </Card>
@@ -553,10 +553,10 @@ export function OrgHeadPRDetailClient({ pr }: OrgHeadPRDetailClientProps) {
       <ConfirmDialog
         open={showPayConfirm}
         onOpenChange={(open) => { if (!open) setShowPayConfirm(false) }}
-        title="تأیید پرداخت"
-        description={`آیا از ثبت پرداخت به مبلغ ${draftPaymentOrder?.amount?.toLocaleString("fa-IR") || "—"} ریال اطمینان دارید؟`}
-        confirmLabel="تأیید پرداخت"
-        onConfirm={handleMarkPaid}
+        title="ارسال به واحد مالی"
+        description={`آیا از ارسال دستور پرداخت به مبلغ ${draftPaymentOrder?.amount?.toLocaleString("fa-IR") || "—"} ریال به واحد مالی اطمینان دارید؟`}
+        confirmLabel="ارسال به مالی"
+        onConfirm={handleSendToFinance}
         loading={paying}
       />
     </div>
