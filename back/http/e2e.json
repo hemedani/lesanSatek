@@ -195,7 +195,7 @@
   },
   {
     "id": "gen-finance-head",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"first_name\": \"فاطمه\", \"last_name\": \"موسوی\", \"email\": \"fatemeh@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000011\", \"gender\": \"Female\", \"isActive\": true, \"is_verified\": true, \"organizations\": [\"{orgId}\"]}, \"get\": {\"_id\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"first_name\": \"فاطمه\", \"last_name\": \"موسوی\", \"email\": \"fatemeh@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000011\", \"gender\": \"Female\", \"isActive\": true, \"is_verified\": true, \"features\": [{\"feature\": \"canManageBudget\"}, {\"feature\": \"canIssuePaymentOrder\"}, {\"feature\": \"canViewBudgetReports\"}], \"organizations\": [\"{orgId}\"]}, \"get\": {\"_id\": 1}}}}",
     "repeat": 1,
     "captures": [
       {
@@ -360,7 +360,7 @@
   },
   {
     "id": "gen-finance-user",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"first_name\": \"مریم\", \"last_name\": \"حسینی\", \"email\": \"maryam@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000002\", \"gender\": \"Female\", \"isActive\": true, \"is_verified\": true, \"features\": [{\"feature\": \"canManageBudget\"}], \"organizations\": [\"{orgId}\"]}, \"get\": {\"_id\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"first_name\": \"مریم\", \"last_name\": \"حسینی\", \"email\": \"maryam@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000002\", \"gender\": \"Female\", \"isActive\": true, \"is_verified\": true, \"features\": [{\"feature\": \"canManageBudget\"}, {\"feature\": \"canIssuePaymentOrder\"}, {\"feature\": \"canViewBudgetReports\"}], \"organizations\": [\"{orgId}\"]}, \"get\": {\"_id\": 1}}}}",
     "repeat": 1,
     "captures": [
       {
@@ -1107,6 +1107,17 @@
       {
         "key": "remainingBudgetAfterPayment",
         "value": "[body][remainingBudget]"
+      }
+    ]
+  },
+  {
+    "id": "gen-deduct-direct",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"deductDirect\", \"details\": {\"set\": {\"_id\": \"{budgetLineId}\", \"amount\": 100000, \"description\": \"تست کسر مستقیم بودجه\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"totalAllocated\": 1, \"remainingBudget\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "totalAllocatedAfterDeduction",
+        "value": "[body][totalAllocated]"
       }
     ]
   },
