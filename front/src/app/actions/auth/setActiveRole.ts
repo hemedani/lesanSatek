@@ -3,13 +3,15 @@
 import { cookies } from "next/headers";
 
 import { getPanelForRole } from "@/lib/roles";
+import { isSecureRequest } from "@/lib/server-action";
 
 export const setActiveRole = async (roleId: string, roleName: string) => {
   try {
     const cookieStore = await cookies();
+    const secure = await isSecureRequest();
     cookieStore.set("activeRoleId", roleId, {
       httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
+      secure,
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 7,

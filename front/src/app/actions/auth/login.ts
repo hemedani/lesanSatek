@@ -4,12 +4,14 @@ import { AppApi } from "@/lib/api";
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 import { cookies } from "next/headers";
 import { getHighestRole } from "@/lib/roles";
+import { isSecureRequest } from "@/lib/server-action";
 
 export const login = async (
   data: Omit<ReqType["main"]["user"]["login"]["set"], "activeRoleId"> & { activeRoleId?: string },
   getSelection?: DeepPartial<ReqType["main"]["user"]["login"]["get"]>
 ) => {
   const cookieStore = await cookies();
+  const secure = await isSecureRequest();
 
   try {
     const result = await AppApi().send({
@@ -43,7 +45,7 @@ export const login = async (
     if (result.success && result.body?.token) {
       cookieStore.set("token", result.body.token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure,
         sameSite: "lax",
         path: "/",
         maxAge: 60 * 60 * 24 * 7,
@@ -55,7 +57,7 @@ export const login = async (
         const roleId = currentActiveRoleId || (highest ? highest.roleId : result.body.user.roles[0].roleId);
         cookieStore.set("activeRoleId", roleId, {
           httpOnly: false,
-          secure: process.env.NODE_ENV === "production",
+          secure,
           sameSite: "lax",
           path: "/",
           maxAge: 60 * 60 * 24 * 7,

@@ -3,12 +3,14 @@
 import { AppApi } from "@/lib/api";
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 import { cookies } from "next/headers";
+import { isSecureRequest } from "@/lib/server-action";
 
 export const tempUser = async (
   data: Omit<ReqType["main"]["user"]["tempUser"]["set"], "activeRoleId"> & { activeRoleId?: string },
   getSelection?: DeepPartial<ReqType["main"]["user"]["tempUser"]["get"]>
 ) => {
   const cookieStore = await cookies();
+  const secure = await isSecureRequest();
 
   try {
     const result = await AppApi().send({
@@ -35,7 +37,7 @@ export const tempUser = async (
     if (result.success && result.body?.token) {
       cookieStore.set("token", result.body.token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure,
         sameSite: "lax",
         path: "/",
         maxAge: 60 * 60 * 24 * 7,
