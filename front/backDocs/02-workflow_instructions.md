@@ -36,16 +36,18 @@ The suite creates **126 records** spanning the full lifecycle. Below is the comp
 6. [Test the UnitHead Panel](#6-test-the-unithead-panel)
 7. [Test the Employee/Requester Panel](#7-test-the-employeerequester-panel)
 8. [Test the Finance Panel](#8-test-the-finance-panel)
-9. [Test the Vendor Panel](#9-test-the-vendor-panel)
-10. [Test the Store Panel (StoreHead)](#10-test-the-store-panel-storehead)
-11. [Test Inventory & Stock Management](#11-test-inventory--stock-management)
-12. [Test Budget & Reporting](#12-test-budget--reporting)
-13. [Test Process Builder & Archiving](#13-test-process-builder--archiving)
-14. [Test Extended Features](#14-test-extended-features)
-15. [Test Panel Switching & Role Routing](#15-test-panel-switching--role-routing)
-16. [Test Edge Cases](#16-test-edge-cases)
-17. [Verification Checklist](#17-verification-checklist)
-18. [Appendix — Complete Test Data Reference](#18-appendix--complete-test-data-reference)
+9. [Test the Vendor / Store Head Panel](#9-test-the-vendor--store-head-panel)
+10. [Test the OrgHead Panel](#10-test-the-orghead-panel)
+11. [Test the Store Panel (StoreHead)](#11-test-the-store-panel-storehead)
+12. [Test Inventory & Stock Management](#12-test-inventory--stock-management)
+13. [Test Budget & Reporting](#13-test-budget--reporting)
+14. [Test Process Builder & Archiving](#14-test-process-builder--archiving)
+15. [Test Extended Features](#15-test-extended-features)
+16. [Test Panel Switching & Role Routing](#16-test-panel-switching--role-routing)
+17. [Test Edge Cases](#17-test-edge-cases)
+18. [Verification Checklist](#18-verification-checklist)
+19. [Standard Workflow Examples](#19-standard-workflow-examples)
+20. [Appendix — Complete Test Data Reference](#20-appendix--complete-test-data-reference)
 
 ---
 
@@ -299,9 +301,10 @@ All processes are **activated** via `activateProcess`.
 
 | # | Test Case | Expected Result |
 |---|-----------|----------------|
-| 3.7.1 | **درخواست‌های خرید** — click | 3 PRs listed (direct store + tender + pending) |
-| 3.7.2 | Click completed PR → full details | Workflow visualizer all steps done, history timeline, payment info |
-| 3.7.3 | Click the pending PR (25M, qty=5) | Current step highlighted, no decision yet |
+| 3.7.1 | **درخواست‌های خرید** — click sidebar | 3+ PRs listed across statuses (Draft, Pending, PendingFinalization, Completed) |
+| 3.7.2 | Click completed PR → full details | Workflow visualizer all steps done, history timeline (`stuff_assigned`, `step_approved`, `all_steps_approved`, `finalized`, `goods_received`), payment info |
+| 3.7.3 | Click a Draft PR | Shows `selectionType` = "none" or "stuff"/"tender". No process linked. "ارسال درخواست" button available. |
+| 3.7.4 | Click the pending PR (25M, qty=5) | Current step highlighted, no decision yet |
 
 ### 3.8 Tenders
 
@@ -314,90 +317,113 @@ All processes are **activated** via `activateProcess`.
 
 ## 4. Test the PR Flow (Direct Store Purchase)
 
-This is the core business flow: **PR submit → UnitHead approves step-by-step → Goods Receipt → Payment**.
+This is the core business flow: **PR Draft → addStuff/submit → UnitHead approves step-by-step → OrgHead Finalizes → StoreHead delivers → Goods Receipt → Payment**.
 
-### 4a. Create a PR as Employee
+### 4a. Create a Draft PR (Requester)
 
-1. **Log out**, login as `ali@lesansatek.com` / `password123` (or as `admin@lesansatek.com` if the Employee panel routes differently)
+1. **Log out**, login as `ali@lesansatek.com` / `password123`
 2. Navigate to the PR creation form
 3. Fill in:
    - عنوان: `خرید کیت TSH` (or any custom title)
    - توضیحات: `Urgent request for TSH kits`
-   - مبلغ تخمینی: `50000000`
    - تعداد: `10`
    - مدل کالا: Search for `کیت TSH` and select it
-   - واحد درخواست‌کننده: `واحد خرید`
-   - **No process field** — the backend auto-resolves to Process #2 (unit-scoped, Procurement)
-4. Click "ثبت درخواست"
+   - **No `estimatedAmount`, `budgetLineId`, `processId`, or `storeId`** — these are set later or auto-resolved
+   - **No `requestingUnit` field in `add`** — auto-derived from the active role's scope
+4. Click "ثبت پیشنویس درخواست"
 5. **Verify:**
-   - Toast: "درخواست خرید با موفقیت ثبت شد"
-   - PR appears with status **"در انتظار تایید"**
+   - Toast: "پیش‌نویس درخواست خرید با موفقیت ثبت شد"
+   - PR appears with status **"Draft"** (پیش‌نویس)
+   - No process linked yet
+   - `selectionType` is `"none"`
+   - `stuffStatus` is `"none"`
+
+### 4b. Assign Stuff to PR (UnitHead/Admin)
+
+1. Navigate to the Draft PR detail
+2. Click **"تخصیص کالا"** (Add Stuff) — this calls `purchasingRequest.addStuff`
+3. Browse available **Stuff** records (product listings) — store name is **NOT shown** to unit head
+4. Select the TSH Kit stuff (فروشگاه نمونه's inventory at 2,800,000 IRR)
+5. **Verify:**
+   - `selectionType` → `"stuff"`
+   - `stuffStatus` → `"assigned"`
+   - `estimatedAmount` set to stuff price × quantity
+   - History shows `"stuff_assigned"` entry (replaces old `"item_assigned"`)
+
+### 4c. Submit the PR (Draft → Pending)
+
+1. From the Draft PR detail, click **"ارسال درخواست"** (Submit)
+2. **Verify:**
+   - Toast: "درخواست خرید با موفقیت ارسال شد"
+   - PR status → **"در انتظار تایید" (Pending)**
    - Process name shows "فرآیند خرید واحد خرید" (auto-resolved)
    - Step 1 highlighted in workflow visualizer
 
-### 4b. Check Store Availability (Admin/Procurement)
-
-This step calls `checkStoreAvailability` to see which stores carry the ware model.  
-In the frontend this would be a UI action to preview available stores and their pricing.
-
-### 4c. Assign Stuff to PR (Admin/Procurement)
-
-1. Navigate to the PR detail
-2. Assign the stuff (فروشگاه نمونه's inventory of TSH Kit at 2,800,000 IRR) to the PR
-3. **Verify:**
-   - PR's `stuffStatus` becomes `"assigned"`, `estimatedAmount` set to stuff price * quantity
-   - History shows "item_assigned" entry
+**Note:** Submit requires `selectionType !== "none"`. If no stuff is assigned and no tender offer is selected, the backend rejects with: `"Please assign stuff or select a tender offer before submitting this request"`.
 
 ### 4d. Approve Step 1 — Procurement Unit
 
 1. **Log in as** `reza@lesansatek.com` / `password123` (UnitHead of Procurement)
-2. Navigate to the UnitHead panel → pending requests
-3. Click the PR
-4. **Verify:**
+2. The UnitHead panel now uses **`getPendingByUnit`** (not `stepApproval.gets`) to find pending PRs
+3. Navigate to the UnitHead panel → pending requests
+4. Click the PR
+5. **Verify:**
    - Step Approval Panel shows "تأیید درخواست"
    - Comment textarea + "تایید" / "رد" buttons
-5. Type comment: `تایید شد.`
-6. Click "تایید" → confirm dialog → "تایید"
-7. **Verify:**
+6. Type comment: `تایید شد.`
+7. Click "تایید" → confirm dialog → "تایید"
+8. **Verify:**
    - Toast: "درخواست با موفقیت تایید شد"
    - Step 1 marked complete, Step 2 "تأیید انبار" highlighted as current
    - History shows "step_approved" entry
 
-### 4e. Warehouse Check (Admin/Warehouse)
-
-1. Navigate to the PR detail
-2. Run warehouse check (confirms stock status from Central Warehouse)
-3. **Verify:** Status still InProgress, step remains at 2
-
-### 4f. Approve Step 2 — Warehouse Unit
+### 4e. Approve Step 2 — Warehouse Unit
 
 1. **Log in as** `hossein@lesansatek.com` / `password123` (UnitHead of Warehouse)
 2. Navigate to UnitHead panel → pending requests
 3. Approve Step 2 "تأیید انبار"
 4. **Verify:** Step 3 "تأیید مالی" highlighted as current
 
-### 4g. Approve Step 3 — Finance Unit
+### 4f. Approve Step 3 — Finance Unit (with Budget Line + Auto-Encumbrance)
 
 1. **Log in as** `fatemeh@lesansatek.com` / `password123` (UnitHead of Finance)
 2. Navigate to UnitHead panel → pending requests
-3. Approve Step 3 "تأیید مالی" — must provide a budget line (select BUD-001 from the budget line picker)
+3. Approve Step 3 "تأیید مالی" — **must provide a budget line** (select BUD-001 from the budget line picker)
 4. **Verify:**
    - PR status → **"در انتظار نهایی‌سازی" (PendingFinalization)**
    - All steps complete in visualizer
    - History shows "all_steps_approved" entry with budget line info
-   - Budget line is linked to the PR
+   - Budget line linked to the PR
+   - **Auto-created BudgetEncumbrance** (reserves the estimated amount on the budget line)
+   - Budget line's `totalEncumbered` increased, `remainingBudget` reduced accordingly
 
-### 4h. OrgHead Finalize
+### 4g. OrgHead Finalize (PendingFinalization → Completed)
 
-1. **Log in as** `dr.ahmadi@lesansatek.com` / `password123` (OrgHead) or admin
-2. Navigate to the PR detail
-3. Click **"نهایی‌سازی"** (Finalize) — the system will set it to Completed
-4. **Verify:**
+1. **Log in as** `dr.ahmadi@lesansatek.com` / `password123` (OrgHead)
+2. Navigate to **OrgHead panel** (`/orghead`) → "در انتظار تأیید" tab
+3. Click the PR → Click **"تأیید نهایی"** (Finalize)
+4. If both stuff AND tender exist: pick the winner (stuff or tender)
+5. Optionally add **post-completion steps** (quality review steps for specific units)
+6. **Verify:**
    - PR status → **"تکمیل شده" (Completed)**
    - `finalizedAt` timestamp set
+   - `stuffStatus` → `"assigned"`
    - History shows "finalized" entry
+   - If tender was selected: tender → `"awarded"`, winning offer → `"accepted"`, other offers → `"rejected"`
 
-### 4i. Goods Receipt (Requester or Warehouse Head)
+### 4h. StoreHead Delivery (assigned → ready_to_ship → shipped → delivered)
+
+1. **Log in as** `sara@lesansatek.com` / `password123` (StoreHead)
+2. Navigate to **Store panel** (`/store`) → purchasing requests list
+3. Find the PR (stuffStatus = "assigned")
+4. Click **"آماده ارسال"** → status → `"ready_to_ship"`
+5. Click **"ارسال شد"** → status → `"shipped"`
+6. Click **"تحویل داده شد"** → status → `"delivered"`
+7. **Verify:**
+   - `stuffStatus` progresses: assigned → ready_to_ship → shipped → delivered
+   - History shows "stuff_status_updated" entries for each stage
+
+### 4i. Goods Receipt (Requester or Warehouse Head Only)
 
 > **Authority check:** Only the PR's requester or a Warehouse-type unit head can confirm delivery.
 > If the requester confirms, `receivingUnitId` must equal the PR's `requestingUnit._id`.
@@ -409,17 +435,23 @@ In the frontend this would be a UI action to preview available stores and their 
    - Inventory updated (+10 units from goods receipt)
    - PR's `stuffStatus` → `"received"`
    - Auto-created draft PaymentOrder with payTo=فروشگاه نمونه, financialUnit=requestingUnit
+   - Budget encumbrance auto-converted to spent
    - History shows "goods_received" entry
 
-### 4j. Mark Payment Paid (Finance/Admin) — Budget Deduction
+### 4j. Payment Lifecycle (OrgHead → Finance UnitHead)
 
-1. Navigate to payment orders
-2. Find the auto-created payment order
-3. Click "markPaid"
+**Step 1 — OrgHead sends to Finance:**
+1. **Log in as** `dr.ahmadi@lesansatek.com` / `password123` (OrgHead)
+2. Navigate to payment orders → find the draft auto-created payment order
+3. Update status → `"sent_to_finance"`
+
+**Step 2 — Finance UnitHead marks Paid:**
+1. **Log in as** `fatemeh@lesansatek.com` / `password123` (Finance UnitHead)
+2. Navigate to Finance panel → payment orders filtered by `status: "sent_to_finance"`
+3. Click **"پرداخت شد"** (Mark Paid)
 4. **Verify:**
-   - PaymentOrder status → "paid"
-   - `paidAt` timestamp recorded
-   - Budget line's `totalAllocated` is deducted by the payment amount
+   - PaymentOrder status → `"paid"`, `paidAt` timestamp recorded
+   - Budget line's `totalAllocated` deducted by the payment amount
    - `remainingBudget` recalculated accordingly
    - History shows payment entry
 
@@ -427,37 +459,52 @@ In the frontend this would be a UI action to preview available stores and their 
 
 ## 5. Test the Tender Flow
 
-### 5a. Create the Tender PR
+### 5a. Create the Tender PR (Draft)
 
 1. Login as `admin@lesansatek.com`
-2. Create PR: title "خرید کیت TSH - مناقصه", qty=20, no store assignment
-3. **Verify:** Status = Pending, process auto-resolved to Process #2
+2. Create PR: title "خرید کیت TSH - مناقصه", qty=20 — this creates a **Draft** PR
+3. **Verify:** Status = Draft, `selectionType` = "none", no process linked
 
-### 5b. Create & Configure Tender
+### 5b. Create & Configure Tender (on Draft PR)
 
-1. Create tender: "مناقصه خرید کیت TSH", deadline=2026-05-01
-2. Link to PR #2
-3. Assign vendor: add "فروشگاه نمونه" as assigned vendor
+1. From the Draft PR, create tender: "مناقصه خرید کیت TSH", deadline=2026-05-01
+2. The PR remains in Draft status (tender can be created on Draft PRs)
+3. Assign vendor: add "فروشگاه نمونه" as assigned vendor via `tender.updateRelations`
 
 ### 5c. Vendor Submits Offer
 
-1. **Log in as** `sara@lesansatek.com` / `password123` (Vendor)
+1. **Log in as** `sara@lesansatek.com` / `password123` (Vendor/StoreHead)
 2. Navigate to open tenders
 3. Find the tender → click "ثبت پیشنهاد"
-4. Fill: price=2,500,000, delivery=7 days, terms="30 days"
+4. Fill: price=2,500,000, delivery=7 days, terms="30 days", **select a specific Ware** (required)
 5. Submit
 6. **Verify:** Offer status = "submitted"
 
-### 5d. Close & Award
+### 5d. Close Tender & Select Winning Offer (Deferred Award)
 
 1. **Log in as** `admin@lesansatek.com`
-2. Close the tender
-3. Award to the submitted offer (winningOfferId)
+2. Close the tender (no more offers accepted)
+3. **Select the winning offer** via `purchasingRequest.selectTenderOffer` (NOT `tender.award`)
 4. **Verify:**
-   - Tender status → "awarded"
-   - Winning offer status → "accepted", others → "rejected"
-   - PR's `stuffStatus` → `"assigned"`, `estimatedAmount` set to winning price * quantity
-   - History "item_assigned" entry
+   - `selectionType` → `"tender"`
+   - `selectedTenderOfferId` → the chosen offer's `_id`
+   - `estimatedAmount` set to winning price × quantity
+   - Tender status **remains `"closed"`** (not awarded yet)
+   - History shows `"tender_offer_selected"` entry
+   - All offers still `"submitted"` (none accepted/rejected yet)
+
+### 5e. Submit PR & Complete Approvals (Auto-Award)
+
+1. Submit the Draft PR → status `"Pending"`, process linked
+2. Complete all process step approvals (same as 4d-4f)
+3. When the **last step is approved**, the backend auto-awards the tender:
+   - Tender status → `"awarded"`
+   - Winning offer → `"accepted"`, others → `"rejected"`
+   - PR's `stuffStatus` → `"assigned"`, store/stuff linked
+   - History shows `"tender_awarded"` entry
+4. PR status → `"PendingFinalization"`
+
+**Note:** If the OrgHead directly calls `finalize` and the tender is still `"closed"` (not yet auto-awarded), the `finalize` action handles the award automatically as part of winner selection.
 
 ---
 
@@ -468,9 +515,9 @@ In the frontend this would be a UI action to preview available stores and their 
 | # | Test Case | Expected Result |
 |---|-----------|----------------|
 | 6.1 | Login redirect | Lands on `/unit-head` dashboard |
-| 6.2 | Dashboard | Pending approvals count, active PRs, decided counts |
-| 6.3 | "درخواست‌های نیازمند تایید" → `/unit-head/requests` | PRs filtered by this unit, pending approvals only |
-| 6.4 | PR detail page | Step approval panel, workflow visualizer, history timeline |
+| 6.2 | Dashboard uses **`dashboardStatistic`** (single call replaces 5 separate calls) | Shows: unit info, PR counts (draft/pending/approved/rejected/total), pending approval count, recent approvals. If Warehouse unit → receipt count. If Finance unit → budget stats + payment order counts + fiscal year info. |
+| 6.3 | "درخواست‌های نیازمند تایید" → uses **`getPendingByUnit`** (not `stepApproval.gets`) | Returns full PR documents pending action for this unit — includes PRs where StepApproval record hasn't been created yet |
+| 6.4 | PR detail page | Step approval panel, workflow visualizer, history timeline. Shows `selectionType` badge. If tender offer selected, shows offer details. |
 | 6.5 | Approve/Reject | Confirmation dialog before submitting |
 | 6.6 | Loading state | Skeleton loaders on initial load |
 | 6.7 | Empty state | If no PRs pending, Persian empty state with icon |
@@ -499,17 +546,28 @@ In the frontend this would be a UI action to preview available stores and their 
 
 ## 8. Test the Finance Panel
 
-**Login:** `maryam@lesansatek.com` / `password123`
+**Login:** `maryam@lesansatek.com` / `password123` (Finance Employee, `canManageBudget` + `canIssuePaymentOrder`)
 
 | # | Test Case | Expected Result |
 |---|-----------|----------------|
 | 8.1 | Login redirect | Lands on `/finance` dashboard |
-| 8.2 | Dashboard KPIs | Total budget, remaining, pending payment orders, budget lines count |
+| 8.2 | Dashboard KPIs | Total budget, remaining, pending payment orders, budget lines count, fiscal year info |
 | 8.3 | Budget lines (`/finance/budget-lines`) | BUD-001 with allocation, remaining, color-coded |
-| 8.4 | Payment orders (`/finance/payment-orders`) | PR #1 payment order, status=paid, amount |
-| 8.5 | Budget reports (`/finance/budget-reports`) | KPI summary + breakdown with utilization % |
-| 8.6 | Empty states | Persian empty state when no data |
-| 8.7 | **Access control** | Try `/admin` → redirect to `/finance` (no admin role) |
+| 8.4 | Budget line CRUD | Can create/edit/delete budget lines (with `canManageBudget` feature) |
+| 8.5 | Budget allocations | Can create/remove allocations within a budget line |
+| 8.6 | Fiscal year management | Can create, update, and close fiscal years |
+| 8.7 | Payment orders (`/finance/payment-orders`) | PR #1 payment order, status=paid, amount. Filterable by `status: "sent_to_finance"` |
+| 8.8 | Mark payment as paid | Click "پرداخت شد" → PaymentOrder status → "paid", budget line's `totalAllocated` deducted |
+| 8.9 | Budget reports (`/finance/budget-reports`) | KPI summary + breakdown with utilization % |
+| 8.10 | **Direct deduction** (`budgetLine.deductDirect`) | Non-PR expense: directly deduct from a budget line's `totalAllocated` with `canIssuePaymentOrder` |
+| 8.11 | Empty states | Persian empty state when no data |
+| 8.12 | **Access control** | Try `/admin` → redirect to `/finance` (no admin role) |
+
+**Also test as Finance UnitHead:** Login as `fatemeh@lesansatek.com` / `password123`
+- Same Finance dashboard but with UnitHead role scope
+- Can manage budgets for the organization (UnitHead with Finance scope)
+- Payment orders scoped to organization
+- `dashboardStatistic` returns finance-specific stats (budgetLineCount, totalAllocated, totalSpent, pendingPaymentCount)
 
 ---
 
@@ -524,7 +582,7 @@ Sara is the **vendor** (canRespondToTender), the **StoreHead** of فروشگاه
 | 9.1 | Login redirect | Lands on `/vendor` dashboard (default for her role set) |
 | 9.2 | Dashboard KPIs | Open tenders, my offers, awarded count, win rate |
 | 9.3 | Open tenders (`/vendor/tenders`) | DataTable with title, deadline, status; "ثبت پیشنهاد" for open |
-| 9.4 | Submit offer form | Fields: price, delivery time, terms, notes |
+| 9.4 | Submit offer form | Fields: `wareId` (required — specific ware being offered), price, delivery time, terms, notes. `storeId` auto-derived from `activeRole.scopeId` |
 | 9.5 | My offers (`/vendor/my-offers`) | The submitted offer (2,500,000, 7 days, status=submitted) |
 | 9.6 | Empty states | Persian empty state when no data |
 | 9.7 | **Manager role** | Also has `/admin` panel access (PanelSelector shows مدیریت) |
@@ -540,14 +598,34 @@ Sara (as store head with Manager role) can add inventory items to her store:
 4. Add new Stuff entry with:
    - Ware: کیت TSH زیشیمی
    - Price: 2,800,000 (absolute) or any valid price
-   - Inventory No: custom number
-   - Denormalized hierarchy: wareTypeId, wareClassId, wareGroupId, wareModelId
+   - Quantity: 50
+   - Denormalized hierarchy: wareTypeId, wareClassId, wareGroupId, wareModelId, **wareId** (required)
 5. **Or** use the Vendor panel's store inventory management feature to add new stock items
 6. **Verify:** New Stuff record appears in the store's inventory list
 
 ---
 
-## 10. Test the Store Panel (StoreHead)
+## 10. Test the OrgHead Panel
+
+**Login:** `dr.ahmadi@lesansatek.com` / `password123`
+
+| # | Test Case | Expected Result |
+|---|-----------|----------------|
+| 10.1 | Login redirect | Lands on `/orghead` dashboard |
+| 10.2 | Dashboard KPIs | Pending finalization count, completed PRs count, total PRs |
+| 10.3 | **"در انتظار تأیید" tab** (`/orghead/requests?tab=pending`) | PRs in `PendingFinalization` status, sorted by oldest first |
+| 10.4 | Click a PR → detail page | Shows all info: requester, requesting unit, ware model, budget line, selection type (stuff/tender/both), process steps, step approvals, history timeline, tenders, goods receipts, payment orders |
+| 10.5 | Click **"تأیید نهایی"** (Finalize) | If only stuff exists → auto-finalizes. If both stuff+tender → modal with winner selection |
+| 10.6 | Winner selection modal (both paths) | Two cards side-by-side: stuff option vs tender option. Pick one → sets `finalWinner` |
+| 10.7 | Post-completion steps | Can add optional review steps: name + unit + description |
+| 10.8 | After finalize | PR status → `"Completed"`, `finalizedAt` set. If tender was picked → auto-awarded. |
+| 10.9 | **"تکمیل شده" tab** | Completed PRs with finalizedAt dates |
+| 10.10 | **"همه درخواست‌ها" tab** | All PRs in the org across all statuses |
+| 10.11 | Role guard | Try `/orghead` as non-OrgHead → redirect to default panel |
+
+---
+
+## 11. Test the Store Panel (StoreHead)
 
 **Login:** `sara@lesansatek.com` / `password123`
 
@@ -555,22 +633,23 @@ Sara has a **StoreHead** role with `scopeType: "store"` and `scopeId: {storeId}`
 
 | # | Test Case | Expected Result |
 |---|-----------|----------------|
-| 10.1 | Login redirect → `/store` dashboard (or via PanelSelector) | Lands on `/store` dashboard with store info and KPIs |
-| 10.2 | Dashboard shows store overview | Store name (فروشگاه نمونه), address, contact, score, total sales |
-| 10.3 | **Edit store info** – update name, address, contact, bank info | `store.update` succeeds (scope check: `_id` matches `activeRole.scopeId`) |
-| 10.4 | **Cannot edit another store** – try to access a non-existent or different store ID | Backend returns "You cant do this" (scope mismatch) |
-| 10.5 | **Cannot delete store** – delete button hidden or disabled | Remove restricted to Manager/Admin only |
-| 10.6 | **View store inventory (Stuff list)** – list all Stuff items for this store | All stuff entries for فروشگاه نمونه visible (inventoryNo, price, ware info) |
-| 10.7 | **Store settings** – manage delivery settings, working hours, status | Update pure fields works within scope |
-| 10.8 | **Can also access `/admin`** via PanelSelector (has Manager role) | PanelSelector shows مدیریت and فروشگاه options |
-| 10.9 | **Cannot access `/vendor`** – not a vendor panel by default | PanelSelector may show فروشندگان due to Manager role |
-| 10.10 | **Add Stuff to store** – add new inventory item to own store | `stuff.add` succeeds (scope check: `storeId` matches `activeRole.scopeId`) |
-| 10.11 | **Update Stuff** – edit price, inventoryNo of own store's stuff | `stuff.update` succeeds (scope check: fetched `store._id` matches `activeRole.scopeId`) |
-| 10.12 | **Remove Stuff** – delete own store's stuff | `stuff.remove` succeeds (scope check: fetched `store._id` matches `activeRole.scopeId`) |
-| 10.13 | **View open tenders** – browse tenders with status `open` | `tender.gets` returns open tenders; StoreHead can view offers |
-| 10.14 | **Submit tender offer** – submit a bid on an open tender | `tenderOffer.submit` succeeds (scope check: `storeId` matches `activeRole.scopeId`) |
-| 10.15 | **View PRs assigned to store** – list PRs where `store._id` matches own store | `purchasingRequest.gets` auto-filters by `store._id`; only PRs assigned to فروشگاه نمونه visible |
-| 10.16 | **Update stuff status** – change PR's `stuffStatus` (ready_to_ship → shipped → delivered) | `purchasingRequest.updateStuffStatus` succeeds (scope check: PR's `store._id` matches `activeRole.scopeId`) |
+| 11.1 | Login redirect → `/store` dashboard (or via PanelSelector) | Lands on `/store` dashboard with store info and KPIs |
+| 11.2 | Dashboard shows store overview | Store name (فروشگاه نمونه), address, contact, score, total sales |
+| 11.3 | **Edit store info** – update name, address, contact, bank info | `store.update` succeeds (scope check: `_id` matches `activeRole.scopeId`) |
+| 11.4 | **Cannot edit another store** – try to access a non-existent or different store ID | Backend returns "You cant do this" (scope mismatch) |
+| 11.5 | **Cannot delete store** – delete button hidden or disabled | Remove restricted to Manager/Admin only |
+| 11.6 | **View store inventory (Stuff list)** – list all Stuff items for this store | All stuff entries for فروشگاه نمونه visible (quantity, price, ware info). Uses `quantity` field (replaces old `inventoryNo`) |
+| 11.7 | **Add Stuff to store** – add new inventory item to own store | `stuff.add` succeeds (scope check: `storeId` matches `activeRole.scopeId`). Requires `quantity`, `price`, `wareId`, hierarchy IDs |
+| 11.8 | **Update Stuff** – edit price, quantity of own store's stuff | `stuff.update` succeeds (scope check: fetched `store._id` matches `activeRole.scopeId`) |
+| 11.9 | **Remove Stuff** – delete own store's stuff | `stuff.remove` succeeds (scope check: fetched `store._id` matches `activeRole.scopeId`) |
+| 11.10 | **Store settings** – manage delivery settings, working hours, status | Update pure fields works within scope |
+| 11.11 | **Can also access `/admin`** via PanelSelector (has Manager role) | PanelSelector shows مدیریت and فروشگاه options |
+| 11.12 | **View open tenders** – browse tenders with status `open` | `tender.gets` returns open tenders; StoreHead can view offers |
+| 11.13 | **Submit tender offer** – submit a bid on an open tender | `tenderOffer.submit` succeeds (scope check: `storeId` matches `activeRole.scopeId`). **Requires `wareId`** (specific ware being offered) |
+| 11.14 | **View PRs assigned to store** – list PRs where `store._id` matches own store | `purchasingRequest.gets` auto-filters by `store._id`; shows ALL PRs (not just Completed) |
+| 11.15 | **Update stuff status flow** – progress fulfillment: assigned → ready_to_ship → shipped → delivered | Each `purchasingRequest.updateStuffStatus` call advances status. Confirmation dialog before each step. **No inventory changes on delivery** (goods receipt handles inventory) |
+| 11.16 | **View submitted tender offers** – browse own offers | `tenderOffer.gets` auto-filters by `store._id`; StoreHead only sees their own store's offers |
+| 11.17 | **Offer exists check** – visit tender page with existing offer | Shows "شما قبلاً پیشنهاد داده‌اید" with offer details instead of submit form |
 
 ### StoreHead Scope Rules
 
@@ -584,9 +663,9 @@ Sara has a **StoreHead** role with `scopeType: "store"` and `scopeId: {storeId}`
 - **`stuff.remove`**: Allowed for StoreHead; the Stuff document's `store._id` must match `activeRole.scopeId`
 - **`stuff.gets`**: Allowed for StoreHead; auto-filtered by `store._id` = `activeRole.scopeId`
 - **`tender.gets`**: Allowed for StoreHead; returns all tenders (no store filter)
-- **`tenderOffer.submit`**: Allowed for StoreHead; `storeId` must match `activeRole.scopeId`
+- **`tenderOffer.submit`**: Allowed for StoreHead; `storeId` must match `activeRole.scopeId`. StoreHead does NOT need `canRespondToTender` feature flag.
 - **`tenderOffer.gets`**: Allowed for StoreHead; auto-filtered by `store._id` = `activeRole.scopeId`
-- **`purchasingRequest.gets`**: Allowed for StoreHead; auto-filtered by `store._id` = `activeRole.scopeId` AND `status="Completed"` AND `finalizedAt` exists (only finalized purchases)
+- **`purchasingRequest.gets`**: Allowed for StoreHead; auto-filtered by `store._id` = `activeRole.scopeId` (all statuses, not just Completed)
 - **`purchasingRequest.updateStuffStatus`**: Allowed for StoreHead; the PR's `store._id` must match `activeRole.scopeId`
 
 ### PanelSelector Behavior for Sara
@@ -595,85 +674,85 @@ Sara has **3 roles** with different panels:
 | Role | Panel | Access |
 |------|-------|--------|
 | Manager | `/admin` | Full admin panel |
-| StoreHead | `/store` | Store management panel (NEW) |
+| StoreHead | `/store` | Store management panel |
 | Employee | `/employee` | PR submission panel |
 
 The PanelSelector should show all 3 options for role switching.
 
 ---
 
-## 11. Test Inventory & Stock Management
+## 12. Test Inventory & Stock Management
 
 **Login as:** `admin@lesansatek.com`
 
 | # | Test Case | Expected Result |
 |---|-----------|----------------|
-| 11.1 | **موجودی انبار** (Inventory list) | TSH Kit: qty=45 (after adjust), min=10, max=200, Shelf A-12 |
-| 11.2 | Click inventory → adjust qty | Can update quantity |
-| 11.3 | **حرکات انبار** (Stock Movements list) | Chronological list: addStock(50) → adjust(45) → consumption(-5) → goodsReceipt(+10) → transfer(-10) → consumption(-3) |
-| 11.4 | Click any movement | Detail with balanceBefore, balanceAfter, reason, reference |
-| 11.5 | **مصرف کالا** (Consumption Records) | 2 records: qty=5 (routine lab testing), qty=3 (quality control, linked to PR) |
+| 12.1 | **موجودی انبار** (Inventory list) | TSH Kit: qty=45 (after adjust), min=10, max=200, Shelf A-12 |
+| 12.2 | Click inventory → adjust qty | Can update quantity |
+| 12.3 | **حرکات انبار** (Stock Movements list) | Chronological list: addStock(50) → adjust(45) → consumption(-5) → goodsReceipt(+10) → transfer(-10) → consumption(-3) |
+| 12.4 | Click any movement | Detail with balanceBefore, balanceAfter, reason, reference |
+| 12.5 | **مصرف کالا** (Consumption Records) | 2 records: qty=5 (routine lab testing), qty=3 (quality control, linked to PR) |
 
 ---
 
-## 12. Test Budget & Reporting
+## 13. Test Budget & Reporting
 
 | # | Test Case | Expected Result |
 |---|-----------|----------------|
-| 12.1 | Fiscal years list | "سال مالی 1405", open, active |
-| 12.2 | Budget lines list | BUD-001 with allocations, spending, remaining |
-| 12.3 | Click budget line | Detail: 100M allocated, encumbrances converted to spent, remaining |
-| 12.4 | Budget report | Total allocated, spent, surplus/deficit, utilization % |
-| 12.5 | Budget reports by fiscal year | Filter to 1405 → same data |
+| 13.1 | Fiscal years list | "سال مالی 1405", open, active |
+| 13.2 | Budget lines list | BUD-001 with allocations, spending, remaining |
+| 13.3 | Click budget line | Detail: 100M allocated, encumbrances converted to spent, remaining |
+| 13.4 | Budget report | Total allocated, spent, surplus/deficit, utilization % |
+| 13.5 | Budget reports by fiscal year | Filter to 1405 → same data |
 
 ---
 
-## 13. Test Process Builder & Archiving
+## 14. Test Process Builder & Archiving
 
 | # | Test Case | Expected Result |
 |---|-----------|----------------|
-| 13.1 | **Create process** | Form with name, description, optional scoping (unit / wareType / wareClass / wareGroup / wareModel) |
-| 13.2 | **Create step** | Form with name, type, order, assignee groups (unit selector + AND/OR operator) |
-| 13.3 | **Activate process** | Validates consecutive order, auto-increments version, status=Active |
-| 13.4 | **Duplicate process** | Creates Draft copy with "(Copy)" suffix |
-| 13.5 | **Archive process** | Set status=Archived on duplicate (no active PRs for that process) |
-| 13.6 | **Archive guard** | Cannot archive a process with active PRs → error message |
+| 14.1 | **Create process** | Form with name, description, optional scoping (unit / wareType / wareClass / wareGroup / wareModel) |
+| 14.2 | **Create step** | Form with name, type, order, assignee groups (unit selector + AND/OR operator) |
+| 14.3 | **Activate process** | Validates consecutive order, auto-increments version, status=Active |
+| 14.4 | **Duplicate process** | Creates Draft copy with "(Copy)" suffix |
+| 14.5 | **Archive process** | Set status=Archived on duplicate (no active PRs for that process) |
+| 14.6 | **Archive guard** | Cannot archive a process with active PRs → error message |
 
 ---
 
-## 14. Test Extended Features
+## 15. Test Extended Features
 
 | # | Test Case | Steps | Expected |
 |---|-----------|-------|----------|
-| 14.1 | **getMe** | Any user, navigate to profile | Returns user profile with roles, features |
-| 14.2 | **Store score update** | Admin → edit store | score=4.5, totalSoldAmount=15,000,000, totalSoldNum=5 |
-| 14.3 | **Step approval gets** | UnitHead → PR detail → approvals tab | 3 approval records (one per step), with unit and step names |
-| 14.4 | **Tender offer gets** | Vendor → my offers | Winning offer: 2,500,000, 7 days, store name |
-| 14.5 | **Tag CRUD** | Admin → tags | Create فوری (#FF0000), create موقت (#00FF00), delete موقت |
-| 14.6 | **Ware update relations** | Admin → ware detail → edit | Link/unlink manufacturer |
-| 14.7 | **Consumption with PR** | Admin → consumption records | qty=3, "Quality control testing", linked to PR #1 |
-| 14.8 | **Role update** | Admin → edit admin user | Manager role added alongside Ordinary |
+| 15.1 | **getMe** | Any user, navigate to profile | Returns user profile with roles, features |
+| 15.2 | **Store score update** | Admin → edit store | score=4.5, totalSoldAmount=15,000,000, totalSoldNum=5 |
+| 15.3 | **Step approval gets** | UnitHead → PR detail → approvals tab | 3 approval records (one per step), with unit and step names |
+| 15.4 | **Tender offer gets** | Vendor → my offers | Winning offer: 2,500,000, 7 days, store name |
+| 15.5 | **Tag CRUD** | Admin → tags | Create فوری (#FF0000), create موقت (#00FF00), delete موقت |
+| 15.6 | **Ware update relations** | Admin → ware detail → edit | Link/unlink manufacturer |
+| 15.7 | **Consumption with PR** | Admin → consumption records | qty=3, "Quality control testing", linked to PR #1 |
+| 15.8 | **Role update** | Admin → edit admin user | Manager role added alongside Ordinary |
 
 ---
 
-## 15. Test Panel Switching & Role Routing
+## 16. Test Panel Switching & Role Routing
 
-### 15a. Multi-Role Panel Switching
+### 16a. Multi-Role Panel Switching
 
 1. Login as **admin@lesansatek.com** — has Manager + Ordinary roles, all features
 2. **PanelSelector** — in admin header, click the LayoutDashboard icon
-3. **Verify:** Dropdown shows: مدیریت, پنل واحد, درخواست‌ها, مالی, فروشندگان, فروشگاه
+3. **Verify:** Dropdown shows: مدیریت, پنل واحد, درخواست‌ها, مالی, فروشندگان, فروشگاه, مدیریت سازمان
 4. Click **"پنل واحد"** → redirects to `/unit-head`
 5. Header changes to simpler PanelLayout (no sidebar)
 6. Click PanelSelector → switch back to **"مدیریت"** → back to `/admin`
 
-### 15b. User Menu Panel Links
+### 16b. User Menu Panel Links
 
 1. Click avatar → user menu opens
 2. **Verify:** "پنل‌ها" section shows accessible panels
 3. Click any panel → redirects
 
-### 15c. Direct URL Access Control
+### 16c. Direct URL Access Control
 
 | URL | Login as | Expected |
 |-----|----------|----------|
@@ -683,12 +762,14 @@ The PanelSelector should show all 3 options for role switching.
 | `/vendor` | `ali@lesansatek.com` | Redirect to default panel |
 | `/store` | `ali@lesansatek.com` | Redirect to default panel |
 | `/store` | `sara@lesansatek.com` | Allowed (StoreHead role) |
+| `/org-head` | `dr.ahmadi@lesansatek.com` | Allowed (OrgHead role) |
+| `/org-head` | `ali@lesansatek.com` | Redirect to default panel |
 | `/admin` | unauthenticated | Redirect to `/login` |
 | `/unit-head` | unauthenticated | Redirect to `/login` |
 
 ---
 
-## 16. Test Edge Cases
+## 17. Test Edge Cases
 
 | # | Scenario | Steps | Expected |
 |---|----------|-------|----------|
@@ -709,7 +790,7 @@ The PanelSelector should show all 3 options for role switching.
 
 ---
 
-## 17. Verification Checklist
+## 18. Verification Checklist
 
 ### Authentication & Routing
 - [ ] Login with each user (5 panel users) redirects to correct panel
@@ -723,18 +804,24 @@ The PanelSelector should show all 3 options for role switching.
 - [ ] Feature-gated sections hide correctly
 
 ### PR Flow (Core)
-- [ ] Employee creates PR with ware model, unit, budget line — NO process selector
-- [ ] Process auto-resolves (shown in response/detail)
-- [ ] PR status = "در انتظار تایید" after submission
-- [ ] UnitHead sees PR in pending list
+- [ ] Employee creates Draft PR via `add` — no process, no pricing, no budget line
+- [ ] `selectionType` = "none" after Draft creation
+- [ ] UnitHead/Admin adds Stuff to Draft PR via `addStuff` → `selectionType` = "stuff", `stuffStatus` = "assigned"
+- [ ] OR UnitHead creates tender on Draft PR, closes it, selects winning offer via `selectTenderOffer` → `selectionType` = "tender"
+- [ ] **Cannot submit without a selection** — error: "لطفاً ابتدا کالا تخصیص دهید یا از طریق مناقصه پیشنهاد انتخاب کنید"
+- [ ] Submit Draft PR (Draft → Pending) — process auto-resolves
+- [ ] UnitHead sees pending PRs via `getPendingByUnit` (new action)
 - [ ] Step approval panel with comment + approve/reject
 - [ ] Approve advances to next step
 - [ ] Reject changes PR status to "رد شده"
-- [ ] Finance step approval requires budget line — picker shown for Finance unit approvers
+- [ ] Finance step approval requires budget line — auto-creates BudgetEncumbrance
 - [ ] All steps approved → "در انتظار نهایی‌سازی" (PendingFinalization)
-- [ ] OrgHead/Manager finalizes → "تکمیل شده" (Completed)
-- [ ] Workflow visualizer reflects current step
-- [ ] History timeline captures all events (submitted, step_approved, item_assigned, all_steps_approved, finalized, goods_received)
+- [ ] OrgHead finalizes (if both stuff+tender exist, must pick winner) → "تکمیل شده" (Completed)
+- [ ] `stuffStatus` automatically set to "assigned" on finalize (or auto-awarded for tender)
+- [ ] StoreHead progresses delivery: assigned → ready_to_ship → shipped → delivered
+- [ ] Requester/Warehouse Head creates goods receipt → `stuffStatus` = "received", auto-creates PaymentOrder
+- [ ] OrgHead sends PaymentOrder to Finance → Finance UnitHead marks paid → budget deducted
+- [ ] History timeline captures: created, submitted, step_approved/rejected, stuff_assigned, stuff_status_updated, goods_received, tender_created, tender_offer_selected, tender_awarded, finalized
 - [ ] Employee view is read-only (no approve/reject)
 
 ### Tender Flow
@@ -808,9 +895,9 @@ The PanelSelector should show all 3 options for role switching.
 
 ---
 
-## 18. Standard Workflow Examples
+## 19. Standard Workflow Examples
 
-### 18a. Organization & User Quick Reference
+### 19a. Organization & User Quick Reference
 
 | User | Login | Panel(s) | Can Submit PR | Can Approve Steps |
 |------|-------|----------|--------------|-------------------|
@@ -829,7 +916,7 @@ The PanelSelector should show all 3 options for role switching.
 
 ---
 
-### 18b. Simple Workflow (1-Step: Finance Unit)
+### 19b. Simple Workflow (1-Step: Finance Unit)
 
 **Objective:** Single-step approval flow with one submitter and one approver.
 
@@ -843,23 +930,27 @@ The PanelSelector should show all 3 options for role switching.
 
 #### Step-by-Step Frontend Walkthrough
 
-**Phase 1 — Submit the PR (as Submitter)**
+**Phase 1 — Create Draft PR (as Submitter)**
 1. **Login** as فاطمه موسوی (fatemeh@lesansatek.com / password123)
    - If using `/unit-head` panel → you'll see Finance Unit data only
    - If using `/employee` panel → generic employee view
-2. Navigate to **"درخواست خرید جدید"** (New Purchase Request)
+2. Navigate to **"ایجاد پیش‌نویس درخواست خرید"** (New Draft Purchase Request)
 3. Fill in the form:
    - **عنوان (Title):** "تجهیزات آزمایشگاه هماتولوژی"
    - **توضیحات (Description):** "درخواست خرید کیت TSH برای آزمایشگاه"
    - **مدل کالا (Ware Model):** select "کیت TSH" (the ware model from seed data)
    - **تعداد (Quantity):** `5`
-   - **مبلغ تخمینی (Estimated Amount):** `25000000` (25,000,000)
-   - **واحد درخواست‌کننده (Requesting Unit):** **"واحد مالی"** (Finance Unit) ← REQUIRED for org detection
-   - **بودجه (Budget Line):** select "BUD-001" (if budget line field is shown)
-4. Click **"ثبت درخواست"** (Submit Request)
-5. ✅ Expected result: PR created with status **"در انتظار تایید"** (Pending)
-6. The process auto-resolves to **Process #4** (1 step: تأیید مالی)
-7. Note the PR number/ID for approval step
+   - **No `estimatedAmount`, `budgetLineId`, or `requestingUnit`** — auto-derived or set later
+4. Click **"ثبت پیش‌نویس"** (Create Draft)
+5. ✅ PR status: **"Draft" (پیش‌نویس)**, `selectionType` = "none", no process linked
+
+**Phase 2 — Assign Stuff & Submit**
+1. From the Draft PR detail, click **"تخصیص کالا"** (Add Stuff) → select TSH Kit stuff
+2. ✅ `selectionType` → `"stuff"`, `stuffStatus` → `"assigned"`
+3. Click **"ارسال درخواست"** (Submit Request)
+4. ✅ The process auto-resolves to **Process #4** (1 step: تأیید مالی)
+5. PR status → **"در انتظار تایید"** (Pending)
+6. Note the PR number/ID for approval step
 
 **Phase 2 — Approve the PR (as Approver)**
 1. **Logout** and **Login** as **Admin System** (admin@lesansatek.com / password123) via `/admin` panel
@@ -874,7 +965,7 @@ The PanelSelector should show all 3 options for role switching.
 
 ---
 
-### 18c. Complex Workflow (3-Step: Procurement → Warehouse → Finance)
+### 19c. Complex Workflow (3-Step: Procurement → Warehouse → Finance)
 
 **Objective:** Full multi-approver chain. Three different users approve across three units, demonstrating OR/AND step logic and role switching.
 
@@ -896,20 +987,29 @@ The PanelSelector should show all 3 options for role switching.
 
 #### Step-by-Step Frontend Walkthrough
 
-**Phase 1 — Submit the PR (as رضا احمدی)**
+**Phase 1a — Create Draft PR (as رضا احمدی)**
 1. **Login** as **رضا احمدی** (reza@lesansatek.com / password123) via `/unit-head` panel
-2. Navigate to **"درخواست خرید جدید"**
+2. Navigate to **"ایجاد پیش‌نویس درخواست خرید"**
 3. Fill in:
    - **عنوان:** "کیت آزمایشگاهی — خرید عمده"
    - **توضیحات:** "خرید ۱۰ عدد کیت TSH برای آزمایشگاه هماتولوژی"
    - **مدل کالا:** "کیت TSH"
    - **تعداد:** `10`
-   - **مبلغ تخمینی:** `50000000` (50,000,000)
-   - **واحد درخواست‌کننده:** **"واحد خرید"** (Procurement Unit)
-   - **بودجه:** select BUD-001 if shown
-4. Click **"ثبت درخواست"**
-5. ✅ PR status: **"در انتظار تایید"**
-6. The process auto-resolves to **Process #2** (3 steps)
+   - **No `estimatedAmount`, `budgetLineId`, `storeId`** — these are set later
+   - **No `requestingUnit`** — auto-derived from active role scope
+4. Click **"ثبت پیش‌نویس"**
+5. ✅ PR status: **"Draft" (پیش‌نویس)**
+6. The PR has no process linked yet, `selectionType` = "none"
+
+**Phase 1b — Add Stuff to Draft PR**
+1. From the Draft PR detail, click **"تخصیص کالا"**
+2. Browse available Stuff records → select the TSH Kit stuff
+3. ✅ `selectionType` → `"stuff"`, `stuffStatus` → `"assigned"`, `estimatedAmount` set
+
+**Phase 1c — Submit the PR**
+1. Click **"ارسال درخواست"**
+2. ✅ PR status: **"در انتظار تایید" (Pending)**
+3. The process auto-resolves to **Process #2** (3 steps)
 
 **Phase 2 — Approve Step 1 (تأیید درخواست)**
 1. **Logout** and **Login** as **Admin System** (admin@lesansatek.com) via `/admin` panel
@@ -949,62 +1049,81 @@ The PanelSelector should show all 3 options for role switching.
 
 ---
 
-### 18d. Alternative Workflow: Direct Store Purchase
+### 19d. Alternative Workflow: Direct Store Purchase
 
-**Objective:** After the 3-step approval above, test store assignment, goods receipt, and payment using the completed PR.
+**Objective:** After the 3-step approval above, test store assignment (via `addStuff`), goods receipt, and payment.
 
 | Step | Action | User | Login |
 |------|--------|------|-------|
-| 1 | Assign Store to PO | Admin | admin@lesansatek.com |
-| 2 | Record Goods Receipt | Admin | admin@lesansatek.com |
-| 3 | Mark Payment | حسین کاظمی | hossein@lesansatek.com |
+| 1 | Add Stuff to Draft PR | Admin | admin@lesansatek.com |
+| 2 | Submit & complete approvals | Admin | admin@lesansatek.com |
+| 3 | StoreHead delivers | سارا کریمی | sara@lesansatek.com |
+| 4 | Record Goods Receipt | Admin | admin@lesansatek.com |
+| 5 | Payment | دکتر احمدی → فاطمه موسوی | dr.ahmadi@lesansatek.com → fatemeh@lesansatek.com |
 
 **Frontend flow:**
-1. After PR is finalized to Completed, find it in the Admin panel
-2. Click **"اختصاص کالا"** (Add Stuff) → select the stuff item from the store's inventory
-3. PR's `stuffStatus` is set to `"assigned"`, `estimatedAmount` updated with pricing
-4. Click **"دریافت کالا"** (Goods Receipt) → fill in receipt details, quantity received (no purchaseOrderItemId)
+1. After Draft PR is created, click **"تخصیص کالا"** (Add Stuff) → select the stuff item from store's inventory
+   - Store identity is **NOT shown** to the assigning user — only product name, brand, price
+2. PR's `selectionType` → `"stuff"`, `stuffStatus` → `"assigned"`, `estimatedAmount` updated with pricing
+3. Submit the Draft PR (Draft → Pending), complete all step approvals
+4. OrgHead finalizes (PendingFinalization → Completed)
+5. StoreHead progresses delivery: assigned → ready_to_ship → shipped → delivered
+6. Click **"دریافت کالا"** (Goods Receipt) → fill in receipt details, items WITHOUT `purchaseOrderItemId`
    - **Authority:** Only the PR's requester or a Warehouse-type unit head can confirm delivery
-5. System auto-creates a draft PaymentOrder
-6. Login as Admin → navigate to Payment Orders → Click **"پرداخت شد"** (Mark Paid)
-7. Budget line's `totalAllocated` is deducted by the payment amount
+7. System auto-creates a draft PaymentOrder
+8. OrgHead sets PaymentOrder status → `"sent_to_finance"`
+9. Finance UnitHead clicks **"پرداخت شد"** (Mark Paid) → budget line's `totalAllocated` deducted
 
-### 18e. Workflow: Tender / Vendor Selection
+### 19e. Workflow: Tender / Vendor Selection (Deferred Award)
 
-**Objective:** PR that goes through tender/auction instead of direct store assignment.
+**Objective:** PR that goes through tender/auction with **deferred award** — the winner is selected before submission, but the actual award happens when the last approval step completes.
 
 | Step | Action | User | Login |
 |------|--------|------|-------|
-| 1 | Submit PR | رضا احمدی | reza@lesansatek.com |
-| 2 | Create Tender | Admin | admin@lesansatek.com |
+| 1 | Create Draft PR | رضا احمدی | reza@lesansatek.com |
+| 2 | Create Tender (on Draft) | Admin | admin@lesansatek.com |
 | 3 | Assign Vendor | Admin | admin@lesansatek.com |
-| 4 | Submit Offer | سارا کریمی | sara@lesansatek.com |
+| 4 | Submit Offer (with wareId) | سارا کریمی | sara@lesansatek.com |
 | 5 | Close Tender | Admin | admin@lesansatek.com |
-| 6 | Award Winner | Admin | admin@lesansatek.com |
+| 6 | **Select Winner** (selectTenderOffer) | Admin | admin@lesansatek.com |
+| 7 | Submit PR | رضا احمدی | reza@lesansatek.com |
+| 8 | Complete step approvals | Various | — |
+| 9 | **Auto-award** on final approval | Backend | — |
 
 **Frontend flow (from Procurement perspective):**
-1. رضا احمدی submits a new PR (requesting from Procurement Unit)
-2. Admin creates a Tender linked to this PR, sets deadline
-3. Admin assigns the seed vendor to the tender
-4. سارا کریمی logs into `/vendor` panel, sees the tender, submits an offer (price, delivery time)
+1. رضا احمدی creates a **Draft** PR (requesting from Procurement Unit)
+2. Admin creates a Tender linked to this Draft PR, sets deadline
+3. Admin assigns vendors to the tender
+4. سارا کریمی logs into `/vendor` panel, sees the tender, submits an offer (price, delivery time, **wareId**)
 5. Admin closes the tender (no more offers accepted)
-6. Admin awards the tender to سارا کریمی's store
-7. PR's `stuffStatus` is set to `"assigned"`, store and pricing recorded internally
-8. PR can now proceed to goods receipt
+6. Admin **selects the winning offer** via `purchasingRequest.selectTenderOffer` (NOT `tender.award`)
+   - `selectionType` → `"tender"`, tender stays `"closed"`
+7. رضا احمدی submits the Draft PR (Draft → Pending, process linked)
+8. Step approvals begin — after last step approval, the backend **auto-awards**:
+   - Tender → `"awarded"`, winning offer → `"accepted"`, others → `"rejected"`
+   - PR's `stuffStatus` → `"assigned"`, store+stuff linked, pricing recorded
+9. PR can proceed to PendingFinalization → OrgHead finalizes → delivery → goods receipt → payment
 
 ---
 
-### 18f. Role Switching Reference
+### 19f. Role Switching Reference
 
 | Action | Allowed Roles | Which Role to Use | Admin's Available RoleId |
 |--------|--------------|-------------------|--------------------------|
-| `purchasingRequest.submit` | `Manager`, `Admin`, `OrgHead`, `UnitHead`, `Employee` | **Employee** (all users have it) | `{employeeRoleId}` |
+| `purchasingRequest.add` | `Manager`, `Admin`, `OrgHead`, `UnitHead`, `Employee` (with `canRegisterPurchaseRequest`) | **Employee** | `{employeeRoleId}` |
+| `purchasingRequest.submit` | `Manager`, `Admin`, `OrgHead`, `UnitHead`, `Employee` (with `canSubmitPurchaseRequest`) | **Employee** (all users have it) | `{employeeRoleId}` |
 | `stepApproval.submitDecision` | `Manager`, `Admin`, `OrgHead`, `UnitHead` | **Manager** (org-wide) or **UnitHead** (scoped) | `{managerRoleId}` or `{adminUnitHeadProcRoleId}` / `{adminUnitHeadWhRoleId}` / `{adminUnitHeadFinRoleId}` |
-| `stepApproval.submitDecision` (Finance step) | `Manager`, `Admin`, `OrgHead`, `UnitHead` | Must provide `budgetLineId` when the unit type is `Finance`; system validates `remainingBudget >= estimatedTotal` | Any role with access + a valid budget line ID |
-| `purchasingRequest.finalize` | `Manager`, `Admin`, `OrgHead` | **OrgHead** (org-level) or **Manager** | `{orgHeadRoleId}` or `{managerRoleId}` |
-| `purchasingRequest.addStuff` | Feature: `canAssignItemsToOrder` | Any | Any |
-| `goodsReceipt.add` | `Manager`, `Admin`, `OrgHead`, `UnitHead` | **Manager** | `{managerRoleId}` |
-| `paymentOrder.markPaid` | `Manager`, `Admin`, `OrgHead`, `UnitHead` | **Manager** or **UnitHead** | `{managerRoleId}` or unit-specific |
+| `stepApproval.submitDecision` (Finance step) | `Manager`, `Admin`, `OrgHead`, `UnitHead` | Must provide `budgetLineId` when the unit type is `Finance`; system validates `remainingBudget >= estimatedTotal`. Auto-creates BudgetEncumbrance. | Any role with access + a valid budget line ID |
+| `purchasingRequest.finalize` | `Manager`, `Admin`, `OrgHead` | **OrgHead** (org-level) or **Manager**. Handles winner selection if both stuff+tender exist. Optional `budgetLineId` override. | `{orgHeadRoleId}` or `{managerRoleId}` |
+| `purchasingRequest.addStuff` | `Manager`, `Admin`, `OrgHead`, `UnitHead` | **UnitHead** (during Draft/Pending/InProgress). Sets `selectionType: "stuff"`. | `{managerRoleId}` or any unit head role |
+| `purchasingRequest.selectTenderOffer` | `Manager`, `Admin`, `OrgHead`, `UnitHead` | **UnitHead** on closed tenders (Draft/Pending/InProgress). Sets `selectionType: "tender"`. Does NOT award yet. | `{managerRoleId}` or unit-specific |
+| `purchasingRequest.removeTenderSelection` | `Manager`, `Admin`, `OrgHead`, `UnitHead` | **UnitHead** - clears tender offer selection | `{managerRoleId}` or unit-specific |
+| `purchasingRequest.updateStuffStatus` | `Manager`, `Admin`, `StoreHead` (scoped) | **StoreHead** (own store's PRs only). Progresses: assigned → ready_to_ship → shipped → delivered. | `{storeHeadRoleId}` |
+| `purchasingRequest.getPendingByUnit` | `Manager`, `Admin`, `UnitHead` | **UnitHead** (unit derived from activeRole). Returns full PR docs pending unit approval. | Any unit head role |
+| `user.dashboardStatistic` | `Manager`, `Admin`, `UnitHead`, `OrgHead` | **UnitHead** (scope from role). Single call returns all dashboard KPIs. | Any |
+| `goodsReceipt.add` | `Manager`, `Admin`, `OrgHead`, `UnitHead` | **Requester or Warehouse Head** (authority check). Auto-creates draft PaymentOrder. | `{managerRoleId}` |
+| `paymentOrder.markPaid` | `Manager`, `Admin`, `OrgHead`, `UnitHead` (with `canIssuePaymentOrder`) | **Finance UnitHead** or **Manager**. Deducts budget line's `totalAllocated`. | `{managerRoleId}` or `{adminUnitHeadFinRoleId}` |
+| `paymentOrder.update` | `Manager`, `Admin`, `OrgHead`, `UnitHead` (with `canIssuePaymentOrder`) | **OrgHead** (to send to finance) or **Finance UnitHead** | `{orgHeadRoleId}` or unit-specific |
 | `stuff.add` | `Manager`, `Admin`, `StoreHead` (scoped) | **Manager** (any store) or **StoreHead** (own store only) | `{managerRoleId}` or `{storeHeadRoleId}` |
 | `stuff.update` | `Manager`, `Admin`, `StoreHead` (scoped) | **Manager** (any store) or **StoreHead** (own store only) | `{managerRoleId}` or `{storeHeadRoleId}` |
 | `stuff.remove` | `Manager`, `Admin`, `StoreHead` (scoped) | **Manager** (any store) or **StoreHead** (own store only) | `{managerRoleId}` or `{storeHeadRoleId}` |
@@ -1013,10 +1132,13 @@ The PanelSelector should show all 3 options for role switching.
 | `store.update` | `Manager`, `Admin`, `StoreHead` (scoped) | **Manager** (any store) or **StoreHead** (own store only) | `{managerRoleId}` or `{storeHeadRoleId}` |
 | `store.updateRelations` | `Manager`, `Admin`, `StoreHead` (scoped) | **Manager** (any store) or **StoreHead** (own store only) | `{managerRoleId}` or `{storeHeadRoleId}` |
 | `tender.gets` | `Manager`, `Admin`, `StoreHead` | **StoreHead** | `{storeHeadRoleId}` |
-| `tenderOffer.submit` | `Manager`, `Admin`, `StoreHead` (scoped) | **StoreHead** (own store only) | `{storeHeadRoleId}` |
+| `tenderOffer.submit` | `Manager`, `Admin`, `StoreHead` (scoped) | **StoreHead** (own store only, no feature flag needed) | `{storeHeadRoleId}` |
 | `tenderOffer.gets` | `Manager`, `Admin`, `StoreHead` (scoped filter) | **StoreHead** (auto-filtered) | `{storeHeadRoleId}` |
-| `purchasingRequest.gets` | `Manager`, `Admin`, `OrgHead`, `UnitHead`, `Employee`, `StoreHead` (scoped filter) | **StoreHead** (auto-filtered by store + only Completed/finalized) | `{storeHeadRoleId}` |
-| `purchasingRequest.updateStuffStatus` | `Manager`, `Admin`, `StoreHead` (scoped) | **StoreHead** (own store's PRs only, can still update via direct navigation to PR detail) | `{storeHeadRoleId}` |
+| `purchasingRequest.gets` | `Manager`, `Admin`, `OrgHead`, `UnitHead`, `Employee`, `StoreHead` (scoped filter) | **StoreHead** (auto-filtered by store, all statuses). **OrgHead** (auto-filtered by org). | `{storeHeadRoleId}` or `{orgHeadRoleId}` |
+| `budgetLine.deductDirect` | `Manager`, `Admin`, `OrgHead`, `UnitHead` (with `canIssuePaymentOrder`) | **Finance UnitHead** (non-PR expense deduction) | `{adminUnitHeadFinRoleId}` |
+| `budgetLine.*` (CRUD) | `Manager`, `Admin`, `OrgHead`, `UnitHead` (with `canManageBudget`) | **Finance UnitHead** (budget line management) | `{adminUnitHeadFinRoleId}` |
+| `budgetAllocation.*` (CRUD) | `Manager`, `Admin`, `OrgHead`, `UnitHead` (with `canManageBudget`) | **Finance UnitHead** | `{adminUnitHeadFinRoleId}` |
+| `fiscalYear.*` (CRUD) | `Manager`, `Admin`, `OrgHead`, `UnitHead` (with `canManageBudget`) | **Finance UnitHead** | `{adminUnitHeadFinRoleId}` |
 
 **Key rule:** submit → **Employee** role; approval/CRUD → **Manager** (for org-wide) or **UnitHead** (for unit-specific); store management → **StoreHead** (own store only).
 
@@ -1040,28 +1162,37 @@ The PanelSelector should show all 3 options for role switching.
 - She has `canRespondToTender` → can submit tender offers via `/vendor` panel
 - She has `canAssignItemsToOrder` → can assign store inventory to purchase requests
 
-### 18g. Troubleshooting Common Issues
+### 19g. Troubleshooting Common Issues
 
 | Issue | Likely Cause | Fix |
 |-------|-------------|-----|
 | "You cant do this" | `activeRoleId` resolves to `Ordinary` role, or role has no `roleId` UUID | Use Employee/Manager/UnitHead roleId; re-run `gen-update-admin-roles` to regenerate roles with proper UUIDs |
-| "Could not determine organization" | `requestingUnitId` not sent or user/unit missing org relation | Send `requestingUnitId` in submit; ensure user has `organization` relation |
+| "Your active role does not have an associated unit" | User's active role has no unit `scopeId` | Select a role with `scopeType: "unit"` (e.g. UnitHead or scoped Employee) |
+| "Could not determine organization" | User has no organizations or missing org relation | Ensure user belongs to an organization via `addOrRemoveRoles` |
+| "Please assign stuff or select a tender offer before submitting this request" | `selectionType` is `"none"` when calling `submit` | Call `addStuff` or `selectTenderOffer` first to set `selectionType` |
+| "This purchasing request already has an active tender" | Tender already exists on this PR with status `open`/`closed` | Close/cancel existing tender before creating a new one, or remove tender selection |
+| "Can only select a tender offer for a Draft, Pending, or InProgress request" | PR is already Completed/Rejected/Cancelled | Only open PRs can accept tender offer selections |
+| "Tender must be closed before selecting a winner" | Tender is still `open` — bids are still being accepted | Call `tender.close` first, then `selectTenderOffer` |
+| "Only submitted offers can be selected" | Offer status is not `"submitted"` (already accepted/rejected) | Check offer status — only submitted offers are eligible |
 | PR stuck on step 1 | No StepApproval created for the unit | Check process step assigneeGroups — units must match the requesting unit's process |
-| Goods Receipt fails | PR not completed or stuff not assigned | Complete `addStuff` first; ensure PR's `stuffStatus` is `"assigned"` |
+| Goods Receipt fails | PR not completed or stuff not assigned | Ensure PR status is Completed and `stuffStatus` is `"delivered"` |
 | "Stuff not found" | `addStuff` called with invalid `stuffId` | Verify the stuff document exists for the given wareModel and store |
 | "Budget line is required when approving from a finance unit" | Step approval for a Finance-type unit without providing `budgetLineId` | Pass a valid budget line ID with sufficient `remainingBudget` |
 | "Insufficient budget: remaining is less than required" | The budget line's `remainingBudget` is less than `estimatedTotal` (unitPrice × quantity) | Choose a different budget line or increase allocation |
 | "Only the requester or the central warehouse head can confirm goods delivery" | A user who is neither the PR requester nor a Warehouse head tries to create a goods receipt | Ensure the logged-in user is the PR requester or has a head role at a Warehouse-type unit |
 | "As the requester, goods must be received into your requesting unit" | The PR's requester is creating the goods receipt but `receivingUnitId` differs from the PR's `requestingUnit._id` | Set `receivingUnitId` to the PR's requesting unit ID |
 | PR stuck at PendingFinalization | All steps approved but no OrgHead/Manager has finalized | Call `purchasingRequest.finalize` as Manager/Admin/OrgHead |
+| "You can only add items to your own store" | StoreHead calls `stuff.add` with `storeId` not matching their scope | Use `activeRole.scopeId` as `storeId` |
+| "Invalid stuffStatus" | Called `updateStuffStatus` with wrong enum value | Use one of: assigned, ready_to_ship, shipped, delivered |
+| "Can only add stuff to a Draft or active purchasing request" | Called `addStuff` on a non-Draft/non-active PR | Only Draft, Pending, or InProgress PRs can accept stuff assignments |
 
 ---
 
-## 19. Appendix — Complete Test Data Reference
+## 20. Appendix — Complete Test Data Reference
 
 This appendix provides the full field-level reference for all test data created by the `e2e.json` suite. Use it when verifying data in the frontend UI.
 
-### 19a. User Info
+### 20a. User Info
 
 #### TempUser (Bootstrap Ghost)
 
@@ -1118,7 +1249,7 @@ This appendix provides the full field-level reference for all test data created 
 
 ---
 
-### 19b. Geographic Data
+### 20b. Geographic Data
 
 #### State
 
@@ -1136,7 +1267,7 @@ This appendix provides the full field-level reference for all test data created 
 
 ---
 
-### 19c. Organizational Structure
+### 20c. Organizational Structure
 
 #### Organization
 
@@ -1202,7 +1333,7 @@ This appendix provides the full field-level reference for all test data created 
 
 ---
 
-### 19d. Product Hierarchy
+### 20d. Product Hierarchy
 
 #### Manufacturer
 
@@ -1264,7 +1395,7 @@ WareType (تجهیزات آزمایشگاهی)
 
 ---
 
-### 19e. Store & Stuff
+### 20e. Store & Stuff
 
 #### Store
 
@@ -1281,17 +1412,19 @@ WareType (تجهیزات آزمایشگاهی)
 
 | Field | Value |
 |-------|-------|
-| `inventoryNo` | 1001 |
+| `quantity` | 50 (replaces old `inventoryNo`) |
 | `price` | 2,800,000 |
 | `hasAbsolutePrice` | true |
+| `pricePercentage` | null (not used when `hasAbsolutePrice` is true) |
 
 **Denormalized relations:** `wareId`, `storeId`, `wareTypeId`, `wareClassId`, `wareGroupId`, `wareModelId`
 
-Pricing: **Absolute** (not percentage) — `hasAbsolutePrice: true`, actual price = 2,800,000.
+Pricing: **Absolute** (not percentage) — `hasAbsolutePrice: true`, actual price = 2,800,000.  
+If `hasAbsolutePrice = false`, price would be computed as `Ware.price * (1 + pricePercentage/100)`.
 
 ---
 
-### 19f. Process & Steps — 8 Scoped Processes
+### 20f. Process & Steps — 8 Scoped Processes
 
 The E2E suite creates **8 processes** covering every scope form. PR creation auto-resolves the correct process via `resolveProcessForPR()`.
 
@@ -1413,7 +1546,7 @@ The general process is duplicated via `duplicateProcess` (creates Draft copy nam
 
 ---
 
-### 19g. Tag
+### 20g. Tag
 
 | Field | Value |
 |-------|-------|
@@ -1423,7 +1556,7 @@ The general process is duplicated via `duplicateProcess` (creates Draft copy nam
 
 ---
 
-### 19h. Budget
+### 20h. Budget
 
 #### FiscalYear
 
@@ -1454,9 +1587,30 @@ Status defaults to `"open"`.
 
 ---
 
-### 19i. Purchasing Requests
+### 20i. Purchasing Requests
 
-#### PR #1 — Direct Store Purchase
+**New/Changed Model Fields:**
+- `selectionType`: `"none"` | `"stuff"` | `"tender"` — tracks whether user has assigned stuff or selected tender offer
+- `selectedTenderOfferId`: string (ObjectId, optional) — set when `selectionType === "tender"`
+- `finalizedAt`: date (optional) — set when OrgHead calls `finalize()`
+- `postCompletionSteps`: array (optional) — post-finalization quality review steps added by OrgHead
+- `stuffStatus`: `"none"` | `"assigned"` | `"ready_to_ship"` | `"shipped"` | `"delivered"` | `"received"` | `"cancelled"`
+
+**PR Status Lifecycle (Updated):**
+```
+Draft → (submit) → Pending → (step approvals) → InProgress → (last step approved) → PendingFinalization
+  ↑                                                                                          ↓
+  └── (cancelled) ←── Rejected ←────────────────────────────────────────────────────────┘  OrgHead finalize()
+                                                                                             ↓
+                                                                                        Completed
+```
+
+- **Draft**: Initial state after `add`. No process linked. `addStuff`/`selectTenderOffer`/`tender.add` all allowed
+- **Pending**: After `submit`. Process linked, step approvals created
+- **PendingFinalization**: All steps approved. OrgHead must review and finalize
+- **Completed**: Finalized by OrgHead. `stuffStatus = "assigned"`. Proceeds to delivery/goods receipt/payment
+
+#### PR #1 — Direct Store Purchase (New Flow)
 
 | Field | Value |
 |-------|-------|
@@ -1465,13 +1619,11 @@ Status defaults to `"open"`.
 | `estimatedAmount` | 50,000,000 |
 | `quantity` | 10 |
 
-**Relations (no processId — auto-resolved):** `wareModelId`, `requestingUnitId` → Procurement Unit, `budgetLineId`
+**Relations (no processId — auto-resolved):** `wareModelId`, `requestingUnitId` → Procurement Unit
 
-**Auto-resolve:** requestingUnit=`{unitId}` → matches Process #2 (unit-scoped, Procurement) → resolves `{processUnitId}`
+**Flow:** Draft → `addStuff` (selectionType="stuff") → Submit → Step 1 → Step 2 → Step 3 (Finance approves with budgetLineId, auto-encumbrance) → PendingFinalization → OrgHead finalizes → Completed → StoreHead delivers (assigned→ready_to_ship→shipped→delivered) → Goods Receipt → Auto Payment
 
-**Flow:** Submit → Check Store Availability → Add Stuff (`addStuff`) → Step 1 Decision (approved) → Warehouse Check → Step 2 Decision (approved) → Step 3 Decision (approved) → Goods Receipt → Auto Payment
-
-#### PR #2 — Tender-Based Purchase
+#### PR #2 — Tender-Based Purchase (New Flow)
 
 | Field | Value |
 |-------|-------|
@@ -1479,9 +1631,7 @@ Status defaults to `"open"`.
 | `description` | Tender-based procurement |
 | `quantity` | 20 |
 
-**Relations (no processId — auto-resolved):** `wareModelId`, `requestingUnitId` → Procurement Unit, `budgetLineId`
-
-**Auto-resolve:** requestingUnit=`{unitId}` → matches Process #2 (unit-scoped, Procurement) → resolves `{processUnitId}`
+**Flow:** Draft → `tender.add` → `tender.close` → `selectTenderOffer` (selectionType="tender") → Submit → Step approvals → Last step approved → Auto-awards tender → PendingFinalization → OrgHead finalize → Completed
 
 #### PR #3 — Pending (for approval flow test)
 
@@ -1496,7 +1646,7 @@ Status defaults to `"open"`.
 
 ---
 
-### 19j. Tender
+### 20j. Tender
 
 | Field | Value |
 |-------|-------|
@@ -1519,21 +1669,22 @@ Status defaults to `"open"`.
 
 ---
 
-### 19k. Goods Receipt
+### 20k. Goods Receipt
 
 | Field | Value |
 |-------|-------|
 | `receiptNumber` | GR-001 |
 | `description` | First goods receipt |
 | `receivedAt` | 2026-04-01 |
-| `items` | `[{wareModelId, quantityReceived: 10, quantityAccepted: 10, quantityRejected: 0}]` |
+| `items` | `[{wareModelId, wareModelName, wareId, wareName, quantityReceived: 10, quantityAccepted: 10, quantityRejected: 0, batchNo, expirationDate}]` |
 
 **Relations:** `purchasingRequestId` → PR #1, `receivedById` → user (must be the PR requester or a Warehouse unit head), `receivingUnitId` → requesting unit (not warehouse, due to authority check)  
-**Pricing:** Reads `estimatedAmount` from PR (prorated by accepted qty). No purchaseOrderItem needed.
+**Pricing:** Reads `estimatedAmount` from PR (prorated by accepted qty). No `purchaseOrderItemId` needed — `PurchaseOrderItem` model was deleted. `payTo` resolved from PR's `store` relation.  
+**Authority:** Only the PR's requester (receivingUnit must match requestingUnit) or a Warehouse-type unit head can confirm delivery.
 
 ---
 
-### 19l. Inventory & Stock
+### 20l. Inventory & Stock
 
 #### Inventory (Initial)
 
@@ -1584,15 +1735,22 @@ Status defaults to `"open"`.
 
 ---
 
-### 19m. Role Management (Frontend Panel Users)
+### 20m. Role Management (Frontend Panel Users)
 
 > **Roles are ONLY managed via `addOrRemoveRoles`** — `addUser` no longer accepts a `roles` field. All users are created with a default `[{name: "Ordinary"}]` role, and their full role set is applied via `addOrRemoveRoles` calls.
+>
+> **Key model changes:**
+> - `user.organization` (single relation) → `user.organizations` (multiple relation, array)
+> - `user.headedUnit` / `user.headedOrganization` — **removed**. To find headed units: parse `user.roles` for `UnitHead` entries or query `unit.gets` with `{ "head._id": userId }`
+> - **Two-step unit head assignment:** `unit.updateRelations` sets the head relation, then `user.addOrRemoveRoles` adds the `UnitHead` role + syncs `user.units`
+> - **OrgHead role:** `scopeType: "organization"`, `scopeId: <orgId>`
+> - **StoreHead role:** `scopeType: "store"`, `scopeId: <storeId>`
 
 | # | ID | Purpose | Captures |
 |---|-----|---------|----------|
 | 51 | `gen-update-admin-roles` | Adds `Manager`, scoped `Employee`, and scoped `UnitHead`×3 roles to admin for `/admin` panel | — |
 | 52 | `gen-unithead-user` | Creates **رضا احمدی** (`reza@lesansatek.com` / `password123`) | `{unitheadUserId}` |
-| 53 | `gen-finance-user` | Creates **مریم حسینی** (`maryam@lesansatek.com` / `password123`) with `canManageBudget` feature | `{financeUserId}` |
+| 53 | `gen-finance-user` | Creates **مریم حسینی** (`maryam@lesansatek.com` / `password123`) with `canManageBudget` + `canIssuePaymentOrder` + `canViewBudgetReports` features | `{financeUserId}` |
 | 54 | `gen-vendor-user` | Creates **سارا کریمی** (`sara@lesansatek.com` / `password123`) with `canRespondToTender` + `canAssignItemsToOrder` features. Also serves as **store head** of فروشگاه نمونه. | `{vendorUserId}` |
 | 55 | `gen-roles-sara` | Adds `Manager` + scoped `Employee` (Procurement unit) to سارا کریمی | — |
 | 56 | `gen-roles-sara-storehead` | Adds **StoreHead** role (`scopeType: "store"`, `scopeId: {storeId}`) to سارا کریمی for managing فروشگاه نمونه | `{storeHeadRoleId}` |
@@ -1604,11 +1762,11 @@ Status defaults to `"open"`.
 | 62 | `gen-roles-parisa` | Adds `Manager` + scoped `Employee` (R&D) + `UnitHead` (R&D) to پریسا صادقی | — |
 | 63 | `gen-roles-reza` | Adds `UnitHead` (Procurement) + scoped `Employee` (Procurement) + `UnitHead` (Hematology/Micro/Pathology labs) to رضا احمدی | — |
 | 64 | `gen-roles-hossein` | Adds `UnitHead` (Warehouse) + scoped `Employee` (Warehouse) + `UnitHead` (Cold Storage) to حسین کاظمی | — |
-| 65 | `gen-roles-fatemeh` | Adds `UnitHead` (Finance) + scoped `Employee` (Finance) + `UnitHead` (Internal Audit) to فاطمه موسوی | — |
+| 65 | `gen-roles-fatemeh` | Adds `UnitHead` (Finance) + scoped `Employee` (Finance) + `UnitHead` (Internal Audit) + `canManageBudget` + `canIssuePaymentOrder` + `canViewBudgetReports` features to فاطمه موسوی | — |
 | 66 | `gen-roles-maryam` | Adds scoped `Employee` (Finance unit) to مریم حسینی | — |
 | 67 | `gen-pr-pending` | Submits a 3rd PR (25,000,000, qty=5, TSH Kit) that stays in `Pending` status | `{prPendingId}` |
 
-**Note:** All users are created with only `[{name: "Ordinary"}]` by `addUser`. Their full role set (Manager, UnitHead, scoped Employee, etc.) is applied immediately after via `addOrRemoveRoles`. This enforces a single source of truth for role management.
+**Note:** All users are created with only `[{name: "Ordinary"}]` by `addUser`. Their full role set (Manager, UnitHead, OrgHead, StoreHead, scoped Employee, etc.) is applied immediately after via `addOrRemoveRoles`. This enforces a single source of truth for role management.
 
 #### Panel-to-User Mapping
 
@@ -1637,7 +1795,7 @@ Status defaults to `"open"`.
 
 ---
 
-### 19n. Extended E2E Coverage
+### 20n. Extended E2E Coverage
 
 | # | ID | What It Tests | Data Added |
 |---|-----|---------------|------------|
@@ -1655,7 +1813,7 @@ Status defaults to `"open"`.
 
 ---
 
-### 19o. Complete Data Flow Summary
+### 20o. Complete Data Flow Summary
 
 ```
 Setup Phase:
@@ -1674,18 +1832,19 @@ Setup Phase:
     FiscalYear (1405) → BudgetLine (BUD-001) → Allocation (100,000,000)
   ↓
 
-E2E Flow #1 — Direct Store Purchase (auto-resolved → Process #2, unit-scoped):
-  PR Submit (TSH Kit, qty=10, est=50M, requestingUnit=Procurement) → Pending
-    Auto-resolve: requestingUnit matches Process #2 (unit-scoped, Procurement)
-  Check Store Availability → Add Stuff (`addStuff`, uses `{stuffId}`) → `stuffStatus=assigned`
+E2E Flow #1 — Direct Store Purchase (New Lifecycle):
+  PR Draft via `add` (TSH Kit, qty=10, requestingUnit=Procurement) → Draft
+    No process, no pricing, selectionType="none"
+  Add Stuff via `addStuff({stuffId})` → selectionType="stuff", stuffStatus="assigned", estimatedAmount set
+  Submit PR via `submit` → Pending (process auto-resolved to Process #2)
   Step 1 (Procurement Unit): approve → advances to step 2
-  Warehouse Check → Step 2 (Warehouse): approve → advances to step 3
-  Step 3 (Finance): approve with `budgetLineId` + budget check → PendingFinalization
-    Budget line BUD-001 linked to PR, remainingBudget validated against estimatedTotal
-  OrgHead/Admin finalize (`finalize` action) → Completed
-  Goods Receipt (GR-001, qty=10 accepted) → auto-inventory, auto-payment
+  Step 2 (Warehouse Unit): approve → advances to step 3
+  Step 3 (Finance Unit): approve with `budgetLineId` → budget check → auto-encumbrance → PendingFinalization
+  OrgHead finalize (`finalize` action) → Completed, stuffStatus="assigned"
+  StoreHead delivery: `updateStuffStatus` → assigned→ready_to_ship→shipped→delivered
+  Goods Receipt (GR-001, qty=10 accepted) → stuffStatus="received", auto-inventory, auto-payment
     Authority: requester or warehouse head only; receivingUnit must match requestingUnit
-  Payment Order: gets existing PO → markPaid (deducts totalAllocated from budget line)
+  Payment Order: OrgHead sends to finance → Finance UnitHead markPaid (budget deducted)
   ↓
 
 E2E Flow #2 — Inventory Management:
