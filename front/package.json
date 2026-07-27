@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
+    "build:server": "NODE_OPTIONS=\"--max-old-space-size=2048 --no-warnings\" next build",
+    "build:local": "NODE_OPTIONS=\"--max-old-space-size=8192\" next build",
+    "build:strict": "tsc --noEmit && eslint . && NODE_OPTIONS=\"--max-old-space-size=8192\" next build",
     "start": "next start",
     "lint": "eslint"
   },
