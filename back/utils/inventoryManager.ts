@@ -1,28 +1,119 @@
 import { type Document, ObjectId } from "lesan";
-import { inventory, stockMovement } from "../mod.ts";
+import { inventory, stockMovement, ware } from "../mod.ts";
 
 type StockOptions = {
-  wareId?: string;
   wareName?: string;
+  wareModelId?: string;
   referenceType?: string;
   referenceId?: string;
   description?: string;
   storeId?: string;
-  inventoryId?: string; // If provided, look up inventory by _id instead of (unit, wareModel)
+  inventoryId?: string;
 };
+
+async function getWareHierarchy(wareId: string): Promise<{
+  wareModelId: ObjectId;
+  wareGroupId: ObjectId;
+  wareClassId: ObjectId;
+  wareTypeId: ObjectId;
+}> {
+  const wareDoc = await ware.findOne({
+    filters: { _id: new ObjectId(wareId) },
+    projection: {
+      _id: 1,
+      "wareModel._id": 1,
+      "wareGroup._id": 1,
+      "wareClass._id": 1,
+      "wareType._id": 1,
+    },
+  }) as Document | null;
+
+  if (!wareDoc) {
+    throw new Error(`Ware not found: ${wareId}`);
+  }
+
+  return {
+    wareModelId: (wareDoc.wareModel as Record<string, unknown>)?._id as ObjectId,
+    wareGroupId: (wareDoc.wareGroup as Record<string, unknown>)?._id as ObjectId,
+    wareClassId: (wareDoc.wareClass as Record<string, unknown>)?._id as ObjectId,
+    wareTypeId: (wareDoc.wareType as Record<string, unknown>)?._id as ObjectId,
+  };
+}
+
+function buildHierarchyRelations(
+  wareId: ObjectId,
+  hierarchy: { wareModelId: ObjectId; wareGroupId: ObjectId; wareClassId: ObjectId; wareTypeId: ObjectId },
+): Record<string, unknown> {
+  return {
+    ware: {
+      _ids: wareId,
+      relatedRelations: { inventories: true },
+    },
+    wareModel: {
+      _ids: hierarchy.wareModelId,
+      relatedRelations: { inventories: true },
+    },
+    wareGroup: {
+      _ids: hierarchy.wareGroupId,
+      relatedRelations: { inventories: true },
+    },
+    wareClass: {
+      _ids: hierarchy.wareClassId,
+      relatedRelations: { inventories: true },
+    },
+    wareType: {
+      _ids: hierarchy.wareTypeId,
+      relatedRelations: { inventories: true },
+    },
+  };
+}
+
+function buildStockMovementHierarchyRelations(
+  wareId: ObjectId | undefined,
+  hierarchy?: { wareModelId: ObjectId; wareGroupId: ObjectId; wareClassId: ObjectId; wareTypeId: ObjectId },
+): Record<string, unknown> {
+  const rels: Record<string, unknown> = {};
+  if (wareId) {
+    rels.ware = {
+      _ids: wareId,
+      relatedRelations: { stockMovements: true },
+    };
+  }
+  if (hierarchy) {
+    rels.wareModel = {
+      _ids: hierarchy.wareModelId,
+      relatedRelations: { stockMovements: true },
+    };
+    rels.wareGroup = {
+      _ids: hierarchy.wareGroupId,
+      relatedRelations: { stockMovements: true },
+    };
+    rels.wareClass = {
+      _ids: hierarchy.wareClassId,
+      relatedRelations: { stockMovements: true },
+    };
+    rels.wareType = {
+      _ids: hierarchy.wareTypeId,
+      relatedRelations: { stockMovements: true },
+    };
+  }
+  return rels;
+}
 
 export async function addStock(
   unitId: string,
-  wareModelId: string,
+  wareId: string,
   quantity: number,
   reason: string,
   createdByUserId: string,
   options?: StockOptions,
 ): Promise<Document> {
+  const hierarchy = await getWareHierarchy(wareId);
+
   const existing = await inventory.findOne({
     filters: {
       "unit._id": new ObjectId(unitId),
-      "wareModel._id": new ObjectId(wareModelId),
+      "ware._id": new ObjectId(wareId),
     },
     projection: { _id: 1, quantity: 1 },
   }) as Document;
@@ -45,21 +136,18 @@ export async function addStock(
         _ids: new ObjectId(unitId),
         relatedRelations: { inventories: true },
       },
-      wareModel: {
-        _ids: new ObjectId(wareModelId),
-        relatedRelations: { inventories: true },
-      },
+      ...buildHierarchyRelations(new ObjectId(wareId), hierarchy),
     };
-    if (options?.wareId) {
-      inventoryRelations.ware = {
-        _ids: new ObjectId(options.wareId),
+
+    if (options?.storeId) {
+      inventoryRelations.store = {
+        _ids: new ObjectId(options.storeId),
         relatedRelations: { inventories: true },
       };
     }
+
     await inventory.insertOne({
-      doc: {
-        quantity,
-      },
+      doc: { quantity },
       relations: inventoryRelations,
       projection: { _id: 1, quantity: 1 },
     });
@@ -76,18 +164,8 @@ export async function addStock(
       _ids: new ObjectId(createdByUserId),
       relatedRelations: { createdStockMovements: true },
     },
-    wareModel: {
-      _ids: new ObjectId(wareModelId),
-      relatedRelations: { stockMovements: true },
-    },
+    ...buildStockMovementHierarchyRelations(new ObjectId(wareId), hierarchy),
   };
-
-  if (options?.wareId) {
-    stockMovementRelations.ware = {
-      _ids: new ObjectId(options.wareId),
-      relatedRelations: { stockMovements: true },
-    };
-  }
 
   if (options?.storeId) {
     stockMovementRelations.store = {
@@ -110,17 +188,19 @@ export async function addStock(
     projection: { _id: 1, quantity: 1, balanceBefore: 1, balanceAfter: 1 },
   });
 
-  return { success: true, wareModelId, balanceBefore, balanceAfter };
+  return { success: true, wareId, balanceBefore, balanceAfter };
 }
 
 export async function removeStock(
   unitId: string,
-  wareModelId: string,
+  wareId: string,
   quantity: number,
   reason: string,
   createdByUserId: string,
   options?: StockOptions,
 ): Promise<Document> {
+  const hierarchy = await getWareHierarchy(wareId);
+
   let existing: Document;
 
   if (options?.inventoryId) {
@@ -132,14 +212,14 @@ export async function removeStock(
     existing = await inventory.findOne({
       filters: {
         "unit._id": new ObjectId(unitId),
-        "wareModel._id": new ObjectId(wareModelId),
+        "ware._id": new ObjectId(wareId),
       },
       projection: { _id: 1, quantity: 1 },
     }) as Document;
   }
 
   if (!existing) {
-    throw new Error("Inventory not found for this unit and wareModel");
+    throw new Error("Inventory not found for this unit and ware");
   }
 
   const balanceBefore = (existing.quantity as number) || 0;
@@ -170,18 +250,8 @@ export async function removeStock(
       _ids: new ObjectId(createdByUserId),
       relatedRelations: { createdStockMovements: true },
     },
-    wareModel: {
-      _ids: new ObjectId(wareModelId),
-      relatedRelations: { stockMovements: true },
-    },
+    ...buildStockMovementHierarchyRelations(new ObjectId(wareId), hierarchy),
   };
-
-  if (options?.wareId) {
-    stockMovementRelations.ware = {
-      _ids: new ObjectId(options.wareId),
-      relatedRelations: { stockMovements: true },
-    };
-  }
 
   if (options?.storeId) {
     stockMovementRelations.store = {
@@ -204,42 +274,42 @@ export async function removeStock(
     projection: { _id: 1, quantity: 1, balanceBefore: 1, balanceAfter: 1 },
   });
 
-  return { success: true, wareModelId, balanceBefore, balanceAfter };
+  return { success: true, wareId, balanceBefore, balanceAfter };
 }
 
 export async function transferStock(
   fromUnitId: string,
   toUnitId: string,
-  wareModelId: string,
+  wareId: string,
   quantity: number,
   createdByUserId: string,
   options?: StockOptions,
 ): Promise<Document> {
-  await removeStock(fromUnitId, wareModelId, quantity, "transfer_out", createdByUserId, {
+  await removeStock(fromUnitId, wareId, quantity, "transfer_out", createdByUserId, {
     ...options,
     referenceType: options?.referenceType || "unit",
     referenceId: options?.referenceId || toUnitId,
     description: options?.description || `Transfer to unit ${toUnitId}`,
   });
 
-  await addStock(toUnitId, wareModelId, quantity, "transfer_in", createdByUserId, {
+  await addStock(toUnitId, wareId, quantity, "transfer_in", createdByUserId, {
     ...options,
     referenceType: options?.referenceType || "unit",
     referenceId: options?.referenceId || fromUnitId,
     description: options?.description || `Transfer from unit ${fromUnitId}`,
   });
 
-  return { success: true, wareModelId, quantity, fromUnitId, toUnitId };
+  return { success: true, wareId, quantity, fromUnitId, toUnitId };
 }
 
 export async function getStockLevel(
   unitId: string,
-  wareModelId: string,
+  wareId: string,
 ): Promise<Document> {
   const result = await inventory.findOne({
     filters: {
       "unit._id": new ObjectId(unitId),
-      "wareModel._id": new ObjectId(wareModelId),
+      "ware._id": new ObjectId(wareId),
     },
     projection: {
       _id: 1,
@@ -250,7 +320,7 @@ export async function getStockLevel(
       expirationDate: 1,
       location: 1,
       unit: 1,
-      wareModel: 1,
+      ware: 1,
     },
   });
 
@@ -260,6 +330,7 @@ export async function getStockLevel(
 export async function getWarehouseDashboard(
   warehouseUnitId: string,
   wareModelId?: string,
+  wareId?: string,
 ): Promise<Document[]> {
   const match: Document = {
     $or: [
@@ -269,6 +340,9 @@ export async function getWarehouseDashboard(
   };
   if (wareModelId) {
     match["wareModel._id"] = new ObjectId(wareModelId);
+  }
+  if (wareId) {
+    match["ware._id"] = new ObjectId(wareId);
   }
 
   const results = await inventory
@@ -287,6 +361,7 @@ export async function getWarehouseDashboard(
         {
           $project: {
             _id: 1,
+            ware: 1,
             wareModel: 1,
             quantity: 1,
             minQuantity: 1,
@@ -297,7 +372,7 @@ export async function getWarehouseDashboard(
             unitType: "$unitInfo.type",
           },
         },
-        { $sort: { "wareModel.name": 1 } },
+        { $sort: { "ware.name": 1 } },
       ],
       projection: {
         _id: 1,

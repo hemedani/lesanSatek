@@ -8,6 +8,6 @@ export const getValidator = () => {
       ...activeRoleMixin,
       _id: objectIdValidation,
     }),
-    get: selectStruct("consumptionRecord", 2),
+    get: selectStruct("consumption", 2),
   });
 };

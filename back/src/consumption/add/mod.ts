@@ -5,7 +5,7 @@ import { addValidator } from "./add.val.ts";
 
 export const addSetup = () =>
   coreApp.acts.setAct({
-    schema: "consumptionRecord",
+    schema: "consumption",
     fn: addFn,
     actName: "add",
     preAct: [

@@ -2480,7 +2480,7 @@ token: "{token}"
 
 HTTP 200
 
-POST {{serverAddress}}/consumptionRecord/add
+POST {{serverAddress}}/consumption/add
 token: "{token}"
 {
   "details": {
@@ -2864,7 +2864,7 @@ token: "{token}"
 
 HTTP 200
 
-POST {{serverAddress}}/consumptionRecord/add
+POST {{serverAddress}}/consumption/add
 token: "{token}"
 {
   "details": {

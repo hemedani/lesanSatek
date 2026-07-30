@@ -1,4 +1,4 @@
-import { enums, object, optional, string } from "lesan";
+import { enums, object, objectIdValidation, optional, string } from "lesan";
 import { activeRoleMixin } from "@lib";
 import { stockMovement_reason_emums } from "../../../models/stockMovement.ts";
 
@@ -7,6 +7,7 @@ export const countValidator = () => {
     set: object({
       ...activeRoleMixin,
       unitId: optional(string()),
+      wareId: optional(objectIdValidation),
       wareModelId: optional(string()),
       reason: optional(stockMovement_reason_emums),
       referenceType: optional(string()),

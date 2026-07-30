@@ -132,22 +132,23 @@ export const addFn: ActFn = async (body) => {
     if (item.quantityAccepted > 0) {
       totalAccepted += item.quantityAccepted;
 
-      // Add stock
-      await addStock(
-        receivingUnitId as string,
-        item.wareModelId,
-        item.quantityAccepted,
-        "goods_receipt",
-        userId,
-        {
-          wareId: item.wareId,
-          wareName: item.wareName,
-          referenceType: "goodsReceipt",
-          referenceId: result._id?.toString(),
-          description: `Goods receipt for ${item.wareModelName || item.wareModelId}`,
-          storeId: prStoreId,
-        },
-      );
+      if (item.wareId) {
+        await addStock(
+          receivingUnitId as string,
+          item.wareId,
+          item.quantityAccepted,
+          "goods_receipt",
+          userId,
+          {
+            wareName: item.wareName,
+            wareModelId: item.wareModelId,
+            referenceType: "goodsReceipt",
+            referenceId: result._id?.toString(),
+            description: `Goods receipt for ${item.wareModelName || item.wareModelId}`,
+            storeId: prStoreId,
+          },
+        );
+      }
     }
   }
 

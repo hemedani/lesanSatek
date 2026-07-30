@@ -1,9 +1,9 @@
-import { enums, object, objectIdValidation, optional, string } from "lesan";
+import { enums, number, object, objectIdValidation, optional, string } from "lesan";
 import { activeRoleMixin } from "@lib";
 import { selectStruct } from "../../../mod.ts";
 import { pagination } from "@lib";
 
-export const getsValidator = () => {
+export const getWarehouseInventoryValidator = () => {
   return object({
     set: object({
       ...activeRoleMixin,
@@ -11,11 +11,8 @@ export const getsValidator = () => {
       sortBy: optional(enums(["createdAt", "updatedAt", "_id", "quantity"])),
       sortOrder: optional(enums(["asc", "desc"])),
       search: optional(string()),
-      wareId: optional(objectIdValidation),
       wareModelId: optional(objectIdValidation),
-      unitId: optional(string()),
-      warehouseUnitId: optional(string()),
-      organizationId: optional(string()),
+      wareId: optional(objectIdValidation),
     }),
     get: selectStruct("inventory", 2),
   });

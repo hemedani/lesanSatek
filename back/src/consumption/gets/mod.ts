@@ -5,7 +5,7 @@ import { getsValidator } from "./gets.val.ts";
 
 export const getsSetup = () =>
   coreApp.acts.setAct({
-    schema: "consumptionRecord",
+    schema: "consumption",
     fn: getsFn,
     actName: "gets",
     preAct: [

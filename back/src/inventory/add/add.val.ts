@@ -15,8 +15,7 @@ export const addValidator = () => {
       lastCountedAt: optional(coerce(date(), string(), (value) => new Date(value))),
       unitId: objectIdValidation,
       warehouseUnitId: optional(objectIdValidation),
-      wareModelId: objectIdValidation,
-      wareId: optional(objectIdValidation),
+      wareId: objectIdValidation,
     }),
     get: selectStruct("inventory", 1),
   });

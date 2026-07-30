@@ -6,18 +6,17 @@ export const addValidator = () => {
   return object({
     set: object({
       ...activeRoleMixin,
-      wareModelId: objectIdValidation,
-      wareId: optional(objectIdValidation),
+      wareId: objectIdValidation,
       quantity: number(),
       consumedAt: coerce(date(), string(), (value) => new Date(value)),
       reason: optional(string()),
-      patientId: optional(string()),
+      consumedFor: optional(string()),
       notes: optional(string()),
-      unitId: objectIdValidation,
-      consumedById: objectIdValidation,
+      unitId: optional(objectIdValidation),
+      consumedById: optional(objectIdValidation),
       inventoryId: optional(objectIdValidation),
       purchasingRequestId: optional(objectIdValidation),
     }),
-    get: selectStruct("consumptionRecord", 2),
+    get: selectStruct("consumption", 2),
   });
 };

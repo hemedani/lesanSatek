@@ -1,17 +1,17 @@
 import { grantAccess, setTokens, setUser } from "@lib";
 import { coreApp } from "../../../mod.ts";
-import { getFn } from "./get.fn.ts";
-import { getValidator } from "./get.val.ts";
+import { countFn } from "./count.fn.ts";
+import { countValidator } from "./count.val.ts";
 
-export const getSetup = () =>
+export const countSetup = () =>
   coreApp.acts.setAct({
-    schema: "consumptionRecord",
-    fn: getFn,
-    actName: "get",
+    schema: "consumption",
+    fn: countFn,
+    actName: "count",
     preAct: [
       setTokens,
       setUser,
       grantAccess([{ roles: ["Manager", "Admin", "OrgHead", "UnitHead", "Employee", "Ordinary"] }]),
     ],
-    validator: getValidator(),
+    validator: countValidator(),
   });

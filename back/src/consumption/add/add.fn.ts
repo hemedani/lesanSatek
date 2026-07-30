@@ -1,58 +1,87 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { consumptionRecord, purchasingRequest, wareModel, coreApp } from "../../../mod.ts";
+import { consumption, purchasingRequest, ware, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { removeStock } from "../../../utils/inventoryManager.ts";
+import { throwError } from "../../../utils/throwError.ts";
 
 export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
 
-  const { activeRoleId, unitId, consumedById, inventoryId, purchasingRequestId, wareModelId, wareId, ...rest } = set;
+  const { activeRoleId, unitId: rawUnitId, consumedById: rawConsumedById, inventoryId, purchasingRequestId, wareId, ...rest } = set;
 
   const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
+
+  const unitId = rawUnitId || (activeRole?.scopeType === "unit" ? activeRole.scopeId : undefined);
+  const consumedById = rawConsumedById || user._id;
+
+  if (!unitId) {
+    throwError("unitId is required and cannot be derived from active role");
+    return;
+  }
+
+  // Fetch ware to derive hierarchy
+  const wareDoc = await ware.findOne({
+    filters: { _id: new ObjectId(wareId as string) },
+    projection: {
+      _id: 1,
+      "wareModel._id": 1,
+      "wareGroup._id": 1,
+      "wareClass._id": 1,
+      "wareType._id": 1,
+    },
+  }) as Document;
+
+  if (!wareDoc) {
+    throwError("Ware not found");
+    return;
+  }
 
   const relations: Record<string, unknown> = {};
 
   relations.unit = {
     _ids: new ObjectId(unitId as string),
-    relatedRelations: {
-      consumptionRecords: true,
-    },
+    relatedRelations: { consumptions: true },
   };
 
   relations.consumedBy = {
     _ids: new ObjectId(consumedById as string),
-    relatedRelations: {
-      consumptionRecords: true,
-    },
+    relatedRelations: { consumptions: true },
+  };
+
+  relations.ware = {
+    _ids: new ObjectId(wareId as string),
+    relatedRelations: { consumptions: true },
   };
 
   relations.wareModel = {
-    _ids: new ObjectId(wareModelId as string),
-    relatedRelations: {
-      consumptionRecords: true,
-    },
+    _ids: (wareDoc.wareModel as Record<string, unknown>)?._id as ObjectId,
+    relatedRelations: { consumptions: true },
   };
 
-  if (wareId) {
-    relations.ware = {
-      _ids: new ObjectId(wareId as string),
-      relatedRelations: {
-        consumptionRecords: true,
-      },
-    };
-  }
+  relations.wareGroup = {
+    _ids: (wareDoc.wareGroup as Record<string, unknown>)?._id as ObjectId,
+    relatedRelations: { consumptions: true },
+  };
+
+  relations.wareClass = {
+    _ids: (wareDoc.wareClass as Record<string, unknown>)?._id as ObjectId,
+    relatedRelations: { consumptions: true },
+  };
+
+  relations.wareType = {
+    _ids: (wareDoc.wareType as Record<string, unknown>)?._id as ObjectId,
+    relatedRelations: { consumptions: true },
+  };
 
   if (inventoryId) {
     relations.inventory = {
       _ids: new ObjectId(inventoryId as string),
-      relatedRelations: {
-        consumptionRecords: true,
-      },
+      relatedRelations: { consumptions: true },
     };
   }
 
-  const result = await consumptionRecord.insertOne({
+  const result = await consumption.insertOne({
     doc: rest,
     relations,
     projection: get,
@@ -62,28 +91,15 @@ export const addFn: ActFn = async (body) => {
     throw new Error("Failed to create consumption record");
   }
 
-  // Resolve wareModel name for removeStock (the wareModelName param is no longer stored, but removeStock accepts it)
-  let resolvedWareModelName = "";
-  if (wareModelId) {
-    const wm = await wareModel.findOne({
-      filters: { _id: new ObjectId(wareModelId as string) },
-      projection: { name: 1 },
-    }) as Record<string, unknown> | null;
-    if (wm) {
-      resolvedWareModelName = (wm.name as string) || "";
-    }
-  }
-
   // Remove from inventory
   await removeStock(
     unitId as string,
-    wareModelId as string,
+    wareId as string,
     rest.quantity as number,
     (rest.reason as string) || "consumption",
     consumedById as string,
     {
-      wareId: wareId as string | undefined,
-      referenceType: "consumptionRecord",
+      referenceType: "consumption",
       referenceId: String(result._id),
       ...(inventoryId && { inventoryId: inventoryId as string }),
     },
@@ -91,6 +107,9 @@ export const addFn: ActFn = async (body) => {
 
   // Push "goods_consumed" history on the purchasing request if linked
   if (purchasingRequestId) {
+    const wareDoc2 = wareDoc as Record<string, unknown>;
+    const wareModelName = ((wareDoc2.wareModel as Record<string, unknown>)?.name as string) || "";
+
     await purchasingRequest.findOneAndUpdate({
       filter: { _id: new ObjectId(purchasingRequestId as string) },
       update: {
@@ -109,9 +128,9 @@ export const addFn: ActFn = async (body) => {
               } : { id: "", name: "" },
             },
             details: {
-              consumptionRecordId: result._id?.toString(),
-              wareModelId,
-              wareModelName: resolvedWareModelName,
+              consumptionId: result._id?.toString(),
+              wareId,
+              wareModelName,
               quantity: rest.quantity,
             },
           },

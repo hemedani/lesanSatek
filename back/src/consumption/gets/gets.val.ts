@@ -13,8 +13,8 @@ export const getsValidator = () => {
       unitId: optional(string()),
       wareModelId: optional(string()),
       reason: optional(string()),
-      patientId: optional(string()),
+      consumedFor: optional(string()),
     }),
-    get: selectStruct("consumptionRecord", 2),
+    get: selectStruct("consumption", 2),
   });
 };

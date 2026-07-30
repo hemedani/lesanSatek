@@ -7,6 +7,7 @@ import { removeSetup } from "./remove/mod.ts";
 import { countSetup } from "./count/mod.ts";
 import { adjustSetup } from "./adjust/mod.ts";
 import { transferSetup } from "./transfer/mod.ts";
+import { getWarehouseInventorySetup } from "./getWarehouseInventory/mod.ts";
 
 export const inventorySetup = () => {
   addSetup();
@@ -18,4 +19,5 @@ export const inventorySetup = () => {
   countSetup();
   adjustSetup();
   transferSetup();
+  getWarehouseInventorySetup();
 };

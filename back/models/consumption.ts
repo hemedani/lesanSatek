@@ -1,36 +1,33 @@
 /**
- * StockMovement — Audit trail for every inventory change.
+ * Consumption — Goods usage/consumption tracking.
  *
- * Read-only model; records are created by the system (inventoryManager) whenever
- * inventory quantity changes. Each entry captures the before/after balance, reason
- * (goods_receipt, goods_issue, transfer_in, transfer_out, consumption, adjustment,
- * return, write_off), and an optional reference to the triggering document
- * (e.g. a GoodsReceipt or ConsumptionRecord).
+ * Records when inventory stock is consumed (used, dispensed, etc.). The `add`
+ * custom action triggers inventoryManager.removeStock to decrement the relevant
+ * inventory record. Includes optional consumedFor (person full name) and
+ * a reason/notes field for documentation.
  *
  * Hierarchy relations (wareType, wareClass, wareGroup, wareModel) are auto-derived
  * from the ware and stored for efficient querying/stats.
  *
- * Pure fields: quantity, balanceBefore, balanceAfter, reason,
- *   referenceType, referenceId, description
- * Relations: unit (Unit), createdBy (User), store (Store, optional),
+ * Pure fields: quantity, consumedAt, reason, consumedFor, notes
+ * Relations: unit (Unit), consumedBy (User), inventory (Inventory, optional),
  *   ware (Ware, optional), wareModel (WareModel, optional),
  *   wareGroup (WareGroup, optional), wareClass (WareClass, optional),
  *   wareType (WareType, optional)
  *
  * @example
- * // A stock movement from goods receipt — 50 of a specific Ware added to Central Warehouse
+ * // A consumption record for using 2 units of a specific Ware
  * {
- *   _id: ObjectId("sm_gr_tsh"),
- *   quantity: 50,
- *   balanceBefore: 0,
- *   balanceAfter: 50,
- *   reason: "goods_receipt",
- *   referenceType: "goodsReceipt",
- *   referenceId: ObjectId("gr_tsh"),
- *   description: "رسید کالا شماره GR-1403-001",
+ *   _id: ObjectId("cr_tsh_pat1"),
+ *   quantity: 2,
+ *   consumedAt: ISODate("2024-06-15T09:30:00Z"),
+ *   reason: "استفاده برای آزمایش بیمار",
+ *   consumedFor: "علی محمدی",
+ *   notes: "کیت‌های شماره سریال KT-001 و KT-002 مصرف شدند",
  *   // Relations (populated via Lesan):
- *   // unit → { _id: ObjectId("unit_warehouse") }
- *   // createdBy → { _id: ObjectId("user_mehdi") }
+ *   // unit → { _id: ObjectId("unit_lab") }
+ *   // consumedBy → { _id: ObjectId("user_ahmadi") }
+ *   // inventory → { _id: ObjectId("inv_tsh_lab") }
  *   // ware → { _id: ObjectId("w_tsh_zist") }
  *   // wareModel → { _id: ObjectId("wm_tsh") }
  *   // wareGroup → { _id: ObjectId("wg_kit") }
@@ -41,8 +38,7 @@
 import { coreApp } from "../mod.ts";
 import {
   coerce,
-  defaulted,
-  enums,
+  date,
   number,
   optional,
   type RelationDataType,
@@ -50,55 +46,25 @@ import {
   string,
 } from "lesan";
 import { createUpdateAt } from "@lib";
-import {
-  store_excludes,
-  unit_excludes,
-  user_excludes,
-  ware_excludes,
-  wareModel_excludes,
-  wareType_excludes,
-  wareClass_excludes,
-  wareGroup_excludes,
-} from "./excludes.ts";
+import { inventory_excludes, unit_excludes, user_excludes, wareModel_excludes, ware_excludes, wareType_excludes, wareClass_excludes, wareGroup_excludes } from "./excludes.ts";
 
-export const stockMovement_reason_array = [
-  "goods_receipt",
-  "goods_issue",
-  "transfer_in",
-  "transfer_out",
-  "consumption",
-  "adjustment",
-  "return",
-  "write_off",
-];
-export const stockMovement_reason_emums = enums(stockMovement_reason_array);
-
-export const stockMovement_pure = {
+export const consumption_pure = {
   quantity: number(),
-  balanceBefore: number(),
-  balanceAfter: number(),
-  reason: defaulted(
-    coerce(
-      stockMovement_reason_emums,
-      string(),
-      (value) => value as typeof stockMovement_reason_array[number],
-    ),
-    "adjustment",
-  ),
-  referenceType: optional(string()),
-  referenceId: optional(string()),
-  description: optional(string()),
+  consumedAt: coerce(date(), string(), (value) => new Date(value)),
+  reason: optional(string()),
+  consumedFor: optional(string()),
+  notes: optional(string()),
   ...createUpdateAt,
 };
 
-export const stockMovement_relations = {
+export const consumption_relations = {
   unit: {
     schemaName: "unit",
     type: "single" as RelationDataType,
     optional: false,
     excludes: unit_excludes,
     relatedRelations: {
-      stockMovements: {
+      consumptions: {
         type: "multiple" as RelationDataType,
         limit: 50,
         sort: {
@@ -108,13 +74,13 @@ export const stockMovement_relations = {
       },
     },
   },
-  createdBy: {
+  consumedBy: {
     schemaName: "user",
     type: "single" as RelationDataType,
     optional: false,
     excludes: user_excludes,
     relatedRelations: {
-      createdStockMovements: {
+      consumptions: {
         type: "multiple" as RelationDataType,
         limit: 50,
         sort: {
@@ -124,13 +90,13 @@ export const stockMovement_relations = {
       },
     },
   },
-  store: {
-    schemaName: "store",
+  inventory: {
+    schemaName: "inventory",
     type: "single" as RelationDataType,
     optional: true,
-    excludes: store_excludes,
+    excludes: inventory_excludes,
     relatedRelations: {
-      stockMovements: {
+      consumptions: {
         type: "multiple" as RelationDataType,
         limit: 50,
         sort: {
@@ -146,7 +112,7 @@ export const stockMovement_relations = {
     optional: true,
     excludes: ware_excludes,
     relatedRelations: {
-      stockMovements: {
+      consumptions: {
         type: "multiple" as RelationDataType,
         limit: 50,
         sort: {
@@ -162,7 +128,7 @@ export const stockMovement_relations = {
     optional: true,
     excludes: wareModel_excludes,
     relatedRelations: {
-      stockMovements: {
+      consumptions: {
         type: "multiple" as RelationDataType,
         limit: 50,
         sort: {
@@ -178,7 +144,7 @@ export const stockMovement_relations = {
     optional: true,
     excludes: wareGroup_excludes,
     relatedRelations: {
-      stockMovements: {
+      consumptions: {
         type: "multiple" as RelationDataType,
         limit: 50,
         sort: {
@@ -194,7 +160,7 @@ export const stockMovement_relations = {
     optional: true,
     excludes: wareClass_excludes,
     relatedRelations: {
-      stockMovements: {
+      consumptions: {
         type: "multiple" as RelationDataType,
         limit: 50,
         sort: {
@@ -210,7 +176,7 @@ export const stockMovement_relations = {
     optional: true,
     excludes: wareType_excludes,
     relatedRelations: {
-      stockMovements: {
+      consumptions: {
         type: "multiple" as RelationDataType,
         limit: 50,
         sort: {
@@ -222,9 +188,5 @@ export const stockMovement_relations = {
   },
 };
 
-export const stockMovements = () =>
-  coreApp.odm.newModel(
-    "stockMovement",
-    stockMovement_pure,
-    stockMovement_relations,
-  );
+export const consumptions = () =>
+  coreApp.odm.newModel("consumption", consumption_pure, consumption_relations);

@@ -160,7 +160,7 @@ export const budgetEncumbrance_excludes: string[] = [
   "updatedAt",
 ];
 
-export const consumptionRecord_excludes: string[] = [
+export const consumption_excludes: string[] = [
   "createdAt",
   "updatedAt",
 ];

@@ -8,7 +8,7 @@ export const countValidator = () => {
       unitId: optional(string()),
       wareModelId: optional(string()),
       reason: optional(string()),
-      patientId: optional(string()),
+      consumedFor: optional(string()),
     }),
     get: object({}),
   });

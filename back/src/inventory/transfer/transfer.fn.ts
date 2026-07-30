@@ -1,16 +1,36 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { inventory } from "../../../mod.ts";
+import { inventory, coreApp } from "../../../mod.ts";
+import type { MyContext } from "@lib";
+import { throwError } from "../../../utils/throwError.ts";
 
 export const transferFn: ActFn = async (body) => {
   const {
-    set: { fromUnitId, toUnitId, wareModelId, quantity, description },
+    set: { fromUnitId, toUnitId, wareId, quantity, description, activeRoleId },
     get,
   } = body.details;
+
+  const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
+
+  const activeRole = (user.roles || []).find(
+    (r: { roleId: string }) => r.roleId === activeRoleId,
+  ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
+
+  if (!user.isGhost && activeRole && !["Manager", "Admin"].includes(activeRole.name)) {
+    if (activeRole.scopeType === "unit" && activeRole.scopeId) {
+      if (activeRole.scopeId.toString() !== fromUnitId.toString()) {
+        throwError("You can only transfer inventory from your own unit");
+        return;
+      }
+    } else {
+      throwError("Your active role does not have an associated unit");
+      return;
+    }
+  }
 
   const fromInv = await inventory.findOne({
     filters: {
       "unit._id": new ObjectId(fromUnitId as string),
-      "wareModel._id": new ObjectId(wareModelId as string),
+      "ware._id": new ObjectId(wareId as string),
     },
     projection: { _id: 1, unit: 1, quantity: 1 } as Document,
   }) as Document;
@@ -35,7 +55,7 @@ export const transferFn: ActFn = async (body) => {
   const toInv = await inventory.findOne({
     filters: {
       "unit._id": new ObjectId(toUnitId as string),
-      "wareModel._id": new ObjectId(wareModelId as string),
+      "ware._id": new ObjectId(wareId as string),
     },
     projection: { _id: 1, quantity: 1 } as Document,
   }) as Document;

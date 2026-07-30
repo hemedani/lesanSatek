@@ -45,5 +45,5 @@ export * from "./fiscalYear.ts";
 export * from "./budgetLine.ts";
 export * from "./budgetAllocation.ts";
 export * from "./budgetEncumbrance.ts";
-export * from "./consumptionRecord.ts";
+export * from "./consumption.ts";
 

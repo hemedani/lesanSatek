@@ -1,15 +1,50 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { inventory } from "../../../mod.ts";
+import { inventory, ware, coreApp } from "../../../mod.ts";
+import type { MyContext } from "@lib";
+import { throwError } from "../../../utils/throwError.ts";
 
 export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
+  const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
 
-  const { activeRoleId, unitId, warehouseUnitId, wareModelId, wareId, ...rest } = set;
+  const { activeRoleId, unitId, warehouseUnitId, wareId, ...rest } = set;
+
+  const activeRole = (user.roles || []).find(
+    (r: { roleId: string }) => r.roleId === activeRoleId,
+  ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
+
+  if (!user.isGhost && activeRole && !["Manager", "Admin"].includes(activeRole.name)) {
+    if (activeRole.scopeType === "unit" && activeRole.scopeId) {
+      if (activeRole.scopeId.toString() !== unitId.toString()) {
+        throwError("You can only add inventory to your own unit");
+        return;
+      }
+    } else {
+      throwError("Your active role does not have an associated unit");
+      return;
+    }
+  }
+
+  const wareDoc = await ware.findOne({
+    filters: { _id: new ObjectId(wareId as string) },
+    projection: {
+      _id: 1,
+      "wareModel._id": 1,
+      "wareGroup._id": 1,
+      "wareClass._id": 1,
+      "wareType._id": 1,
+    },
+  }) as Document;
+
+  if (!wareDoc) {
+    throwError("Ware not found");
+    return;
+  }
 
   const existing = await inventory.findOne({
     filters: {
       "unit._id": new ObjectId(unitId as string),
-      "wareModel._id": new ObjectId(wareModelId as string),
+      "ware._id": new ObjectId(wareId as string),
     },
     projection: { _id: 1, quantity: 1 },
   }) as Document;
@@ -31,43 +66,48 @@ export const addFn: ActFn = async (body) => {
     });
   }
 
-  const relations: Record<string, unknown> = {};
+  const inventoryRelations: Record<string, unknown> = {};
 
-  relations.unit = {
+  inventoryRelations.unit = {
     _ids: new ObjectId(unitId as string),
-    relatedRelations: {
-      inventories: true,
-    },
+    relatedRelations: { inventories: true },
   };
 
   if (warehouseUnitId) {
-    relations.warehouseUnit = {
+    inventoryRelations.warehouseUnit = {
       _ids: new ObjectId(warehouseUnitId as string),
-      relatedRelations: {
-        warehouseInventories: true,
-      },
+      relatedRelations: { warehouseInventories: true },
     };
   }
 
-  relations.wareModel = {
-    _ids: new ObjectId(wareModelId as string),
-    relatedRelations: {
-      inventories: true,
-    },
+  inventoryRelations.ware = {
+    _ids: new ObjectId(wareId as string),
+    relatedRelations: { inventories: true },
   };
 
-  if (wareId) {
-    relations.ware = {
-      _ids: new ObjectId(wareId as string),
-      relatedRelations: {
-        inventories: true,
-      },
-    };
-  }
+  inventoryRelations.wareModel = {
+    _ids: (wareDoc.wareModel as Record<string, unknown>)?._id as ObjectId,
+    relatedRelations: { inventories: true },
+  };
+
+  inventoryRelations.wareGroup = {
+    _ids: (wareDoc.wareGroup as Record<string, unknown>)?._id as ObjectId,
+    relatedRelations: { inventories: true },
+  };
+
+  inventoryRelations.wareClass = {
+    _ids: (wareDoc.wareClass as Record<string, unknown>)?._id as ObjectId,
+    relatedRelations: { inventories: true },
+  };
+
+  inventoryRelations.wareType = {
+    _ids: (wareDoc.wareType as Record<string, unknown>)?._id as ObjectId,
+    relatedRelations: { inventories: true },
+  };
 
   return await inventory.insertOne({
     doc: rest,
-    relations,
+    relations: inventoryRelations,
     projection: get,
   });
 };

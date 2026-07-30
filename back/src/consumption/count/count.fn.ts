@@ -1,13 +1,11 @@
-import { type ActFn, type Document, ObjectId } from "lesan";
-import { inventory, unit, coreApp } from "../../../mod.ts";
+import type { ActFn, Document } from "lesan";
+import { ObjectId } from "lesan";
+import { consumption, unit, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
 
 export const countFn: ActFn = async (body) => {
-  const {
-    set: { wareId, wareModelId, unitId, warehouseUnitId, activeRoleId },
-    get,
-  } = body.details;
+  const { set: { unitId, wareModelId, reason, consumedFor, activeRoleId } } = body.details;
 
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
 
@@ -46,12 +44,12 @@ export const countFn: ActFn = async (body) => {
     }
   }
 
-  wareId && (match["ware._id"] = new ObjectId(wareId));
-  wareModelId && (match["wareModel._id"] = new ObjectId(wareModelId));
   unitId && (match["unit._id"] = new ObjectId(unitId as string));
-  warehouseUnitId && (match["warehouseUnit._id"] = new ObjectId(warehouseUnitId as string));
+  wareModelId && (match["wareModel._id"] = new ObjectId(wareModelId));
+  reason && (match.reason = { $regex: new RegExp(reason as string, "i") });
+  consumedFor && (match.consumedFor = { $regex: new RegExp(consumedFor as string, "i") });
 
-  const qty = await inventory.countDocument({ filter: match });
+  const qty = await consumption.countDocument({ filter: match });
 
   return { qty };
 };

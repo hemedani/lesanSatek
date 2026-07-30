@@ -64,7 +64,7 @@ The backend defines models across four domains: Organizational, Procurement/Purc
 - **Store** - Seller entity (name, address, contact, logo, city, state, storeHead, wareTypes, status, score, bank info, certificate info, economicCode, postalCode, etc.)
 - **Inventory** - Per-unit stock tracking (wareModelId, wareModelName, wareId?, wareName?, quantity, minQuantity?, maxQuantity?, batchNo?, expirationDate?, location?). Unique index on (unit, wareModelId). Relations: unit, warehouseUnit.
 - **StockMovement** - Audit trail for every inventory change (wareModelId, wareModelName, quantity, balanceBefore, balanceAfter, reason: goods_receipt|goods_issue|transfer_in|transfer_out|consumption|adjustment|return|write_off, referenceType?, referenceId?). Relations: unit, createdBy. Read-only; created by system actions.
-- **ConsumptionRecord** - Goods usage tracking (wareModelId, wareModelName, wareId?, wareName?, quantity, consumedAt, reason?, patientId?, notes?). Custom action: add triggers inventoryManager.removeStock. Relations: unit, consumedBy, inventory.
+- **Consumption** - Goods usage tracking (wareModelId, wareModelName, wareId?, wareName?, quantity, consumedAt, reason?, consumedFor?, notes?). Custom action: add triggers inventoryManager.removeStock. Relations: unit, consumedBy, inventory.
 
 #### Budget & Finance Domain
 - **FiscalYear** - Annual budget period (name, startDate, endDate, isActive, status: open|closed). Custom action: close.
@@ -300,7 +300,7 @@ lesanSatek/back/
 │   ├── budgetLine/         # BudgetLine CRUD + reports (NEW)
 │   ├── budgetAllocation/   # BudgetAllocation add + get (NEW)
 │   ├── budgetEncumbrance/  # BudgetEncumbrance add + release + convert (NEW)
-│   ├── consumptionRecord/  # ConsumptionRecord CRUD (NEW)
+│   ├── consumption/  # Consumption CRUD (NEW)
 │   ├── state/              # State actions
 │   ├── city/               # City actions
 │   ├── manufacturer/       # Manufacturer actions
@@ -597,7 +597,7 @@ Ware and Stuff models use denormalized relations to WareType, WareClass, WareGro
 | **Store** | add, get, gets, update, updateRelations, remove, count | name, address, location, contact, logoUrl, ceoname, workingHours, delivery times, fastDelivery, isAvailableInHolidays, status, score, totalSoldAmount, totalSoldNum, email, storeType, economicCode, postalCode, certificateUrl, bankCardNumber, shebaNumber, nameOfAccountHolder, bankName, certificateNumber, registerNumber, certificateExpireDate, legalPerson, nationalId | Mixed |
 | **Inventory** | add, get, gets, update, count | adjust, transfer (custom) | Mixed |
 | **StockMovement** | get, gets, count | read-only (created by system) | Mixed |
-| **ConsumptionRecord** | add, get, gets, count | add triggers removeStock | Mixed |
+| **Consumption** | add, get, gets, count | add triggers removeStock | Mixed |
 
 ### Budget & Finance Models
 
@@ -627,7 +627,7 @@ Ware and Stuff models use denormalized relations to WareType, WareClass, WareGro
 ### Remove Endpoints
 
 11 models have remove endpoints (all guarded to Manager/Admin):
-- BudgetAllocation, BudgetEncumbrance, BudgetLine, ConsumptionRecord, File, FiscalYear, GoodsReceipt, PaymentOrder, StepApproval, StockMovement, TenderOffer
+- BudgetAllocation, BudgetEncumbrance, BudgetLine, Consumption, File, FiscalYear, GoodsReceipt, PaymentOrder, StepApproval, StockMovement, TenderOffer
 
 Each accepts `{ _id, activeRoleId, hardCascade?: boolean }` and follows the standard `deleteOne` pattern.
 
@@ -783,7 +783,7 @@ StockMovement
   ├── createdBy (User) [single]
   └── store (Store) [single, optional]
 
-ConsumptionRecord
+Consumption
   ├── unit (Unit) [single]
   ├── consumedBy (User) [single]
   ├── inventory (Inventory) [single, optional]

@@ -5,7 +5,7 @@ import { grantAccess, setTokens, setUser } from "@lib";
 
 export const removeSetup = () =>
   coreApp.acts.setAct({
-    schema: "consumptionRecord",
+    schema: "consumption",
     fn: removeFn,
     actName: "remove",
     preAct: [

@@ -1,5 +1,5 @@
 import { type ActFn, ObjectId } from "lesan";
-import { consumptionRecord } from "../../../mod.ts";
+import { consumption } from "../../../mod.ts";
 
 export const removeFn: ActFn = async (body) => {
   const {
@@ -7,7 +7,7 @@ export const removeFn: ActFn = async (body) => {
     get,
   } = body.details;
 
-  return await consumptionRecord.deleteOne({
+  return await consumption.deleteOne({
     filter: { _id: new ObjectId(_id as string) },
     hardCascade: hardCascade || false,
   });

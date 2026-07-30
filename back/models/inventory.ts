@@ -1,22 +1,25 @@
 /**
  * Inventory — Per-unit stock tracking.
  *
- * Tracks the quantity of a specific WareModel (optionally a specific Ware) within
- * a Unit. Has a unique compound index on (unit, "wareModel._id") ensuring one record
- * per unit+model combo. Supports min/max quantity alerts, batch tracking,
- * expiration dates, and location. Records are created/updated by the
- * inventoryManager utility (addStock, removeStock, adjustStock, transferStock).
+ * Tracks the quantity of a specific Ware within a Unit. Has a unique compound
+ * index on (unit, "ware._id") ensuring one record per unit+ware combo.
+ * Supports min/max quantity alerts, batch tracking, expiration dates, and
+ * location. Records are created/updated by the inventoryManager utility
+ * (addStock, removeStock, adjustStock, transferStock).
+ *
+ * All hierarchy relations (wareType, wareClass, wareGroup, wareModel) are
+ * auto-derived from the ware and stored for efficient querying/stats.
  *
  * Pure fields: quantity, minQuantity, maxQuantity, batchNo, expirationDate,
  *   location, lastCountedAt
  * Relations: unit (Unit — inventory owner), warehouseUnit (Unit — org warehouse, optional),
- *   wareModel (WareModel), ware (Ware, optional)
+ *   ware (Ware), wareModel (WareModel), wareGroup (WareGroup), wareClass (WareClass),
+ *   wareType (WareType)
  *
  * @example
- * // Inventory record for TSH Kit in the central warehouse, received via goods receipt gr_tsh
- * // Also shows the Lab's separate inventory record consuming from this stock
+ * // Inventory record for a specific Ware in the central warehouse
  * {
- *   _id: ObjectId("inv_tsh_warehouse"),
+ *   _id: ObjectId("inv_tsh_zist_warehouse"),
  *   quantity: 50,
  *   minQuantity: 10,
  *   maxQuantity: 200,
@@ -27,19 +30,14 @@
  *   // Relations (populated via Lesan):
  *   // unit → { _id: ObjectId("unit_warehouse"), name: "انبار مرکزی" }
  *   // warehouseUnit → { _id: ObjectId("unit_warehouse") }
- *   // wareModel → { _id: ObjectId("wm_tsh"), name: "کیت TSH پیشرفته" }
  *   // ware → { _id: ObjectId("w_tsh_zist"), name: "کیت TSH پیشرفته ZistShimi" }
+ *   // wareModel → { _id: ObjectId("wm_tsh"), name: "کیت TSH پیشرفته" }
+ *   // wareGroup → { _id: ObjectId("wg_kit"), name: "کیت" }
+ *   // wareClass → { _id: ObjectId("wc_hemato"), name: "هماتولوژی" }
+ *   // wareType → { _id: ObjectId("wt_lab"), name: "تجهیزات آزمایشگاهی" }
  *   createdAt: ISODate("2024-01-15T08:00:00Z"),
  *   updatedAt: ISODate("2024-06-10T14:00:00Z")
  * }
- * // ── Lab's separate inventory (transferred from warehouse) ──
- * // {
- * //   _id: ObjectId("inv_tsh_lab"),
- * //   quantity: 50,
- * //   unit: { _id: ObjectId("unit_lab") },
- * //   warehouseUnit: { _id: ObjectId("unit_warehouse") },
- * //   wareModel: { _id: ObjectId("wm_tsh") }
- * // }
  */
 import { coreApp } from "../mod.ts";
 import {
@@ -53,7 +51,7 @@ import {
   string,
 } from "lesan";
 import { createUpdateAt } from "@lib";
-import { unit_excludes, wareModel_excludes, ware_excludes } from "./excludes.ts";
+import { unit_excludes, wareModel_excludes, ware_excludes, wareType_excludes, wareClass_excludes, wareGroup_excludes } from "./excludes.ts";
 
 export const inventory_pure = {
   quantity: defaulted(number(), 0),
@@ -99,6 +97,22 @@ export const inventory_relations = {
       },
     },
   },
+  ware: {
+    schemaName: "ware",
+    type: "single" as RelationDataType,
+    optional: false,
+    excludes: ware_excludes,
+    relatedRelations: {
+      inventories: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
   wareModel: {
     schemaName: "wareModel",
     type: "single" as RelationDataType,
@@ -115,11 +129,43 @@ export const inventory_relations = {
       },
     },
   },
-  ware: {
-    schemaName: "ware",
+  wareGroup: {
+    schemaName: "wareGroup",
     type: "single" as RelationDataType,
-    optional: true,
-    excludes: ware_excludes,
+    optional: false,
+    excludes: wareGroup_excludes,
+    relatedRelations: {
+      inventories: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  wareClass: {
+    schemaName: "wareClass",
+    type: "single" as RelationDataType,
+    optional: false,
+    excludes: wareClass_excludes,
+    relatedRelations: {
+      inventories: {
+        type: "multiple" as RelationDataType,
+        limit: 50,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+  wareType: {
+    schemaName: "wareType",
+    type: "single" as RelationDataType,
+    optional: false,
+    excludes: wareType_excludes,
     relatedRelations: {
       inventories: {
         type: "multiple" as RelationDataType,
@@ -140,7 +186,7 @@ export const createInventoryIndex = async () => {
   const collection = coreApp.odm.getCollection("inventory");
   try {
     await collection.createIndex(
-      { unit: 1, "wareModel._id": 1 },
+      { unit: 1, "ware._id": 1 },
       { unique: true },
     );
   } catch (error) {

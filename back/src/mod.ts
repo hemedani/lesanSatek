@@ -28,7 +28,7 @@ import { budgetLineSetup } from "./budgetLine/mod.ts";
 import { budgetAllocationSetup } from "./budgetAllocation/mod.ts";
 import { budgetEncumbranceSetup } from "./budgetEncumbrance/mod.ts";
 
-import { consumptionRecordSetup } from "./consumptionRecord/mod.ts";
+import { consumptionSetup } from "./consumption/mod.ts";
 
 export const functionsSetup = () => {
 	userSetup();
@@ -60,5 +60,5 @@ export const functionsSetup = () => {
   budgetLineSetup();
   budgetAllocationSetup();
   budgetEncumbranceSetup();
-  consumptionRecordSetup();
+  consumptionSetup();
 };

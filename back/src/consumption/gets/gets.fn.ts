@@ -1,11 +1,22 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { inventory, unit, coreApp } from "../../../mod.ts";
+import { consumption, unit, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
 
-export const countFn: ActFn = async (body) => {
+export const getsFn: ActFn = async (body) => {
   const {
-    set: { wareId, wareModelId, unitId, warehouseUnitId, activeRoleId },
+    set: {
+      page,
+      limit,
+      skip,
+      sortBy,
+      sortOrder,
+      unitId,
+      wareModelId,
+      reason,
+      consumedFor,
+      activeRoleId,
+    },
     get,
   } = body.details;
 
@@ -20,6 +31,7 @@ export const countFn: ActFn = async (body) => {
     return;
   }
 
+  const pipeline: Document[] = [];
   const match: Document = {};
 
   const isWarehouseHead = await (async () => {
@@ -46,12 +58,26 @@ export const countFn: ActFn = async (body) => {
     }
   }
 
-  wareId && (match["ware._id"] = new ObjectId(wareId));
-  wareModelId && (match["wareModel._id"] = new ObjectId(wareModelId));
   unitId && (match["unit._id"] = new ObjectId(unitId as string));
-  warehouseUnitId && (match["warehouseUnit._id"] = new ObjectId(warehouseUnitId as string));
+  wareModelId && (match["wareModel._id"] = new ObjectId(wareModelId));
+  reason && (match.reason = { $regex: reason, $options: "i" });
+  consumedFor && (match.consumedFor = { $regex: consumedFor, $options: "i" });
+  if (Object.keys(match).length > 0) {
+    pipeline.push({ $match: match });
+  }
 
-  const qty = await inventory.countDocument({ filter: match });
+  const sortField = sortBy || "_id";
+  const sortDirection = sortOrder === "asc" ? 1 : -1;
+  pipeline.push({ $sort: { [sortField]: sortDirection } });
 
-  return { qty };
+  const calculatedSkip = skip ?? (limit || 50) * ((page || 1) - 1);
+  pipeline.push({ $skip: calculatedSkip });
+  pipeline.push({ $limit: limit || 50 });
+
+  return await consumption
+    .aggregation({
+      pipeline,
+      projection: get,
+    })
+    .toArray();
 };

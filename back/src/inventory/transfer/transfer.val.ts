@@ -7,7 +7,7 @@ export const transferValidator = () => {
       ...activeRoleMixin,
       fromUnitId: objectIdValidation,
       toUnitId: objectIdValidation,
-      wareModelId: objectIdValidation,
+      wareId: objectIdValidation,
       quantity: number(),
       description: optional(string()),
     }),

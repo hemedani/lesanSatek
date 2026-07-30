@@ -4,7 +4,7 @@ import {
   budgetEncumbrances,
   budgetLines,
   cities,
-  consumptionRecords,
+  consumptions,
   createInventoryIndex,
   createUserTextIndex,
   files,
@@ -73,7 +73,7 @@ export const fiscalYear = fiscalYears();
 export const budgetLine = budgetLines();
 export const budgetAllocation = budgetAllocations();
 export const budgetEncumbrance = budgetEncumbrances();
-export const consumptionRecord = consumptionRecords();
+export const consumption = consumptions();
 
 export const { setAct, setService, getAtcsWithServices } = coreApp.acts;
 

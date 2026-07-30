@@ -1069,7 +1069,7 @@
   },
   {
     "id": "gen-goods-receipt",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"goodsReceipt\", \"act\": \"add\", \"details\": {\"set\": {\"receiptNumber\": \"رسید-۰۰۱\", \"description\": \"رسید اولین محموله\", \"receivedAt\": \"2026-04-01\", \"items\": [{\"wareModelId\": \"{wareModelId}\", \"quantityReceived\": 10, \"quantityAccepted\": 10, \"quantityRejected\": 0}], \"purchasingRequestId\": \"{prId}\", \"receivedById\": \"{userId}\", \"receivingUnitId\": \"{unitId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"receiptNumber\": 1, \"status\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"goodsReceipt\", \"act\": \"add\", \"details\": {\"set\": {\"receiptNumber\": \"رسید-۰۰۱\", \"description\": \"رسید اولین محموله\", \"receivedAt\": \"2026-04-01\", \"items\": [{\"wareModelId\": \"{wareModelId}\", \"wareId\": \"{wareId}\", \"quantityReceived\": 10, \"quantityAccepted\": 10, \"quantityRejected\": 0}], \"purchasingRequestId\": \"{prId}\", \"receivedById\": \"{userId}\", \"receivingUnitId\": \"{unitId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"receiptNumber\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": [
       {
@@ -1123,7 +1123,7 @@
   },
   {
     "id": "gen-inventory-add",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"add\", \"details\": {\"set\": {\"wareModelId\": \"{wareModelId}\", \"unitId\": \"{warehouseUnitId}\", \"quantity\": 50, \"minQuantity\": 10, \"maxQuantity\": 200, \"location\": \"قفسه A-12\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"minQuantity\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{wareId}\", \"unitId\": \"{warehouseUnitId}\", \"quantity\": 50, \"minQuantity\": 10, \"maxQuantity\": 200, \"location\": \"قفسه A-12\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"minQuantity\": 1}}}}",
     "repeat": 1,
     "captures": [
       {
@@ -1146,13 +1146,13 @@
   },
   {
     "id": "gen-consumption",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"consumptionRecord\", \"act\": \"add\", \"details\": {\"set\": {\"wareModelId\": \"{wareModelId}\", \"quantity\": 5, \"consumedAt\": \"2026-04-02\", \"reason\": \"تست روتین آزمایشگاه\", \"unitId\": \"{unitId}\", \"consumedById\": \"{userId}\", \"inventoryId\": \"{inventoryId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"reason\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"consumption\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{wareId}\", \"quantity\": 5, \"consumedAt\": \"2026-04-02\", \"reason\": \"تست روتین آزمایشگاه\", \"unitId\": \"{unitId}\", \"consumedById\": \"{userId}\", \"inventoryId\": \"{inventoryId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"reason\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
   {
     "id": "gen-inventory-transfer",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"transfer\", \"details\": {\"set\": {\"fromUnitId\": \"{warehouseUnitId}\", \"toUnitId\": \"{unitId}\", \"wareModelId\": \"{wareModelId}\", \"quantity\": 10, \"description\": \"انتقال به واحد خرید برای تست\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"fromUnit\": {\"_id\": 1}, \"toUnit\": {\"_id\": 1}, \"quantity\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"transfer\", \"details\": {\"set\": {\"fromUnitId\": \"{warehouseUnitId}\", \"toUnitId\": \"{unitId}\", \"wareId\": \"{wareId}\", \"quantity\": 10, \"description\": \"انتقال به واحد خرید برای تست\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"fromUnit\": {\"_id\": 1}, \"toUnit\": {\"_id\": 1}, \"quantity\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
@@ -1296,7 +1296,7 @@
   },
   {
     "id": "gen-consumption-with-pr",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"consumptionRecord\", \"act\": \"add\", \"details\": {\"set\": {\"wareModelId\": \"{wareModelId}\", \"quantity\": 3, \"consumedAt\": \"2026-04-03\", \"reason\": \"تست کنترل کیفیت\", \"unitId\": \"{unitId}\", \"consumedById\": \"{userId}\", \"inventoryId\": \"{inventoryId}\", \"purchasingRequestId\": \"{prId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"reason\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"consumption\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{wareId}\", \"quantity\": 3, \"consumedAt\": \"2026-04-03\", \"reason\": \"تست کنترل کیفیت\", \"unitId\": \"{unitId}\", \"consumedById\": \"{userId}\", \"inventoryId\": \"{inventoryId}\", \"purchasingRequestId\": \"{prId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"reason\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
