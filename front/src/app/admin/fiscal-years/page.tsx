@@ -19,6 +19,7 @@ import { Form } from "@/components/ui/form";
 import { FormInput } from "@/components/form/form-input";
 import { FormJalaliDatePicker } from "@/components/form/form-jalali-date-picker";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
+import { useAuthStore } from "@/stores/authStore";
 import { gets } from "@/app/actions/fiscalYear/gets";
 import { add } from "@/app/actions/fiscalYear/add";
 import { update } from "@/app/actions/fiscalYear/update";
@@ -65,9 +66,11 @@ export default function FiscalYearsPage() {
   const openEdit = (item: FiscalYear) => { setEditTarget(item); form.reset({ name: item.name || "", startDate: item.startDate?.slice(0, 10) || "", endDate: item.endDate?.slice(0, 10) || "", status: item.status || "open" }); setShowDialog(true); };
 
   const onSubmit = async (values: FYData) => {
+    const scope = useAuthStore.getState().getActiveScope();
+    const organizationId = scope?.type === "organization" ? scope.id : "";
     const res = editTarget
       ? await update({ activeRoleId: getActiveRoleIdFromStore(), _id: editTarget._id, name: values.name, startDate: new Date(values.startDate), endDate: new Date(values.endDate) }, { _id: 1 })
-      : await add({ activeRoleId: getActiveRoleIdFromStore(), name: values.name, startDate: new Date(values.startDate), endDate: new Date(values.endDate) }, { _id: 1 });
+      : await add({ activeRoleId: getActiveRoleIdFromStore(), organizationId, name: values.name, startDate: new Date(values.startDate), endDate: new Date(values.endDate) }, { _id: 1 });
     if (res.success) { toast.success(editTarget ? "به‌روزرسانی شد." : "ایجاد شد."); setShowDialog(false); fetchItems(); }
     else toast.error(res.body?.message || "خطا");
   };

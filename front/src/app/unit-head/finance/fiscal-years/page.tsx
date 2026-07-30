@@ -19,6 +19,8 @@ import { toast } from "sonner"
 import { gets as getFiscalYears } from "@/app/actions/fiscalYear/gets"
 import { add } from "@/app/actions/fiscalYear/add"
 import { close } from "@/app/actions/fiscalYear/close"
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
+import { useAuthStore } from "@/stores/authStore"
 
 interface FiscalYearItem {
   _id: string
@@ -78,8 +80,12 @@ export default function UnitHeadFinanceFiscalYearsPage() {
   const handleAdd = async (values: AddFormData) => {
     setSaving(true)
     try {
+      const scope = useAuthStore.getState().getActiveScope();
+      const organizationId = scope?.type === "organization" ? scope.id : "";
       const result = await add(
         {
+          activeRoleId: getActiveRoleIdFromStore(),
+          organizationId,
           name: values.name,
           startDate: new Date(values.startDate),
           endDate: new Date(values.endDate),
