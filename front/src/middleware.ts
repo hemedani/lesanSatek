@@ -8,8 +8,6 @@ const panelRoutes = [
   "/ordinary",
   "/unit-head",
   "/requests",
-  "/finance",
-  "/vendor",
   "/storehead",
   "/orghead",
 ]
