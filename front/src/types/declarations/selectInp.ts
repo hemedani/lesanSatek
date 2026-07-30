@@ -57,6 +57,7 @@ users?: number | userInp
 processes?: number | processInp
 budgetLines?: number | budgetLineInp
 purchaseRequests?: number | purchasingRequestInp
+fiscalYears?: number | fiscalYearInp
     }
 
 
@@ -258,6 +259,16 @@ name: string;
 details?: {
 };
 }[];
+createdAt?: Date;
+updatedAt?: Date;
+}[];
+fiscalYears: {
+_id?: string;
+name: string;
+startDate: Date;
+endDate: Date;
+isActive: boolean;
+status: ("open" | "closed" );
 createdAt?: Date;
 updatedAt?: Date;
 }[];
@@ -688,6 +699,8 @@ _id?: string;
 status: ("pending" | "approved" | "rejected" );
 comment?: string;
 decidedAt?: Date;
+createdAt?: Date;
+updatedAt?: Date;
 }[];
 inventories: {
 _id?: string;
@@ -1035,6 +1048,8 @@ _id?: string;
 status: ("pending" | "approved" | "rejected" );
 comment?: string;
 decidedAt?: Date;
+createdAt?: Date;
+updatedAt?: Date;
 }[];
 createdTenders: {
 _id?: string;
@@ -2431,6 +2446,8 @@ _id?: string;
 status: ("pending" | "approved" | "rejected" );
 comment?: string;
 decidedAt?: Date;
+createdAt?: Date;
+updatedAt?: Date;
 }[];
 };
 ;
@@ -3249,6 +3266,8 @@ _id?: string;
 status: ("pending" | "approved" | "rejected" );
 comment?: string;
 decidedAt?: Date;
+createdAt?: Date;
+updatedAt?: Date;
 }[];
 tenders: {
 _id?: string;
@@ -3340,6 +3359,8 @@ _id?: string;
 status: ("pending" | "approved" | "rejected" );
 comment?: string;
 decidedAt?: Date;
+createdAt?: Date;
+updatedAt?: Date;
 purchasingRequest: {
 _id?: string;
 title: string;
@@ -4256,7 +4277,7 @@ coordinates: number[];
 
 
     export type fiscalYearInp = {
-      
+      organization?: number | organizationInp
       budgetLines?: number | budgetLineInp
     }
 
@@ -4270,6 +4291,17 @@ isActive: boolean;
 status: ("open" | "closed" );
 createdAt?: Date;
 updatedAt?: Date;
+organization: {
+_id?: string;
+name: string;
+enName?: string;
+description?: string;
+isActive: boolean;
+location?: {
+type: string;
+coordinates: number[];
+};
+};
 budgetLines: {
 _id?: string;
 code: string;
@@ -4735,6 +4767,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -5010,6 +5044,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -5303,6 +5347,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -5547,6 +5593,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 createdUnits?: {
 _id?: (0 | 1 );
@@ -5715,6 +5771,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -6311,6 +6369,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -6348,6 +6408,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -7310,6 +7372,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 state?: {
 _id?: (0 | 1 );
@@ -7600,6 +7672,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -7844,6 +7918,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 createdUnits?: {
 _id?: (0 | 1 );
@@ -8012,6 +8096,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -8608,6 +8694,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -8645,6 +8733,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -9608,6 +9698,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -9902,6 +9994,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -10198,6 +10292,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -10491,6 +10587,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -10776,6 +10874,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -11069,6 +11177,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -11313,6 +11423,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 createdUnits?: {
 _id?: (0 | 1 );
@@ -11481,6 +11601,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -12077,6 +12199,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -12114,6 +12238,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -13103,6 +13229,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -13191,7 +13319,7 @@ updatedAt?: (0 | 1 );
             dashboardStatistic: {
 set: {
 activeRoleId: string;
-type: ("unitHead" );
+type: ("unitHead" | "orgHead" );
 unitId?: string;
 orgId?: string;
 };
@@ -13204,6 +13332,20 @@ finance?: (0 | 1 );
 receiptCount?: (0 | 1 );
 fiscalYear?: (0 | 1 );
 paymentOrders?: (0 | 1 );
+prStatusDistribution?: (0 | 1 );
+prMonthlyTrend?: (0 | 1 );
+prCycleTime?: (0 | 1 );
+budgetLineBreakdown?: (0 | 1 );
+budgetBurnDown?: (0 | 1 );
+inventorySummary?: (0 | 1 );
+inventoryLowStock?: (0 | 1 );
+consumptionTrend?: (0 | 1 );
+consumptionByUnit?: (0 | 1 );
+consumptionByCategory?: (0 | 1 );
+procurementByStore?: (0 | 1 );
+selectionBreakdown?: (0 | 1 );
+stockMovementSummary?: (0 | 1 );
+stepBottleneck?: (0 | 1 );
 };
 };
 
@@ -13412,6 +13554,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -13705,6 +13857,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -13949,6 +14103,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 createdUnits?: {
 _id?: (0 | 1 );
@@ -14117,6 +14281,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -14713,6 +14879,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -14750,6 +14918,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -15763,6 +15933,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -16054,6 +16226,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -16340,6 +16514,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -16724,6 +16900,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -17014,6 +17192,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -17333,6 +17513,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 };
 
@@ -17562,6 +17752,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -17830,6 +18022,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -18203,6 +18397,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -18461,6 +18657,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -18958,6 +19156,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -18986,6 +19186,36 @@ amount?: (0 | 1 );
 description?: (0 | 1 );
 status?: (0 | 1 );
 paidAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -19224,6 +19454,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -19492,6 +19724,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -19865,6 +20099,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -20123,6 +20359,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -20620,6 +20858,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -20648,6 +20888,36 @@ amount?: (0 | 1 );
 description?: (0 | 1 );
 status?: (0 | 1 );
 paidAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -20809,6 +21079,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -21047,6 +21327,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -21315,6 +21597,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -21688,6 +21972,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -21946,6 +22232,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -22443,6 +22731,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -22471,6 +22761,36 @@ amount?: (0 | 1 );
 description?: (0 | 1 );
 status?: (0 | 1 );
 paidAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -22702,6 +23022,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -22966,6 +23288,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -23213,6 +23537,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 parentUnit?: {
 _id?: (0 | 1 );
@@ -23379,6 +23713,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -23634,6 +23970,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -23902,6 +24240,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -24151,6 +24491,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -24409,6 +24751,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -24788,6 +25132,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -24825,6 +25171,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -25663,6 +26011,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 parentUnit?: {
 _id?: (0 | 1 );
@@ -25829,6 +26187,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -26084,6 +26444,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -26352,6 +26714,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -26601,6 +26965,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -26859,6 +27225,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -27238,6 +27606,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -27275,6 +27645,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -28120,6 +28492,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 parentUnit?: {
 _id?: (0 | 1 );
@@ -28286,6 +28668,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -28541,6 +28925,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -28809,6 +29195,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -29058,6 +29446,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -29316,6 +29706,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -29695,6 +30087,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -29732,6 +30126,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -30867,6 +31263,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 createdBy?: {
 _id?: (0 | 1 );
@@ -31054,6 +31460,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -31301,6 +31709,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -32181,6 +32591,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 };
 requests?: {
@@ -32389,6 +32801,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -32584,6 +32998,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 createdBy?: {
 _id?: (0 | 1 );
@@ -32771,6 +33195,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -33018,6 +33444,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -33898,6 +34326,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 };
 requests?: {
@@ -34106,6 +34536,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -34307,6 +34739,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 createdBy?: {
 _id?: (0 | 1 );
@@ -34494,6 +34936,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -34741,6 +35185,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -35621,6 +36067,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 };
 requests?: {
@@ -35829,6 +36277,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -36048,6 +36498,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 createdBy?: {
 _id?: (0 | 1 );
@@ -36235,6 +36695,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -36482,6 +36944,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -37362,6 +37826,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 };
 requests?: {
@@ -37570,6 +38036,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -37766,6 +38234,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 createdBy?: {
 _id?: (0 | 1 );
@@ -37953,6 +38431,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -38200,6 +38680,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -39080,6 +39562,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 };
 requests?: {
@@ -39288,6 +39772,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -39369,6 +39855,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 };
 };
@@ -39413,6 +39901,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 };
 };
@@ -39447,6 +39937,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 };
 };
@@ -39589,6 +40081,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -39813,6 +40307,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -40252,6 +40748,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -40499,6 +40997,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -40710,6 +41210,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -41927,6 +42437,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -42510,6 +43022,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -42883,6 +43397,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -43130,6 +43646,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -43341,6 +43859,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -44558,6 +45086,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -44967,6 +45497,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 unit?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -45207,6 +45739,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 processStep?: {
 _id?: (0 | 1 );
 name?: (0 | 1 );
@@ -45722,6 +46256,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -45969,6 +46505,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -46180,6 +46718,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -47397,6 +47945,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -48124,6 +48674,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -48371,6 +48923,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -48582,6 +49136,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -49799,6 +50363,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -50488,6 +51054,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -50735,6 +51303,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -50946,6 +51516,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -52163,6 +52743,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -52866,6 +53448,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -53113,6 +53697,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -53324,6 +53910,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -54541,6 +55137,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -55370,6 +55968,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -55617,6 +56217,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -55828,6 +56430,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -57045,6 +57657,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -57734,6 +58348,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -57981,6 +58597,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -58192,6 +58810,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -59409,6 +60037,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -60098,6 +60728,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -60345,6 +60977,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -60556,6 +61190,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -61773,6 +62417,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -62461,6 +63107,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -62708,6 +63356,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -62919,6 +63569,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -64136,6 +64796,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -64828,6 +65490,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -65075,6 +65739,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -65286,6 +65952,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -66503,6 +67179,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -67049,6 +67727,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 createdBy?: {
 _id?: (0 | 1 );
@@ -67236,6 +67924,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -67483,6 +68173,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -68363,6 +69055,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 };
 requests?: {
@@ -68571,6 +69265,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -68788,6 +69484,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -69081,6 +69787,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -69325,6 +70033,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 createdUnits?: {
 _id?: (0 | 1 );
@@ -69493,6 +70211,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -70089,6 +70809,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -70126,6 +70848,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -71055,6 +71779,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 parentUnit?: {
 _id?: (0 | 1 );
@@ -71221,6 +71955,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -71476,6 +72212,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -71744,6 +72482,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -71993,6 +72733,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -72251,6 +72993,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -72630,6 +73374,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -72667,6 +73413,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -73548,6 +74296,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -73816,6 +74566,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -74189,6 +74941,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -74447,6 +75201,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -74944,6 +75700,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -74972,6 +75730,36 @@ amount?: (0 | 1 );
 description?: (0 | 1 );
 status?: (0 | 1 );
 paidAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -75169,6 +75957,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -75268,6 +76058,14 @@ startDate?: (0 | 1 );
 endDate?: (0 | 1 );
 isActive?: (0 | 1 );
 status?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+};
 budgetLines?: {
 _id?: (0 | 1 );
 code?: (0 | 1 );
@@ -75423,6 +76221,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -75592,6 +76400,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -76035,6 +76845,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -76332,6 +77144,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -77393,6 +78207,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -77951,6 +78767,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -78663,6 +79481,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -79291,6 +80111,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -80355,6 +81177,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -80946,6 +81770,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -82086,6 +82912,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -82611,6 +83439,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -83672,6 +84502,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -84197,6 +85029,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -85258,6 +86092,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -86805,6 +87641,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -86843,6 +87681,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -87047,6 +87887,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -87101,6 +87943,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 };
 unit?: {
@@ -87268,6 +88112,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -87612,6 +88458,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -87907,6 +88755,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -88125,6 +88975,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -88665,6 +89517,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -88883,6 +89737,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -89130,6 +89986,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -89413,6 +90271,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -89631,6 +90491,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -89899,6 +90761,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -90323,6 +91187,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -90617,6 +91483,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 cities?: {
 _id?: (0 | 1 );
@@ -90890,6 +91766,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -91139,6 +92017,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 cities?: {
 _id?: (0 | 1 );
@@ -91412,6 +92300,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -91658,6 +92548,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 cities?: {
 _id?: (0 | 1 );
@@ -91931,6 +92831,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -92342,6 +93244,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 users?: {
 _id?: (0 | 1 );
@@ -92532,6 +93444,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -93004,6 +93918,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 users?: {
 _id?: (0 | 1 );
@@ -93194,6 +94118,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -93662,6 +94588,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 users?: {
 _id?: (0 | 1 );
@@ -93852,6 +94788,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -94318,6 +95256,16 @@ history?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
 };
 users?: {
 _id?: (0 | 1 );
@@ -94508,6 +95456,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -95800,6 +96750,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -96940,6 +97892,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -97480,6 +98434,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -98620,6 +99576,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -99157,6 +100115,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -100297,6 +101257,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -101029,6 +101991,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -102090,6 +103054,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -102630,6 +103596,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -103691,6 +104659,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -104228,6 +105198,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -105289,6 +106261,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -105824,6 +106798,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -106885,6 +107861,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -107616,6 +108594,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -108677,6 +109657,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -109217,6 +110199,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -110278,6 +111262,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -110815,6 +111801,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -111876,6 +112864,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -112413,6 +113403,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -113474,6 +114466,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -114204,6 +115198,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -115265,6 +116261,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -115805,6 +116803,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -116866,6 +117866,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -117403,6 +118405,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -118464,6 +119468,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -118999,6 +120005,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -120060,6 +121068,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -120821,6 +121831,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -121885,6 +122897,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -122509,6 +123523,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -123573,6 +124589,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -124190,6 +125208,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -125254,6 +126274,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -125867,6 +126889,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -126931,6 +127955,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -128770,6 +129796,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -130047,6 +131075,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -131342,6 +132372,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -132597,6 +133629,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -133122,6 +134156,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -133834,6 +134870,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -134505,6 +135543,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -135217,6 +136257,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -135921,6 +136963,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -136633,6 +137677,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -137299,6 +138345,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -138011,6 +139059,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -138490,6 +139540,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -138580,6 +139632,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -138784,6 +139838,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -138838,6 +139894,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 };
 unit?: {
@@ -139005,6 +140063,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -139349,6 +140409,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -139453,6 +140515,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -139657,6 +140721,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -139711,6 +140777,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 };
 unit?: {
@@ -139878,6 +140946,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -140222,6 +141292,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -140323,6 +141395,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 purchasingRequest?: {
 _id?: (0 | 1 );
 title?: (0 | 1 );
@@ -140527,6 +141601,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -140581,6 +141657,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 };
 unit?: {
@@ -140748,6 +141826,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -141092,6 +142172,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -141532,6 +142614,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -141750,6 +142834,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -142303,6 +143389,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -142521,6 +143609,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -143073,6 +144163,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -143291,6 +144383,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -143842,6 +144936,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -144060,6 +145156,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -144631,6 +145729,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -144849,6 +145949,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -145396,6 +146498,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -145614,6 +146718,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -147257,6 +148363,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -147491,6 +148599,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -148631,6 +149741,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -148865,6 +149977,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -150004,6 +151118,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -150238,6 +151354,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -151370,6 +152488,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -151604,6 +152724,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -152762,6 +153884,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -152996,6 +154120,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -154154,6 +155280,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -154388,6 +155516,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -155524,6 +156654,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -155779,6 +156911,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -157020,6 +158154,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -157275,6 +158411,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -158671,6 +159809,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -158889,6 +160029,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -159136,6 +160278,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -159435,6 +160579,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -159653,6 +160799,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -159900,6 +161048,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -160211,6 +161361,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -160429,6 +161581,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -160676,6 +161830,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -161124,6 +162280,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -161342,6 +162500,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -161610,6 +162770,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -162034,6 +163196,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -162332,6 +163496,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -162550,6 +163716,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -162818,6 +163986,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -163242,6 +164412,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -163543,6 +164715,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -163761,6 +164935,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -164029,6 +165205,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -164453,6 +165631,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -164744,6 +165924,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -164962,6 +166144,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -165230,6 +166414,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -165654,6 +166840,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -165753,6 +166941,7 @@ startDate: Date;
 endDate: Date;
 isActive?: boolean;
 status?: ("open" | "closed" );
+organizationId: string;
 };
 get: {
 _id?: (0 | 1 );
@@ -165763,6 +166952,14 @@ isActive?: (0 | 1 );
 status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+};
 budgetLines?: {
 _id?: (0 | 1 );
 code?: (0 | 1 );
@@ -165793,6 +166990,162 @@ isActive?: (0 | 1 );
 status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+logo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+units?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+location?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+processes?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+finalizedAt?: (0 | 1 );
+postCompletionSteps?: (0 | 1 );
+quantity?: (0 | 1 );
+stuffStatus?: (0 | 1 );
+selectionType?: (0 | 1 );
+selectedTenderOfferId?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
 budgetLines?: {
 _id?: (0 | 1 );
 code?: (0 | 1 );
@@ -165909,6 +167262,162 @@ isActive?: (0 | 1 );
 status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+logo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+units?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+location?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+processes?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+finalizedAt?: (0 | 1 );
+postCompletionSteps?: (0 | 1 );
+quantity?: (0 | 1 );
+stuffStatus?: (0 | 1 );
+selectionType?: (0 | 1 );
+selectedTenderOfferId?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
 budgetLines?: {
 _id?: (0 | 1 );
 code?: (0 | 1 );
@@ -166023,6 +167532,162 @@ isActive?: (0 | 1 );
 status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+logo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+units?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+location?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+processes?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+finalizedAt?: (0 | 1 );
+postCompletionSteps?: (0 | 1 );
+quantity?: (0 | 1 );
+stuffStatus?: (0 | 1 );
+selectionType?: (0 | 1 );
+selectedTenderOfferId?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
 budgetLines?: {
 _id?: (0 | 1 );
 code?: (0 | 1 );
@@ -166132,6 +167797,162 @@ isActive?: (0 | 1 );
 status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+logo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+units?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+location?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+processes?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+finalizedAt?: (0 | 1 );
+postCompletionSteps?: (0 | 1 );
+quantity?: (0 | 1 );
+stuffStatus?: (0 | 1 );
+selectionType?: (0 | 1 );
+selectedTenderOfferId?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
 budgetLines?: {
 _id?: (0 | 1 );
 code?: (0 | 1 );
@@ -166377,6 +168198,14 @@ startDate?: (0 | 1 );
 endDate?: (0 | 1 );
 isActive?: (0 | 1 );
 status?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+};
 budgetLines?: {
 _id?: (0 | 1 );
 code?: (0 | 1 );
@@ -166532,6 +168361,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -166701,6 +168540,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -167144,6 +168985,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -167286,6 +169129,14 @@ startDate?: (0 | 1 );
 endDate?: (0 | 1 );
 isActive?: (0 | 1 );
 status?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+};
 budgetLines?: {
 _id?: (0 | 1 );
 code?: (0 | 1 );
@@ -167441,6 +169292,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -167610,6 +169471,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -168053,6 +169916,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -168197,6 +170062,14 @@ startDate?: (0 | 1 );
 endDate?: (0 | 1 );
 isActive?: (0 | 1 );
 status?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+};
 budgetLines?: {
 _id?: (0 | 1 );
 code?: (0 | 1 );
@@ -168352,6 +170225,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -168521,6 +170404,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -168964,6 +170849,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -169123,6 +171010,14 @@ startDate?: (0 | 1 );
 endDate?: (0 | 1 );
 isActive?: (0 | 1 );
 status?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+};
 budgetLines?: {
 _id?: (0 | 1 );
 code?: (0 | 1 );
@@ -169278,6 +171173,16 @@ stuffStatus?: (0 | 1 );
 selectionType?: (0 | 1 );
 selectedTenderOfferId?: (0 | 1 );
 history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
 createdAt?: (0 | 1 );
 updatedAt?: (0 | 1 );
 };
@@ -169447,6 +171352,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -169890,6 +171797,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 tenders?: {
 _id?: (0 | 1 );
@@ -170464,6 +172373,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -170842,6 +172753,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -171241,6 +173154,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -171621,6 +173536,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -171996,6 +173913,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -172371,6 +174290,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -172663,6 +174584,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -172918,6 +174841,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -174062,6 +175987,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -174317,6 +176244,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
@@ -175469,6 +177398,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 inventories?: {
 _id?: (0 | 1 );
@@ -175724,6 +177655,8 @@ _id?: (0 | 1 );
 status?: (0 | 1 );
 comment?: (0 | 1 );
 decidedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
 };
 createdTenders?: {
 _id?: (0 | 1 );
