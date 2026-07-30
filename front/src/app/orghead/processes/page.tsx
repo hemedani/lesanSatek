@@ -1,0 +1,41 @@
+import { gets } from "@/app/actions/process/gets"
+import { ProcessesClient } from "./processes-client"
+
+export default async function OrgHeadProcessesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; search?: string }>
+}) {
+  const resolvedSearchParams = await searchParams
+  const page = Number(resolvedSearchParams.page) || 1
+  const limit = 20
+
+  const result = await gets(
+    { activeRoleId: "", page, limit, search: resolvedSearchParams.search || undefined },
+    {
+      _id: 1,
+      name: 1,
+      description: 1,
+      status: 1,
+      version: 1,
+      isActive: 1,
+      createdAt: 1,
+      unit: { _id: 1, name: 1 },
+      organization: { _id: 1, name: 1 },
+    },
+  )
+
+  const items = result.success ? result.body : []
+  const prevPageUrl = page > 1 ? `/orghead/processes?page=${page - 1}${resolvedSearchParams.search ? `&search=${resolvedSearchParams.search}` : ""}` : ""
+  const nextPageUrl = items.length >= limit ? `/orghead/processes?page=${page + 1}${resolvedSearchParams.search ? `&search=${resolvedSearchParams.search}` : ""}` : ""
+
+  return (
+    <ProcessesClient
+      items={items}
+      prevPageUrl={prevPageUrl}
+      nextPageUrl={nextPageUrl}
+      page={page}
+      search={resolvedSearchParams.search || ""}
+    />
+  )
+}

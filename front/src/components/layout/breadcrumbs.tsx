@@ -24,6 +24,8 @@ const routeLabels: Record<string, string> = {
   stores: "انبارها",
   stuff: "موجودی",
   consumption: "مصرف",
+  "org-chart": "نمودار سازمان",
+  settings: "تنظیمات",
   "fiscal-years": "سال‌های مالی",
   "budget-lines": "ره‌بودجه",
   "budget-reports": "گزارش بودجه",
