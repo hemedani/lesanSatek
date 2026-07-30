@@ -1,5 +1,5 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { goodsReceipt, purchasingRequest, paymentOrder, processStep, stepApproval, budgetEncumbrance, budgetLine, unit, coreApp } from "../../../mod.ts";
+import { goodsReceipt, purchasingRequest, paymentOrder, processStep, stepApproval, budgetEncumbrance, budgetLine, unit, ware, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
 import { addStock } from "../../../utils/inventoryManager.ts";
@@ -58,7 +58,7 @@ export const addFn: ActFn = async (body) => {
       filters: { _id: new ObjectId(purchasingRequestId as string) },
       projection: {
         store: { _id: 1 }, estimatedAmount: 1, quantity: 1, stuffStatus: 1,
-        requester: { _id: 1 }, requestingUnit: { _id: 1 },
+        requester: { _id: 1 }, requestingUnit: { _id: 1 }, ware: { _id: 1 },
       },
     }) as Record<string, unknown> | null;
 
@@ -73,15 +73,16 @@ export const addFn: ActFn = async (body) => {
       (pr.requester as Record<string, unknown>)._id?.toString() === user._id.toString();
 
     let isWarehouseHead = false;
+    let warehouseHeadUnitIds: string[] = [];
     if (!isRequester) {
       const warehouseUnits = await unit.aggregation({
         pipeline: [
           { $match: { type: "Warehouse", "head._id": user._id } },
-          { $limit: 1 },
         ],
         projection: { _id: 1 },
       }).toArray();
       isWarehouseHead = warehouseUnits.length > 0;
+      warehouseHeadUnitIds = warehouseUnits.map((u: Document) => u._id.toString());
     }
 
     if (!isRequester && !isWarehouseHead) {
@@ -93,6 +94,9 @@ export const addFn: ActFn = async (body) => {
     if (isRequester && receivingUnitId !== prRequestingUnitId) {
       throwError("As the requester, goods must be received into your requesting unit");
     }
+    if (isWarehouseHead && !warehouseHeadUnitIds.includes(receivingUnitId as string)) {
+      throwError("As the warehouse head, goods must be received into your warehouse unit");
+    }
 
     // Extract store/pricing data
     if (pr.store) {
@@ -101,6 +105,11 @@ export const addFn: ActFn = async (body) => {
     prEstimatedAmount = (pr.estimatedAmount as number) || 0;
     prQuantity = (pr.quantity as number) || 0;
   }
+
+  // Get PR's ware as fallback when items don't specify wareId
+  const prWareId = prDoc
+    ? ((prDoc as Record<string, unknown>).ware as Record<string, unknown>)?._id as string | undefined
+    : undefined;
 
   const result = await goodsReceipt.insertOne({
     doc: rest,
@@ -132,10 +141,22 @@ export const addFn: ActFn = async (body) => {
     if (item.quantityAccepted > 0) {
       totalAccepted += item.quantityAccepted;
 
-      if (item.wareId) {
+      // Resolve wareId: item > PR > first ware for this wareModel
+      let resolvedWareId = item.wareId || prWareId;
+      if (!resolvedWareId) {
+        const firstWare = await ware.findOne({
+          filters: { "wareModel._id": new ObjectId(item.wareModelId) },
+          projection: { _id: 1 },
+        }) as Document | null;
+        if (firstWare) {
+          resolvedWareId = (firstWare._id as ObjectId).toString();
+        }
+      }
+
+      if (resolvedWareId) {
         await addStock(
           receivingUnitId as string,
-          item.wareId,
+          resolvedWareId,
           item.quantityAccepted,
           "goods_receipt",
           userId,
