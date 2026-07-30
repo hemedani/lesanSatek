@@ -23,9 +23,9 @@ export const getsFn: ActFn = async (body) => {
   const match: Document = {};
   code && (match.code = { $regex: code, $options: "i" });
   title && (match.title = { $regex: title, $options: "i" });
-  fiscalYearId && (match.fiscalYear = new ObjectId(fiscalYearId as string));
-  organizationId && (match.organization = new ObjectId(organizationId as string));
-  unitId && (match.unit = new ObjectId(unitId as string));
+  fiscalYearId && (match["fiscalYear._id"] = new ObjectId(fiscalYearId as string));
+  organizationId && (match["organization._id"] = new ObjectId(organizationId as string));
+  unitId && (match["unit._id"] = new ObjectId(unitId as string));
   if (Object.keys(match).length > 0) {
     pipeline.push({ $match: match });
   }

@@ -19,8 +19,8 @@ export const getsFn: ActFn = async (body) => {
   const pipeline: Document[] = [];
 
   const match: Document = {};
-  purchasingRequestId && (match.purchasingRequest = new ObjectId(purchasingRequestId as string));
-  receivingUnitId && (match.receivingUnit = new ObjectId(receivingUnitId as string));
+  purchasingRequestId && (match["purchasingRequest._id"] = new ObjectId(purchasingRequestId as string));
+  receivingUnitId && (match["receivingUnit._id"] = new ObjectId(receivingUnitId as string));
   status && (match.status = status);
   if (Object.keys(match).length > 0) {
     pipeline.push({ $match: match });

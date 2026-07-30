@@ -21,7 +21,7 @@ export const getsFn: ActFn = async (body) => {
   const match: Document = {};
   title && (match.title = { $regex: title, $options: "i" });
   status && (match.status = status);
-  purchasingRequestId && (match.purchasingRequest = new ObjectId(purchasingRequestId as string));
+  purchasingRequestId && (match["purchasingRequest._id"] = new ObjectId(purchasingRequestId as string));
   if (Object.keys(match).length > 0) {
     pipeline.push({ $match: match });
   }
