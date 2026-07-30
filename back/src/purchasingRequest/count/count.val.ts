@@ -1,5 +1,7 @@
 import { enums, object, objectIdValidation, optional, string } from "lesan";
 import { request_status_array } from "../../../models/purchasingRequest.ts";
+import { paymentOrder_status_array } from "../../../models/paymentOrder.ts";
+import { goodsReceipt_status_array } from "../../../models/goodsReceipt.ts";
 import { activeRoleMixin } from "@lib";
 
 const stuff_status_array = [
@@ -30,6 +32,8 @@ export const countValidator = () => {
       fromDate: optional(string()),
       toDate: optional(string()),
       search: optional(string()),
+      paymentOrderStatus: optional(enums(["none", ...paymentOrder_status_array])),
+      goodsReceiptStatus: optional(enums(["none", ...goodsReceipt_status_array])),
     }),
     get: object({ qty: optional(enums([0, 1])) }),
   });

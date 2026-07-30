@@ -24,6 +24,8 @@ export const getsFn: ActFn = async (body) => {
       wareGroupId,
       unitId,
       stuffStatus,
+      paymentOrderStatus,
+      goodsReceiptStatus,
       activeRoleId,
     },
     get,
@@ -123,6 +125,38 @@ export const getsFn: ActFn = async (body) => {
     pipeline.push({
       $match: { stuffStatus },
     });
+
+  if (paymentOrderStatus) {
+    pipeline.push({
+      $lookup: {
+        from: "paymentOrder",
+        localField: "_id",
+        foreignField: "purchasingRequest._id",
+        as: "paymentOrders",
+      },
+    });
+    if (paymentOrderStatus === "none") {
+      pipeline.push({ $match: { paymentOrders: { $size: 0 } } });
+    } else {
+      pipeline.push({ $match: { "paymentOrders.status": paymentOrderStatus } });
+    }
+  }
+
+  if (goodsReceiptStatus) {
+    pipeline.push({
+      $lookup: {
+        from: "goodsReceipt",
+        localField: "_id",
+        foreignField: "purchasingRequest._id",
+        as: "goodsReceipts",
+      },
+    });
+    if (goodsReceiptStatus === "none") {
+      pipeline.push({ $match: { goodsReceipts: { $size: 0 } } });
+    } else {
+      pipeline.push({ $match: { "goodsReceipts.status": goodsReceiptStatus } });
+    }
+  }
 
   if (unitId) {
     if (!["Manager", "Admin", "OrgHead"].includes(activeRole.name)) {

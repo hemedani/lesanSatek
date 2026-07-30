@@ -1,6 +1,8 @@
 import { enums, object, objectIdValidation, optional, string } from "lesan";
 import { selectStruct } from "../../../mod.ts";
 import { request_status_array } from "../../../models/purchasingRequest.ts";
+import { paymentOrder_status_array } from "../../../models/paymentOrder.ts";
+import { goodsReceipt_status_array } from "../../../models/goodsReceipt.ts";
 import { activeRoleMixin, pagination } from "@lib";
 
 export const getsValidator = () => {
@@ -45,6 +47,8 @@ export const getsValidator = () => {
       stuffStatus: optional(enums([
         "none", "assigned", "ready_to_ship", "shipped", "delivered", "received", "cancelled",
       ])),
+      paymentOrderStatus: optional(enums(["none", ...paymentOrder_status_array])),
+      goodsReceiptStatus: optional(enums(["none", ...goodsReceipt_status_array])),
     }),
     get: selectStruct("purchasingRequest", 2),
   });

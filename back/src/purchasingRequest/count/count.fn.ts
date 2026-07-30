@@ -9,7 +9,7 @@ export const countFn: ActFn = async (body) => {
     set: {
       status, processId, requesterId, storeId, wareId, wareTypeId,
       wareClassId, wareGroupId, unitId, createdBy, stuffStatus,
-      fromDate, toDate, search, activeRoleId,
+      fromDate, toDate, search, paymentOrderStatus, goodsReceiptStatus, activeRoleId,
     },
     get,
   } = body.details;
@@ -76,11 +76,51 @@ export const countFn: ActFn = async (body) => {
     filters["createdAt"] = createdAtFilter;
   }
 
-  if (search) {
-    const pipeline: Document[] = [
-      { $match: { ...filters, $text: { $search: search } } },
-      { $count: "count" },
-    ];
+  const needLookup = !!(paymentOrderStatus || goodsReceiptStatus);
+
+  if (search || needLookup) {
+    const pipeline: Document[] = [];
+
+    if (search) {
+      pipeline.push({ $match: { ...filters, $text: { $search: search } } });
+    } else {
+      pipeline.push({ $match: filters });
+    }
+
+    if (paymentOrderStatus) {
+      pipeline.push({
+        $lookup: {
+          from: "paymentOrder",
+          localField: "_id",
+          foreignField: "purchasingRequest._id",
+          as: "paymentOrders",
+        },
+      });
+      if (paymentOrderStatus === "none") {
+        pipeline.push({ $match: { paymentOrders: { $size: 0 } } });
+      } else {
+        pipeline.push({ $match: { "paymentOrders.status": paymentOrderStatus } });
+      }
+    }
+
+    if (goodsReceiptStatus) {
+      pipeline.push({
+        $lookup: {
+          from: "goodsReceipt",
+          localField: "_id",
+          foreignField: "purchasingRequest._id",
+          as: "goodsReceipts",
+        },
+      });
+      if (goodsReceiptStatus === "none") {
+        pipeline.push({ $match: { goodsReceipts: { $size: 0 } } });
+      } else {
+        pipeline.push({ $match: { "goodsReceipts.status": goodsReceiptStatus } });
+      }
+    }
+
+    pipeline.push({ $count: "count" });
+
     const result = await purchasingRequest
       .aggregation({ pipeline, projection: { count: 1 } })
       .toArray();

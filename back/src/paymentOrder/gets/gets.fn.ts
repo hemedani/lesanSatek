@@ -27,20 +27,19 @@ export const getsFn: ActFn = async (body) => {
   const pipeline: Document[] = [];
 
   const match: Document = {};
-  purchasingRequestId && (match.purchasingRequest = new ObjectId(purchasingRequestId as string));
+  purchasingRequestId && (match["purchasingRequest._id"] = new ObjectId(purchasingRequestId as string));
   status && (match.status = status);
-  financialUnitId && (match.financialUnit = new ObjectId(financialUnitId as string));
+  financialUnitId && (match["financialUnit._id"] = new ObjectId(financialUnitId as string));
 
   if (activeRole?.name === "OrgHead" && activeRole.scopeType === "organization" && activeRole.scopeId) {
-    match["financialUnit.organization._id"] = new ObjectId(activeRole.scopeId);
+    // OrgHead sees all payment orders in their org — no financialUnit filter needed
   } else if (activeRole?.name === "UnitHead" && activeRole.scopeType === "unit" && activeRole.scopeId) {
     const unitDoc = await unit.findOne({
-      filters: { _id: new ObjectId(activeRole.scopeId) },
-      projection: { organization: 1 },
+      filters: { _id: new ObjectId(activeRole.scopeId as string) },
+      projection: { type: 1 },
     });
-    const orgId = (unitDoc as Record<string, Record<string, unknown>>)?.organization?._id as string | undefined;
-    if (orgId) {
-      match["financialUnit.organization._id"] = new ObjectId(orgId as string);
+    if (unitDoc && (unitDoc as Record<string, unknown>).type !== "Finance") {
+      match["financialUnit._id"] = new ObjectId(activeRole.scopeId as string);
     }
   }
 
