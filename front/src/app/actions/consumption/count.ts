@@ -5,18 +5,22 @@ import { getToken, getActiveRoleId } from "@/lib/auth";
 
 export const count = async (
   data: {
-    activeRoleId: string;
+    activeRoleId?: string;
+    unitId?: string;
+    wareModelId?: string;
+    reason?: string;
+    consumedFor?: string;
   }
 ) => {
   try {
     const token = await getToken();
     const activeRoleId = await getActiveRoleId();
     const result = await AppApi(undefined, token).send({
-      service: "main",
-      model: "consumptionRecord",
-      act: "count",
+      service: "main" as const,
+      model: "consumption" as const,
+      act: "count" as any,
       details: {
-        set: { ...data, activeRoleId },
+        set: { ...data, activeRoleId } as any,
         get: { qty: 1 as const },
       },
     });

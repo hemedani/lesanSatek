@@ -13,11 +13,11 @@ export const remove = async (
     const token = await getToken();
     const activeRoleId = await getActiveRoleId();
     const result = await AppApi(undefined, token).send({
-      service: "main",
-      model: "consumptionRecord",
-      act: "remove",
+      service: "main" as const,
+      model: "consumption" as const,
+      act: "remove" as any,
       details: {
-        set: { ...data, activeRoleId },
+        set: { ...data, activeRoleId } as any,
         get: { success: 1 as const },
       },
     });

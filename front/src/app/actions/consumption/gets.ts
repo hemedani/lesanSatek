@@ -2,22 +2,31 @@
 
 import { AppApi } from "@/lib/api";
 import { getToken, getActiveRoleId } from "@/lib/auth";
-import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 
 export const gets = async (
-  data: Omit<ReqType["main"]["consumptionRecord"]["gets"]["set"], "activeRoleId"> & { activeRoleId?: string },
-  getSelection?: DeepPartial<ReqType["main"]["consumptionRecord"]["gets"]["get"]>
+  data: {
+    activeRoleId?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+    unitId?: string;
+    wareModelId?: string;
+    reason?: string;
+    consumedFor?: string;
+  },
+  getSelection?: any
 ) => {
   try {
     const token = await getToken();
     const activeRoleId = await getActiveRoleId();
     const result = await AppApi(undefined, token).send({
-      service: "main",
-      model: "consumptionRecord",
-      act: "gets",
+      service: "main" as const,
+      model: "consumption" as const,
+      act: "gets" as any,
       details: {
-        set: { ...data, activeRoleId },
-        get: getSelection || { _id: 1, quantity: 1, consumedAt: 1, reason: 1 },
+        set: { ...data, activeRoleId } as any,
+        get: (getSelection || { _id: 1, quantity: 1, consumedAt: 1, reason: 1 }) as any,
       },
     });
     return result;
