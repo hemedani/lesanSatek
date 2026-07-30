@@ -54,8 +54,16 @@ export const login = async (
       if (result.body.user?.roles?.length > 0) {
         const currentActiveRoleId = cookieStore.get("activeRoleId")?.value;
         const highest = getHighestRole(result.body.user.roles);
-        const roleId = currentActiveRoleId || (highest ? highest.roleId : result.body.user.roles[0].roleId);
+        const selectedRole = highest || result.body.user.roles[0];
+        const roleId = currentActiveRoleId || selectedRole.roleId;
         cookieStore.set("activeRoleId", roleId, {
+          httpOnly: false,
+          secure,
+          sameSite: "lax",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 7,
+        });
+        cookieStore.set("roleName", selectedRole.name, {
           httpOnly: false,
           secure,
           sameSite: "lax",

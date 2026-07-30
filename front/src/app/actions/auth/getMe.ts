@@ -46,15 +46,37 @@ export const getMe = async (
       const cookieStore = await cookies();
       const secure = await isSecureRequest();
       const currentActiveRoleId = cookieStore.get("activeRoleId")?.value;
-      if (!currentActiveRoleId && result.body.roles?.length > 0) {
-        const highest = getHighestRole(result.body.roles);
-        cookieStore.set("activeRoleId", highest ? highest.roleId : result.body.roles[0].roleId, {
-          httpOnly: false,
-          secure,
-          sameSite: "lax",
-          path: "/",
-          maxAge: 60 * 60 * 24 * 7,
-        });
+      const currentRoleName = cookieStore.get("roleName")?.value;
+      if (result.body.roles?.length > 0) {
+        if (!currentActiveRoleId) {
+          const highest = getHighestRole(result.body.roles);
+          const selected = highest || result.body.roles[0];
+          cookieStore.set("activeRoleId", selected.roleId, {
+            httpOnly: false,
+            secure,
+            sameSite: "lax",
+            path: "/",
+            maxAge: 60 * 60 * 24 * 7,
+          });
+          cookieStore.set("roleName", selected.name, {
+            httpOnly: false,
+            secure,
+            sameSite: "lax",
+            path: "/",
+            maxAge: 60 * 60 * 24 * 7,
+          });
+        } else if (!currentRoleName) {
+          const activeRole = result.body.roles.find((r: { roleId: string }) => r.roleId === currentActiveRoleId);
+          if (activeRole) {
+            cookieStore.set("roleName", activeRole.name, {
+              httpOnly: false,
+              secure,
+              sameSite: "lax",
+              path: "/",
+              maxAge: 60 * 60 * 24 * 7,
+            });
+          }
+        }
       }
     }
 

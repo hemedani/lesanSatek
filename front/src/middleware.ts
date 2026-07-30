@@ -18,7 +18,9 @@ export function middleware(request: NextRequest) {
 
   if (publicRoutes.includes(pathname)) {
     if (token) {
-      return NextResponse.redirect(new URL("/admin", request.url))
+      const roleName = request.cookies.get("roleName")?.value
+      const target = roleName === "OrgHead" ? "/orghead" : "/admin"
+      return NextResponse.redirect(new URL(target, request.url))
     }
     return NextResponse.next()
   }
