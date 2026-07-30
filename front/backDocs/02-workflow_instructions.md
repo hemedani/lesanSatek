@@ -762,8 +762,8 @@ The PanelSelector should show all 3 options for role switching.
 | `/vendor` | `ali@lesansatek.com` | Redirect to default panel |
 | `/store` | `ali@lesansatek.com` | Redirect to default panel |
 | `/store` | `sara@lesansatek.com` | Allowed (StoreHead role) |
-| `/org-head` | `dr.ahmadi@lesansatek.com` | Allowed (OrgHead role) |
-| `/org-head` | `ali@lesansatek.com` | Redirect to default panel |
+| `/orghead` | `dr.ahmadi@lesansatek.com` | Allowed (OrgHead role) |
+| `/orghead` | `ali@lesansatek.com` | Redirect to default panel |
 | `/admin` | unauthenticated | Redirect to `/login` |
 | `/unit-head` | unauthenticated | Redirect to `/login` |
 
@@ -908,7 +908,7 @@ The PanelSelector should show all 3 options for role switching.
 | **فاطمه موسوی** (finHead) | fatemeh@lesansatek.com / password123 | `/unit-head` | ✓ (Employee role) | ✓ (UnitHead role) |
 | **مریم حسینی** (financeUser) | maryam@lesansatek.com / password123 | `/finance` | ✓ (Employee role) | ✗ (Ordinary) |
 | **سارا کریمی** (vendorUser) | sara@lesansatek.com / password123 | `/vendor`, `/admin`, or `/store` | ✓ (Employee/Manager role) | ✓ (Manager role) |
-| **دکتر احمدی** (orgHeadUser) | dr.ahmadi@lesansatek.com / password123 | `/org-head` | ✓ (Employee role) | ✓ (OrgHead role) |
+| **دکتر احمدی** (orgHeadUser) | dr.ahmadi@lesansatek.com / password123 | `/orghead` | ✓ (Employee role) | ✓ (OrgHead role) |
 
 **All unit heads** (علی محمدی through فاطمه موسوی) work via `/admin` panel — they have Manager role.  
 **UnitHead users** (رضا احمدی, حسین کاظمی, فاطمه موسوی) work via `/unit-head` panel — they see only their unit's data. This is the most common approval panel.  

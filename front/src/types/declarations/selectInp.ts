@@ -45399,6 +45399,8 @@ wareClassId?: string;
 wareGroupId?: string;
 unitId?: string;
 stuffStatus?: ("none" | "assigned" | "ready_to_ship" | "shipped" | "delivered" | "received" | "cancelled" );
+paymentOrderStatus?: ("none" | "draft" | "sent_to_finance" | "paid" | "cancelled" );
+goodsReceiptStatus?: ("none" | "pending" | "completed" | "partially_rejected" );
 };
 get: {
 _id?: (0 | 1 );
@@ -47787,6 +47789,8 @@ stuffStatus?: ("none" | "assigned" | "ready_to_ship" | "shipped" | "delivered" |
 fromDate?: string;
 toDate?: string;
 search?: string;
+paymentOrderStatus?: ("none" | "draft" | "sent_to_finance" | "paid" | "cancelled" );
+goodsReceiptStatus?: ("none" | "pending" | "completed" | "partially_rejected" );
 };
 get: {
 qty?: (0 | 1 );
