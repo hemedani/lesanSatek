@@ -1,7 +1,8 @@
 import Link from "next/link"
-import { Box, Gavel, FileText, ShoppingCart, Store, Package } from "lucide-react"
+import { Box, Gavel, FileText, ShoppingCart, Store, Package, Truck } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { count as countStuff } from "@/app/actions/stuff/count"
 import { gets as getTenders } from "@/app/actions/tender/gets"
 import { gets as getOffers } from "@/app/actions/tenderOffer/gets"
@@ -9,12 +10,13 @@ import { count as countPRs } from "@/app/actions/purchasingRequest/count"
 import { getMe } from "@/app/actions/auth/getMe"
 
 export default async function StoreHeadDashboard() {
-  const [me, stuffRes, tendersRes, offersRes, prsRes] = await Promise.all([
+  const [me, stuffRes, tendersRes, offersRes, prsRes, pendingDeliveryRes] = await Promise.all([
     getMe({ _id: 1, managedStore: { _id: 1, name: 1 } }).catch(() => ({ success: false, body: null })),
     countStuff({ activeRoleId: "" }).catch(() => ({ success: false, body: { qty: 0 } })),
     getTenders({ activeRoleId: "", page: 1, limit: 1, status: "open" }, { _id: 1 }).catch(() => ({ success: false, body: [] })),
     getOffers({ activeRoleId: "", page: 1, limit: 1 }, { _id: 1, status: 1 }).catch(() => ({ success: false, body: [] })),
     countPRs({ activeRoleId: "" }).catch(() => ({ success: false, body: { qty: 0 } })),
+    countPRs({ activeRoleId: "", goodsReceiptStatus: "none" as any }).catch(() => ({ success: false, body: { qty: 0 } })),
   ])
 
   const store = me.success && me.body?.managedStore ? me.body.managedStore : null
@@ -23,6 +25,8 @@ export default async function StoreHeadDashboard() {
   const myOffers = offersRes.success && offersRes.body ? offersRes.body : []
   const awardedOffers = myOffers.filter((o: { status?: string }) => o.status === "awarded")
   const prCount = prsRes.success && prsRes.body ? prsRes.body.qty ?? 0 : 0
+
+  const pendingDeliveryCount = pendingDeliveryRes.success && pendingDeliveryRes.body ? pendingDeliveryRes.body.qty ?? 0 : 0
 
   const stats = [
     {
@@ -105,6 +109,30 @@ export default async function StoreHeadDashboard() {
           )
         })}
       </div>
+
+      {/* Pending Delivery Alert */}
+      {pendingDeliveryCount > 0 && (
+        <Link href="/storehead/purchasing-requests?goodsReceiptStatus=none">
+          <Card variant="glass" className="cursor-pointer transition-all duration-200 hover:border-amber-500/30 border-amber-500/20">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-4">
+                <div className="size-12 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0 ring-1 ring-inset ring-amber-500/15">
+                  <Truck className="size-6 text-amber-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-amber-400">درخواست‌های نیازمند تحویل</p>
+                  <p className="text-xs text-fog/60 mt-0.5">
+                    {pendingDeliveryCount} درخواست خرید که هنوز تحویل داده نشده است
+                  </p>
+                </div>
+                <Badge variant="outline" className="text-lg font-semibold text-amber-400 border-amber-500/20 bg-amber-500/10 shrink-0 px-3 py-1">
+                  {pendingDeliveryCount}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      )}
 
       {/* Quick Actions */}
       <div className="flex flex-wrap gap-3">

@@ -2,7 +2,7 @@
 
 import { useRouter, useParams } from "next/navigation"
 import { useState, useEffect } from "react"
-import { ArrowRight, ShoppingCart, Package, Calendar, Building2, BadgeCheck, Store, BarChart3, FileText } from "lucide-react"
+import { ArrowRight, ShoppingCart, Package, Calendar, Building2, BadgeCheck, Store, BarChart3, FileText, Landmark } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -11,11 +11,19 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { ErrorState } from "@/components/ui/error-state"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { RequestStatusBadge } from "@/components/purchasing/request-status-badge"
+import { StatusBadge } from "@/components/ui/status-badge"
 import { HistoryTimeline } from "@/components/purchasing/history-timeline"
 import { cn } from "@/lib/utils"
 import { get } from "@/app/actions/purchasingRequest/get"
 import { updateStuffStatus } from "@/app/actions/purchasingRequest/updateStuffStatus"
 import { useAuthStore } from "@/stores/authStore"
+
+const PAYMENT_STATUS_LABELS: Record<string, string> = {
+  draft: "پیش‌نویس",
+  sent_to_finance: "ارجاع به مالی",
+  paid: "پرداخت شده",
+  cancelled: "لغو شده",
+}
 
 const STUFF_STATUS_LABELS: Record<string, string> = {
   assigned: "تخصیص داده شده",
@@ -77,6 +85,7 @@ interface PR {
   ware?: { name?: string; brand?: string }
   store?: { _id?: string; name?: string }
   history?: { action?: string; performed?: { by?: string; name?: string; at?: string } }[]
+  paymentOrders?: { _id: string; title?: string; amount?: number; status?: string; paidAt?: string }[]
 }
 
 export default function StorePRDetailPage() {
@@ -108,6 +117,7 @@ export default function StorePRDetailPage() {
           stuff: { _id: 1, quantity: 1, price: 1 },
           ware: { name: 1, brand: 1 },
           store: { _id: 1, name: 1 },
+          paymentOrders: { _id: 1, title: 1, amount: 1, status: 1, paidAt: 1 },
           history: 1,
         },
       )
@@ -286,6 +296,44 @@ export default function StorePRDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-moonlight/80 leading-relaxed">{pr.description}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Payment Orders */}
+          {pr.paymentOrders && pr.paymentOrders.length > 0 && (
+            <Card variant="glass">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex size-8 items-center justify-center rounded-lg bg-violet-500/10 ring-1 ring-inset ring-violet-500/15">
+                    <Landmark className="size-4 text-violet-400" />
+                  </div>
+                  <CardTitle className="text-sm font-medium text-moonlight">دستورات پرداخت</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="divide-y divide-steel-border/10">
+                  {pr.paymentOrders.map((po) => (
+                    <div key={po._id} className="py-3 first:pt-0 last:pb-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-moonlight">
+                          {po.title || "—"}
+                        </span>
+                        <span className="text-sm text-moonlight">
+                          {Number(po.amount || 0).toLocaleString("fa-IR")} ریال
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-4 text-xs text-fog/50">
+                        <StatusBadge status={po.status || ""} labelMap={PAYMENT_STATUS_LABELS} />
+                        {po.paidAt && (
+                          <span>
+                            پرداخت: {new Date(po.paidAt).toLocaleDateString("fa-IR")}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           )}
