@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { FormInput } from "@/components/form/form-input";
+import { FormJalaliDatePicker } from "@/components/form/form-jalali-date-picker";
 import { FormTextarea } from "@/components/form/form-textarea";
 import { FormSearchSelect } from "@/components/form/form-search-select";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
@@ -32,6 +33,7 @@ const goodsReceiptSchema = z.object({
   description: z.string().optional(),
   notes: z.string().optional(),
   receivedAt: z.string().min(1, "تاریخ رسید الزامی است"),
+  receivedAtTime: z.string().optional(),
   purchasingRequestId: z.string().min(1, "انتخاب درخواست خرید الزامی است"),
   items: z.array(itemSchema).min(1, "حداقل یک آیتم کالا باید وارد شود"),
 });
@@ -48,7 +50,8 @@ export function GoodsReceiptForm() {
       receiptNumber: "",
       description: "",
       notes: "",
-      receivedAt: new Date().toISOString().slice(0, 16),
+      receivedAt: new Date().toISOString(),
+      receivedAtTime: new Date().toTimeString().slice(0, 5),
       purchasingRequestId: "",
       items: [{
         wareModelId: "",
@@ -71,12 +74,15 @@ export function GoodsReceiptForm() {
   const onSubmit = async (values: GoodsReceiptData) => {
     setSubmitting(true);
     try {
+      const [h, m] = (values.receivedAtTime || "00:00").split(":").map(Number)
+      const receivedDate = new Date(values.receivedAt)
+      receivedDate.setHours(h || 0, m || 0)
       const result = await add(
         {
           activeRoleId: getActiveRoleIdFromStore(),
           receiptNumber: values.receiptNumber,
           description: values.description || undefined,
-          receivedAt: new Date(values.receivedAt),
+          receivedAt: receivedDate,
           status: "pending",
           notes: values.notes || undefined,
           items: values.items.map((item) => ({
@@ -124,7 +130,12 @@ export function GoodsReceiptForm() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInput control={form.control} name="receiptNumber" label="شماره رسید" placeholder="مثال: GR-۰۰۱" required />
-              <FormInput control={form.control} name="receivedAt" label="تاریخ رسید" type="datetime-local" required />
+              <div className="flex gap-2 items-end">
+                <div className="flex-1">
+                  <FormJalaliDatePicker control={form.control} name="receivedAt" label="تاریخ رسید" required />
+                </div>
+                <FormInput control={form.control} name="receivedAtTime" label="ساعت" type="time" />
+              </div>
             </div>
             <FormSearchSelect
               control={form.control}
@@ -212,7 +223,7 @@ export function GoodsReceiptForm() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <FormInput control={form.control} name={`items.${index}.batchNo`} label="شماره بچ" placeholder="مثال: BATCH-۰۰۱" />
-                  <FormInput control={form.control} name={`items.${index}.expirationDate`} label="تاریخ انقضا" type="date" />
+                  <FormJalaliDatePicker control={form.control} name={`items.${index}.expirationDate`} label="تاریخ انقضا" />
                 </div>
                 {items?.[index] && (
                   <div className="flex items-center gap-4 text-xs text-fog/50">

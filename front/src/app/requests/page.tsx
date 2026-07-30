@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ShoppingCart, CheckCircle, XCircle, Clock, Package, Plus } from "lucide-react"
+import { ShoppingCart, CheckCircle, XCircle, Clock, Package, Plus, Warehouse, ScrollText, Activity } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { StatusBadge } from "@/components/ui/status-badge"
@@ -100,6 +100,63 @@ export default async function RequestsDashboard() {
         })}
       </div>
 
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <Link href="/requests/inventory">
+          <Card variant="glass" className="group cursor-pointer transition-all duration-200 hover:border-frost-link/30 hover:shadow-lg hover:shadow-frost-link/5">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-400/10 ring-1 ring-inset ring-white/[0.06]">
+                  <Warehouse className="size-5 text-emerald-400" />
+                </div>
+                <CardTitle className="text-sm font-medium text-fog leading-5">
+                  انبار واحد
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-fog/60 leading-5">مشاهده موجودی انبار واحد خود و رهگیری موجودی کالاها</p>
+              <div className="mt-4 h-px bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent" />
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/requests/consumption">
+          <Card variant="glass" className="group cursor-pointer transition-all duration-200 hover:border-frost-link/30 hover:shadow-lg hover:shadow-frost-link/5">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-lg bg-amber-400/10 ring-1 ring-inset ring-white/[0.06]">
+                  <ScrollText className="size-5 text-amber-400" />
+                </div>
+                <CardTitle className="text-sm font-medium text-fog leading-5">
+                  مصرف کالا
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-fog/60 leading-5">ثبت مصرف کالاهای انبار و مشاهده سوابق مصرف</p>
+              <div className="mt-4 h-px bg-gradient-to-r from-transparent via-amber-400/20 to-transparent" />
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/requests/stock-movements">
+          <Card variant="glass" className="group cursor-pointer transition-all duration-200 hover:border-frost-link/30 hover:shadow-lg hover:shadow-frost-link/5">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-lg bg-electric-iris/10 ring-1 ring-inset ring-white/[0.06]">
+                  <Activity className="size-5 text-electric-iris" />
+                </div>
+                <CardTitle className="text-sm font-medium text-fog leading-5">
+                  گردش کالا
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-fog/60 leading-5">گردش و جابجایی کالاها بین واحدها و انبارها</p>
+              <div className="mt-4 h-px bg-gradient-to-r from-transparent via-frost-link/20 to-transparent" />
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-2">
         <Card variant="glass">
           <CardHeader className="pb-3">
@@ -117,9 +174,6 @@ export default async function RequestsDashboard() {
             </Link>
             <Link href="/requests/my-requests?tab=receipt">
               <Button variant="outline" size="sm">دریافت کالا</Button>
-            </Link>
-            <Link href="/requests/inventory">
-              <Button variant="outline" size="sm">انبار واحد</Button>
             </Link>
           </CardContent>
         </Card>

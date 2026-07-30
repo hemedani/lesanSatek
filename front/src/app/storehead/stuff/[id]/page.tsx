@@ -20,6 +20,7 @@ import { update } from "@/app/actions/stuff/update"
 import { remove } from "@/app/actions/stuff/remove"
 import { useAuthStore } from "@/stores/authStore"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
+import { FormJalaliDatePicker } from "@/components/form/form-jalali-date-picker"
 
 const stuffSchema = z.object({
   quantity: z.string().min(1, "تعداد الزامی است"),
@@ -201,19 +202,7 @@ export default function EditStuffPage() {
 
               <Separator className="bg-steel-border/20" />
 
-              <FormField
-                control={form.control}
-                name="expiration"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>تاریخ انقضا</FormLabel>
-                    <FormControl>
-                      <Input type="date" dir="rtl" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <FormJalaliDatePicker control={form.control} name="expiration" label="تاریخ انقضا" />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField

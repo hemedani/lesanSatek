@@ -4,10 +4,11 @@ import { useForm } from "react-hook-form"
 import { zodV4Resolver } from "@/lib/zod-v4-resolver"
 import { z } from "zod"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { Loader2, ArrowRight, FileText } from "lucide-react"
+import { Loader2, ArrowRight, FileText, Warehouse } from "lucide-react"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -16,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { SearchSelect, type SearchSelectOption } from "@/components/form/form-search-select"
 import { add as addPR } from "@/app/actions/purchasingRequest/add"
 import { gets as getWareModels } from "@/app/actions/wareModel/gets"
+import { gets as getInventories } from "@/app/actions/inventory/gets"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
 
 const prSchema = z.object({
@@ -40,6 +42,40 @@ export default function NewRequestPage() {
       wareModelId: "",
     },
   })
+
+  const [wareStocks, setWareStocks] = useState<{ name: string; quantity: number }[] | null>(null)
+  const [loadingStock, setLoadingStock] = useState(false)
+  const selectedWareModelId = form.watch("wareModelId")
+  const prevWareModelRef = useRef("")
+
+  useEffect(() => {
+    const wmId = selectedWareModelId
+    if (!wmId || wmId === prevWareModelRef.current) return
+    prevWareModelRef.current = wmId
+    setLoadingStock(true)
+    getInventories(
+      { activeRoleId: getActiveRoleIdFromStore(), wareModelId: wmId, page: 1, limit: 50 },
+      { _id: 1, quantity: 1, ware: { _id: 1, name: 1 } },
+    ).then((res) => {
+      if (res.success && res.body) {
+        const stocks: { name: string; quantity: number }[] = []
+        const seen = new Set<string>()
+        for (const inv of res.body as { quantity?: number; ware?: { _id: string; name?: string } }[]) {
+          const name = inv.ware?.name || "کالای عمومی"
+          if (seen.has(name)) continue
+          seen.add(name)
+          stocks.push({ name, quantity: inv.quantity || 0 })
+        }
+        setWareStocks(stocks.length > 0 ? stocks : null)
+      } else {
+        setWareStocks(null)
+      }
+    }).catch(() => {
+      setWareStocks(null)
+    }).finally(() => {
+      setLoadingStock(false)
+    })
+  }, [selectedWareModelId])
 
   const loadWareModels = async (query?: string): Promise<SearchSelectOption[]> => {
     const res = await getWareModels(
@@ -162,6 +198,36 @@ export default function NewRequestPage() {
                         label="مدل کالا"
                       />
                     </FormControl>
+                    {loadingStock && (
+                      <p className="text-xs text-fog/50 mt-1 flex items-center gap-1">
+                        <Loader2 className="size-3 animate-spin" />
+                        در حال بررسی موجودی...
+                      </p>
+                    )}
+                    {!loadingStock && wareStocks !== null && selectedWareModelId && (
+                      <div className="mt-2 space-y-1">
+                        <p className="text-xs text-fog/60 flex items-center gap-1">
+                          <Warehouse className="size-3" />
+                          موجودی انبار:
+                        </p>
+                        <div className="space-y-0.5">
+                          {wareStocks.map((ws) => (
+                            <div key={ws.name} className="flex items-center justify-between text-xs px-2 py-0.5 rounded-sm bg-white/[0.03]">
+                              <span className="text-fog">{ws.name}</span>
+                              <span className={cn("font-mono", ws.quantity > 0 ? "text-emerald-400" : "text-fog/40")} dir="ltr">
+                                {ws.quantity.toLocaleString("fa-IR")} عدد
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {!loadingStock && wareStocks === null && selectedWareModelId && (
+                      <p className="text-xs text-ember flex items-center gap-1 mt-1">
+                        <Warehouse className="size-3" />
+                        موجودی در انبار موجود نیست
+                      </p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}

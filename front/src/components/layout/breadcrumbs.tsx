@@ -45,6 +45,7 @@ const routeLabels: Record<string, string> = {
   "my-requests": "درخواست‌های من",
   store: "فروشگاه",
   inventory: "موجودی",
+  "stock-movements": "گردش کالا",
   new: "جدید",
   offers: "پیشنهادها",
   show: "مشاهده",

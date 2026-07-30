@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { FormInput } from "@/components/form/form-input";
+import { FormJalaliDatePicker } from "@/components/form/form-jalali-date-picker";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 import { gets } from "@/app/actions/fiscalYear/gets";
 import { add } from "@/app/actions/fiscalYear/add";
@@ -91,8 +92,8 @@ export default function FiscalYearsPage() {
           <Form {...form}><form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormInput control={form.control} name="name" label="نام سال مالی" required />
             <div className="grid grid-cols-2 gap-3">
-              <FormInput control={form.control} name="startDate" label="تاریخ شروع" type="date" required />
-              <FormInput control={form.control} name="endDate" label="تاریخ پایان" type="date" required />
+              <FormJalaliDatePicker control={form.control} name="startDate" label="تاریخ شروع" required />
+              <FormJalaliDatePicker control={form.control} name="endDate" label="تاریخ پایان" required />
             </div>
             <div className="flex justify-end gap-3 pt-2">
               <Button type="button" variant="ghost" onClick={() => setShowDialog(false)}>انصراف</Button>

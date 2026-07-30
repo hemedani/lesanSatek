@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Clock, CheckCircle, ShoppingCart, Building2, Wallet } from "lucide-react"
+import { Clock, CheckCircle, ShoppingCart, Building2, Wallet, Warehouse, ScrollText, Activity } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { count } from "@/app/actions/purchasingRequest/count"
@@ -150,6 +150,24 @@ export default async function OrgHeadDashboard() {
           <Button variant="outline" className="gap-2">
             <ShoppingCart className="size-4" />
             همه درخواست‌ها
+          </Button>
+        </Link>
+        <Link href="/orghead/inventory">
+          <Button variant="outline" className="gap-2">
+            <Warehouse className="size-4" />
+            موجودی انبار
+          </Button>
+        </Link>
+        <Link href="/orghead/consumption">
+          <Button variant="outline" className="gap-2">
+            <ScrollText className="size-4" />
+            مصرف کالا
+          </Button>
+        </Link>
+        <Link href="/orghead/stock-movements">
+          <Button variant="outline" className="gap-2">
+            <Activity className="size-4" />
+            گردش کالا
           </Button>
         </Link>
       </div>

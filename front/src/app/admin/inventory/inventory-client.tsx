@@ -18,14 +18,14 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { FormInput } from "@/components/form/form-input";
-import { FormSearchSelect } from "@/components/form/form-search-select";
+import { FormSearchSelect, SearchSelect } from "@/components/form/form-search-select";
 import type { SearchSelectOption } from "@/components/form/form-search-select";
 import { remove } from "@/app/actions/inventory/remove";
 import { add } from "@/app/actions/inventory/add";
 import { update } from "@/app/actions/inventory/update";
 import { adjust } from "@/app/actions/inventory/adjust";
+import { transferWithAudit } from "@/app/actions/inventory/transferWithAudit";
 import { gets as getUnits } from "@/app/actions/unit/gets";
-import { gets as getWareModels } from "@/app/actions/wareModel/gets";
 import { gets as getWares } from "@/app/actions/ware/gets";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 
@@ -60,8 +60,7 @@ const inventorySchema = z.object({
   location: z.string().optional(),
   unitId: z.string().min(1, "انتخاب واحد الزامی است"),
   warehouseUnitId: z.string().optional(),
-  wareModelId: z.string().min(1, "انتخاب مدل کالا الزامی است"),
-  wareId: z.string().optional(),
+  wareId: z.string().min(1, "انتخاب کالا الزامی است"),
 });
 
 type InventoryData = z.infer<typeof inventorySchema>;
@@ -72,16 +71,14 @@ const unitFetcher = async (q?: string): Promise<SearchSelectOption[]> => {
   return result.body.map((s: { _id: string; name?: string }) => ({ _id: s._id, name: s.name || "" }));
 };
 
-const wareModelFetcher = async (q?: string): Promise<SearchSelectOption[]> => {
-  const result = await getWareModels({ activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 100, search: q }, { _id: 1, name: 1 });
-  if (!result.success) return [];
-  return result.body.map((s: { _id: string; name?: string }) => ({ _id: s._id, name: s.name || "" }));
-};
-
 const wareFetcher = async (q?: string): Promise<SearchSelectOption[]> => {
-  const result = await getWares({ activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 100, search: q }, { _id: 1, name: 1 });
+  const result = await getWares({ activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 100, search: q }, { _id: 1, name: 1, wareModel: { _id: 1, name: 1 } });
   if (!result.success) return [];
-  return result.body.map((s: { _id: string; name?: string }) => ({ _id: s._id, name: s.name || "" }));
+  return result.body.map((s: { _id: string; name?: string; wareModel?: { _id: string; name?: string } }) => ({
+    _id: s._id,
+    name: s.name || "",
+    sublabel: s.wareModel?.name,
+  }));
 };
 
 export function InventoryClient({
@@ -101,10 +98,15 @@ export function InventoryClient({
   const [adjustQuantity, setAdjustQuantity] = useState("");
   const [adjustDescription, setAdjustDescription] = useState("");
   const [adjusting, setAdjusting] = useState(false);
+  const [transferTarget, setTransferTarget] = useState<Inventory | null>(null);
+  const [toUnitId, setToUnitId] = useState("");
+  const [transferQuantity, setTransferQuantity] = useState("");
+  const [transferDescription, setTransferDescription] = useState("");
+  const [transferring, setTransferring] = useState(false);
 
   const form = useForm<InventoryData>({
     resolver: zodV4Resolver(inventorySchema),
-    defaultValues: { quantity: "", minQuantity: "", maxQuantity: "", batchNo: "", location: "", unitId: "", warehouseUnitId: "", wareModelId: "", wareId: "" },
+    defaultValues: { quantity: "", minQuantity: "", maxQuantity: "", batchNo: "", location: "", unitId: "", warehouseUnitId: "", wareId: "" },
   });
 
   const handleSearch = (value: string) => {
@@ -116,7 +118,7 @@ export function InventoryClient({
   };
 
   const openAdd = () => {
-    form.reset({ quantity: "", minQuantity: "", maxQuantity: "", batchNo: "", location: "", unitId: "", warehouseUnitId: "", wareModelId: "", wareId: "" });
+    form.reset({ quantity: "", minQuantity: "", maxQuantity: "", batchNo: "", location: "", unitId: "", warehouseUnitId: "", wareId: "" });
     setEditTarget(null);
     setShowDialog(true);
   };
@@ -130,7 +132,6 @@ export function InventoryClient({
       location: item.location || "",
       unitId: item.unit?._id || "",
       warehouseUnitId: item.warehouseUnit?._id || "",
-      wareModelId: item.wareModel?._id || "",
       wareId: item.ware?._id || "",
     });
     setEditTarget(item);
@@ -152,7 +153,7 @@ export function InventoryClient({
       }
     } else {
       const result = await add(
-        { activeRoleId: getActiveRoleIdFromStore(), quantity: Number(data.quantity), minQuantity: data.minQuantity ? Number(data.minQuantity) : undefined, maxQuantity: data.maxQuantity ? Number(data.maxQuantity) : undefined, batchNo: data.batchNo || undefined, location: data.location || undefined, unitId: data.unitId, warehouseUnitId: data.warehouseUnitId || undefined, wareModelId: data.wareModelId, wareId: data.wareId || undefined },
+        { activeRoleId: getActiveRoleIdFromStore(), quantity: Number(data.quantity), minQuantity: data.minQuantity ? Number(data.minQuantity) : undefined, maxQuantity: data.maxQuantity ? Number(data.maxQuantity) : undefined, batchNo: data.batchNo || undefined, location: data.location || undefined, unitId: data.unitId, warehouseUnitId: data.warehouseUnitId || undefined, wareId: data.wareId },
         { _id: 1, quantity: 1 }
       );
       if (result.success) {
@@ -181,14 +182,14 @@ export function InventoryClient({
 
   const columns: Column<Inventory>[] = [
     {
-      key: "wareModel",
-      label: "مدل کالا",
+      key: "ware",
+      label: "کالا",
       render: (item) => (
         <div className="flex items-center gap-3">
           <div className="size-6 rounded-lg bg-electric-iris/10 flex items-center justify-center shrink-0">
             <Warehouse className="size-3.5 text-electric-iris" />
           </div>
-          <span className="text-moonlight font-medium">{item.wareModel?.name || item.ware?.name || "—"}</span>
+          <span className="text-moonlight font-medium">{item.ware?.name || item.wareModel?.name || "—"}</span>
         </div>
       ),
     },
@@ -234,10 +235,13 @@ export function InventoryClient({
       label: "",
       render: (item) => (
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200 text-sky-400/60 hover:text-sky-400" onClick={() => { setAdjustTarget(item); setAdjustQuantity(""); setAdjustDescription(""); }}>
-            <RotateCcw className="size-3.5" />
-          </Button>
-          <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200" onClick={() => openEdit(item)}>
+            <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200 text-sky-400/60 hover:text-sky-400" onClick={() => { setAdjustTarget(item); setAdjustQuantity(""); setAdjustDescription(""); }}>
+              <RotateCcw className="size-3.5" />
+            </Button>
+            <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200 text-emerald-400/60 hover:text-emerald-400" onClick={() => { setTransferTarget(item); setToUnitId(""); setTransferQuantity(""); setTransferDescription(""); }}>
+              <ArrowRightLeft className="size-3.5" />
+            </Button>
+            <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200" onClick={() => openEdit(item)}>
             <Pencil className="size-3.5" />
           </Button>
           <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200 text-fog/60 hover:text-destructive" onClick={() => setDeleteTarget(item)}>
@@ -275,7 +279,7 @@ export function InventoryClient({
                   <Warehouse className="size-5 text-electric-iris" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-base font-semibold text-moonlight leading-6 truncate">{item.wareModel?.name || item.ware?.name || "—"}</p>
+                  <p className="text-base font-semibold text-moonlight leading-6 truncate">{item.ware?.name || item.wareModel?.name || "—"}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     {item.unit?.name && <span className="text-xs text-fog/60">{item.unit.name}</span>}
                     {item.quantity != null && (
@@ -326,9 +330,7 @@ export function InventoryClient({
 
               <FormSearchSelect control={form.control} name="warehouseUnitId" label="واحد انبار" placeholder="واحد انبار را انتخاب کنید..." fetcher={unitFetcher} disabled={form.formState.isSubmitting} />
 
-              <FormSearchSelect control={form.control} name="wareModelId" label="مدل کالا" placeholder="مدل کالا را انتخاب کنید..." fetcher={wareModelFetcher} required disabled={form.formState.isSubmitting} />
-
-              <FormSearchSelect control={form.control} name="wareId" label="کالا" placeholder="کالا را انتخاب کنید..." fetcher={wareFetcher} disabled={form.formState.isSubmitting} />
+              <FormSearchSelect control={form.control} name="wareId" label="کالا" placeholder="کالا را انتخاب کنید..." fetcher={wareFetcher} required disabled={form.formState.isSubmitting} />
 
               <div className="grid grid-cols-3 gap-3">
                 <FormInput control={form.control} name="quantity" label="مقدار" type="number" placeholder="۰" required disabled={form.formState.isSubmitting} />
@@ -357,7 +359,7 @@ export function InventoryClient({
           <DialogHeader>
             <DialogTitle className="text-glacier">تعدیل موجودی</DialogTitle>
             <DialogDescription className="text-fog/70">
-              {adjustTarget?.wareModel?.name || adjustTarget?.ware?.name || ""}
+              {adjustTarget?.ware?.name || adjustTarget?.wareModel?.name || ""}
               {" — "}موجودی فعلی: {adjustTarget?.quantity != null ? adjustTarget.quantity.toLocaleString("fa-IR") : "۰"}
             </DialogDescription>
           </DialogHeader>
@@ -418,6 +420,91 @@ export function InventoryClient({
                 className="gap-1.5"
               >
                 {adjusting ? "در حال تعدیل..." : "تأیید تعدیل"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Transfer Dialog */}
+      <Dialog open={!!transferTarget} onOpenChange={(open) => { if (!open) setTransferTarget(null); }}>
+        <DialogContent className="sm:max-w-md" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-glacier">انتقال موجودی</DialogTitle>
+            <DialogDescription className="text-fog/70">
+              {transferTarget?.ware?.name || transferTarget?.wareModel?.name || ""}
+              {" — "}موجودی فعلی: {transferTarget?.quantity != null ? transferTarget.quantity.toLocaleString("fa-IR") : "۰"}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="block text-sm font-medium text-moonlight mb-1.5">واحد مقصد</label>
+              <SearchSelect
+                value={toUnitId}
+                onChange={setToUnitId}
+                fetcher={unitFetcher}
+                placeholder="واحد مقصد را انتخاب کنید..."
+                label="واحد مقصد"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-moonlight mb-1.5">تعداد انتقال</label>
+              <input
+                type="number"
+                value={transferQuantity}
+                onChange={(e) => setTransferQuantity(e.target.value)}
+                className="w-full h-9 rounded-sm border border-steel-border/60 bg-transparent px-3 text-sm text-moonlight outline-none transition-all duration-200 hover:border-frost-link/20 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                placeholder="تعداد را وارد کنید"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-moonlight mb-1.5">توضیحات انتقال</label>
+              <textarea
+                value={transferDescription}
+                onChange={(e) => setTransferDescription(e.target.value)}
+                className="w-full rounded-sm border border-steel-border/60 bg-transparent px-3 py-2 text-sm text-moonlight outline-none transition-all duration-200 hover:border-frost-link/20 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 resize-none"
+                rows={2}
+                placeholder="دلیل انتقال..."
+              />
+            </div>
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <Button type="button" variant="ghost" onClick={() => setTransferTarget(null)} disabled={transferring}>
+                انصراف
+              </Button>
+              <Button
+                type="button"
+                onClick={async () => {
+                  if (!transferTarget || !toUnitId || !transferQuantity) return;
+                  setTransferring(true);
+                  try {
+                    const result = await transferWithAudit(
+                      {
+                        activeRoleId: getActiveRoleIdFromStore(),
+                        fromUnitId: transferTarget.unit?._id || "",
+                        toUnitId,
+                        wareId: transferTarget.ware?._id || "",
+                        quantity: Number(transferQuantity),
+                        description: transferDescription || undefined,
+                      },
+                      { fromUnit: { _id: 1 }, toUnit: { _id: 1 }, quantity: 1 }
+                    );
+                    if (result.success) {
+                      toast.success("موجودی با موفقیت انتقال یافت.");
+                      setTransferTarget(null);
+                      router.refresh();
+                    } else {
+                      toast.error(result.body?.message || "خطا در انتقال موجودی");
+                    }
+                  } catch {
+                    toast.error("خطا در انتقال موجودی");
+                  } finally {
+                    setTransferring(false);
+                  }
+                }}
+                disabled={transferring || !toUnitId || !transferQuantity}
+                className="gap-1.5"
+              >
+                {transferring ? "در حال انتقال..." : "انتقال"}
               </Button>
             </div>
           </div>

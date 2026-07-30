@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { ArrowRight, Loader2, Trash2, Shield, Check, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/form/form-input";
+import { FormJalaliDatePicker } from "@/components/form/form-jalali-date-picker";
 import { FormSelect } from "@/components/form/form-select";
 import { FormCheckbox } from "@/components/form/form-checkbox";
 import { FormCard } from "@/components/form/form-card";
@@ -233,11 +234,10 @@ export default function EditUserPage({
                   { value: "Female", label: "زن" },
                 ]}
               />
-              <FormInput
+              <FormJalaliDatePicker
                 control={form.control}
                 name="birth_date"
                 label="تاریخ تولد"
-                type="date"
               />
             </div>
             <FormInput

@@ -118,7 +118,8 @@ function renderDetails(entry: HistoryEntry) {
   } else if (action === "goods_consumed" || action === "Consumed") {
     if (d.wareModelName) items.push(`کالا: ${d.wareModelName}`);
     if (d.quantity) items.push(`مقدار: ${Number(d.quantity).toLocaleString("fa-IR")}`);
-    if (d.consumptionRecordId) items.push(`مصرف: ${String(d.consumptionRecordId)}`);
+    if (d.consumptionId) items.push(`مصرف: ${String(d.consumptionId)}`);
+    else if (d.consumptionRecordId) items.push(`مصرف: ${String(d.consumptionRecordId)}`);
   } else if (action === "assigned") {
     if (d.storeName) items.push(`فروشگاه: ${d.storeName}`);
     if (d.wareModelName) items.push(`کالا: ${d.wareModelName}`);

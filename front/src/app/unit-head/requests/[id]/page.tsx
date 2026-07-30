@@ -13,6 +13,8 @@ import { StepApprovalPanel } from "@/components/purchasing/step-approval-panel"
 import { UnitHeadActions } from "./unit-head-actions"
 import { ActiveTenderCard } from "@/components/purchasing/active-tender-card"
 import { TendersList } from "@/components/purchasing/tenders-list"
+import { WarehouseInventoryPanel } from "@/components/purchasing/warehouse-inventory-panel"
+import { getWarehouseInventory } from "@/app/actions/inventory/getWarehouseInventory"
 import { cookies } from "next/headers"
 import { getMe } from "@/app/actions/user/getMe"
 
@@ -250,6 +252,35 @@ export default async function UnitHeadRequestDetailPage({
   const tenderWithSelection = pr.selectionType === "tender"
   const completedTender = tenders.find((t: any) => t.status === "awarded" || t.status === "closed")
   const hasActiveTenderOrSelected = actionableTender || completedTender || tenderWithSelection
+
+  const isWarehouseUnitHead = userUnitType === "Warehouse"
+  const isAssignedToWarehouseStep = !!(
+    isWarehouseUnitHead &&
+    userUnitId &&
+    effectiveStep?._id &&
+    (effectiveStep.assigneeGroups || []).some((g) => (g.unitIds || []).includes(userUnitId))
+  )
+  let warehouseInventoryBody: { centralWarehouse: { items: any[]; total: number }; unitWarehouses: { items: any[]; total: number } } | null = null
+  if (isAssignedToWarehouseStep && pr.wareModel?._id) {
+    const invRes = await getWarehouseInventory(
+      { wareModelId: pr.wareModel._id },
+      {
+        _id: 1,
+        quantity: 1,
+        minQuantity: 1,
+        maxQuantity: 1,
+        batchNo: 1,
+        expirationDate: 1,
+        location: 1,
+        unit: { _id: 1, name: 1, type: 1 },
+        ware: { _id: 1, name: 1 },
+        wareModel: { _id: 1, name: 1 },
+      },
+    )
+    if (invRes.success && invRes.body) {
+      warehouseInventoryBody = invRes.body as any
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -729,6 +760,14 @@ export default async function UnitHeadRequestDetailPage({
                   />
                 </CardContent>
               </Card>
+              {warehouseInventoryBody && (
+                <WarehouseInventoryPanel
+                  centralWarehouse={warehouseInventoryBody.centralWarehouse}
+                  unitWarehouses={warehouseInventoryBody.unitWarehouses}
+                  requestedQuantity={pr.quantity ?? 0}
+                  wareModelName={pr.wareModel?.name}
+                />
+              )}
               <StepApprovalPanel
                 purchasingRequestId={pr._id || id}
                 processStep={effectiveStep}

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { FileEdit, Clock, ShoppingCart, Package, CheckCircle, XCircle, AlertCircle, Calculator, Receipt, TrendingDown, Landmark, Calendar, FileSpreadsheet } from "lucide-react"
+import { FileEdit, Clock, ShoppingCart, Package, CheckCircle, XCircle, AlertCircle, Calculator, Receipt, TrendingDown, Landmark, Calendar, FileSpreadsheet, Warehouse, ScrollText, Activity } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -78,6 +78,33 @@ export default async function UnitHeadDashboard() {
     },
   ]
 
+  const inventoryNavCards = [
+    {
+      title: "موجودی انبار",
+      description: "مشاهده موجودی کالا",
+      icon: Warehouse,
+      color: "text-electric-iris",
+      bg: "bg-electric-iris/10",
+      href: "/unit-head/inventory",
+    },
+    {
+      title: "مصرف کالا",
+      description: "ثبت و مشاهده مصرف",
+      icon: ScrollText,
+      color: "text-amber-400",
+      bg: "bg-amber-400/10",
+      href: "/unit-head/consumption",
+    },
+    {
+      title: "گردش کالا",
+      description: "تاریخچه جابه‌جایی",
+      icon: Activity,
+      color: "text-emerald-400",
+      bg: "bg-emerald-400/10",
+      href: "/unit-head/stock-movements",
+    },
+  ]
+
   const stats = [
     { label: "در انتظار بررسی", value: pendingPRs, icon: Clock, color: "text-amber-400", bg: "bg-amber-400/10" },
     { label: "تایید شده", value: approvedPRs, icon: CheckCircle, color: "text-emerald-400", bg: "bg-emerald-400/10" },
@@ -119,6 +146,39 @@ export default async function UnitHeadDashboard() {
             </Link>
           )
         })}
+      </div>
+
+      {/* Inventory Nav Cards */}
+      <div>
+        <h2 className="text-sm font-medium text-fog tracking-wide mb-4">مدیریت کالا</h2>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {inventoryNavCards.map((card) => {
+            const Icon = card.icon
+            return (
+              <Link key={card.href} href={card.href}>
+                <Card variant="glass" className="cursor-pointer transition-all duration-200 hover:border-frost-link/30">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`flex size-10 items-center justify-center rounded-lg ${card.bg} ring-1 ring-inset ring-white/[0.06]`}>
+                        <Icon className={`size-5 ${card.color}`} />
+                      </div>
+                      <div>
+                        <CardTitle className="text-sm font-medium text-frost-link leading-5">
+                          {card.title}
+                        </CardTitle>
+                        <p className="text-xs text-fog/50 mt-0.5">{card.description}</p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-2" />
+                    <p className="text-xs text-fog/40">مشاهده جزئیات</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            )
+          })}
+        </div>
       </div>
 
       {/* Status Stats */}

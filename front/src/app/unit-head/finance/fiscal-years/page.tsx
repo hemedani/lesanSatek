@@ -14,6 +14,7 @@ import { zodV4Resolver } from "@/lib/zod-v4-resolver"
 import { z } from "zod"
 import { Form } from "@/components/ui/form"
 import { FormInput } from "@/components/form/form-input"
+import { FormJalaliDatePicker } from "@/components/form/form-jalali-date-picker"
 import { toast } from "sonner"
 import { gets as getFiscalYears } from "@/app/actions/fiscalYear/gets"
 import { add } from "@/app/actions/fiscalYear/add"
@@ -199,8 +200,8 @@ export default function UnitHeadFinanceFiscalYearsPage() {
             <form onSubmit={form.handleSubmit(handleAdd)} className="space-y-4">
               <FormInput control={form.control} name="name" label="نام سال مالی" placeholder="مثال: سال مالی ۱۴۰۶" required />
               <div className="grid gap-4 sm:grid-cols-2">
-                <FormInput control={form.control} name="startDate" label="تاریخ شروع" type="date" required />
-                <FormInput control={form.control} name="endDate" label="تاریخ پایان" type="date" required />
+                <FormJalaliDatePicker control={form.control} name="startDate" label="تاریخ شروع" required />
+                <FormJalaliDatePicker control={form.control} name="endDate" label="تاریخ پایان" required />
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <Button type="button" variant="outline" onClick={() => setShowAdd(false)} disabled={saving}>

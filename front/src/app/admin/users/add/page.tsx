@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Loader2, UserPlus, Shield, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/form/form-input";
+import { FormJalaliDatePicker } from "@/components/form/form-jalali-date-picker";
 import { FormSelect } from "@/components/form/form-select";
 import { FormPasswordInput } from "@/components/form/form-password-input";
 import { FormCheckbox } from "@/components/form/form-checkbox";
@@ -186,11 +187,10 @@ export default function AddUserPage() {
                 ]}
                 disabled={isSubmitting}
               />
-              <FormInput
+              <FormJalaliDatePicker
                 control={form.control}
                 name="birth_date"
                 label="تاریخ تولد"
-                type="date"
                 disabled={isSubmitting}
               />
             </div>
