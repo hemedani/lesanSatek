@@ -1,9 +1,10 @@
 "use client"
 
 import Link from "next/link"
-import { Activity, ArrowRight, Package, User, FileText, Hash, CalendarDays } from "lucide-react"
+import { Activity, ArrowRight, Package, User, FileText, Hash, CalendarDays, Building2, Store, BadgePercent, FolderTree } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 
 interface StockMovement {
   _id: string
@@ -14,10 +15,14 @@ interface StockMovement {
   description?: string
   createdAt?: string
   updatedAt?: string
-  unit?: { _id: string; name?: string }
+  unit?: { _id: string; name?: string; type?: string }
   createdBy?: { _id: string; first_name?: string; last_name?: string }
-  wareModel?: { _id: string; name?: string }
-  ware?: { _id: string; name?: string }
+  store?: { _id: string; name?: string }
+  ware?: { _id: string; name?: string; enName?: string; brand?: string }
+  wareModel?: { _id: string; name?: string; enName?: string }
+  wareGroup?: { _id: string; name?: string }
+  wareClass?: { _id: string; name?: string }
+  wareType?: { _id: string; name?: string }
 }
 
 const reasonLabels: Record<string, string> = {
@@ -100,6 +105,20 @@ function StockMovementDetailClient({ item }: { item: StockMovement }) {
             label="کالا"
             value={item.ware?.name || item.wareModel?.name || "—"}
           />
+          {item.ware?.brand && (
+            <DetailRow
+              icon={<BadgePercent className="size-3.5 text-frost-link" />}
+              label="برند"
+              value={item.ware.brand}
+            />
+          )}
+          {item.wareModel?.name && (
+            <DetailRow
+              icon={<Package className="size-3.5 text-frost-link" />}
+              label="مدل"
+              value={item.wareModel.name}
+            />
+          )}
           <DetailRow
             icon={<Hash className="size-3.5 text-frost-link" />}
             label="تعداد"
@@ -124,6 +143,13 @@ function StockMovementDetailClient({ item }: { item: StockMovement }) {
             label="نوع"
             value={reasonLabels[reasonKey] || reasonKey || "—"}
           />
+          {item.store?.name && (
+            <DetailRow
+              icon={<Store className="size-3.5 text-frost-link" />}
+              label="انبار"
+              value={item.store.name}
+            />
+          )}
           {item.description && (
             <DetailRow
               icon={<FileText className="size-3.5 text-frost-link" />}
@@ -133,7 +159,7 @@ function StockMovementDetailClient({ item }: { item: StockMovement }) {
           )}
           {item.unit?.name && (
             <DetailRow
-              icon={<Package className="size-3.5 text-frost-link" />}
+              icon={<Building2 className="size-3.5 text-frost-link" />}
               label="واحد"
               value={item.unit.name}
             />
@@ -152,6 +178,35 @@ function StockMovementDetailClient({ item }: { item: StockMovement }) {
           />
         </CardContent>
       </Card>
+
+      {/* Category badges */}
+      {(item.wareType?.name || item.wareClass?.name || item.wareGroup?.name) && (
+        <Card variant="glass">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-frost-link">دسته‌بندی</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap items-center gap-2">
+              <FolderTree className="size-4 text-fog/30" />
+              {item.wareType?.name && (
+                <Badge variant="outline" className="bg-frost-link/5 text-fog border-white/[0.06]">
+                  {item.wareType.name}
+                </Badge>
+              )}
+              {item.wareClass?.name && (
+                <Badge variant="outline" className="bg-frost-link/5 text-fog border-white/[0.06]">
+                  {item.wareClass.name}
+                </Badge>
+              )}
+              {item.wareGroup?.name && (
+                <Badge variant="outline" className="bg-frost-link/5 text-fog border-white/[0.06]">
+                  {item.wareGroup.name}
+                </Badge>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

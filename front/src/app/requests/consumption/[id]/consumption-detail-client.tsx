@@ -1,21 +1,27 @@
 "use client"
 
 import Link from "next/link"
-import { ScrollText, ArrowRight, Package, User, FileText, CalendarDays } from "lucide-react"
+import { ScrollText, ArrowRight, Package, User, FileText, CalendarDays, Building2, BadgePercent, FolderTree } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 
 interface ConsumptionRecord {
   _id: string
   quantity?: number
   notes?: string
   reason?: string
+  consumedFor?: string
   consumedAt?: string
   createdAt?: string
   updatedAt?: string
-  unit?: { _id: string; name?: string }
+  unit?: { _id: string; name?: string; type?: string }
   consumedBy?: { _id: string; first_name?: string; last_name?: string }
-  wareModel?: { _id: string; name?: string }
-  ware?: { _id: string; name?: string }
+  inventory?: { _id: string; quantity?: number }
+  wareModel?: { _id: string; name?: string; enName?: string }
+  ware?: { _id: string; name?: string; enName?: string; brand?: string }
+  wareGroup?: { _id: string; name?: string }
+  wareClass?: { _id: string; name?: string }
+  wareType?: { _id: string; name?: string }
 }
 
 interface DetailRowProps {
@@ -71,6 +77,20 @@ function ConsumptionDetailClient({ item }: { item: ConsumptionRecord }) {
             label="کالا"
             value={item.ware?.name || item.wareModel?.name || "—"}
           />
+          {item.ware?.brand && (
+            <DetailRow
+              icon={<BadgePercent className="size-3.5 text-frost-link" />}
+              label="برند"
+              value={item.ware.brand}
+            />
+          )}
+          {item.wareModel?.name && (
+            <DetailRow
+              icon={<Package className="size-3.5 text-frost-link" />}
+              label="مدل"
+              value={item.wareModel.name}
+            />
+          )}
           <DetailRow
             icon={<Package className="size-3.5 text-frost-link" />}
             label="مقدار"
@@ -83,18 +103,39 @@ function ConsumptionDetailClient({ item }: { item: ConsumptionRecord }) {
               value={item.notes}
             />
           )}
+          {item.reason && (
+            <DetailRow
+              icon={<FileText className="size-3.5 text-frost-link" />}
+              label="دلیل"
+              value={item.reason}
+            />
+          )}
           {item.unit?.name && (
             <DetailRow
-              icon={<Package className="size-3.5 text-frost-link" />}
+              icon={<Building2 className="size-3.5 text-frost-link" />}
               label="واحد"
               value={item.unit.name}
+            />
+          )}
+          {item.consumedFor && (
+            <DetailRow
+              icon={<User className="size-3.5 text-frost-link" />}
+              label="مصرف‌شونده"
+              value={item.consumedFor}
             />
           )}
           {item.consumedBy && (
             <DetailRow
               icon={<User className="size-3.5 text-frost-link" />}
-              label="مصرف‌کننده"
+              label="ثبت‌کننده"
               value={`${item.consumedBy.first_name || ""} ${item.consumedBy.last_name || ""}`.trim() || "—"}
+            />
+          )}
+          {item.inventory && (
+            <DetailRow
+              icon={<Package className="size-3.5 text-frost-link" />}
+              label="موجودی پس از مصرف"
+              value={<span className="font-mono" dir="ltr">{item.inventory.quantity?.toLocaleString("fa-IR") || "۰"} عدد</span>}
             />
           )}
           <DetailRow
@@ -109,6 +150,35 @@ function ConsumptionDetailClient({ item }: { item: ConsumptionRecord }) {
           />
         </CardContent>
       </Card>
+
+      {/* Category badges */}
+      {(item.wareType?.name || item.wareClass?.name || item.wareGroup?.name) && (
+        <Card variant="glass">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-frost-link">دسته‌بندی</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap items-center gap-2">
+              <FolderTree className="size-4 text-fog/30" />
+              {item.wareType?.name && (
+                <Badge variant="outline" className="bg-frost-link/5 text-fog border-white/[0.06]">
+                  {item.wareType.name}
+                </Badge>
+              )}
+              {item.wareClass?.name && (
+                <Badge variant="outline" className="bg-frost-link/5 text-fog border-white/[0.06]">
+                  {item.wareClass.name}
+                </Badge>
+              )}
+              {item.wareGroup?.name && (
+                <Badge variant="outline" className="bg-frost-link/5 text-fog border-white/[0.06]">
+                  {item.wareGroup.name}
+                </Badge>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

@@ -8,7 +8,17 @@ import { ConsumptionClient } from "./consumption-client"
 export default async function UnitHeadConsumptionPage() {
   const result = await getConsumptions(
     { page: 1, limit: 100 },
-    { _id: 1, quantity: 1, notes: 1, reason: 1, consumedFor: 1, consumedAt: 1, createdAt: 1, unit: { _id: 1, name: 1 }, ware: { _id: 1, name: 1 }, wareModel: { _id: 1, name: 1 }, consumedBy: { _id: 1, first_name: 1 } },
+    {
+      _id: 1, quantity: 1, notes: 1, reason: 1, consumedFor: 1, consumedAt: 1, createdAt: 1,
+      unit: { _id: 1, name: 1, type: 1 },
+      consumedBy: { _id: 1, first_name: 1, last_name: 1 },
+      inventory: { _id: 1, quantity: 1 },
+      ware: { _id: 1, name: 1, enName: 1, brand: 1 },
+      wareModel: { _id: 1, name: 1, enName: 1 },
+      wareGroup: { _id: 1, name: 1 },
+      wareClass: { _id: 1, name: 1 },
+      wareType: { _id: 1, name: 1 },
+    },
   )
 
   const items = result.success ? result.body || [] : []

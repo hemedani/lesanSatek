@@ -44,7 +44,24 @@ export default async function EmployeeInventoryPage({
 
   const result = await getInventory(
     { unitId, page, limit, search: resolvedSearchParams.search || undefined },
-    { _id: 1, quantity: 1, minQuantity: 1, maxQuantity: 1, batchNo: 1, location: 1, createdAt: 1, unit: { _id: 1, name: 1 }, warehouseUnit: { _id: 1, name: 1 }, wareModel: { _id: 1, name: 1 }, ware: { _id: 1, name: 1 } },
+    {
+      _id: 1,
+      quantity: 1,
+      minQuantity: 1,
+      maxQuantity: 1,
+      batchNo: 1,
+      expirationDate: 1,
+      location: 1,
+      lastCountedAt: 1,
+      createdAt: 1,
+      unit: { _id: 1, name: 1, type: 1 },
+      warehouseUnit: { _id: 1, name: 1, type: 1 },
+      ware: { _id: 1, name: 1, enName: 1, brand: 1 },
+      wareModel: { _id: 1, name: 1, enName: 1 },
+      wareGroup: { _id: 1, name: 1 },
+      wareClass: { _id: 1, name: 1 },
+      wareType: { _id: 1, name: 1 },
+    },
   )
 
   const items: InventoryItem[] = result.success ? result.body || [] : []

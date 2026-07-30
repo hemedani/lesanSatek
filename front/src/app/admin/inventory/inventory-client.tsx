@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, Warehouse, RotateCcw, ArrowRightLeft } from "lucide-react";
+import { Plus, Pencil, Trash2, Warehouse, RotateCcw, ArrowRightLeft, Building2, Barcode, MapPin, CalendarDays, Factory, FolderTree, Box } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
@@ -14,6 +14,7 @@ import type { Column } from "@/components/ui/data-table";
 import { Pagination } from "@/components/ui/pagination";
 import { FilterBar } from "@/components/ui/filter-bar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
@@ -37,11 +38,15 @@ interface Inventory {
   batchNo?: string;
   expirationDate?: string;
   location?: string;
+  lastCountedAt?: string;
   createdAt?: string;
-  unit?: { _id: string; name?: string };
-  warehouseUnit?: { _id: string; name?: string };
-  wareModel?: { _id: string; name?: string };
-  ware?: { _id: string; name?: string };
+  unit?: { _id: string; name?: string; type?: string };
+  warehouseUnit?: { _id: string; name?: string; type?: string };
+  ware?: { _id: string; name?: string; enName?: string; brand?: string };
+  wareModel?: { _id: string; name?: string; enName?: string };
+  wareGroup?: { _id: string; name?: string };
+  wareClass?: { _id: string; name?: string };
+  wareType?: { _id: string; name?: string };
 }
 
 interface InventoryClientProps {
@@ -184,64 +189,134 @@ export function InventoryClient({
     {
       key: "ware",
       label: "کالا",
-      render: (item) => (
-        <div className="flex items-center gap-3">
-          <div className="size-6 rounded-lg bg-electric-iris/10 flex items-center justify-center shrink-0">
-            <Warehouse className="size-3.5 text-electric-iris" />
+      render: (item) => {
+        const isLowStock = item.minQuantity != null && item.quantity != null && item.quantity < item.minQuantity;
+        return (
+          <div className="flex items-center gap-3 min-w-0 max-w-[280px]">
+            <div className={cn(
+              "size-9 rounded-lg flex items-center justify-center shrink-0 ring-1 ring-inset ring-white/[0.06]",
+              isLowStock ? "bg-ember/10" : "bg-electric-iris/10",
+            )}>
+              <Warehouse className={cn("size-4", isLowStock ? "text-ember" : "text-electric-iris")} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-moonlight truncate leading-5">
+                  {item.ware?.name || item.wareModel?.name || "—"}
+                </span>
+                {isLowStock && (
+                  <Badge variant="outline" className="text-[9px] px-1 py-0 bg-ember/10 text-ember border-ember/20 shrink-0">
+                    کم‌موجودی
+                  </Badge>
+                )}
+              </div>
+              {item.ware?.brand && (
+                <p className="text-[10px] text-fog/40 truncate leading-4">{item.ware.brand}</p>
+              )}
+              {item.ware?.enName && item.ware.enName !== item.ware.name && (
+                <p className="text-[10px] text-fog/30 truncate leading-4">{item.ware.enName}</p>
+              )}
+            </div>
           </div>
-          <span className="text-moonlight font-medium">{item.ware?.name || item.wareModel?.name || "—"}</span>
+        );
+      },
+    },
+    {
+      key: "wareType",
+      label: "دسته‌بندی",
+      hideOnCard: true,
+      render: (item) => (
+        <div className="space-y-0.5">
+          {item.wareType?.name && <p className="text-xs text-fog">{item.wareType.name}</p>}
+          {item.wareClass?.name && <p className="text-[10px] text-fog/50">{item.wareClass.name}</p>}
+          {!item.wareType?.name && !item.wareClass?.name && <span className="text-xs text-fog/40">—</span>}
         </div>
       ),
     },
     {
       key: "unit",
-      label: "واحد",
+      label: "واحد مصرف‌کننده",
       render: (item) => (
-        <span className="text-fog text-sm">{item.unit?.name || "—"}</span>
+        <div>
+          <span className="text-xs text-fog">{item.unit?.name || "—"}</span>
+          {item.unit?.type && <p className="text-[10px] text-fog/40">{item.unit.type}</p>}
+        </div>
+      ),
+    },
+    {
+      key: "warehouseUnit",
+      label: "انبار",
+      render: (item) => (
+        <span className="text-xs text-fog">{item.warehouseUnit?.name || "—"}</span>
       ),
     },
     {
       key: "quantity",
-      label: "مقدار",
-      render: (item) => (
-        <span className="font-mono text-sm" dir="ltr">
-          {item.quantity != null ? (
-            <span className={item.minQuantity != null && item.quantity < item.minQuantity ? "text-destructive font-medium" : "text-moonlight"}>
-              {item.quantity.toLocaleString("fa-IR")}
+      label: "موجودی",
+      render: (item) => {
+        const isLowStock = item.minQuantity != null && item.quantity != null && item.quantity < item.minQuantity;
+        return (
+          <div>
+            <span className={cn(
+              "text-sm font-semibold font-mono",
+              isLowStock ? "text-ember" : "text-moonlight",
+            )} dir="ltr">
+              {item.quantity != null ? item.quantity.toLocaleString("fa-IR") : "—"}
             </span>
-          ) : "—"}
-        </span>
-      ),
+            {item.minQuantity != null && (
+              <p className="text-[10px] text-fog/40" dir="ltr">
+                حداقل: {item.minQuantity.toLocaleString("fa-IR")}
+                {item.maxQuantity != null && ` · حداکثر: ${item.maxQuantity.toLocaleString("fa-IR")}`}
+              </p>
+            )}
+          </div>
+        );
+      },
     },
     {
       key: "batchNo",
-      label: "شماره سریال",
+      label: "سریال",
+      hideOnCard: true,
       render: (item) => (
-        <span className="text-fog text-sm font-mono" dir="ltr">{item.batchNo || "—"}</span>
+        <span className="text-xs text-fog font-mono" dir="ltr">{item.batchNo || "—"}</span>
+      ),
+    },
+    {
+      key: "location",
+      label: "موقعیت",
+      hideOnCard: true,
+      render: (item) => (
+        <span className="text-xs text-fog">{item.location || "—"}</span>
+      ),
+    },
+    {
+      key: "expirationDate",
+      label: "تاریخ انقضا",
+      hideOnCard: true,
+      render: (item) => (
+        <span className="text-xs text-fog">{item.expirationDate ? new Date(item.expirationDate).toLocaleDateString("fa-IR") : "—"}</span>
       ),
     },
     {
       key: "createdAt",
-      label: "تاریخ ایجاد",
-      render: (item) => (
-        <span className="text-fog text-sm">
-          {item.createdAt ? new Date(item.createdAt).toLocaleDateString("fa-IR") : "—"}
-        </span>
-      ),
+      label: "تاریخ ثبت",
       hideOnCard: true,
+      render: (item) => (
+        <span className="text-xs text-fog">{item.createdAt ? new Date(item.createdAt).toLocaleDateString("fa-IR") : "—"}</span>
+      ),
     },
     {
       key: "actions",
       label: "",
       render: (item) => (
         <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200 text-sky-400/60 hover:text-sky-400" onClick={() => { setAdjustTarget(item); setAdjustQuantity(""); setAdjustDescription(""); }}>
-              <RotateCcw className="size-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200 text-emerald-400/60 hover:text-emerald-400" onClick={() => { setTransferTarget(item); setToUnitId(""); setTransferQuantity(""); setTransferDescription(""); }}>
-              <ArrowRightLeft className="size-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200" onClick={() => openEdit(item)}>
+          <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200 text-sky-400/60 hover:text-sky-400" onClick={() => { setAdjustTarget(item); setAdjustQuantity(""); setAdjustDescription(""); }}>
+            <RotateCcw className="size-3.5" />
+          </Button>
+          <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200 text-emerald-400/60 hover:text-emerald-400" onClick={() => { setTransferTarget(item); setToUnitId(""); setTransferQuantity(""); setTransferDescription(""); }}>
+            <ArrowRightLeft className="size-3.5" />
+          </Button>
+          <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200" onClick={() => openEdit(item)}>
             <Pencil className="size-3.5" />
           </Button>
           <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200 text-fog/60 hover:text-destructive" onClick={() => setDeleteTarget(item)}>
@@ -263,7 +338,7 @@ export function InventoryClient({
         </PageHeader>
       </div>
 
-      <FilterBar search={search} onSearchChange={handleSearch} searchPlaceholder="جستجوی مدل کالا..." />
+      <FilterBar search={search} onSearchChange={handleSearch} searchPlaceholder="جستجوی کالا..." />
 
       <DataTable
         columns={columns}
@@ -271,45 +346,178 @@ export function InventoryClient({
         keyExtractor={(item) => item._id}
         cardView={cardView}
         onViewToggle={() => setCardView((v) => !v)}
-        renderCard={(item) => (
-          <div className="glass-card glass-card-hover-active rounded-xl p-5 transition-all duration-200 cursor-pointer" onClick={() => openEdit(item)}>
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="size-10 rounded-xl bg-electric-iris/10 flex items-center justify-center shrink-0">
-                  <Warehouse className="size-5 text-electric-iris" />
+        renderCard={(item) => {
+          const isLowStock = item.minQuantity != null && item.quantity != null && item.quantity < item.minQuantity;
+
+          return (
+            <div className="glass-card glass-card-hover-active rounded-xl overflow-hidden transition-all duration-200">
+              {/* Header with actions */}
+              <div className={cn(
+                "flex items-center gap-3 p-4 border-b",
+                isLowStock ? "border-ember/10 bg-ember/[0.02]" : "border-white/[0.04]",
+              )}>
+                <div className={cn(
+                  "size-10 rounded-xl flex items-center justify-center shrink-0 ring-1 ring-inset ring-white/[0.06]",
+                  isLowStock ? "bg-ember/10" : "bg-electric-iris/10",
+                )}>
+                  <Box className={cn("size-5", isLowStock ? "text-ember" : "text-electric-iris")} />
                 </div>
-                <div className="min-w-0">
-                  <p className="text-base font-semibold text-moonlight leading-6 truncate">{item.ware?.name || item.wareModel?.name || "—"}</p>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-moonlight truncate leading-5">
+                      {item.ware?.name || item.wareModel?.name || "—"}
+                    </p>
+                    {isLowStock && (
+                      <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-ember/10 text-ember border-ember/20 shrink-0">
+                        کم‌موجودی
+                      </Badge>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 mt-0.5">
-                    {item.unit?.name && <span className="text-xs text-fog/60">{item.unit.name}</span>}
-                    {item.quantity != null && (
-                      <span className={cn(
-                        "text-xs font-mono",
-                        item.minQuantity != null && item.quantity < item.minQuantity ? "text-destructive" : "text-fog/40"
-                      )} dir="ltr">
-                        {item.quantity.toLocaleString("fa-IR")} عدد
+                    {item.ware?.brand && (
+                      <span className="text-[10px] text-fog/50 flex items-center gap-1">
+                        <Factory className="size-3" />
+                        {item.ware.brand}
                       </span>
+                    )}
+                    {item.wareModel?.name && (
+                      <span className="text-[10px] text-fog/40">مدل: {item.wareModel.name}</span>
                     )}
                   </div>
                 </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button variant="ghost" size="icon-xs" className="text-sky-400/60 hover:text-sky-400" onClick={(e) => { e.stopPropagation(); setAdjustTarget(item); setAdjustQuantity(""); setAdjustDescription(""); }}>
+                    <RotateCcw className="size-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="icon-xs" className="text-emerald-400/60 hover:text-emerald-400" onClick={(e) => { e.stopPropagation(); setTransferTarget(item); setToUnitId(""); setTransferQuantity(""); setTransferDescription(""); }}>
+                    <ArrowRightLeft className="size-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-moonlight" onClick={(e) => { e.stopPropagation(); openEdit(item); }}>
+                    <Pencil className="size-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteTarget(item); }}>
+                    <Trash2 className="size-3.5" />
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center gap-1 shrink-0">
-                <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-moonlight" onClick={(e) => { e.stopPropagation(); openEdit(item); }}>
-                  <Pencil className="size-3.5" />
-                </Button>
-                <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteTarget(item); }}>
-                  <Trash2 className="size-3.5" />
-                </Button>
+
+              {/* Quantity row */}
+              <div className={cn(
+                "grid grid-cols-3 gap-px bg-white/[0.04]",
+                isLowStock && "bg-ember/[0.04]",
+              )}>
+                <div className={cn(
+                  "p-3 text-center",
+                  isLowStock ? "bg-ember/[0.02]" : "bg-[#05060f]/60",
+                )}>
+                  <p className="text-[10px] text-fog/50">موجودی</p>
+                  <p className={cn(
+                    "text-lg font-bold font-mono leading-7",
+                    isLowStock ? "text-ember" : "text-glacier",
+                  )} dir="ltr">
+                    {item.quantity != null ? item.quantity.toLocaleString("fa-IR") : "—"}
+                  </p>
+                </div>
+                <div className={cn(
+                  "p-3 text-center",
+                  isLowStock ? "bg-ember/[0.02]" : "bg-[#05060f]/60",
+                )}>
+                  <p className="text-[10px] text-fog/50">حداقل</p>
+                  <p className="text-lg font-bold font-mono text-fog leading-7" dir="ltr">
+                    {item.minQuantity != null ? item.minQuantity.toLocaleString("fa-IR") : "—"}
+                  </p>
+                </div>
+                <div className={cn(
+                  "p-3 text-center",
+                  isLowStock ? "bg-ember/[0.02]" : "bg-[#05060f]/60",
+                )}>
+                  <p className="text-[10px] text-fog/50">حداکثر</p>
+                  <p className="text-lg font-bold font-mono text-fog leading-7" dir="ltr">
+                    {item.maxQuantity != null ? item.maxQuantity.toLocaleString("fa-IR") : "—"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Details */}
+              <div className="p-4 space-y-1">
+                <div className="grid grid-cols-2 gap-x-6 gap-y-1">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="size-3.5 text-fog/30 shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-fog/40">واحد مصرف‌کننده</p>
+                      <p className="text-xs text-moonlight truncate">{item.unit?.name || "—"}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Warehouse className="size-3.5 text-fog/30 shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-fog/40">انبار</p>
+                      <p className="text-xs text-moonlight truncate">{item.warehouseUnit?.name || "—"}</p>
+                    </div>
+                  </div>
+                  {item.batchNo && (
+                    <div className="flex items-center gap-2">
+                      <Barcode className="size-3.5 text-fog/30 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-fog/40">سریال</p>
+                        <p className="text-xs text-moonlight font-mono" dir="ltr">{item.batchNo}</p>
+                      </div>
+                    </div>
+                  )}
+                  {item.location && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="size-3.5 text-fog/30 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-fog/40">موقعیت</p>
+                        <p className="text-xs text-moonlight truncate">{item.location}</p>
+                      </div>
+                    </div>
+                  )}
+                  {item.expirationDate && (
+                    <div className="flex items-center gap-2">
+                      <CalendarDays className="size-3.5 text-fog/30 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-fog/40">تاریخ انقضا</p>
+                        <p className="text-xs text-moonlight">{new Date(item.expirationDate).toLocaleDateString("fa-IR")}</p>
+                      </div>
+                    </div>
+                  )}
+                  {item.createdAt && (
+                    <div className="flex items-center gap-2">
+                      <CalendarDays className="size-3.5 text-fog/30 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-fog/40">تاریخ ثبت</p>
+                        <p className="text-xs text-moonlight">{new Date(item.createdAt).toLocaleDateString("fa-IR")}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Category badges */}
+                {(item.wareType?.name || item.wareClass?.name || item.wareGroup?.name) && (
+                  <div className="flex flex-wrap items-center gap-1.5 pt-2 mt-2 border-t border-white/[0.04]">
+                    <FolderTree className="size-3 text-fog/30" />
+                    {item.wareType?.name && (
+                      <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-frost-link/5 text-fog border-white/[0.06]">
+                        {item.wareType.name}
+                      </Badge>
+                    )}
+                    {item.wareClass?.name && (
+                      <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-frost-link/5 text-fog border-white/[0.06]">
+                        {item.wareClass.name}
+                      </Badge>
+                    )}
+                    {item.wareGroup?.name && (
+                      <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-frost-link/5 text-fog border-white/[0.06]">
+                        {item.wareGroup.name}
+                      </Badge>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
-            {(item.batchNo || item.location) && (
-              <div className="flex items-center gap-3 mt-2 text-xs text-fog/40">
-                {item.batchNo && <span dir="ltr">{item.batchNo}</span>}
-                {item.location && <span>{item.location}</span>}
-              </div>
-            )}
-          </div>
-        )}
+          );
+        }}
         emptyTitle="موجودی‌ای یافت نشد"
         emptyDescription="هنوز هیچ موجودی انباری ثبت نشده است."
         emptyAction={<Button size="sm" className="gap-1.5" onClick={openAdd}><Plus className="size-4" />ایجاد موجودی</Button>}

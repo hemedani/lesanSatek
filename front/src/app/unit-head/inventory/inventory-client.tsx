@@ -2,10 +2,11 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Warehouse, ArrowRightLeft, Building2, ChevronDown, ChevronUp, Package } from "lucide-react"
+import { Warehouse, ArrowRightLeft, Building2, ChevronDown, ChevronUp, Package, Barcode, MapPin, CalendarDays, Factory, FolderTree, Box } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { SearchSelect } from "@/components/form/form-search-select"
@@ -20,12 +21,17 @@ interface Inventory {
   minQuantity?: number
   maxQuantity?: number
   batchNo?: string
+  expirationDate?: string
   location?: string
+  lastCountedAt?: string
   createdAt?: string
-  unit?: { _id: string; name?: string }
-  warehouseUnit?: { _id: string; name?: string }
-  wareModel?: { _id: string; name?: string }
-  ware?: { _id: string; name?: string }
+  unit?: { _id: string; name?: string; type?: string }
+  warehouseUnit?: { _id: string; name?: string; type?: string }
+  ware?: { _id: string; name?: string; enName?: string; brand?: string }
+  wareModel?: { _id: string; name?: string; enName?: string }
+  wareGroup?: { _id: string; name?: string }
+  wareClass?: { _id: string; name?: string }
+  wareType?: { _id: string; name?: string }
 }
 
 interface InventoryClientProps {
@@ -42,58 +48,171 @@ const unitFetcher = async (q?: string): Promise<SearchSelectOption[]> => {
 
 function InvCard({ item, userUnitId }: { item: Inventory; userUnitId?: string }) {
   const isOwn = userUnitId ? item.unit?._id === userUnitId : false
+  const isLowStock = item.minQuantity != null && item.quantity != null && item.quantity < item.minQuantity
 
   return (
     <div className={cn(
-      "rounded-xl p-5 transition-all",
+      "rounded-xl overflow-hidden transition-all",
       isOwn
         ? "glass-card glass-card-hover-active border-electric-iris/20"
         : "glass-card glass-card-hover-active border-steel-border/15",
     )}>
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className={cn(
-            "size-10 rounded-xl flex items-center justify-center shrink-0 ring-1 ring-inset",
-            isOwn
-              ? "bg-electric-iris/10 ring-electric-iris/15"
-              : "bg-white/[0.03] ring-steel-border/15",
-          )}>
-            {isOwn ? (
-              <Warehouse className="size-5 text-electric-iris" />
-            ) : (
-              <Building2 className="size-5 text-fog/50" />
-            )}
-          </div>
-          <div className="min-w-0">
-            <p className="text-base font-semibold text-moonlight leading-6 truncate">
+      {/* Header */}
+      <div className={cn(
+        "flex items-center gap-3 p-4 border-b",
+        isOwn ? "border-electric-iris/10" : "border-white/[0.04]",
+        isLowStock && "bg-ember/[0.02]",
+      )}>
+        <div className={cn(
+          "size-10 rounded-xl flex items-center justify-center shrink-0 ring-1 ring-inset",
+          isOwn
+            ? "bg-electric-iris/10 ring-electric-iris/15"
+            : "bg-white/[0.03] ring-steel-border/15",
+        )}>
+          {isOwn ? (
+            <Box className="size-5 text-electric-iris" />
+          ) : (
+            <Building2 className="size-5 text-fog/50" />
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold text-moonlight truncate leading-5">
               {item.ware?.name || item.wareModel?.name || "—"}
             </p>
-            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-              {item.unit?.name && (
-                <span className={cn(
-                  "text-xs",
-                  isOwn ? "text-electric-iris/70" : "text-fog/60",
-                )}>
-                  {item.unit.name}
-                </span>
-              )}
-              {item.quantity != null && (
-                <span className={cn(
-                  "text-xs font-mono",
-                  item.minQuantity != null && item.quantity < item.minQuantity ? "text-destructive" : isOwn ? "text-fog/50" : "text-fog/40",
-                )} dir="ltr">
-                  {item.quantity.toLocaleString("fa-IR")} عدد
-                </span>
-              )}
-            </div>
-            {(item.batchNo || item.location) && (
-              <div className="flex items-center gap-3 mt-1 text-[10px] text-fog/40">
-                {item.batchNo && <span dir="ltr">{item.batchNo}</span>}
-                {item.location && <span>{item.location}</span>}
-              </div>
+            {isLowStock && (
+              <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-ember/10 text-ember border-ember/20 shrink-0">
+                کم‌موجودی
+              </Badge>
+            )}
+          </div>
+          <div className="flex items-center gap-2 mt-0.5">
+            {item.ware?.brand && (
+              <span className={cn(
+                "text-[10px] flex items-center gap-1",
+                isOwn ? "text-electric-iris/60" : "text-fog/50",
+              )}>
+                <Factory className="size-3" />
+                {item.ware.brand}
+              </span>
+            )}
+            {item.wareModel?.name && (
+              <span className="text-[10px] text-fog/40">مدل: {item.wareModel.name}</span>
             )}
           </div>
         </div>
+      </div>
+
+      {/* Quantity row */}
+      <div className={cn(
+        "grid grid-cols-3 gap-px",
+        isOwn ? "bg-electric-iris/[0.06]" : "bg-white/[0.04]",
+      )}>
+        <div className={cn(
+          "p-3 text-center",
+          isOwn ? "bg-[#05060f]/60" : "bg-[#05060f]/60",
+        )}>
+          <p className="text-[10px] text-fog/50">موجودی</p>
+          <p className={cn(
+            "text-lg font-bold font-mono leading-7",
+            isLowStock ? "text-ember" : "text-glacier",
+          )} dir="ltr">
+            {item.quantity != null ? item.quantity.toLocaleString("fa-IR") : "—"}
+          </p>
+        </div>
+        <div className="p-3 text-center bg-[#05060f]/60">
+          <p className="text-[10px] text-fog/50">حداقل</p>
+          <p className="text-lg font-bold font-mono text-fog leading-7" dir="ltr">
+            {item.minQuantity != null ? item.minQuantity.toLocaleString("fa-IR") : "—"}
+          </p>
+        </div>
+        <div className="p-3 text-center bg-[#05060f]/60">
+          <p className="text-[10px] text-fog/50">حداکثر</p>
+          <p className="text-lg font-bold font-mono text-fog leading-7" dir="ltr">
+            {item.maxQuantity != null ? item.maxQuantity.toLocaleString("fa-IR") : "—"}
+          </p>
+        </div>
+      </div>
+
+      {/* Details */}
+      <div className="p-4 space-y-1">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-1">
+          <div className="flex items-center gap-2">
+            <Building2 className="size-3.5 text-fog/30 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-[10px] text-fog/40">واحد مصرف‌کننده</p>
+              <p className={cn(
+                "text-xs truncate",
+                isOwn ? "text-electric-iris" : "text-moonlight",
+              )}>{item.unit?.name || "—"}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Warehouse className="size-3.5 text-fog/30 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-[10px] text-fog/40">انبار</p>
+              <p className="text-xs text-moonlight truncate">{item.warehouseUnit?.name || "—"}</p>
+            </div>
+          </div>
+          {item.batchNo && (
+            <div className="flex items-center gap-2">
+              <Barcode className="size-3.5 text-fog/30 shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[10px] text-fog/40">سریال</p>
+                <p className="text-xs text-moonlight font-mono" dir="ltr">{item.batchNo}</p>
+              </div>
+            </div>
+          )}
+          {item.location && (
+            <div className="flex items-center gap-2">
+              <MapPin className="size-3.5 text-fog/30 shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[10px] text-fog/40">موقعیت</p>
+                <p className="text-xs text-moonlight truncate">{item.location}</p>
+              </div>
+            </div>
+          )}
+          {item.expirationDate && (
+            <div className="flex items-center gap-2">
+              <CalendarDays className="size-3.5 text-fog/30 shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[10px] text-fog/40">تاریخ انقضا</p>
+                <p className="text-xs text-moonlight">{new Date(item.expirationDate).toLocaleDateString("fa-IR")}</p>
+              </div>
+            </div>
+          )}
+          {item.createdAt && (
+            <div className="flex items-center gap-2">
+              <CalendarDays className="size-3.5 text-fog/30 shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[10px] text-fog/40">تاریخ ثبت</p>
+                <p className="text-xs text-moonlight">{new Date(item.createdAt).toLocaleDateString("fa-IR")}</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Category badges */}
+        {(item.wareType?.name || item.wareClass?.name || item.wareGroup?.name) && (
+          <div className="flex flex-wrap items-center gap-1.5 pt-2 mt-2 border-t border-white/[0.04]">
+            <FolderTree className="size-3 text-fog/30" />
+            {item.wareType?.name && (
+              <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-frost-link/5 text-fog border-white/[0.06]">
+                {item.wareType.name}
+              </Badge>
+            )}
+            {item.wareClass?.name && (
+              <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-frost-link/5 text-fog border-white/[0.06]">
+                {item.wareClass.name}
+              </Badge>
+            )}
+            {item.wareGroup?.name && (
+              <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-frost-link/5 text-fog border-white/[0.06]">
+                {item.wareGroup.name}
+              </Badge>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -105,9 +224,7 @@ function InvRow({ item, userUnitId, onTransfer }: { item: Inventory; userUnitId?
   const isLow = item.minQuantity != null && qty < item.minQuantity
 
   return (
-    <div className={cn(
-      "flex items-center gap-4 px-5 py-3.5 border-b border-steel-border/10 last:border-b-0 transition-colors hover:bg-white/[0.02]",
-    )}>
+    <div className="flex items-center gap-4 px-5 py-3.5 border-b border-steel-border/10 last:border-b-0 transition-colors hover:bg-white/[0.02]">
       <div className={cn(
         "size-8 rounded-lg flex items-center justify-center shrink-0 ring-1 ring-inset",
         isOwn
@@ -120,20 +237,27 @@ function InvRow({ item, userUnitId, onTransfer }: { item: Inventory; userUnitId?
           <Building2 className="size-4 text-fog/40" />
         )}
       </div>
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-[2]">
         <p className="text-sm font-medium text-moonlight truncate">
           {item.ware?.name || item.wareModel?.name || "—"}
         </p>
-        {item.unit?.name && (
-          <p className={cn(
-            "text-[11px] mt-0.5",
-            isOwn ? "text-electric-iris/60" : "text-fog/50",
-          )}>
-            {item.unit.name}
-          </p>
-        )}
+        <div className="flex items-center gap-2 mt-0.5">
+          {item.ware?.brand && (
+            <span className="text-[10px] text-fog/50">{item.ware.brand}</span>
+          )}
+          {item.unit?.name && (
+            <span className={cn(
+              "text-[10px]",
+              isOwn ? "text-electric-iris/60" : "text-fog/50",
+            )}>
+              {item.unit.name}
+            </span>
+          )}
+        </div>
       </div>
-      <div className="text-end shrink-0">
+
+      {/* Quantity with min/max */}
+      <div className="text-end shrink-0 min-w-[100px]">
         <p className={cn(
           "text-base font-semibold font-mono leading-tight",
           isLow ? "text-rose-400" : isOwn ? "text-emerald-400" : "text-moonlight",
@@ -141,19 +265,45 @@ function InvRow({ item, userUnitId, onTransfer }: { item: Inventory; userUnitId?
           {qty.toLocaleString("fa-IR")}
         </p>
         {(item.minQuantity != null || item.maxQuantity != null) && (
-          <p className="text-[10px] text-fog/40 mt-px">
+          <p className="text-[10px] text-fog/40 mt-px" dir="ltr">
             {item.minQuantity != null && `حداقل ${item.minQuantity.toLocaleString("fa-IR")}`}
-            {item.minQuantity != null && item.maxQuantity != null && " / "}
+            {item.minQuantity != null && item.maxQuantity != null && " · "}
             {item.maxQuantity != null && `حداکثر ${item.maxQuantity.toLocaleString("fa-IR")}`}
           </p>
         )}
       </div>
-      {(item.batchNo || item.createdAt) && (
-        <div className="hidden sm:block text-end shrink-0 min-w-[100px]">
-          {item.batchNo && <p className="text-xs text-fog/50 font-mono" dir="ltr">{item.batchNo}</p>}
-          {item.createdAt && <p className="text-[10px] text-fog/40 mt-px">{new Date(item.createdAt).toLocaleDateString("fa-IR")}</p>}
+
+      {/* Extra info */}
+      <div className="hidden md:block text-end shrink-0 min-w-[130px]">
+        {item.warehouseUnit?.name && (
+          <p className="text-xs text-fog/60 truncate">{item.warehouseUnit.name}</p>
+        )}
+        <div className="flex items-center gap-2 mt-0.5">
+          {item.batchNo && <span className="text-[10px] text-fog/40 font-mono" dir="ltr">{item.batchNo}</span>}
+          {item.expirationDate && (
+            <span className="text-[10px] text-fog/40">
+              {new Date(item.expirationDate).toLocaleDateString("fa-IR")}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Category badges - hidden on small */}
+      {(item.wareType?.name || item.wareClass?.name) && (
+        <div className="hidden lg:flex items-center gap-1 shrink-0 min-w-[100px]">
+          {item.wareType?.name && (
+            <Badge variant="outline" className="text-[8px] px-1 py-0 bg-white/[0.03] text-fog/50 border-white/[0.06]">
+              {item.wareType.name}
+            </Badge>
+          )}
+          {item.wareClass?.name && (
+            <Badge variant="outline" className="text-[8px] px-1 py-0 bg-white/[0.03] text-fog/50 border-white/[0.06]">
+              {item.wareClass.name}
+            </Badge>
+          )}
         </div>
       )}
+
       <Button
         variant="ghost"
         size="icon-xs"
@@ -317,14 +467,14 @@ export function InventoryClient({ items, isWarehouseGrouped, userUnitId }: Inven
 
   return (
     <div className="space-y-4">
-      <Card variant="glass" className="overflow-hidden">
-        {items.length > 0 ? (
-          <div>
-            {items.map((item) => (
-              <InvCard key={item._id} item={item} />
-            ))}
-          </div>
-        ) : (
+      {items.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {items.map((item) => (
+            <InvCard key={item._id} item={item} userUnitId={userUnitId} />
+          ))}
+        </div>
+      ) : (
+        <Card variant="glass">
           <CardContent className="py-12 text-center">
             <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-white/[0.03] ring-1 ring-steel-border/15">
               <Package className="size-6 text-fog/30" />
@@ -332,8 +482,8 @@ export function InventoryClient({ items, isWarehouseGrouped, userUnitId }: Inven
             <p className="text-sm font-medium text-fog/50">موجودی‌ای یافت نشد</p>
             <p className="text-xs text-fog/30 mt-1">هنوز هیچ موجودی برای واحد شما ثبت نشده است.</p>
           </CardContent>
-        )}
-      </Card>
+        </Card>
+      )}
 
       <TransferDialog
         transferTarget={transferTarget}
