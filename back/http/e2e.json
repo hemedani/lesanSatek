@@ -911,7 +911,7 @@
   },
   {
     "id": "gen-fiscalYear",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"fiscalYear\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"سال مالی 1405\", \"startDate\": \"2026-03-21\", \"endDate\": \"2027-03-20\", \"isActive\": true, \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"fiscalYear\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"سال مالی 1405\", \"startDate\": \"2026-03-21\", \"endDate\": \"2027-03-20\", \"isActive\": true, \"organizationId\": \"{orgId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,
     "captures": [
       {
@@ -1350,31 +1350,31 @@
   },
   {
     "id": "storehead-stuff-gets",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{saraRoleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"price\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{storeHeadRoleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"price\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
   {
     "id": "storehead-store-gets",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"store\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{saraRoleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"store\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{storeHeadRoleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
   {
     "id": "storehead-tender-gets",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"tender\", \"act\": \"gets\", \"details\": {\"set\": {\"status\": \"open\", \"activeRoleId\": \"{saraRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"tender\", \"act\": \"gets\", \"details\": {\"set\": {\"status\": \"open\", \"activeRoleId\": \"{storeHeadRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
   {
     "id": "storehead-tenderOffer-gets",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"tenderOffer\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{saraRoleId}\", \"tenderId\": \"{tenderId}\"}, \"get\": {\"_id\": 1, \"price\": 1, \"status\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"tenderOffer\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{storeHeadRoleId}\", \"tenderId\": \"{tenderId}\"}, \"get\": {\"_id\": 1, \"price\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
   {
     "id": "storehead-pr-gets",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{saraRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1, \"stuffStatus\": 1, \"store\": {\"_id\": 1, \"name\": 1}}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{storeHeadRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1, \"stuffStatus\": 1, \"store\": {\"_id\": 1, \"name\": 1}}}}}",
     "repeat": 1,
     "captures": [
       {
@@ -1385,13 +1385,142 @@
   },
   {
     "id": "storehead-update-stuff-status",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"updateStuffStatus\", \"details\": {\"set\": {\"_id\": \"{storePrId}\", \"activeRoleId\": \"{saraRoleId}\", \"stuffStatus\": \"ready_to_ship\"}, \"get\": {\"_id\": 1, \"stuffStatus\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"updateStuffStatus\", \"details\": {\"set\": {\"_id\": \"{storePrId}\", \"activeRoleId\": \"{storeHeadRoleId}\", \"stuffStatus\": \"ready_to_ship\"}, \"get\": {\"_id\": 1, \"stuffStatus\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
   {
     "id": "storehead-verify-stuff-status",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"get\", \"details\": {\"set\": {\"_id\": \"{storePrId}\", \"activeRoleId\": \"{saraRoleId}\"}, \"get\": {\"_id\": 1, \"stuffStatus\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"get\", \"details\": {\"set\": {\"_id\": \"{storePrId}\", \"activeRoleId\": \"{storeHeadRoleId}\"}, \"get\": {\"_id\": 1, \"stuffStatus\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+
+  {
+    "id": "gen-second-wareType",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareType\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"محلول‌ها و مواد شیمیایی\", \"enName\": \"محلول‌ها و مواد شیمیایی\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "wareType2Id", "value": "[body][_id]"}]
+  },
+  {
+    "id": "gen-second-wareClass",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareClass\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"مواد شوینده\", \"enName\": \"مواد شوینده\", \"wareTypeId\": \"{wareType2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "wareClass2Id", "value": "[body][_id]"}]
+  },
+  {
+    "id": "gen-second-wareGroup",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareGroup\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"ضدعفونی‌کننده\", \"enName\": \"ضدعفونی‌کننده\", \"wareTypeId\": \"{wareType2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "wareGroup2Id", "value": "[body][_id]"}]
+  },
+  {
+    "id": "gen-second-wareGroup-relations",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareGroup\", \"act\": \"updateRelations\", \"details\": {\"set\": {\"_id\": \"{wareGroup2Id}\", \"activeRoleId\": \"{roleId}\", \"wareClassIds\": [\"{wareClass2Id}\"]}, \"get\": {\"_id\": 1, \"wareClasses\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-second-wareModel",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareModel\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"بتادین ۱۰٪\", \"enName\": \"بتادین ۱۰٪\", \"wareTypeId\": \"{wareType2Id}\", \"wareClassId\": \"{wareClass2Id}\", \"wareGroupId\": \"{wareGroup2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "wareModel2Id", "value": "[body][_id]"}]
+  },
+  {
+    "id": "gen-second-ware",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"ware\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"بتادین ۱۰٪ ۵۰۰ml\", \"enName\": \"بتادین ۱۰٪ ۵۰۰ml\", \"brand\": \"تولیددارو\", \"price\": 450000, \"manufacturerId\": \"{mfrId}\", \"wareTypeId\": \"{wareType2Id}\", \"wareClassId\": \"{wareClass2Id}\", \"wareGroupId\": \"{wareGroup2Id}\", \"wareModelId\": \"{wareModel2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1, \"price\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "ware2Id", "value": "[body][_id]"}, {"key": "ware2Price", "value": "[body][price]"}]
+  },
+  {
+    "id": "gen-second-store",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"store\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"داروخانه مرکزی\", \"address\": \"تهران، خیابان انقلاب\", \"cityId\": \"{cityId}\", \"stateId\": \"{stateId}\", \"storeHeadId\": \"{vendorUserId}\", \"economicCode\": \"987654321\", \"postalCode\": \"1234567899\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "store2Id", "value": "[body][_id]"}]
+  },
+  {
+    "id": "gen-second-stuff",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"add\", \"details\": {\"set\": {\"quantity\": 200, \"price\": 520000, \"hasAbsolutePrice\": true, \"wareId\": \"{ware2Id}\", \"storeId\": \"{store2Id}\", \"wareTypeId\": \"{wareType2Id}\", \"wareClassId\": \"{wareClass2Id}\", \"wareGroupId\": \"{wareGroup2Id}\", \"wareModelId\": \"{wareModel2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"price\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "stuff2Id", "value": "[body][_id]"}, {"key": "stuff2Price", "value": "[body][price]"}]
+  },
+  {
+    "id": "gen-pr-wash",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"add\", \"details\": {\"set\": {\"title\": \"خرید بتادین\", \"description\": \"تأمین مواد ضدعفونی\", \"quantity\": 30, \"wareModelId\": \"{wareModel2Id}\", \"activeRoleId\": \"{employeeRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "prWashId", "value": "[body][_id]"}]
+  },
+  {
+    "id": "gen-assign-store2-wash",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"addStuff\", \"details\": {\"set\": {\"_id\": \"{prWashId}\", \"activeRoleId\": \"{roleId}\", \"stuffId\": \"{stuff2Id}\"}, \"get\": {\"_id\": 1, \"stuffStatus\": 1, \"estimatedAmount\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-pr-wash-submit",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"submit\", \"details\": {\"set\": {\"_id\": \"{prWashId}\", \"activeRoleId\": \"{employeeRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1, \"selectionType\": 1, \"currentStep\": 1, \"process\": {\"_id\": 1, \"name\": 1}, \"stepApprovals\": {\"_id\": 1, \"status\": 1, \"processStep\": {\"_id\": 1}, \"unit\": {\"_id\": 1}}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-decision-wash-step1",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prWashId}\", \"processStepId\": \"{stepUnit1Id}\", \"unitId\": \"{unitId}\", \"status\": \"approved\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-decision-wash-step2",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prWashId}\", \"processStepId\": \"{stepUnit2Id}\", \"unitId\": \"{warehouseUnitId}\", \"status\": \"approved\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-decision-wash-step3",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prWashId}\", \"processStepId\": \"{stepUnit3Id}\", \"unitId\": \"{financeUnitId}\", \"status\": \"approved\", \"budgetLineId\": \"{budgetLineId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-wash-goods-receipt",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"goodsReceipt\", \"act\": \"add\", \"details\": {\"set\": {\"receiptNumber\": \"رسید-۰۰۲\", \"description\": \"رسید مواد ضدعفونی\", \"receivedAt\": \"2026-05-15\", \"items\": [{\"wareModelId\": \"{wareModel2Id}\", \"wareId\": \"{ware2Id}\", \"quantityReceived\": 30, \"quantityAccepted\": 30, \"quantityRejected\": 0}], \"purchasingRequestId\": \"{prWashId}\", \"receivedById\": \"{userId}\", \"receivingUnitId\": \"{unitId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"receiptNumber\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {"key": "washReceiptId", "value": "[body][_id]"}
+    ]
+  },
+  {
+    "id": "gen-second-budgetLine",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"add\", \"details\": {\"set\": {\"code\": \"BUD-002\", \"title\": \"بودجه خرید مواد مصرفی\", \"description\": \"بودجه مواد مصرفی و شوینده\", \"fiscalYearId\": \"{fiscalYearId}\", \"organizationId\": \"{orgId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"code\": 1, \"totalAllocated\": 1, \"remainingBudget\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "budgetLine2Id", "value": "[body][_id]"}]
+  },
+  {
+    "id": "gen-second-budgetAllocation",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetAllocation\", \"act\": \"add\", \"details\": {\"set\": {\"amount\": 50000000, \"description\": \"تخصیص بودجه مواد مصرفی\", \"allocatedAt\": \"2026-04-01\", \"budgetLineId\": \"{budgetLine2Id}\", \"allocatedById\": \"{userId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"amount\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-inventory2-add",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{ware2Id}\", \"unitId\": \"{warehouseUnitId}\", \"quantity\": 100, \"minQuantity\": 20, \"maxQuantity\": 500, \"location\": \"قفسه B-07\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"minQuantity\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "inventory2Id", "value": "[body][_id]"}]
+  },
+  {
+    "id": "gen-inventory-lowstock",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{wareId}\", \"unitId\": \"{coldstoreUnitId}\", \"quantity\": 3, \"minQuantity\": 10, \"maxQuantity\": 50, \"location\": \"قفسه C-03\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"minQuantity\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "inventoryLowId", "value": "[body][_id]"}]
+  },
+  {
+    "id": "gen-consumption2",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"consumption\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{wareId}\", \"quantity\": 2, \"consumedAt\": \"2026-05-10\", \"reason\": \"مصرف آزمایشگاه میکروبیولوژی\", \"unitId\": \"{microlabUnitId}\", \"consumedById\": \"{userId}\", \"inventoryId\": \"{inventoryId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"reason\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-orgHead-dashboard",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"dashboardStatistic\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"type\": \"orgHead\"}, \"get\": {\"unit\": 1, \"purchasingRequestCounts\": 1, \"pendingApprovalCount\": 1, \"recentApprovals\": 1, \"finance\": 1, \"receiptCount\": 1, \"fiscalYear\": 1, \"paymentOrders\": 1, \"prStatusDistribution\": 1, \"prMonthlyTrend\": 1, \"prCycleTime\": 1, \"budgetLineBreakdown\": 1, \"budgetBurnDown\": 1, \"inventorySummary\": 1, \"inventoryLowStock\": 1, \"consumptionTrend\": 1, \"consumptionByUnit\": 1, \"consumptionByCategory\": 1, \"procurementByStore\": 1, \"selectionBreakdown\": 1, \"stockMovementSummary\": 1, \"stepBottleneck\": 1}}}}",
     "repeat": 1,
     "captures": []
   }
