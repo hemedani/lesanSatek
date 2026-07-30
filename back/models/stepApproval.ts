@@ -38,6 +38,7 @@ import {
   type RelationSortOrderType,
   string,
 } from "lesan";
+import { createUpdateAt } from "@lib";
 import {
   budgetLine_excludes,
   purchasingRequest_excludes,
@@ -60,6 +61,7 @@ export const stepApproval_pure = {
   ),
   comment: optional(string()),
   decidedAt: optional(coerce(date(), string(), (value) => new Date(value))),
+  ...createUpdateAt,
 };
 
 export const stepApproval_relations = {

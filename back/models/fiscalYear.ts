@@ -28,8 +28,9 @@
  * }
  */
 import { coreApp } from "../mod.ts";
-import { boolean, coerce, date, defaulted, enums, string } from "lesan";
+import { boolean, coerce, date, defaulted, enums, optional, type RelationDataType, type RelationSortOrderType, string } from "lesan";
 import { createUpdateAt } from "@lib";
+import { organization_excludes } from "./excludes.ts";
 
 export const fiscalYear_status_array = ["open", "closed"];
 export const fiscalYear_status_emums = enums(fiscalYear_status_array);
@@ -50,7 +51,24 @@ export const fiscalYear_pure = {
   ...createUpdateAt,
 };
 
-export const fiscalYear_relations = {};
+export const fiscalYear_relations = {
+  organization: {
+    schemaName: "organization",
+    type: "single" as RelationDataType,
+    optional: false,
+    excludes: organization_excludes,
+    relatedRelations: {
+      fiscalYears: {
+        type: "multiple" as RelationDataType,
+        limit: 5,
+        sort: {
+          field: "_id",
+          order: "desc" as RelationSortOrderType,
+        },
+      },
+    },
+  },
+};
 
 export const fiscalYears = () =>
   coreApp.odm.newModel("fiscalYear", fiscalYear_pure, fiscalYear_relations, {
