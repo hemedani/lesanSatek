@@ -1,7 +1,5 @@
 import { PageHeader } from "@/components/ui/page-header"
 import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
-import { cookies } from "next/headers"
-import { getMe } from "@/app/actions/user/getMe"
 import { RequestsClient } from "./requests-client"
 import { ReqType } from "@/types/declarations/selectInp"
 
@@ -28,24 +26,8 @@ export default async function UnitHeadRequestsPage({
   const search = typeof resolvedSearchParams.search === "string" ? resolvedSearchParams.search : undefined
   const status = typeof resolvedSearchParams.status === "string" ? resolvedSearchParams.status : undefined
 
-  const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value
-  let unitId: string | undefined
-
-  if (activeRoleId) {
-    const userRes = await getMe({
-      _id: 1,
-      roles: 1,
-    }).catch(() => ({ success: false, body: null }))
-    const user = userRes.success ? userRes.body : null
-    const activeRole = user?.roles?.find((r: { roleId?: string }) => r.roleId === activeRoleId)
-    if (activeRole?.scopeType === "unit" && activeRole.scopeId) {
-      unitId = activeRole.scopeId
-    }
-  }
-
   const result = await getPRs(
-    { page, limit, unitId, search, status: status as ReqType["main"]["purchasingRequest"]["gets"]["set"]["status"] || undefined },
+    { page, limit, search, status: status as ReqType["main"]["purchasingRequest"]["gets"]["set"]["status"] || undefined },
     {
       _id: 1,
       title: 1,
@@ -73,7 +55,7 @@ export default async function UnitHeadRequestsPage({
     <div className="space-y-6">
       <PageHeader
         title="همه درخواست‌ها"
-        description="لیست کامل درخواست‌های خرید واحد"
+        description="لیست کامل درخواست‌های خرید سازمان"
       />
       <RequestsClient
         items={items}

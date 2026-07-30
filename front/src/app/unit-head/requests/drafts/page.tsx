@@ -1,7 +1,5 @@
 import { PageHeader } from "@/components/ui/page-header"
 import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
-import { cookies } from "next/headers"
-import { getMe } from "@/app/actions/user/getMe"
 import { DraftsClient } from "./drafts-client"
 
 interface DraftItem {
@@ -24,24 +22,8 @@ export default async function DraftsPage({
   const page = Number(resolvedSearchParams.page) || 1
   const limit = 20
 
-  const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value
-  let unitId: string | undefined
-
-  if (activeRoleId) {
-    const userRes = await getMe({
-      _id: 1,
-      roles: 1,
-    }).catch(() => ({ success: false, body: null }))
-    const user = userRes.success ? userRes.body : null
-    const activeRole = user?.roles?.find((r: { roleId?: string }) => r.roleId === activeRoleId)
-    if (activeRole?.scopeType === "unit" && activeRole.scopeId) {
-      unitId = activeRole.scopeId
-    }
-  }
-
   const result = await getPRs(
-    { page, limit, unitId, status: "Draft" },
+    { page, limit, status: "Draft" },
     {
       _id: 1,
       title: 1,
