@@ -230,7 +230,7 @@ export const addFn: ActFn = async (body) => {
 
     if (requests.length > 0) {
       const req = requests[0];
-      if (["Pending", "InProgress"].includes(req.status)) {
+      if (["Pending", "InProgress", "PendingFinalization"].includes(req.status)) {
         const steps = await processStep.aggregation({
           pipeline: [
             { $match: { "process._id": req.process._id } },

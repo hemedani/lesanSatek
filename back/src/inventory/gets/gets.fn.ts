@@ -58,7 +58,17 @@ export const getsFn: ActFn = async (body) => {
     }
   } else if (activeRole.name === "OrgHead") {
     if (activeRole.scopeType === "organization" && activeRole.scopeId) {
-      match["unit.organization._id"] = new ObjectId(activeRole.scopeId);
+      const orgUnits = await unit.aggregation({
+        pipeline: [
+          { $match: { "organization._id": new ObjectId(activeRole.scopeId) } },
+          { $project: { _id: 1 } },
+        ],
+      }).toArray();
+      if (orgUnits.length > 0) {
+        match["unit._id"] = {
+          $in: orgUnits.map((u: Document) => u._id),
+        };
+      }
     }
   }
 
@@ -72,7 +82,19 @@ export const getsFn: ActFn = async (body) => {
   wareModelId && (match["wareModel._id"] = new ObjectId(wareModelId));
   unitId && (match["unit._id"] = new ObjectId(unitId as string));
   warehouseUnitId && (match["warehouseUnit._id"] = new ObjectId(warehouseUnitId as string));
-  organizationId && (match["unit.organization._id"] = new ObjectId(organizationId as string));
+  if (organizationId) {
+    const orgUnits = await unit.aggregation({
+      pipeline: [
+        { $match: { "organization._id": new ObjectId(organizationId as string) } },
+        { $project: { _id: 1 } },
+      ],
+    }).toArray();
+    if (orgUnits.length > 0) {
+      match["unit._id"] = {
+        $in: orgUnits.map((u: Document) => u._id),
+      };
+    }
+  }
 
   if (Object.keys(match).length > 0) {
     pipeline.push({ $match: match });

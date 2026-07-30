@@ -40,7 +40,17 @@ export const countFn: ActFn = async (body) => {
     }
   } else if (activeRole.name === "OrgHead") {
     if (activeRole.scopeType === "organization" && activeRole.scopeId) {
-      match["unit.organization._id"] = new ObjectId(activeRole.scopeId);
+      const orgUnits = await unit.aggregation({
+        pipeline: [
+          { $match: { "organization._id": new ObjectId(activeRole.scopeId) } },
+          { $project: { _id: 1 } },
+        ],
+      }).toArray();
+      if (orgUnits.length > 0) {
+        match["unit._id"] = {
+          $in: orgUnits.map((u: Document) => u._id),
+        };
+      }
     }
   }
 
