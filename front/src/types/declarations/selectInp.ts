@@ -30821,6 +30821,18 @@ qty?: (0 | 1 );
 };
 
           
+            getOrgChart: {
+set: {
+activeRoleId: string;
+orgId?: string;
+};
+get: {
+units?: (0 | 1 );
+organization?: (0 | 1 );
+};
+};
+
+          
           }
 
         

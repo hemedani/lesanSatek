@@ -5,6 +5,7 @@ import { updateSetup } from "./update/mod.ts";
 import { updateRelationsSetup } from "./updateRelations/mod.ts";
 import { removeSetup } from "./remove/mod.ts";
 import { countSetup } from "./count/mod.ts";
+import { getOrgChartSetup } from "./getOrgChart/mod.ts";
 
 export const unitSetup = () => {
   addSetup();
@@ -14,4 +15,5 @@ export const unitSetup = () => {
   getsSetup();
   removeSetup();
   countSetup();
+  getOrgChartSetup();
 };
