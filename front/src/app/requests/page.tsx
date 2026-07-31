@@ -1,210 +1,146 @@
 import Link from "next/link"
-import { ShoppingCart, CheckCircle, XCircle, Clock, Package, Plus, Warehouse, ScrollText, Activity } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Plus, User, Warehouse, ScrollText, Activity } from "lucide-react"
+import { PageHeader } from "@/components/ui/page-header"
 import { Button } from "@/components/ui/button"
-import { StatusBadge } from "@/components/ui/status-badge"
 import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
-import { getMe } from "@/app/actions/user/getMe"
-import { cookies } from "next/headers"
+import { count as countPRs } from "@/app/actions/purchasingRequest/count"
+import { gets as getProcesses } from "@/app/actions/process/gets"
+import type { ReqType } from "@/types/declarations/selectInp"
+import { RequestsListClient } from "./requests-client"
+import type { PRItem, ProcessOption } from "./requests-client"
 
-const statusMap: Record<string, string> = {
-  draft: "پیش‌نویس",
-  pending: "در انتظار تایید",
-  approved: "تایید شده",
-  rejected: "رد شده",
-  in_progress: "در حال انجام",
-  completed: "تکمیل شده",
-}
+const LIMIT = 12
 
-export default async function RequestsDashboard() {
-  const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value
-  let currentUserId: string | undefined
+const VALID_STATUSES: NonNullable<ReqType["main"]["purchasingRequest"]["gets"]["set"]["status"]>[] = [
+  "Draft",
+  "Pending",
+  "InProgress",
+  "Approved",
+  "PendingFinalization",
+  "Rejected",
+  "Completed",
+  "Cancelled",
+]
 
-  if (activeRoleId) {
-    const userRes = await getMe({
-      _id: 1,
-      roles: 1,
-    }).catch(() => ({ success: false, body: null }))
-    const user = userRes.success ? userRes.body : null
-    currentUserId = user?._id
-  }
+const PR_PROJECTION = {
+  _id: 1,
+  title: 1,
+  status: 1,
+  currentStep: 1,
+  quantity: 1,
+  estimatedAmount: 1,
+  createdAt: 1,
+  requester: { _id: 1, first_name: 1, last_name: 1 },
+  process: { _id: 1, name: 1, unit: { _id: 1, name: 1 } },
+  wareModel: { _id: 1, name: 1 },
+} as const
 
-  const [prsRes, receiptRes] = await Promise.all([
+export default async function RequestsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const resolvedSearchParams = await searchParams
+
+  const page = Math.max(1, Number(resolvedSearchParams.page) || 1)
+  const search = typeof resolvedSearchParams.search === "string" ? resolvedSearchParams.search : ""
+  const status =
+    typeof resolvedSearchParams.status === "string" &&
+    (VALID_STATUSES as readonly string[]).includes(resolvedSearchParams.status)
+      ? (resolvedSearchParams.status as NonNullable<ReqType["main"]["purchasingRequest"]["gets"]["set"]["status"]>)
+      : ""
+  const processId = typeof resolvedSearchParams.processId === "string" ? resolvedSearchParams.processId : ""
+  const sort: "asc" | "desc" = resolvedSearchParams.sort === "asc" ? "asc" : "desc"
+
+  const [prsResult, processesResult, countResult] = await Promise.all([
     getPRs(
-      { page: 1, limit: 5 },
-      { _id: 1, title: 1, status: 1, createdAt: 1 },
+      {
+        page,
+        limit: LIMIT,
+        sortBy: "createdAt",
+        sortOrder: sort,
+        ...(search ? { search } : {}),
+        ...(status ? { status } : {}),
+        ...(processId ? { processId } : {}),
+      },
+      PR_PROJECTION,
     ),
-    currentUserId
-      ? getPRs(
-          { page: 1, limit: 1, requesterId: currentUserId, stuffStatus: "delivered" },
-          { _id: 1, title: 1 },
-        )
-      : Promise.resolve({ success: false, body: [] }),
+    getProcesses({ page: 1, limit: 200 }, { _id: 1, name: 1, status: 1 }),
+    countPRs(
+      {
+        ...(search ? { search } : {}),
+        ...(status ? { status } : {}),
+        ...(processId ? { processId } : {}),
+      },
+      { qty: 1 },
+    ),
   ])
 
-  const prs = prsRes.success ? prsRes.body || [] : []
-  const receiptCount = receiptRes.success ? (receiptRes.body || []).length : 0
+  const items = (prsResult.success ? prsResult.body || [] : []) as PRItem[]
+  const processes = (processesResult.success ? processesResult.body || [] : []) as ProcessOption[]
+  const activeProcesses = processes.filter((p) => p?.status !== "deactivated")
+  const total = countResult.success ? (countResult.body?.qty ?? items.length) : items.length
+  const totalPages = Math.max(1, Math.ceil(total / LIMIT))
 
-  const total = prs.length
-  const pending = prs.filter((p: { status?: string }) => p.status === "pending" || p.status === "draft").length
-  const approved = prs.filter((p: { status?: string }) => p.status === "approved").length
-  const rejected = prs.filter((p: { status?: string }) => p.status === "rejected").length
+  const params = new URLSearchParams()
+  if (search) params.set("search", search)
+  if (status) params.set("status", status)
+  if (processId) params.set("processId", processId)
+  if (sort === "asc") params.set("sort", "asc")
+  const qs = params.toString()
 
-  const stats = [
-    { label: "کل درخواست‌ها", value: total, icon: ShoppingCart, color: "text-electric-iris", bg: "bg-electric-iris/10", href: "/requests/my-requests" },
-    { label: "در انتظار", value: pending, icon: Clock, color: "text-amber-400", bg: "bg-amber-400/10", href: "/requests/my-requests" },
-    { label: "تایید شده", value: approved, icon: CheckCircle, color: "text-emerald-400", bg: "bg-emerald-400/10", href: "/requests/my-requests" },
-    { label: "آماده تحویل", value: receiptCount, icon: Package, color: "text-emerald-400", bg: "bg-emerald-400/10", href: "/requests/my-requests?tab=receipt" },
-    { label: "رد شده", value: rejected, icon: XCircle, color: "text-ember", bg: "bg-ember/10", href: "/requests/my-requests" },
-  ]
+  const prevPageUrl = page > 1 ? `/requests?page=${page - 1}${qs ? `&${qs}` : ""}` : ""
+  const nextPageUrl = page < totalPages ? `/requests?page=${page + 1}${qs ? `&${qs}` : ""}` : ""
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-glacier">درخواست‌های خرید</h1>
-          <p className="text-sm text-fog mt-1">ثبت و پیگیری درخواست‌های خرید</p>
+    <div className="space-y-6">
+      <PageHeader title="درخواست‌های خرید" description="ثبت، پیگیری و مدیریت درخواست‌های خرید سازمان">
+        <div className="flex flex-wrap items-center gap-2">
+          <Link href="/requests/my-requests">
+            <Button variant="ghost" size="sm" className="gap-1.5">
+              <User className="size-4" />
+              درخواست‌های من
+            </Button>
+          </Link>
+          <Link href="/requests/inventory">
+            <Button variant="ghost" size="sm" className="gap-1.5">
+              <Warehouse className="size-4" />
+              انبار واحد
+            </Button>
+          </Link>
+          <Link href="/requests/consumption">
+            <Button variant="ghost" size="sm" className="gap-1.5">
+              <ScrollText className="size-4" />
+              مصرف کالا
+            </Button>
+          </Link>
+          <Link href="/requests/stock-movements">
+            <Button variant="ghost" size="sm" className="gap-1.5">
+              <Activity className="size-4" />
+              گردش کالا
+            </Button>
+          </Link>
+          <Link href="/requests/new">
+            <Button className="gap-1.5">
+              <Plus className="size-4" />
+              ثبت درخواست جدید
+            </Button>
+          </Link>
         </div>
-        <Link href="/requests/new">
-          <Button className="gap-2">
-            <Plus className="size-4" />
-            درخواست جدید
-          </Button>
-        </Link>
-      </div>
+      </PageHeader>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
-        {stats.map((stat) => {
-          const Icon = stat.icon
-          return (
-            <Link key={stat.label} href={stat.href}>
-              <Card variant="glass" className="cursor-pointer transition-all duration-200 hover:border-frost-link/30">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center gap-3">
-                    <div className={`flex size-10 items-center justify-center rounded-lg ${stat.bg} ring-1 ring-inset ring-white/[0.06]`}>
-                      <Icon className={`size-5 ${stat.color}`} />
-                    </div>
-                    <CardTitle className="text-sm font-medium text-fog leading-5">
-                      {stat.label}
-                    </CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-semibold text-glacier leading-8">{stat.value}</p>
-                  <div className="mt-4 h-px bg-gradient-to-r from-transparent via-frost-link/15 to-transparent" />
-                </CardContent>
-              </Card>
-            </Link>
-          )
-        })}
-      </div>
-
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <Link href="/requests/inventory">
-          <Card variant="glass" className="group cursor-pointer transition-all duration-200 hover:border-frost-link/30 hover:shadow-lg hover:shadow-frost-link/5">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-400/10 ring-1 ring-inset ring-white/[0.06]">
-                  <Warehouse className="size-5 text-emerald-400" />
-                </div>
-                <CardTitle className="text-sm font-medium text-fog leading-5">
-                  انبار واحد
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-xs text-fog/60 leading-5">مشاهده موجودی انبار واحد خود و رهگیری موجودی کالاها</p>
-              <div className="mt-4 h-px bg-gradient-to-r from-transparent via-emerald-400/20 to-transparent" />
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/requests/consumption">
-          <Card variant="glass" className="group cursor-pointer transition-all duration-200 hover:border-frost-link/30 hover:shadow-lg hover:shadow-frost-link/5">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-amber-400/10 ring-1 ring-inset ring-white/[0.06]">
-                  <ScrollText className="size-5 text-amber-400" />
-                </div>
-                <CardTitle className="text-sm font-medium text-fog leading-5">
-                  مصرف کالا
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-xs text-fog/60 leading-5">ثبت مصرف کالاهای انبار و مشاهده سوابق مصرف</p>
-              <div className="mt-4 h-px bg-gradient-to-r from-transparent via-amber-400/20 to-transparent" />
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/requests/stock-movements">
-          <Card variant="glass" className="group cursor-pointer transition-all duration-200 hover:border-frost-link/30 hover:shadow-lg hover:shadow-frost-link/5">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-electric-iris/10 ring-1 ring-inset ring-white/[0.06]">
-                  <Activity className="size-5 text-electric-iris" />
-                </div>
-                <CardTitle className="text-sm font-medium text-fog leading-5">
-                  گردش کالا
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-xs text-fog/60 leading-5">گردش و جابجایی کالاها بین واحدها و انبارها</p>
-              <div className="mt-4 h-px bg-gradient-to-r from-transparent via-frost-link/20 to-transparent" />
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card variant="glass">
-          <CardHeader className="pb-3">
-            <p className="text-sm font-medium text-fog tracking-wide">دسترسی سریع</p>
-            <CardTitle className="text-base font-medium text-frost-link mt-1">
-              عملیات‌های پرکاربرد
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-3">
-            <Link href="/requests/new">
-              <Button variant="outline" size="sm">ثبت درخواست خرید جدید</Button>
-            </Link>
-            <Link href="/requests/my-requests">
-              <Button variant="outline" size="sm">درخواست‌های من</Button>
-            </Link>
-            <Link href="/requests/my-requests?tab=receipt">
-              <Button variant="outline" size="sm">دریافت کالا</Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card variant="glass">
-          <CardHeader className="pb-3">
-            <p className="text-sm font-medium text-fog tracking-wide">آخرین درخواست‌ها</p>
-            <CardTitle className="text-base font-medium text-frost-link mt-1">
-              ۵ درخواست اخیر
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {prs.length > 0 ? (
-              <ul className="space-y-2">
-                {prs.map((p: { _id: string; title?: string; status?: string }) => (
-                  <li key={p._id} className="flex items-center justify-between py-1">
-                    <Link href={`/requests/${p._id}`} className="text-sm text-frost-link hover:underline">
-                      {p.title || "بدون عنوان"}
-                    </Link>
-                    <div className="flex items-center gap-2">
-                      <StatusBadge status={p.status || "draft"} labelMap={statusMap} size="sm" />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-fog py-2">هیچ درخواستی ثبت نشده است</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      <RequestsListClient
+        items={items}
+        prevUrl={prevPageUrl}
+        nextUrl={nextPageUrl}
+        page={page}
+        totalPages={totalPages}
+        search={search}
+        status={status}
+        processId={processId}
+        sort={sort}
+        processes={activeProcesses}
+      />
     </div>
   )
 }
