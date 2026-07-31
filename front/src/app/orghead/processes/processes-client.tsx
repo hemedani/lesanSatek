@@ -1,91 +1,385 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Plus, Workflow, Pencil, Trash2, Target, Clock, CheckCircle2, FileText, Building2, CalendarDays } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { PageHeader } from "@/components/ui/page-header"
-import { DataTable } from "@/components/ui/data-table"
-import { Pagination } from "@/components/ui/pagination"
-import { FilterBar } from "@/components/ui/filter-bar"
-import { ConfirmDialog } from "@/components/ui/confirm-dialog"
-import { remove } from "@/app/actions/process/remove"
-import { toast } from "sonner"
-import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
+import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus, Pencil, Workflow, Copy, CheckCircle2, XCircle, Trash2, Clock, FileText, Share2, List, BarChart3, Target } from "lucide-react";
+import { toast } from "sonner";
+import { PageHeader } from "@/components/ui/page-header";
+import { DataTable } from "@/components/ui/data-table";
+import type { Column } from "@/components/ui/data-table";
+import { Pagination } from "@/components/ui/pagination";
+import { FilterBar } from "@/components/ui/filter-bar";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { remove } from "@/app/actions/process/remove";
+import { activateProcess } from "@/app/actions/process/activateProcess";
+import { duplicateProcess } from "@/app/actions/process/duplicateProcess";
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
+import { getProcessScopeLabel, hasProcessScope } from "@/lib/process-scope";
 
 interface Process {
-  _id: string
-  name?: string
-  description?: string
-  status?: string
-  version?: number
-  isActive?: boolean
-  createdAt?: string
-  organization?: { _id: string; name?: string }
-  unit?: { _id: string; name?: string }
-}
-
-const statusConfig: Record<string, { label: string; icon: typeof FileText; color: string; bg: string }> = {
-  Draft: { label: "پیش‌نویس", icon: FileText, color: "text-amber-400", bg: "bg-amber-400/10" },
-  Active: { label: "فعال", icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-  Archived: { label: "بایگانی", icon: Clock, color: "text-fog/50", bg: "bg-fog/10" },
+  _id: string;
+  name?: string;
+  description?: string;
+  status?: string;
+  version?: number;
+  isActive?: boolean;
+  createdAt?: string;
+  organization?: { _id: string; name?: string };
+  createdBy?: { _id: string; first_name?: string; last_name?: string };
+  unit?: { _id: string; name?: string };
+  wareType?: { _id: string; name?: string };
+  wareClass?: { _id: string; name?: string };
+  wareGroup?: { _id: string; name?: string };
+  wareModel?: { _id: string; name?: string };
+  ware?: { _id: string; name?: string };
 }
 
 interface ProcessesClientProps {
-  items: Process[]
-  prevPageUrl: string
-  nextPageUrl: string
-  page: number
-  search?: string
+  items: Process[];
+  prevPageUrl: string;
+  nextPageUrl: string;
+  page: number;
+  search?: string;
 }
 
-export function ProcessesClient({ items, prevPageUrl, nextPageUrl, page, search = "" }: ProcessesClientProps) {
-  const router = useRouter()
-  const [deleteTarget, setDeleteTarget] = useState<Process | null>(null)
-  const [deleting, setDeleting] = useState(false)
+const statusLabels: Record<string, { label: string; variant: "active" | "inactive" | "pending" | "info" }> = {
+  Draft: { label: "پیش‌نویس", variant: "inactive" },
+  Active: { label: "فعال", variant: "active" },
+  Archived: { label: "بایگانی", variant: "pending" },
+};
+
+export function ProcessesClient({
+  items,
+  prevPageUrl,
+  nextPageUrl,
+  page,
+  search = "",
+}: ProcessesClientProps) {
+  const router = useRouter();
+  const [cardView, setCardView] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState<Process | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const handleSearch = (value: string) => {
     if (value.trim()) {
-      router.push(`/orghead/processes?search=${encodeURIComponent(value.trim())}`)
+      router.push(`/orghead/processes?search=${encodeURIComponent(value.trim())}`);
     } else {
-      router.push("/orghead/processes")
+      router.push("/orghead/processes");
     }
-  }
+  };
+
+  const handleActivate = async (process: Process) => {
+    const result = await activateProcess({ activeRoleId: getActiveRoleIdFromStore(), _id: process._id });
+    if (result.success) {
+      toast.success("فرآیند با موفقیت فعال شد");
+      router.refresh();
+    } else {
+      toast.error(result.body?.message || "خطا در فعال‌سازی فرآیند");
+    }
+  };
+
+  const handleDuplicate = async (process: Process) => {
+    const name = `${process.name || "فرآیند"} (کپی)`;
+    const result = await duplicateProcess({ activeRoleId: getActiveRoleIdFromStore(), _id: process._id, name });
+    if (result.success) {
+      toast.success("فرآیند با موفقیت کپی شد");
+      router.refresh();
+    } else {
+      toast.error(result.body?.message || "خطا در کپی فرآیند");
+    }
+  };
 
   const handleDelete = async () => {
-    if (!deleteTarget) return
-    setDeleting(true)
-    const result = await remove({ activeRoleId: getActiveRoleIdFromStore(), _id: deleteTarget._id })
+    if (!deleteTarget) return;
+    setDeleting(true);
+    const result = await remove({ activeRoleId: getActiveRoleIdFromStore(), _id: deleteTarget._id });
     if (result.success) {
-      toast.success("فرآیند با موفقیت حذف شد")
-      router.refresh()
+      toast.success("فرآیند با موفقیت حذف شد");
+      router.refresh();
     } else {
-      toast.error(result.body?.message || "خطا در حذف فرآیند")
+      toast.error(result.body?.message || "خطا در حذف فرآیند");
     }
-    setDeleting(false)
-    setDeleteTarget(null)
-  }
+    setDeleting(false);
+    setDeleteTarget(null);
+  };
+
+  const statusIcon = (status?: string) => {
+    switch (status) {
+      case "Active": return <CheckCircle2 className="size-4 text-emerald-400" />;
+      case "Archived": return <Clock className="size-4 text-fog/50" />;
+      default: return <FileText className="size-4 text-amber-400" />;
+    }
+  };
+
+  const columns: Column<Process>[] = [
+    {
+      key: "name",
+      label: "نام",
+      render: (item) => (
+        <Link
+          href={`/orghead/processes/${item._id}`}
+          className="text-moonlight hover:text-electric-iris transition-colors font-medium"
+        >
+          {item.name || "—"}
+        </Link>
+      ),
+    },
+    {
+      key: "status",
+      label: "وضعیت",
+      render: (item) => {
+        const info = statusLabels[item.status || ""] || { label: item.status || "—", variant: "inactive" as const };
+        return <StatusBadge status={info.variant} label={info.label} />;
+      },
+    },
+    {
+      key: "version",
+      label: "نسخه",
+      render: (item) => (
+        <span className="text-fog text-sm font-mono">v{item.version || 1}</span>
+      ),
+      hideOnCard: true,
+    },
+    {
+      key: "isActive",
+      label: "فعال",
+      render: (item) => (
+        <StatusBadge
+          status={item.isActive ? "active" : "inactive"}
+          label={item.isActive ? "فعال" : "غیرفعال"}
+        />
+      ),
+    },
+    {
+      key: "scope",
+      label: "حوزه کاربرد",
+      render: (item) => {
+        const scope = hasProcessScope(item) ? getProcessScopeLabel(item) : "عمومی";
+        return (
+          <div className="flex items-center gap-1.5">
+            <Target className="size-3 text-fog/40" />
+            <span className="text-fog text-sm">{scope}</span>
+          </div>
+        );
+      },
+      hideOnCard: true,
+    },
+    {
+      key: "createdBy",
+      label: "ایجادکننده",
+      render: (item) => (
+        <span className="text-moonlight text-sm">
+          {item.createdBy ? `${item.createdBy.first_name} ${item.createdBy.last_name}` : "—"}
+        </span>
+      ),
+      hideOnCard: true,
+    },
+    {
+      key: "createdAt",
+      label: "تاریخ ایجاد",
+      render: (item) => (
+        <span className="text-fog text-sm">
+          {item.createdAt ? new Date(item.createdAt).toLocaleDateString("fa-IR") : "—"}
+        </span>
+      ),
+      hideOnCard: true,
+    },
+    {
+      key: "actions",
+      label: "",
+      render: (item) => (
+        <div className="flex items-center gap-1">
+          <Link href={`/orghead/processes/${item._id}`}>
+            <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100" title="ویرایش">
+              <Pencil className="size-3.5" />
+            </Button>
+          </Link>
+          <Link href={`/orghead/processes/${item._id}/graph`}>
+            <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 text-fog/60 hover:text-electric-iris" title="نمودار">
+              <BarChart3 className="size-3.5" />
+            </Button>
+          </Link>
+          <Link href={`/orghead/processes/${item._id}/steps`}>
+            <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 text-fog/60 hover:text-frost-link" title="گام‌ها">
+              <List className="size-3.5" />
+            </Button>
+          </Link>
+          <Link href={`/orghead/processes/${item._id}/relations`}>
+            <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 text-fog/60 hover:text-amber-400" title="روابط">
+              <Share2 className="size-3.5" />
+            </Button>
+          </Link>
+          {item.status === "Draft" && (
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              className="opacity-60 group-hover/row:opacity-100 text-fog/60 hover:text-emerald-400"
+              onClick={() => handleActivate(item)}
+              title="فعال‌سازی"
+            >
+              <CheckCircle2 className="size-3.5" />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            className="opacity-60 group-hover/row:opacity-100 text-fog/60 hover:text-frost-link"
+            onClick={() => handleDuplicate(item)}
+            title="کپی"
+          >
+            <Copy className="size-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            className="opacity-60 group-hover/row:opacity-100 text-fog/60 hover:text-destructive"
+            onClick={() => setDeleteTarget(item)}
+            title="حذف"
+          >
+            <Trash2 className="size-3.5" />
+          </Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="فرآیندها" description="مدیریت فرآیندهای خرید سازمان">
-        <Link href="/orghead/processes/add">
-          <Button size="sm" className="gap-1.5">
-            <Plus className="size-4" />
-            فرآیند جدید
-          </Button>
-        </Link>
-      </PageHeader>
+    <div className="space-y-6 relative">
+      <div className="relative z-[1]">
+        <PageHeader
+          title="فرآیندها"
+          description="مدیریت فرآیندهای خرید سازمان"
+        >
+          <Link href="/orghead/processes/add">
+            <Button size="sm" className="gap-1.5">
+              <Plus className="size-4" />
+              فرآیند جدید
+            </Button>
+          </Link>
+        </PageHeader>
+      </div>
 
-      <FilterBar search={search} onSearchChange={handleSearch} searchPlaceholder="جستجوی فرآیند..." />
+      <FilterBar
+        search={search}
+        onSearchChange={handleSearch}
+        searchPlaceholder="جستجوی فرآیند..."
+      />
 
       <DataTable
-        columns={[]}
+        columns={columns}
         data={items}
         keyExtractor={(item) => item._id}
-        cardView={true}
+        cardView={cardView}
+        onViewToggle={() => setCardView((v) => !v)}
+        renderCard={(item) => (
+          <div className="glass-card glass-card-hover-active rounded-xl p-5 transition-all duration-200">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="size-10 rounded-xl bg-electric-iris/10 border border-electric-iris/15 flex items-center justify-center shrink-0">
+                  <Workflow className="size-5 text-electric-iris" />
+                </div>
+                <div className="min-w-0 space-y-1">
+                  <Link
+                    href={`/orghead/processes/${item._id}`}
+                    className="text-base font-semibold text-moonlight hover:text-electric-iris transition-colors leading-6 truncate block"
+                  >
+                    {item.name || "—"}
+                  </Link>
+                  <div className="flex items-center gap-2">
+                    {statusIcon(item.status)}
+                    <span className="text-xs text-fog/60">
+                      {statusLabels[item.status || ""]?.label || item.status || "—"}
+                    </span>
+                    <span className="text-xs text-fog/40">•</span>
+                    <span className="text-xs text-fog/50 font-mono">v{item.version || 1}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col items-end gap-1.5 shrink-0">
+                <StatusBadge
+                  status={item.isActive ? "active" : "inactive"}
+                  label={item.isActive ? "فعال" : "غیرفعال"}
+                />
+                <span className="text-[10px] text-electric-iris/60">
+                  {hasProcessScope(item) ? getProcessScopeLabel(item) : "عمومی"}
+                </span>
+              </div>
+            </div>
+            {item.description && (
+              <p className="mt-3 text-sm text-fog/60 leading-relaxed line-clamp-2">
+                {item.description}
+              </p>
+            )}
+            <div className="flex items-center justify-between mt-4 pt-3 border-t border-steel-border/10">
+              <div className="flex items-center gap-1">
+                <Link href={`/orghead/processes/${item._id}`}>
+                  <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-moonlight" title="ویرایش">
+                    <Pencil className="size-3.5" />
+                  </Button>
+                </Link>
+                <Link href={`/orghead/processes/${item._id}/graph`}>
+                  <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-electric-iris" title="نمودار">
+                    <BarChart3 className="size-3.5" />
+                  </Button>
+                </Link>
+                <Link href={`/orghead/processes/${item._id}/steps`}>
+                  <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-frost-link" title="گام‌ها">
+                    <List className="size-3.5" />
+                  </Button>
+                </Link>
+                <Link href={`/orghead/processes/${item._id}/relations`}>
+                  <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-amber-400" title="روابط">
+                    <Share2 className="size-3.5" />
+                  </Button>
+                </Link>
+                {item.status === "Draft" && (
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
+                    className="text-fog/60 hover:text-emerald-400"
+                    title="فعال‌سازی"
+                    onClick={() => handleActivate(item)}
+                  >
+                    <CheckCircle2 className="size-3.5" />
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon-xs"
+                  className="text-fog/60 hover:text-frost-link"
+                  title="کپی"
+                  onClick={() => handleDuplicate(item)}
+                >
+                  <Copy className="size-3.5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-xs"
+                  className="text-fog/60 hover:text-destructive"
+                  title="حذف"
+                  onClick={() => setDeleteTarget(item)}
+                >
+                  <XCircle className="size-3.5" />
+                </Button>
+              </div>
+              <div className="flex items-center gap-2">
+                {item.createdBy && (
+                  <span className="text-[10px] text-fog/40 hidden sm:inline">
+                    {item.createdBy.first_name} {item.createdBy.last_name}
+                  </span>
+                )}
+                {item.createdAt && (
+                  <span className="text-[10px] text-fog/40">
+                    {new Date(item.createdAt).toLocaleDateString("fa-IR")}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
         emptyTitle="فرآیندی یافت نشد"
         emptyDescription="هنوز هیچ فرآیندی ایجاد نشده است."
         emptyAction={
@@ -96,132 +390,17 @@ export function ProcessesClient({ items, prevPageUrl, nextPageUrl, page, search 
             </Button>
           </Link>
         }
-        renderCard={(item) => {
-          const status = statusConfig[item.status || ""] || statusConfig.Draft
-          const StatusIcon = status.icon
-
-          return (
-            <div className="glass-card glass-card-hover-active rounded-xl overflow-hidden transition-all duration-200">
-              {/* Header */}
-              <div className="flex items-center gap-3 p-4 border-b border-white/[0.04]">
-                <div className="size-10 rounded-xl flex items-center justify-center shrink-0 ring-1 ring-inset ring-white/[0.06] bg-electric-iris/10">
-                  <Workflow className="size-5 text-electric-iris" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <Link
-                      href={`/orghead/processes/${item._id}`}
-                      className="text-sm font-semibold text-moonlight hover:text-electric-iris transition-colors truncate leading-5"
-                    >
-                      {item.name || "—"}
-                    </Link>
-                    <span className="text-[10px] text-fog/40 font-mono shrink-0">v{item.version || 1}</span>
-                  </div>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className={cn(
-                      "text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-1",
-                      status.bg,
-                    )}>
-                      <StatusIcon className={cn("size-3", status.color)} />
-                      <span className={status.color}>{status.label}</span>
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <Link href={`/orghead/processes/${item._id}`}>
-                    <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-moonlight">
-                      <Pencil className="size-3.5" />
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    size="icon-xs"
-                    className="text-fog/60 hover:text-destructive"
-                    onClick={() => setDeleteTarget(item)}
-                  >
-                    <Trash2 className="size-3.5" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* 3-col info row */}
-              <div className="grid grid-cols-3 gap-px bg-white/[0.04]">
-                <div className="p-3 text-center bg-[#05060f]/60">
-                  <p className="text-[10px] text-fog/50">وضعیت</p>
-                  <div className="flex items-center justify-center gap-1 mt-0.5">
-                    <StatusIcon className={cn("size-4", status.color)} />
-                    <span className={cn("text-xs font-semibold", status.color)}>{status.label}</span>
-                  </div>
-                </div>
-                <div className="p-3 text-center bg-[#05060f]/60">
-                  <p className="text-[10px] text-fog/50">حوزه</p>
-                  <p className="text-xs font-semibold text-moonlight truncate leading-6">
-                    {item.unit?.name || "عمومی"}
-                  </p>
-                </div>
-                <div className="p-3 text-center bg-[#05060f]/60">
-                  <p className="text-[10px] text-fog/50">فعالیت</p>
-                  <p className={cn(
-                    "text-xs font-semibold leading-6",
-                    item.isActive ? "text-emerald-400" : "text-rose-400",
-                  )}>
-                    {item.isActive ? "فعال" : "غیرفعال"}
-                  </p>
-                </div>
-              </div>
-
-              {/* Details */}
-              <div className="p-4 space-y-1">
-                <div className="grid grid-cols-2 gap-x-6 gap-y-1">
-                  <div className="flex items-center gap-2">
-                    <Target className="size-3.5 text-fog/30 shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-[10px] text-fog/40">حوزه کاربرد</p>
-                      <p className="text-xs text-moonlight truncate">{item.unit?.name || "عمومی"}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Building2 className="size-3.5 text-fog/30 shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-[10px] text-fog/40">سازمان</p>
-                      <p className="text-xs text-moonlight truncate">{item.organization?.name || "—"}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CalendarDays className="size-3.5 text-fog/30 shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-[10px] text-fog/40">تاریخ ایجاد</p>
-                      <p className="text-xs text-moonlight">
-                        {item.createdAt ? new Date(item.createdAt).toLocaleDateString("fa-IR") : "—"}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FileText className="size-3.5 text-fog/30 shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-[10px] text-fog/40">نسخه</p>
-                      <p className="text-xs text-moonlight font-mono">v{item.version || 1}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {item.description && (
-                  <div className="pt-2 mt-2 border-t border-white/[0.04]">
-                    <p className="text-[10px] text-fog/40 mb-0.5">توضیحات</p>
-                    <p className="text-xs text-fog/70 leading-relaxed line-clamp-2">{item.description}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-        }}
       />
 
-      <Pagination prevUrl={prevPageUrl} nextUrl={nextPageUrl} page={page} />
+      <Pagination
+        prevUrl={prevPageUrl}
+        nextUrl={nextPageUrl}
+        page={page}
+      />
 
       <ConfirmDialog
         open={!!deleteTarget}
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
         title="حذف فرآیند"
         description={`آیا از حذف "${deleteTarget?.name || 'این فرآیند'}" اطمینان دارید؟ این اقدام قابل بازگشت نیست.`}
         confirmLabel="حذف"
@@ -229,5 +408,5 @@ export function ProcessesClient({ items, prevPageUrl, nextPageUrl, page, search 
         loading={deleting}
       />
     </div>
-  )
+  );
 }

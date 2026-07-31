@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form"
 import { zodV4Resolver } from "@/lib/zod-v4-resolver"
 import { z } from "zod"
 import { toast } from "sonner"
-import { ArrowRight, Loader2, Trash2, Workflow, CheckCircle2, Target } from "lucide-react"
+import { ArrowRight, Loader2, Trash2, Workflow, CheckCircle2, Target, Copy, List, BarChart3, Share2, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { FormInput } from "@/components/form/form-input"
 import { FormTextarea } from "@/components/form/form-textarea"
@@ -21,7 +21,9 @@ import { get } from "@/app/actions/process/get"
 import { update } from "@/app/actions/process/update"
 import { remove } from "@/app/actions/process/remove"
 import { activateProcess } from "@/app/actions/process/activateProcess"
+import { duplicateProcess } from "@/app/actions/process/duplicateProcess"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
+import { getProcessScopeChain, hasProcessScope } from "@/lib/process-scope"
 import Link from "next/link"
 
 const processSchema = z.object({
@@ -76,6 +78,11 @@ export default function EditProcessPage({ params }: { params: Promise<{ id: stri
           organization: { _id: 1, name: 1 },
           createdBy: { _id: 1, first_name: 1, last_name: 1 },
           unit: { _id: 1, name: 1 },
+          wareType: { _id: 1, name: 1 },
+          wareClass: { _id: 1, name: 1 },
+          wareGroup: { _id: 1, name: 1 },
+          wareModel: { _id: 1, name: 1 },
+          ware: { _id: 1, name: 1 },
           steps: { _id: 1, name: 1, description: 1, stepType: 1, order: 1, required: 1, groupsOperator: 1 },
         },
       )
@@ -125,6 +132,20 @@ export default function EditProcessPage({ params }: { params: Promise<{ id: stri
     }
   }
 
+  const handleDuplicate = async () => {
+    const result = await duplicateProcess({
+      activeRoleId: getActiveRoleIdFromStore(),
+      _id: id,
+      name: `${process?.name || "فرآیند"} (کپی)`,
+    })
+    if (result.success) {
+      toast.success("فرآیند با موفقیت کپی شد")
+      router.refresh()
+    } else {
+      toast.error(result.body?.message || "خطا در کپی فرآیند")
+    }
+  }
+
   if (loading) return <LoadingSkeleton type="card" count={1} />
 
   if (notFound) {
@@ -144,6 +165,13 @@ export default function EditProcessPage({ params }: { params: Promise<{ id: stri
   }
 
   const steps = (process?.steps || []).sort((a: { order?: number }, b: { order?: number }) => (a.order || 0) - (b.order || 0))
+  const scopeChain = hasProcessScope(process) ? getProcessScopeChain(process) : []
+
+  const subRoutes = [
+    { href: `/orghead/processes/${id}/graph`, icon: BarChart3, label: "نمودار", hint: "جریان فرآیند" },
+    { href: `/orghead/processes/${id}/steps`, icon: List, label: "گام‌ها", hint: "مدیریت گام‌ها" },
+    { href: `/orghead/processes/${id}/relations`, icon: Share2, label: "روابط", hint: "واحدها و مسئولین" },
+  ]
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
@@ -161,6 +189,10 @@ export default function EditProcessPage({ params }: { params: Promise<{ id: stri
               فعال‌سازی
             </Button>
           )}
+          <Button variant="ghost" size="sm" className="text-frost-link gap-1.5" onClick={handleDuplicate}>
+            <Copy className="size-4" />
+            کپی
+          </Button>
           <Button variant="ghost" size="sm" className="text-destructive gap-1.5" onClick={() => setShowDelete(true)}>
             <Trash2 className="size-4" />
             حذف
@@ -175,11 +207,40 @@ export default function EditProcessPage({ params }: { params: Promise<{ id: stri
             <StatusBadge status={statusLabels[process.status]?.variant || "inactive"} label={statusLabels[process.status]?.label || process.status} />
           )}
         </div>
-        {process?.unit && (
-          <span className="text-[11px] px-2 py-1 rounded-full bg-electric-iris/8 text-electric-iris/80 border border-electric-iris/15">
-            واحد: {process.unit.name}
+        {scopeChain.length > 0 ? (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <Target className="size-3.5 text-electric-iris/70" />
+            {scopeChain.map((chip) => (
+              <span key={chip} className="text-[11px] px-2 py-1 rounded-full bg-electric-iris/8 text-electric-iris/80 border border-electric-iris/15">
+                {chip}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <span className="text-[11px] px-2 py-1 rounded-full bg-white/[0.03] text-fog/60 border border-steel-border/15">
+            حوزه کاربرد: عمومی سازمان
           </span>
         )}
+        {process?.organization?.name && (
+          <span className="text-[11px] px-2 py-1 rounded-full bg-white/[0.03] text-fog/60 border border-steel-border/15 flex items-center gap-1">
+            <MapPin className="size-3" />
+            {process.organization.name}
+          </span>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {subRoutes.map(({ href, icon: Icon, label, hint }) => (
+          <Link key={href} href={href} className="glass-card glass-card-hover-active rounded-xl p-4 flex items-center gap-3 transition-all duration-200 group">
+            <div className="size-9 rounded-xl bg-electric-iris/10 border border-electric-iris/15 flex items-center justify-center shrink-0">
+              <Icon className="size-4.5 text-electric-iris" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-moonlight">{label}</p>
+              <p className="text-xs text-fog/50">{hint}</p>
+            </div>
+          </Link>
+        ))}
       </div>
 
       <Form {...form}>
@@ -202,6 +263,9 @@ export default function EditProcessPage({ params }: { params: Promise<{ id: stri
           <Workflow className="size-5 text-electric-iris" />
           <h2 className="text-base font-medium text-glacier">گام‌های فرآیند</h2>
           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-electric-iris/8 text-electric-iris/70">{steps.length} گام</span>
+          <Link href={`/orghead/processes/${id}/steps`} className="ms-auto text-xs text-frost-link hover:text-electric-iris transition-colors">
+            مدیریت گام‌ها
+          </Link>
         </div>
 
         {steps.length === 0 ? (
