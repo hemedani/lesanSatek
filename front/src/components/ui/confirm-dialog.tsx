@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useEffect, useId } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { createRoot } from "react-dom/client"
 import { AlertTriangle, Loader2 } from "lucide-react"
 import {
@@ -42,17 +42,19 @@ function ConfirmDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm" dir="rtl" data-confirm-dialog={dialogId}>
         <DialogHeader>
-          <div className="flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-full bg-ember/10 shrink-0">
+          <div className="flex items-start gap-3">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-ember/10 ring-1 ring-inset ring-ember/20">
               <AlertTriangle className="size-5 text-ember" />
             </div>
-            <DialogTitle className="text-heading-sm font-medium text-moonlight">
-              {title}
-            </DialogTitle>
+            <div className="min-w-0">
+              <DialogTitle className="text-moonlight">
+                {title}
+              </DialogTitle>
+              <DialogDescription className="mt-1.5">
+                {description}
+              </DialogDescription>
+            </div>
           </div>
-          <DialogDescription className="text-fog body-sm mt-1">
-            {description}
-          </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button
@@ -61,7 +63,7 @@ function ConfirmDialog({
             disabled={loading}
             className="gap-1.5"
           >
-            {loading && <Loader2 className="size-4 animate-spin" />}
+            {loading && <Loader2 className="size-5 animate-spin" />}
             {confirmLabel}
           </Button>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
@@ -98,11 +100,6 @@ export function confirmDialog(options: ConfirmDialogOptions): Promise<boolean> {
         setLoading(true)
         resolve(true)
         setOpen(false)
-      }, [])
-
-      const handleCancel = useCallback(() => {
-        setOpen(false)
-        resolve(false)
       }, [])
 
       useEffect(() => {
