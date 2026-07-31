@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, Store } from "lucide-react";
+import Link from "next/link";
+import { Plus, Pencil, Trash2, Store, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
@@ -190,7 +191,12 @@ export function StoresClient({
             <Store className="size-3.5 text-electric-iris" />
           </div>
           <div className="min-w-0">
-            <span className="text-moonlight font-medium">{item.name || "—"}</span>
+            <Link
+              href={`/admin/stores/${item._id}`}
+              className="text-moonlight font-medium transition-colors hover:text-frost-link"
+            >
+              {item.name || "—"}
+            </Link>
           </div>
         </div>
       ),
@@ -231,6 +237,9 @@ export function StoresClient({
       label: "",
       render: (item) => (
         <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200 text-fog/60 hover:text-frost-link" onClick={() => router.push(`/admin/stores/${item._id}`)}>
+            <ExternalLink className="size-3.5" />
+          </Button>
           <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200" onClick={() => openEdit(item)}>
             <Pencil className="size-3.5" />
           </Button>
@@ -264,7 +273,7 @@ export function StoresClient({
         cardView={cardView}
         onViewToggle={() => setCardView((v) => !v)}
         renderCard={(item) => (
-          <div className="glass-card glass-card-hover-active rounded-xl p-5 transition-all duration-200 cursor-pointer" onClick={() => openEdit(item)}>
+          <div className="glass-card glass-card-hover-active rounded-xl p-5 transition-all duration-200 cursor-pointer" onClick={() => router.push(`/admin/stores/${item._id}`)}>
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="size-10 rounded-xl bg-electric-iris/10 flex items-center justify-center shrink-0">
@@ -279,6 +288,9 @@ export function StoresClient({
                 </div>
               </div>
               <div className="flex items-center gap-1 shrink-0">
+                <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-frost-link" onClick={(e) => { e.stopPropagation(); router.push(`/admin/stores/${item._id}`); }}>
+                  <ExternalLink className="size-3.5" />
+                </Button>
                 <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-moonlight" onClick={(e) => { e.stopPropagation(); openEdit(item); }}>
                   <Pencil className="size-3.5" />
                 </Button>
