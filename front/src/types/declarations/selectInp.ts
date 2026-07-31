@@ -138144,6 +138144,10 @@ location?: (0 | 1 );
 set: {
 activeRoleId: string;
 _id: string;
+storeHeadId?: string;
+cityId?: string;
+stateId?: string;
+wareTypeIds?: string[];
 };
 get: {
 _id?: (0 | 1 );

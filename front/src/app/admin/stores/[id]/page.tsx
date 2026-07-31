@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { FormInput } from "@/components/form/form-input";
 import { FormSelect } from "@/components/form/form-select";
+import { FormSearchMultiSelect } from "@/components/form/form-search-multi-select";
 import { FormTextarea } from "@/components/form/form-textarea";
 import { FormCheckbox } from "@/components/form/form-checkbox";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -22,7 +23,9 @@ import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 import { useAuthStore } from "@/stores/authStore";
 import { get } from "@/app/actions/store/get";
 import { update } from "@/app/actions/store/update";
+import { updateRelations } from "@/app/actions/store/updateRelations";
 import { remove } from "@/app/actions/store/remove";
+import { gets as getWareTypes } from "@/app/actions/wareType/gets";
 import { LocationPicker } from "@/components/ui/location-picker";
 import type { GeoPoint } from "@/components/ui/location-picker";
 
@@ -47,6 +50,7 @@ const storeSchema = z.object({
   isAvailableInHolidays: z.boolean().default(false),
   score: z.string().default("0"),
   status: z.string().min(1, "وضعیت الزامی است"),
+  wareTypeIds: z.array(z.string()).optional(),
 });
 
 type StoreData = z.infer<typeof storeSchema>;
@@ -61,6 +65,7 @@ export default function EditStorePage() {
   const [deleting, setDeleting] = useState(false);
   const [denied, setDenied] = useState(false);
   const [geoLocation, setGeoLocation] = useState<GeoPoint>(null);
+  const [nameMap, setNameMap] = useState<Record<string, string>>({});
 
   const { user } = useAuthStore();
   const activeRole = user?.roles?.find((r) => r.roleId === getActiveRoleIdFromStore());
@@ -89,6 +94,7 @@ export default function EditStorePage() {
       isAvailableInHolidays: false,
       score: "0",
       status: "Active",
+      wareTypeIds: [],
     },
   });
 
@@ -107,11 +113,13 @@ export default function EditStorePage() {
         legalPerson: 1, bankCardNumber: 1, shebaNumber: 1,
         nameOfAccountHolder: 1, bankName: 1, fastDelivery: 1,
         isAvailableInHolidays: 1, score: 1, status: 1,
-        geoLocation: 1,
+        geoLocation: 1, wareTypes: { _id: 1, name: 1 },
       });
       if (result.success && result.body?.[0]) {
         const s = result.body[0];
         if (s.geoLocation) setGeoLocation(s.geoLocation);
+        const wareTypes = (s.wareTypes || []) as { _id: string; name?: string }[];
+        setNameMap(Object.fromEntries(wareTypes.map((w) => [w._id, w.name || ""])));
         form.reset({
           name: s.name || "",
           address: s.address || "",
@@ -133,6 +141,7 @@ export default function EditStorePage() {
           isAvailableInHolidays: s.isAvailableInHolidays ?? false,
           score: String(s.score ?? 0),
           status: s.status || "Active",
+          wareTypeIds: wareTypes.map((w) => w._id),
         });
       } else {
         toast.error("فروشگاه یافت نشد");
@@ -174,7 +183,19 @@ export default function EditStorePage() {
         { _id: 1, name: 1 }
       );
       if (result.success) {
-        toast.success("فروشگاه با موفقیت به‌روزرسانی شد.");
+        const relationsResult = await updateRelations(
+          {
+            activeRoleId: getActiveRoleIdFromStore(),
+            _id: id,
+            wareTypeIds: values.wareTypeIds || [],
+          },
+          { _id: 1, name: 1 }
+        );
+        if (relationsResult.success) {
+          toast.success("فروشگاه با موفقیت به‌روزرسانی شد.");
+        } else {
+          toast.error(relationsResult.body?.message || "خطا در به‌روزرسانی روابط فروشگاه");
+        }
       } else {
         toast.error(result.body?.message || "خطا در به‌روزرسانی فروشگاه");
       }
@@ -235,9 +256,12 @@ export default function EditStorePage() {
       <div className="relative z-[1]">
         <div className="flex items-center justify-between pb-4 border-b border-steel-border/50">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon-sm" onClick={() => router.push("/admin/stores")} className="rounded-lg">
-              <ArrowRight className="size-4" />
-            </Button>
+            <Link href="/admin/stores">
+              <Button variant="ghost" size="sm" className="text-frost-link gap-1.5">
+                <ArrowRight className="size-4 ms-1" />
+                بازگشت به لیست
+              </Button>
+            </Link>
             <div>
               <h1 className="text-xl font-semibold text-moonlight tracking-tight">ویرایش فروشگاه</h1>
               <p className="text-sm text-fog/60 mt-1">به‌روزرسانی اطلاعات فروشگاه</p>
@@ -288,6 +312,27 @@ export default function EditStorePage() {
                   required
                 />
               </div>
+              <FormSearchMultiSelect
+                control={form.control}
+                name="wareTypeIds"
+                label="انواع کالا"
+                placeholder="انواع کالای قابل تأمین را انتخاب کنید..."
+                fetcher={async (search?: string) => {
+                  const result = await getWareTypes(
+                    { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 100, search: search || undefined },
+                    { _id: 1, name: 1 }
+                  );
+                  if (!result.success || !result.body) return [];
+                  return result.body.map((t: { _id?: string; name?: string }) => ({
+                    _id: t._id || "",
+                    name: t.name || "",
+                  }));
+                }}
+                nameMap={nameMap}
+                onSelectData={(option) =>
+                  setNameMap((prev) => ({ ...prev, [option._id]: option.name }))
+                }
+              />
             </CardContent>
           </Card>
 

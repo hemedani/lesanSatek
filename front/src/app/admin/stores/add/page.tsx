@@ -15,10 +15,12 @@ import { FormSelect } from "@/components/form/form-select";
 import { FormTextarea } from "@/components/form/form-textarea";
 import { FormCheckbox } from "@/components/form/form-checkbox";
 import { FormSearchSelect } from "@/components/form/form-search-select";
+import { FormSearchMultiSelect } from "@/components/form/form-search-multi-select";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 import { add } from "@/app/actions/store/add";
 import { gets as getStates } from "@/app/actions/state/gets";
 import { gets as getCities } from "@/app/actions/city/gets";
+import { gets as getWareTypes } from "@/app/actions/wareType/gets";
 import { LocationPicker } from "@/components/ui/location-picker";
 import type { GeoPoint } from "@/components/ui/location-picker";
 
@@ -45,6 +47,7 @@ const storeSchema = z.object({
   status: z.string().min(1, "وضعیت الزامی است"),
   stateId: z.string().optional(),
   cityId: z.string().optional(),
+  wareTypeIds: z.array(z.string()).optional(),
 });
 
 type StoreData = z.infer<typeof storeSchema>;
@@ -53,6 +56,7 @@ export default function AddStorePage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [geoLocation, setGeoLocation] = useState<GeoPoint>(null);
+  const [nameMap, setNameMap] = useState<Record<string, string>>({});
 
   const form = useForm<StoreData>({
     resolver: zodV4Resolver(storeSchema),
@@ -79,6 +83,7 @@ export default function AddStorePage() {
       status: "Active",
       stateId: "",
       cityId: "",
+      wareTypeIds: [],
     },
   });
 
@@ -112,6 +117,7 @@ export default function AddStorePage() {
           totalSoldNum: 0,
           cityId: values.cityId || undefined,
           stateId: values.stateId || undefined,
+          wareTypeIds: values.wareTypeIds || [],
           ...(geoLocation ? { geoLocation } : {}),
         },
         { _id: 1, name: 1 }
@@ -176,6 +182,27 @@ export default function AddStorePage() {
                   required
                 />
               </div>
+              <FormSearchMultiSelect
+                control={form.control}
+                name="wareTypeIds"
+                label="انواع کالا"
+                placeholder="انواع کالای قابل تأمین را انتخاب کنید..."
+                fetcher={async (search?: string) => {
+                  const result = await getWareTypes(
+                    { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 100, search: search || undefined },
+                    { _id: 1, name: 1 }
+                  );
+                  if (!result.success || !result.body) return [];
+                  return result.body.map((t: { _id?: string; name?: string }) => ({
+                    _id: t._id || "",
+                    name: t.name || "",
+                  }));
+                }}
+                nameMap={nameMap}
+                onSelectData={(option) =>
+                  setNameMap((prev) => ({ ...prev, [option._id]: option.name }))
+                }
+              />
             </CardContent>
           </Card>
 
