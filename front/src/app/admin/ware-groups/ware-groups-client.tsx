@@ -20,10 +20,13 @@ import { Form } from "@/components/ui/form";
 import { FormInput } from "@/components/form/form-input";
 import { FormSearchSelect } from "@/components/form/form-search-select";
 import type { SearchSelectOption } from "@/components/form/form-search-select";
+import { FormSearchMultiSelect } from "@/components/form/form-search-multi-select";
 import { remove } from "@/app/actions/wareGroup/remove";
 import { add } from "@/app/actions/wareGroup/add";
 import { update } from "@/app/actions/wareGroup/update";
+import { updateRelations } from "@/app/actions/wareGroup/updateRelations";
 import { gets as getWareTypes } from "@/app/actions/wareType/gets";
+import { gets as getWareClasses } from "@/app/actions/wareClass/gets";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 
 interface WareType {
@@ -59,6 +62,7 @@ const wareGroupSchema = z.object({
   name: z.string().min(1, "نام گروه کالا الزامی است"),
   enName: z.string().optional(),
   wareTypeId: z.string().min(1, "انتخاب نوع کالا الزامی است"),
+  wareClassIds: z.array(z.string()).optional(),
 });
 
 type WareGroupData = z.infer<typeof wareGroupSchema>;
@@ -88,11 +92,29 @@ export function WareGroupsClient({
   const [deleting, setDeleting] = useState(false);
   const [editTarget, setEditTarget] = useState<WareGroup | null>(null);
   const [showDialog, setShowDialog] = useState(false);
+  const [nameMap, setNameMap] = useState<Record<string, string>>({});
 
   const form = useForm<WareGroupData>({
     resolver: zodV4Resolver(wareGroupSchema),
-    defaultValues: { name: "", enName: "", wareTypeId: "" },
+    defaultValues: { name: "", enName: "", wareTypeId: "", wareClassIds: [] },
   });
+
+  const wareClassFetcher = async (q?: string): Promise<SearchSelectOption[]> => {
+    const wareTypeId = form.getValues("wareTypeId");
+    const result = await getWareClasses(
+      {
+        activeRoleId: getActiveRoleIdFromStore(),
+        page: 1,
+        limit: 100,
+        search: q,
+        ...(wareTypeId ? { wareTypeId } : {}),
+      },
+      { _id: 1, name: 1 }
+    );
+    if (!result.success) return [];
+    const items: WareClass[] = result.body;
+    return items.map((c) => ({ _id: c._id, name: c.name || "" }));
+  };
 
   const handleSearch = (value: string) => {
     const params = new URLSearchParams();
@@ -109,7 +131,8 @@ export function WareGroupsClient({
   };
 
   const openAdd = () => {
-    form.reset({ name: "", enName: "", wareTypeId: "" });
+    form.reset({ name: "", enName: "", wareTypeId: "", wareClassIds: [] });
+    setNameMap({});
     setEditTarget(null);
     setShowDialog(true);
   };
@@ -119,7 +142,11 @@ export function WareGroupsClient({
       name: item.name || "",
       enName: item.enName || "",
       wareTypeId: item.wareType?._id || "",
+      wareClassIds: (item.wareClasses || []).map((c) => c._id),
     });
+    setNameMap(
+      Object.fromEntries((item.wareClasses || []).map((c) => [c._id, c.name || ""]))
+    );
     setEditTarget(item);
     setShowDialog(true);
   };
@@ -130,16 +157,29 @@ export function WareGroupsClient({
         { activeRoleId: getActiveRoleIdFromStore(), _id: editTarget._id, name: data.name, enName: data.enName || undefined },
         { _id: 1, name: 1 }
       );
-      if (result.success) {
+      if (!result.success) {
+        toast.error(result.body?.message || "خطا در به‌روزرسانی گروه کالا");
+        return;
+      }
+      const relationsResult = await updateRelations(
+        {
+          activeRoleId: getActiveRoleIdFromStore(),
+          _id: editTarget._id,
+          wareTypeId: data.wareTypeId,
+          wareClassIds: data.wareClassIds || [],
+        },
+        { _id: 1, name: 1 }
+      );
+      if (relationsResult.success) {
         toast.success("گروه کالا با موفقیت به‌روزرسانی شد");
         router.refresh();
         setShowDialog(false);
       } else {
-        toast.error(result.body?.message || "خطا در به‌روزرسانی گروه کالا");
+        toast.error(relationsResult.body?.message || "خطا در به‌روزرسانی روابط گروه کالا");
       }
     } else {
       const result = await add(
-        { activeRoleId: getActiveRoleIdFromStore(), name: data.name, enName: data.enName || undefined, wareTypeId: data.wareTypeId },
+        { activeRoleId: getActiveRoleIdFromStore(), name: data.name, enName: data.enName || undefined, wareTypeId: data.wareTypeId, wareClassIds: data.wareClassIds || [] },
         { _id: 1, name: 1 }
       );
       if (result.success) {
@@ -397,6 +437,22 @@ export function WareGroupsClient({
                 placeholder="نوع کالا را انتخاب کنید..."
                 fetcher={wareTypeFetcher}
                 required
+                disabled={form.formState.isSubmitting}
+                onValueChange={() => {
+                  form.setValue("wareClassIds", [], { shouldDirty: true });
+                }}
+              />
+
+              <FormSearchMultiSelect
+                control={form.control}
+                name="wareClassIds"
+                label="رده‌های کالا"
+                placeholder="رده‌های کالا را انتخاب کنید..."
+                fetcher={wareClassFetcher}
+                nameMap={nameMap}
+                onSelectData={(option) =>
+                  setNameMap((prev) => ({ ...prev, [option._id]: option.name }))
+                }
                 disabled={form.formState.isSubmitting}
               />
 
