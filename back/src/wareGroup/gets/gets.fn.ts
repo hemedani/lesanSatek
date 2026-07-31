@@ -1,9 +1,10 @@
 import type { ActFn, Document } from "lesan";
+import { ObjectId } from "lesan";
 import { wareGroup } from "../../../mod.ts";
 
 export const getsFn: ActFn = async (body) => {
 	const {
-		set: { page, limit, skip, search, sortBy, sortOrder },
+		set: { page, limit, skip, search, sortBy, sortOrder, wareTypeId, wareClassId },
 		get,
 	} = body.details;
 
@@ -12,6 +13,16 @@ export const getsFn: ActFn = async (body) => {
 	search &&
 		pipeline.push({
 			$match: { $text: { $search: search } },
+		});
+
+	wareTypeId &&
+		pipeline.push({
+			$match: { "wareType._id": new ObjectId(wareTypeId as string) },
+		});
+
+	wareClassId &&
+		pipeline.push({
+			$match: { "wareClasses._id": new ObjectId(wareClassId as string) },
 		});
 
 	if (search && (!sortBy || sortBy === "relevance")) {

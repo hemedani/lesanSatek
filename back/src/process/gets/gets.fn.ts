@@ -1,6 +1,7 @@
 import type { ActFn, Document } from "lesan";
 import { ObjectId } from "lesan";
-import { process } from "../../../mod.ts";
+import { process, coreApp } from "../../../mod.ts";
+import type { MyContext } from "@lib";
 
 export const getsFn: ActFn = async (body) => {
 	const {
@@ -12,11 +13,30 @@ export const getsFn: ActFn = async (body) => {
 			organizationId,
 			sortBy,
 			sortOrder,
+			activeRoleId,
 		},
 		get,
 	} = body.details;
 
+	const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
+
+	const activeRole = (user.roles || []).find(
+		(r: { roleId: string }) => r.roleId === activeRoleId,
+	) as { name: string; scopeType?: string; scopeId?: string } | undefined;
+
 	const pipeline: Document[] = [];
+
+	if (
+		!user.isGhost &&
+		!["Manager", "Admin"].includes(activeRole?.name as string) &&
+		activeRole?.name === "OrgHead" &&
+		activeRole.scopeType === "organization" &&
+		activeRole.scopeId
+	) {
+		pipeline.push({
+			$match: { "organization._id": new ObjectId(activeRole.scopeId) },
+		});
+	}
 
 	search &&
 		pipeline.push({
