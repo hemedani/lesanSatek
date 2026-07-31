@@ -14,6 +14,7 @@ interface SearchSelectOption {
   _id: string
   name: string
   sublabel?: string
+  data?: Record<string, unknown>
 }
 
 interface FormSearchSelectProps<
@@ -27,6 +28,9 @@ interface FormSearchSelectProps<
   fetcher: (search?: string) => Promise<SearchSelectOption[]>
   disabled?: boolean
   required?: boolean
+  onValueChange?: (value: string) => void
+  onSelectData?: (option: SearchSelectOption) => void
+  displayLabel?: string
 }
 
 const SearchSelect = React.forwardRef(function SearchSelect({
@@ -38,6 +42,8 @@ const SearchSelect = React.forwardRef(function SearchSelect({
   label,
   hasError,
   className,
+  onSelectData,
+  displayLabel,
 }: {
   value: string
   onChange: (value: string) => void
@@ -47,6 +53,8 @@ const SearchSelect = React.forwardRef(function SearchSelect({
   label: string
   hasError?: boolean
   className?: string
+  onSelectData?: (option: SearchSelectOption) => void
+  displayLabel?: string
 }, ref: React.Ref<HTMLButtonElement>) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState("")
@@ -84,9 +92,11 @@ const SearchSelect = React.forwardRef(function SearchSelect({
 
   const handleSelect = useCallback((selectedValue: string) => {
     onChange(selectedValue)
+    const option = options.find((o) => o._id === selectedValue)
+    if (option) onSelectData?.(option)
     setOpen(false)
     setSearch("")
-  }, [onChange])
+  }, [onChange, onSelectData, options])
 
   const handleOpenChange = useCallback((nextOpen: boolean) => {
     setOpen(nextOpen)
@@ -118,7 +128,7 @@ const SearchSelect = React.forwardRef(function SearchSelect({
           "flex-1 text-start truncate",
           value && "text-moonlight"
         )}>
-          {selectedOption ? selectedOption.name : placeholder}
+          {value ? (displayLabel || (selectedOption ? selectedOption.name : placeholder)) : placeholder}
         </span>
         <ChevronDownIcon className={cn(
           "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
@@ -218,6 +228,9 @@ function FormSearchSelect<
   fetcher,
   disabled,
   required,
+  onValueChange,
+  onSelectData,
+  displayLabel,
 }: FormSearchSelectProps<TFieldValues, TName>) {
   return (
     <FormField
@@ -232,12 +245,17 @@ function FormSearchSelect<
           <FormControl>
             <SearchSelect
               value={typeof field.value === "string" ? field.value : ""}
-              onChange={field.onChange}
+              onChange={(value) => {
+                field.onChange(value)
+                onValueChange?.(value)
+              }}
               placeholder={placeholder}
               fetcher={fetcher}
               disabled={disabled}
               label={label}
               hasError={!!fieldState.error}
+              onSelectData={onSelectData}
+              displayLabel={displayLabel}
             />
           </FormControl>
           <FormMessage />

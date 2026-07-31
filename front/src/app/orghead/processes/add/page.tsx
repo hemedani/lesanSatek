@@ -11,12 +11,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FormInput } from "@/components/form/form-input"
 import { FormTextarea } from "@/components/form/form-textarea"
 import { FormSection } from "@/components/form/form-section"
-import { FormSearchSelect } from "@/components/form/form-search-select"
 import { Form } from "@/components/ui/form"
 import { ProcessBuilder } from "@/components/process/process-builder"
+import { ProcessScopeFields } from "@/components/process/process-scope-fields"
 import { add as addProcess } from "@/app/actions/process/add"
 import { add as addStep } from "@/app/actions/processStep/add"
-import { gets as getUnits } from "@/app/actions/unit/gets"
+import { count as countProcesses } from "@/app/actions/process/count"
 import Link from "next/link"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
 import { useAuthStore } from "@/stores/authStore"
@@ -35,10 +35,34 @@ const processSchema = z.object({
   name: z.string().min(1, "نام فرآیند الزامی است"),
   description: z.string().optional(),
   unitId: z.string().optional(),
+  wareTypeId: z.string().optional(),
+  wareClassId: z.string().optional(),
+  wareGroupId: z.string().optional(),
+  wareModelId: z.string().optional(),
+  wareId: z.string().optional(),
   steps: z.array(stepSchema),
 })
 
 type ProcessData = z.infer<typeof processSchema>
+
+const checkScopeConflict = async (scope: Pick<ProcessData, "unitId" | "wareTypeId" | "wareClassId" | "wareGroupId" | "wareModelId" | "wareId">): Promise<string | null> => {
+  const scopeFilter: Record<string, string> = {}
+  for (const key of ["unitId", "wareTypeId", "wareClassId", "wareGroupId", "wareModelId", "wareId"] as const) {
+    if (scope[key]) scopeFilter[key] = scope[key]
+  }
+  if (Object.keys(scopeFilter).length === 0) return null
+
+  for (const status of ["Active", "Draft"] as const) {
+    const result = await countProcesses({ status, ...scopeFilter } as Parameters<typeof countProcesses>[0])
+    const qty = result.success ? result.body?.qty : 0
+    if (qty > 0) {
+      return status === "Active"
+        ? "یک فرآیند فعال با همین حوزه کاربرد وجود دارد. ابتدا آن را غیرفعال یا بایگانی کنید."
+        : "یک فرآیند پیش‌نویس با همین حوزه کاربرد وجود دارد. حوزه کاربرد را تغییر دهید یا فرآیند قبلی را تکمیل کنید."
+    }
+  }
+  return null
+}
 
 export default function AddProcessPage() {
   const router = useRouter()
@@ -48,6 +72,11 @@ export default function AddProcessPage() {
       name: "",
       description: "",
       unitId: "",
+      wareTypeId: "",
+      wareClassId: "",
+      wareGroupId: "",
+      wareModelId: "",
+      wareId: "",
       steps: [],
     },
   })
@@ -55,6 +84,13 @@ export default function AddProcessPage() {
   const onSubmit = async (data: ProcessData) => {
     const scope = useAuthStore.getState().getActiveScope();
     const organizationId = scope?.type === "organization" ? scope.id : "";
+
+    const conflict = await checkScopeConflict(data)
+    if (conflict) {
+      toast.error(conflict)
+      return
+    }
+
     const result = await addProcess(
       {
         activeRoleId: getActiveRoleIdFromStore(),
@@ -65,6 +101,11 @@ export default function AddProcessPage() {
         version: 1,
         isActive: true,
         ...(data.unitId ? { unitId: data.unitId } : {}),
+        ...(data.wareTypeId ? { wareTypeId: data.wareTypeId } : {}),
+        ...(data.wareClassId ? { wareClassId: data.wareClassId } : {}),
+        ...(data.wareGroupId ? { wareGroupId: data.wareGroupId } : {}),
+        ...(data.wareModelId ? { wareModelId: data.wareModelId } : {}),
+        ...(data.wareId ? { wareId: data.wareId } : {}),
       },
       { _id: 1, name: 1 },
     )
@@ -147,30 +188,13 @@ export default function AddProcessPage() {
                 <div>
                   <CardTitle className="text-glacier">حوزه کاربرد فرآیند</CardTitle>
                   <p className="text-sm text-fog/70 leading-relaxed mt-1">
-                    فرآیند را به یک واحد خاص محدود کنید. در صورت عدم انتخاب، فرآیند عمومی سازمان خواهد بود.
+                    فرآیند را به یک واحد یا سطحی از سلسله‌مراتب کالا محدود کنید. در صورت عدم انتخاب، فرآیند عمومی سازمان خواهد بود. انتخاب هر سطح، سطوح پایین‌تر را به صورت هوشمند فیلتر می‌کند.
                   </p>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <FormSearchSelect
-                control={form.control}
-                name="unitId"
-                label="واحد"
-                placeholder="انتخاب واحد..."
-                disabled={form.formState.isSubmitting}
-                fetcher={async (search?: string) => {
-                  const result = await getUnits(
-                    { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-                    { _id: 1, name: 1 },
-                  )
-                  if (!result.success || !result.body) return []
-                  return result.body.map((u: { _id?: string; name?: string }) => ({
-                    _id: u._id || "",
-                    name: u.name || "",
-                  }))
-                }}
-              />
+              <ProcessScopeFields form={form} disabled={form.formState.isSubmitting} />
             </CardContent>
           </Card>
 

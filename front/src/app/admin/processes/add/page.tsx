@@ -15,15 +15,11 @@ import { FormSearchSelect } from "@/components/form/form-search-select";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Form } from "@/components/ui/form";
 import { ProcessBuilder } from "@/components/process/process-builder";
+import { ProcessScopeFields } from "@/components/process/process-scope-fields";
 import { add as addProcess } from "@/app/actions/process/add";
 import { add as addStep } from "@/app/actions/processStep/add";
+import { count as countProcesses } from "@/app/actions/process/count";
 import { gets as getOrgs } from "@/app/actions/organization/gets";
-import { gets as getUnits } from "@/app/actions/unit/gets";
-import { gets as getWareTypes } from "@/app/actions/wareType/gets";
-import { gets as getWareClasses } from "@/app/actions/wareClass/gets";
-import { gets as getWareGroups } from "@/app/actions/wareGroup/gets";
-import { gets as getWareModels } from "@/app/actions/wareModel/gets";
-import { gets as getWares } from "@/app/actions/ware/gets";
 import Link from "next/link";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 
@@ -57,6 +53,28 @@ const processSchema = z.object({
 
 type ProcessData = z.infer<typeof processSchema>;
 
+const checkScopeConflict = async (
+  organizationId: string,
+  scope: Pick<ProcessData, "unitId" | "wareTypeId" | "wareClassId" | "wareGroupId" | "wareModelId" | "wareId">
+): Promise<string | null> => {
+  const scopeFilter: Record<string, string> = { organizationId };
+  for (const key of ["unitId", "wareTypeId", "wareClassId", "wareGroupId", "wareModelId", "wareId"] as const) {
+    if (scope[key]) scopeFilter[key] = scope[key];
+  }
+  if (Object.keys(scopeFilter).length === 1) return null;
+
+  for (const status of ["Active", "Draft"] as const) {
+    const result = await countProcesses({ status, ...scopeFilter } as Parameters<typeof countProcesses>[0]);
+    const qty = result.success ? result.body?.qty : 0;
+    if (qty > 0) {
+      return status === "Active"
+        ? "یک فرآیند فعال با همین حوزه کاربرد وجود دارد. ابتدا آن را غیرفعال یا بایگانی کنید."
+        : "یک فرآیند پیش‌نویس با همین حوزه کاربرد وجود دارد. حوزه کاربرد را تغییر دهید یا فرآیند قبلی را تکمیل کنید.";
+    }
+  }
+  return null;
+};
+
 export default function AddProcessPage() {
   const router = useRouter();
   const form = useForm<ProcessData>({
@@ -76,6 +94,12 @@ export default function AddProcessPage() {
   });
 
   const onSubmit = async (data: ProcessData) => {
+    const conflict = await checkScopeConflict(data.organizationId, data);
+    if (conflict) {
+      toast.error(conflict);
+      return;
+    }
+
     const result = await addProcess(
       {
         activeRoleId: getActiveRoleIdFromStore(),
@@ -220,117 +244,12 @@ export default function AddProcessPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-5">
-            <FormSearchSelect
-              control={form.control}
-              name="unitId"
-              label="واحد"
-              placeholder="انتخاب واحد..."
-              disabled={form.formState.isSubmitting}
-              fetcher={async (search?: string) => {
-                const result = await getUnits(
-                  { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-                  { _id: 1, name: 1 }
-                );
-                if (!result.success || !result.body) return [];
-                return result.body.map((u: { _id?: string; name?: string }) => ({
-                  _id: u._id || "",
-                  name: u.name || "",
-                }));
-              }}
-            />
-            <FormSearchSelect
-              control={form.control}
-              name="wareTypeId"
-              label="نوع کالا"
-              placeholder="انتخاب نوع کالا..."
-              disabled={form.formState.isSubmitting}
-              fetcher={async (search?: string) => {
-                const result = await getWareTypes(
-                  { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-                  { _id: 1, name: 1 }
-                );
-                if (!result.success || !result.body) return [];
-                return result.body.map((w: { _id?: string; name?: string }) => ({
-                  _id: w._id || "",
-                  name: w.name || "",
-                }));
-              }}
-            />
-            <FormSearchSelect
-              control={form.control}
-              name="wareClassId"
-              label="رده کالا"
-              placeholder="انتخاب رده کالا..."
-              disabled={form.formState.isSubmitting}
-              fetcher={async (search?: string) => {
-                const result = await getWareClasses(
-                  { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-                  { _id: 1, name: 1 }
-                );
-                if (!result.success || !result.body) return [];
-                return result.body.map((w: { _id?: string; name?: string }) => ({
-                  _id: w._id || "",
-                  name: w.name || "",
-                }));
-              }}
-            />
-            <FormSearchSelect
-              control={form.control}
-              name="wareGroupId"
-              label="گروه کالا"
-              placeholder="انتخاب گروه کالا..."
-              disabled={form.formState.isSubmitting}
-              fetcher={async (search?: string) => {
-                const result = await getWareGroups(
-                  { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-                  { _id: 1, name: 1 }
-                );
-                if (!result.success || !result.body) return [];
-                return result.body.map((w: { _id?: string; name?: string }) => ({
-                  _id: w._id || "",
-                  name: w.name || "",
-                }));
-              }}
-            />
-            <FormSearchSelect
-              control={form.control}
-              name="wareModelId"
-              label="مدل کالا"
-              placeholder="انتخاب مدل کالا..."
-              disabled={form.formState.isSubmitting}
-              fetcher={async (search?: string) => {
-                const result = await getWareModels(
-                  { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-                  { _id: 1, name: 1 }
-                );
-                if (!result.success || !result.body) return [];
-                return result.body.map((w: { _id?: string; name?: string }) => ({
-                  _id: w._id || "",
-                  name: w.name || "",
-                }));
-              }}
-            />
-            <FormSearchSelect
-              control={form.control}
-              name="wareId"
-              label="کالا"
-              placeholder="انتخاب کالا..."
-              disabled={form.formState.isSubmitting}
-              fetcher={async (search?: string) => {
-                const result = await getWares(
-                  { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-                  { _id: 1, name: 1, enName: 1, brand: 1 }
-                );
-                if (!result.success || !result.body) return [];
-                return result.body.map((w: { _id?: string; name?: string; enName?: string; brand?: string }) => ({
-                  _id: w._id || "",
-                  name: w.name || "",
-                  sublabel: w.brand || w.enName || undefined,
-                }));
-              }}
-            />
-          </CardContent>
-        </Card>
+              <ProcessScopeFields
+                form={form}
+                disabled={form.formState.isSubmitting}
+              />
+            </CardContent>
+          </Card>
 
           <div className="space-y-4">
             <h2 className="text-heading-sm font-medium text-glacier tracking-tight leading-tight">

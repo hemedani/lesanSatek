@@ -10,15 +10,11 @@ import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { ErrorState } from "@/components/ui/error-state";
 import { SearchSelect } from "@/components/form/form-search-select";
+import { ProcessScopeFieldsStandalone } from "@/components/process/process-scope-fields";
+import type { ProcessScopeValues } from "@/components/process/process-scope-fields";
 import { get } from "@/app/actions/process/get";
 import { updateRelations } from "@/app/actions/process/updateRelations";
 import { gets as getOrgs } from "@/app/actions/organization/gets";
-import { gets as getUnits } from "@/app/actions/unit/gets";
-import { gets as getWareTypes } from "@/app/actions/wareType/gets";
-import { gets as getWareClasses } from "@/app/actions/wareClass/gets";
-import { gets as getWareGroups } from "@/app/actions/wareGroup/gets";
-import { gets as getWareModels } from "@/app/actions/wareModel/gets";
-import { gets as getWares } from "@/app/actions/ware/gets";
 import Link from "next/link";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 
@@ -49,12 +45,14 @@ export default function ProcessRelationsPage({
   const [notFound, setNotFound] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [orgId, setOrgId] = useState("");
-  const [unitId, setUnitId] = useState("");
-  const [wareTypeId, setWareTypeId] = useState("");
-  const [wareClassId, setWareClassId] = useState("");
-  const [wareGroupId, setWareGroupId] = useState("");
-  const [wareModelId, setWareModelId] = useState("");
-  const [wareId, setWareId] = useState("");
+  const [scope, setScope] = useState<ProcessScopeValues>({
+    unitId: "",
+    wareTypeId: "",
+    wareClassId: "",
+    wareGroupId: "",
+    wareModelId: "",
+    wareId: "",
+  });
 
   useEffect(() => {
     const load = async () => {
@@ -75,12 +73,14 @@ export default function ProcessRelationsPage({
       if (result.success && result.body?.[0]) {
         const p = result.body[0];
         setOrgId(p.organization?._id || "");
-        setUnitId(p.unit?._id || "");
-        setWareTypeId(p.wareType?._id || "");
-        setWareClassId(p.wareClass?._id || "");
-        setWareGroupId(p.wareGroup?._id || "");
-        setWareModelId(p.wareModel?._id || "");
-        setWareId(p.ware?._id || "");
+        setScope({
+          unitId: p.unit?._id || "",
+          wareTypeId: p.wareType?._id || "",
+          wareClassId: p.wareClass?._id || "",
+          wareGroupId: p.wareGroup?._id || "",
+          wareModelId: p.wareModel?._id || "",
+          wareId: p.ware?._id || "",
+        });
       } else {
         setNotFound(true);
       }
@@ -88,6 +88,10 @@ export default function ProcessRelationsPage({
     };
     load();
   }, [id]);
+
+  const handleScopeChange = (key: keyof ProcessScopeValues, value: string) => {
+    setScope((prev) => ({ ...prev, [key]: value }));
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,12 +101,12 @@ export default function ProcessRelationsPage({
         activeRoleId: getActiveRoleIdFromStore(),
         _id: id,
         ...(orgId ? { organizationId: orgId } : {}),
-        ...(unitId ? { unitId } : {}),
-        ...(wareTypeId ? { wareTypeId } : {}),
-        ...(wareClassId ? { wareClassId } : {}),
-        ...(wareGroupId ? { wareGroupId } : {}),
-        ...(wareModelId ? { wareModelId } : {}),
-        ...(wareId ? { wareId } : {}),
+        ...(scope.unitId ? { unitId: scope.unitId } : {}),
+        ...(scope.wareTypeId ? { wareTypeId: scope.wareTypeId } : {}),
+        ...(scope.wareClassId ? { wareClassId: scope.wareClassId } : {}),
+        ...(scope.wareGroupId ? { wareGroupId: scope.wareGroupId } : {}),
+        ...(scope.wareModelId ? { wareModelId: scope.wareModelId } : {}),
+        ...(scope.wareId ? { wareId: scope.wareId } : {}),
       },
       { _id: 1, name: 1 }
     );
@@ -172,76 +176,13 @@ export default function ProcessRelationsPage({
 
         <FormCard
           title="حوزه کاربرد"
-          description="فرآیند را به واحد یا سلسله‌مراتب کالا محدود کنید. در صورت عدم انتخاب، فرآیند عمومی خواهد بود."
+          description="فرآیند را به واحد یا سلسله‌مراتب کالا محدود کنید. در صورت عدم انتخاب، فرآیند عمومی خواهد بود. هر سطح، گزینه‌های سطح بعد را فیلتر می‌کند."
         >
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-xs text-fog/70 block font-medium">واحد</label>
-              <SearchSelect
-                value={unitId}
-                onChange={setUnitId}
-                placeholder="انتخاب واحد..."
-                fetcher={scopeFetcher(getUnits)}
-                label="واحد"
-                disabled={submitting}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs text-fog/70 block font-medium">نوع کالا</label>
-              <SearchSelect
-                value={wareTypeId}
-                onChange={setWareTypeId}
-                placeholder="انتخاب نوع کالا..."
-                fetcher={scopeFetcher(getWareTypes)}
-                label="نوع کالا"
-                disabled={submitting}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs text-fog/70 block font-medium">رده کالا</label>
-              <SearchSelect
-                value={wareClassId}
-                onChange={setWareClassId}
-                placeholder="انتخاب رده کالا..."
-                fetcher={scopeFetcher(getWareClasses)}
-                label="رده کالا"
-                disabled={submitting}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs text-fog/70 block font-medium">گروه کالا</label>
-              <SearchSelect
-                value={wareGroupId}
-                onChange={setWareGroupId}
-                placeholder="انتخاب گروه کالا..."
-                fetcher={scopeFetcher(getWareGroups)}
-                label="گروه کالا"
-                disabled={submitting}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs text-fog/70 block font-medium">مدل کالا</label>
-              <SearchSelect
-                value={wareModelId}
-                onChange={setWareModelId}
-                placeholder="انتخاب مدل کالا..."
-                fetcher={scopeFetcher(getWareModels)}
-                label="مدل کالا"
-                disabled={submitting}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs text-fog/70 block font-medium">کالا</label>
-              <SearchSelect
-                value={wareId}
-                onChange={setWareId}
-                placeholder="انتخاب کالا..."
-                fetcher={scopeFetcher(getWares)}
-                label="کالا"
-                disabled={submitting}
-              />
-            </div>
-          </div>
+          <ProcessScopeFieldsStandalone
+            values={scope}
+            onChange={handleScopeChange}
+            disabled={submitting}
+          />
         </FormCard>
 
         <div className="sticky bottom-0 z-10 bg-[rgba(5,6,15,0.85)] backdrop-blur-xl border border-steel-border/15 rounded-xl p-4 flex items-center justify-end gap-3 shadow-[0_-8px_32px_rgba(0,0,0,0.4)]">
