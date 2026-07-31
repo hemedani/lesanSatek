@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, PackageCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 import { submit } from "@/app/actions/purchasingRequest/submit";
 
@@ -69,38 +69,56 @@ export function SubmitPRDialog({ open, onOpenChange, purchasingRequestId, title,
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg" dir="rtl">
         <DialogHeader>
-          <DialogTitle className="text-glacier">ارسال درخواست خرید</DialogTitle>
-          <DialogDescription className="text-fog/70">
-            با ارسال این درخواست، فرآیند خرید آغاز می‌شود.
-          </DialogDescription>
+          <div className="flex items-start gap-3">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-electric-iris/10 ring-1 ring-inset ring-electric-iris/20">
+              <Send className="size-5 text-electric-iris" />
+            </div>
+            <div className="min-w-0">
+              <DialogTitle>ارسال درخواست خرید</DialogTitle>
+              <DialogDescription className="mt-1.5">
+                با ارسال این درخواست، فرآیند خرید آغاز می‌شود و وارد گردش کار تأیید خواهد شد.
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* PR Summary */}
-          <div className="p-3 rounded-lg bg-white/[0.02] border border-steel-border/20 space-y-2">
-            <p className="text-sm font-medium text-moonlight truncate">{title || "—"}</p>
-            <div className="flex items-center gap-4 text-xs text-fog/50">
-              {quantity != null && <span>تعداد: {quantity.toLocaleString("fa-IR")}</span>}
-              {wareModelName && <span>کالا: {wareModelName}</span>}
+          <div className="rounded-xl border border-steel-border/20 bg-white/[0.02] p-4">
+            <p className="text-body font-medium text-moonlight">{title || "درخواست خرید"}</p>
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+              {quantity != null && (
+                <span className="inline-flex items-center gap-1.5 text-body-sm text-fog">
+                  <PackageCheck className="size-4 text-fog/60" />
+                  تعداد: {quantity.toLocaleString("fa-IR")}
+                </span>
+              )}
+              {wareModelName && (
+                <span className="inline-flex items-center gap-1.5 text-body-sm text-fog">
+                  کالا: {wareModelName}
+                </span>
+              )}
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center justify-end gap-3 pt-2">
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} disabled={submitting}>
-              انصراف
-            </Button>
-            <Button
-              type="button"
-              onClick={handleSubmit}
-              disabled={submitting}
-              className="gap-1.5"
-            >
-              {submitting ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
-              {submitting ? "در حال ارسال..." : "ارسال درخواست"}
-            </Button>
-          </div>
+          <p className="rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-3 text-body-sm leading-6 text-amber-400/90">
+            پس از ارسال، امکان ویرایش درخواست وجود نخواهد داشت.
+          </p>
         </div>
+
+        <DialogFooter>
+          <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} disabled={submitting}>
+            انصراف
+          </Button>
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            disabled={submitting}
+            className="gap-1.5"
+          >
+            {submitting ? <Loader2 className="size-5 animate-spin" /> : <Send className="size-5" />}
+            {submitting ? "در حال ارسال..." : "ارسال درخواست"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

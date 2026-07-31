@@ -10,15 +10,16 @@ interface SubmitPRButtonProps {
   title?: string
   quantity?: number
   wareModelName?: string
+  className?: string
 }
 
-export function SubmitPRButton({ purchasingRequestId, title, quantity, wareModelName }: SubmitPRButtonProps) {
+export function SubmitPRButton({ purchasingRequestId, title, quantity, wareModelName, className }: SubmitPRButtonProps) {
   const [open, setOpen] = useState(false)
 
   return (
     <>
-      <Button className="w-full gap-2" onClick={() => setOpen(true)}>
-        <Send className="size-4" />
+      <Button className={className || "w-full gap-2"} onClick={() => setOpen(true)}>
+        <Send className="size-5" />
         ارسال درخواست
       </Button>
       <SubmitPRDialog
