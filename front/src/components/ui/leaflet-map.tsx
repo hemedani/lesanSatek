@@ -30,7 +30,7 @@ function ClickHandler({ onMapClick }: { onMapClick: (lat: number, lng: number) =
 
 export default function LeafletMap({ center, marker, onMapClick }: LeafletMapProps) {
   return (
-    <div className="h-48 rounded-lg overflow-hidden border border-steel-border/20 relative z-0">
+    <div className="h-80 rounded-lg overflow-hidden border border-steel-border/20 relative z-0">
       <MapContainer
         center={center}
         zoom={13}

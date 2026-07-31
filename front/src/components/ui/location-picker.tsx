@@ -18,7 +18,7 @@ const defaultCenter: [number, number] = [35.6892, 51.3890];
 const LeafletMap = dynamic(
   () => import("./leaflet-map"),
   { ssr: false, loading: () => (
-    <div className="h-48 rounded-lg border border-steel-border/20 bg-white/[0.02] flex items-center justify-center">
+    <div className="h-80 rounded-lg border border-steel-border/20 bg-white/[0.02] flex items-center justify-center">
       <span className="text-xs text-fog/40">بارگذاری نقشه...</span>
     </div>
   )}
