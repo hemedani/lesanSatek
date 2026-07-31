@@ -1,715 +1,220 @@
-# Authkit — Style Reference
+# LesanSatek Design System
 > blueprint on midnight glass
 
-**Theme:** dark
-**Direction:** RTL (Persian)
-**Language:** Persian (fa) only — never introduce English or second-language text.
+**Theme:** dark  
+**Direction:** RTL (Persian only)  
+**Language:** Persian (fa) ONLY — never introduce English or any second-language UI text.  
+**Framework:** Next.js 16 + Tailwind CSS v4 + shadcn/ui (base-ui) + next-themes
 
-AuthKit operates in a midnight blueprint language: near-black canvas, cool blue-gray typography, and a single electric iris purple that marks the only thing you can press. Surfaces are matte and flat — no glossy gradients, no heavy drop shadows — instead, a constellation of soft blue glows (rgba(186, 207, 247, 0.32)) and hairline 1px inset strokes suggest an interface drawn in light on dark paper. Typography is restrained and confident: a geometric workhorse (Untitled Sans) handles everything from 12px captions to 24px section titles, while a wider display face (aeonikPro) introduces hero and section headlines. Almost all decorative color lives in the shadows themselves, not in fills — the result reads as technical, precise, and quietly luminous rather than colorful.
+---
 
-## Tokens — Colors
+## North Star
 
-| Name | Value | Token | Role |
-|------|-------|-------|------|
-| Midnight Ink | `#05060f` | `--color-midnight-ink` | Page canvas and primary surface — the near-black ground everything else is drawn onto. Slight cool tint keeps it from feeling truly black, giving a blueprint-paper quality |
-| Graphite Plate | `#2f343e` | `--color-graphite-plate` | Elevated card and panel surface — one step above canvas, used for previewed UI mockups and form containers. Matte, never glossy |
-| Steel Border | `#3f4959` | `--color-steel-border` | Hairline borders, dividers, and muted structural lines between UI elements |
-| Fog | `#81899b` | `--color-fog` | De-emphasized helper text and secondary metadata that should recede behind primary content |
-| Pebble | `#9da7ba` | `--color-pebble` | Muted body text and disabled-state labels — readable but clearly secondary |
-| Moonlight | `#c7d3ea` | `--color-moonlight` | Primary body and icon color — cool off-white that carries the interface's default voice |
-| Ice | `#d1e4fa` | `--color-ice` | Highlighted body text, strong secondary labels, and badge content where extra presence is needed without going full white |
-| Glacier | `#d8ecf8` | `--color-glacier` | Headings, link text, and section titles — the brightest readable text, used to anchor the eye on the most important strings |
-| Frost Link | `#b6d9fc` | `--color-frost-link` | Active link states and glow-infused accent text where a clear blue signal is required |
-| Electric Iris | `#663af3` | `--color-electric-iris` | Violet supporting accent for decorative details and low-frequency emphasis. Do not promote it to the primary CTA color |
-| Ember | `#e46d4c` | `--color-ember` | Alternative brand accent for live-preview or demo CTAs where a warm contrast is needed against the cool palette |
-| Azure | `#027dea` | `--color-azure` | Blue supporting accent for decorative details and low-frequency emphasis. Do not promote it to the primary CTA color |
-| Cipher Mint | `#269684` | `--color-cipher-mint` | Teal supporting accent for decorative details and low-frequency emphasis. Do not promote it to the primary CTA color |
-| Blueprint Glow | `linear-gradient(0deg, #d8ecf8 0%, #98c0ef 100%)` | `--color-blueprint-glow` | Soft highlight gradient endpoint — appears in the vertical text gradient (Glacier → Frost Link) and as the top stop in hero light gradients |
+LesanSatek uses a midnight blueprint language: near-black canvas, cool blue-gray typography, and a single Electric Iris purple that marks the only thing the user should press. Surfaces are matte and flat — no glossy gradients, no heavy drop shadows. Instead, soft blue glows and 1–2 px inset hairline strokes create the feeling of an interface drawn in light on dark paper. The result is technical, precise, and quietly luminous.
 
-## Tokens — Typography
+Every screen must feel like a luminous blueprint panel that belongs to the same visual family.
 
-### Untitled Sans — Workhorse UI and body face. Carries everything from 12px captions to 24px section titles; weight 400 is default body, 500 for emphasis, 600–700 for button labels and form controls. Slight negative tracking (-0.01em) tightens the dark-mode rhythm. · `--font-untitled-sans`
-- **Substitute:** Inter
-- **Weights:** 400, 500, 600, 700
-- **Sizes:** 12, 14, 16, 18, 24
-- **Line height:** 1.17, 1.20, 1.33, 1.43, 1.50
-- **Letter spacing:** -0.01em
-- **Role:** Workhorse UI and body face. Carries everything from 12px captions to 24px section titles; weight 400 is default body, 500 for emphasis, 600–700 for button labels and form controls. Slight negative tracking (-0.01em) tightens the dark-mode rhythm.
+---
 
-### aeonikPro — Display and hero-only face. Used for the 'AuthKit' wordmark and large section headlines at 44–48px. Wider proportions and a cleaner geometric skeleton give the brand a distinctive presence that Untitled Sans cannot supply at scale. Normal tracking. · `--font-aeonikpro`
-- **Substitute:** Aeonik
-- **Weights:** 400, 500
-- **Sizes:** 28, 44, 48
-- **Line height:** 1.14, 1.16, 1.17, 1.20
-- **Letter spacing:** normal
-- **Role:** Display and hero-only face. Used for the 'AuthKit' wordmark and large section headlines at 44–48px. Wider proportions and a cleaner geometric skeleton give the brand a distinctive presence that Untitled Sans cannot supply at scale. Normal tracking.
+## 1. Tokens — Colors
 
-### dotDigital — Eyebrow and label-only face at 15px. The wide 0.1em tracking and tabular numerals ('tnum') mark these as quiet structural markers — 'Introducing', 'Shine bright', 'Extensible by design' — that precede headlines. Never used for body copy. · `--font-dotdigital`
-- **Substitute:** JetBrains Mono
-- **Weights:** 400
-- **Sizes:** 15
-- **Line height:** 1.20
-- **Letter spacing:** 0.1em
-- **OpenType features:** `"tnum"`
-- **Role:** Eyebrow and label-only face at 15px. The wide 0.1em tracking and tabular numerals ('tnum') mark these as quiet structural markers — 'Introducing', 'Shine bright', 'Extensible by design' — that precede headlines. Never used for body copy.
+| Name            | Value                          | Token                     | Role |
+|-----------------|--------------------------------|---------------------------|------|
+| Midnight Ink    | `#05060f`                      | `--color-midnight-ink`    | Page canvas / primary surface |
+| Graphite Plate  | `#2f343e`                      | `--color-graphite-plate`  | Elevated cards, modals, panels |
+| Steel Border    | `#3f4959`                      | `--color-steel-border`    | Hairline borders & dividers |
+| Fog             | `#81899b`                      | `--color-fog`             | Helper / secondary metadata |
+| Pebble          | `#9da7ba`                      | `--color-pebble`          | Muted body / disabled text |
+| Moonlight       | `#c7d3ea`                      | `--color-moonlight`       | Primary body & icon color |
+| Ice             | `#d1e4fa`                      | `--color-ice`             | Strong secondary labels / badges |
+| Glacier         | `#d8ecf8`                      | `--color-glacier`         | Headings & section titles |
+| Frost Link      | `#b6d9fc`                      | `--color-frost-link`      | Active links / accent text |
+| Electric Iris   | `#663af3`                      | `--color-electric-iris`   | Primary CTA & current-step accent |
+| Ember           | `#e46d4c`                      | `--color-ember`           | Warning / destructive accent |
+| Azure           | `#027dea`                      | `--color-azure`           | Informational accent |
+| Cipher Mint     | `#269684`                      | `--color-cipher-mint`     | Success accent |
+| Blueprint Glow  | `linear-gradient(0deg, #d8ecf8 0%, #98c0ef 100%)` | `--color-blueprint-glow` | Soft highlight gradient |
+
+**Rule:** Almost all decorative color lives in shadows and strokes, not in fills.
+
+---
+
+## 2. Tokens — Typography
+
+- **Workhorse:** Untitled Sans (or Inter) — 400/500/600/700  
+- **Display (rare):** aeonikPro / Aeonik — only for large section headlines  
+- **Eyebrow / label:** dotDigital / JetBrains Mono — 15 px, 0.1 em tracking, `tnum`
 
 ### Type Scale
 
-| Role | Size | Line Height | Letter Spacing | Token |
-|------|------|-------------|----------------|-------|
-| caption | 12px | 1.5 | -0.01px | `--text-caption` |
-| body-sm | 14px | 1.43 | -0.01px | `--text-body-sm` |
-| body | 16px | 1.5 | -0.01px | `--text-body` |
-| subheading | 18px | 1.33 | -0.01px | `--text-subheading` |
-| heading-sm | 24px | 1.2 | -0.01px | `--text-heading-sm` |
-| heading | 28px | 1.17 | — | `--text-heading` |
-| display | 48px | 1.14 | — | `--text-display` |
+| Role        | Size | Line-height | Token              |
+|-------------|------|-------------|--------------------|
+| caption     | 12px | 1.5         | `--text-caption`   |
+| body-sm     | 14px | 1.43        | `--text-body-sm`   |
+| body        | 16px | 1.5         | `--text-body`      |
+| subheading  | 18px | 1.33        | `--text-subheading`|
+| heading-sm  | 24px | 1.2         | `--text-heading-sm`|
+| heading     | 28px | 1.17        | `--text-heading`   |
+| display     | 48px | 1.14        | `--text-display`   |
 
-## Tokens — Spacing & Shapes
+Letter-spacing for UI text: `-0.01em`.
 
-**Base unit:** 4px
+---
 
+## 3. Tokens — Spacing, Radius, Shadows
+
+**Base unit:** 4 px  
 **Density:** comfortable
 
 ### Spacing Scale
-
-| Name | Value | Token |
-|------|-------|-------|
-| 4 | 4px | `--spacing-4` |
-| 8 | 8px | `--spacing-8` |
-| 12 | 12px | `--spacing-12` |
-| 16 | 16px | `--spacing-16` |
-| 20 | 20px | `--spacing-20` |
-| 24 | 24px | `--spacing-24` |
-| 32 | 32px | `--spacing-32` |
-| 36 | 36px | `--spacing-36` |
-| 40 | 40px | `--spacing-40` |
-| 48 | 48px | `--spacing-48` |
-| 56 | 56px | `--spacing-56` |
-| 100 | 100px | `--spacing-100` |
-| 120 | 120px | `--spacing-120` |
-| 200 | 200px | `--spacing-200` |
+4, 8, 12, 16, 20, 24, 32, 36, 40, 48, 56, 100, 120, 200 px
 
 ### Border Radius
+| Element   | Value   |
+|-----------|---------|
+| Cards     | 10–16 px|
+| Modals    | 12–16 px|
+| Pills     | 999 px  |
+| Badges    | 6 px    |
+| Inputs    | 2 px    |
+| Buttons   | 2 px    |
 
-| Element | Value |
-|---------|-------|
-| cards | 10-16px |
-| pills | 999px |
-| badges | 6px |
-| inputs | 2px |
-| buttons | 2px |
-
-### Shadows
-
-| Name | Value | Token |
-|------|-------|-------|
-| sm | `rgba(186, 207, 247, 0.32) 0px 0px 6px 0px` | `--shadow-sm` |
-| md | `rgba(238, 186, 247, 0.24) 0px 0px 12px 0px` | `--shadow-md` |
-| subtle | `rgba(186, 215, 247, 0.12) 0px 0px 0px 1px inset` | `--shadow-subtle` |
-| subtle-2 | `rgba(199, 211, 234, 0.12) -0.5px 0.5px 1px 0px inset, rgb...` | `--shadow-subtle-2` |
-| subtle-3 | `rgba(186, 214, 247, 0.06) 0px 0px 0px 1px inset` | `--shadow-subtle-3` |
-| subtle-4 | `rgba(199, 211, 234, 0.12) 0px 1px 1px 0px inset, rgba(199...` | `--shadow-subtle-4` |
-| subtle-5 | `rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset` | `--shadow-subtle-5` |
-| subtle-6 | `rgba(216, 236, 248, 0.2) 0px 1px 1px 0px inset, rgba(168,...` | `--shadow-subtle-6` |
-| subtle-7 | `rgba(216, 236, 248, 0.2) 0px 1px 1px 0px inset, rgba(168,...` | `--shadow-subtle-7` |
+### Shadows (preferred)
+- Soft outer blue glow: `rgba(186, 207, 247, 0.32) 0 0 6–12px`
+- Inset hairlines: `rgba(186, 215, 247, 0.06–0.12) 0 0 0 1px inset`
+- Never heavy black drop shadows.
 
 ### Layout
-
-- **Page max-width:** 1200px
-- **Section gap:** 120px
-- **Card padding:** 24px
-- **Element gap:** 8-16px
-
-## Components
-
-### Primary CTA Button (Electric Iris)
-**Role:** Filled action button for the single most important action on a page.
-
-Background #663af3, text #ffffff, radius 2px, padding 10px 16px. Untitled Sans weight 500, 16px, line-height 1.5. Sits flat — no drop shadow, relying on the saturated fill against Midnight Ink for emphasis. Used at most once per viewport.
-
-### Ghost Button
-**Role:** Secondary actions that should not compete with the primary CTA.
-
-Transparent background with 1px inset hairline rgba(186, 215, 247, 0.06), text #c7d3ea, radius 2px, padding 10px 16px. Untitled Sans weight 500, 16px. The hairline stroke gives presence without adding luminance.
-
-### Pill Navigation Button
-**Role:** Top-bar and inline navigation links.
-
-Radius 999px, background transparent or subtle Moonlight tint on hover. Text 14px Untitled Sans weight 400–500, #c7d3ea. Pairs with the sharp 2px form buttons to create a clear primary/pill button pairing.
-
-### Sign-In Form Card
-**Role:** Product preview card showing AuthKit's sign-in widget embedded in marketing.
-
-Background #2f343 with card elevation stack (inset highlights + near-black drop shadow). Radius 10px. Contains email input (2px radius, 1px Steel Border), Continue button (Electric Iris), and social provider buttons (Microsoft, Google) in ghost style. Padding 24px.
-
-### Eyebrow Label
-**Role:** Small structural marker above a headline — 'Introducing', 'Shine bright', 'Extensible by design'.
-
-dotDigital 15px, weight 400, letter-spacing 0.1em, line-height 1.20. Text color #81899b. The wide tracking and tabular figures are the system's quietest brand signal — it telegraphs 'this is a structural label, not content'.
-
-### Section Heading
-**Role:** Mid-tier section titles — 'Your users. Your data. Maximum flexibility.'
-
-aeonikPro 44–48px, weight 400–500, line-height 1.14–1.16, normal tracking. Color #d8ecf8 (Glacier) on Midnight Ink. The combination of a display face at near-regular weight and a cool off-white gives the headline architectural weight without shouting.
-
-### Feature Icon Tile
-**Role:** Single sign-on, password, MFA, social login, RBAC, and magic auth feature row entries.
-
-Square ~40px icon container in Graphite Plate (#2f343e) with 6px radius. Icon stroke is Moonlight (#c7d3ea), 1.5px. Label below in Untitled Sans 12–14px weight 400, color #81899b. Arrows between tiles are 1px Moonlight lines with a subtle 186/207/247 glow.
-
-### Theme Toggle Pill
-**Role:** Light/dark mode switcher shown above the feature row.
-
-Pill 999px radius, background #2f343e. Two icon segments (moon/sun) in Moonlight. Caption below in Untitled Sans 14px, #81899b.
-
-### Customization Annotation Chip
-**Role:** Small labeled callouts pointing at parts of a UI mockup — 'Colour', 'Logo icon', 'Page background', 'Button text', 'Preferred appearance: System / Light / Dark'.
-
-Radius 6–10px, background #2f343 with 1px inset rgba(186, 215, 247, 0.12) hairline. Text 12px Untitled Sans weight 500, #c7d3ea. Connected to the target element with a faint blue guideline. Sits floating around the previewed sign-in card.
-
-### Brand Colour Swatch
-**Role:** Row of small colored squares inside the Colour annotation chip.
-
-Four 12px squares, 2px radius, filled with Electric Iris, Ember, Azure, and Cipher Mint. Communicates the customizable brand color slots AuthKit offers.
-
-### Background Grid Overlay
-**Role:** Faint architectural grid visible on the Midnight Ink canvas behind the hero.
-
-1px lines in rgba(186, 215, 247, 0.04) forming a ~40px square grid. Plus a radial blue glow at the top center using the Blueprint Glow palette, and thin conic gradient borders around the hero frame. The grid is the 'blueprint' in the north star — it makes the page feel drafted, not designed.
-
-### Static Aurora Canvas (Admin Background)
-**Role:** Base Midnight Ink canvas with dot-grid texture. The static foundation behind the ambient orbs.
-
-- Base: `#05060f` (Midnight Ink)
-- Subtle SVG dot-grid texture at `opacity-40` (60px squares, 3% white dots)
-- Purely static — GPU-composited with no repaints
-
-### Ambient Orb Layer (Animated Background)
-**Role:** Large, soft, slow-drifting radial-gradient light sources behind admin content. Creates the "light blooming through frosted glass" quality on glass cards. Mounted once in `admin/layout.tsx` via `<AmbientBackground />`.
-
-**Visual spec:**
-- 3 orbs, 40–55vw diameter, positioned fixed behind all content (`z-0`, with `pointer-events: none`)
-- Orb 1: Electric Iris (#663af3) at 0.15 opacity, 55vw, blur(130px), leftward drift — largest, slowest (45s)
-- Orb 2: Frost Link (#b6d9fc) + Glacier at 0.12 opacity, 48vw, blur(120px), rightward drift — medium (38s)
-- Orb 3: Graphite Plate + Electric Iris blend at 0.18/0.08 opacity, 40vw, blur(100px), center drift — deepest (42s)
-- Each orb animates ONLY `transform: translate() scale()` — no paint or layout triggers
-- Each orb has `will-change: transform` for its own GPU-composited layer
-- Staggered cubic-bezier curves so they never sync up
-
-**Reduced motion:** `@media (prefers-reduced-motion: reduce)` freezes all orbs at static translated offsets (animation: none).
-
-**Performance:** The orb layer shows as its own composited tile in DevTools Layers panel. `filter: blur()` is applied once as a static texture that the GPU caches — only the `transform` matrix changes per frame. Confirmed 60fps during scroll on `/admin/organizations` with 3 orbs running; zero paint triggers on scroll.
-
-### Faint Outline Shapes (Blueprint Structure)
-**Role:** 4 large, thin-stroke geometric SVG outlines placed behind the orbs. Purely decorative architectural "blueprint lines" — no fill, no glow, no shadow. They add quiet structure without competing with the orbs' diffuse light or the UI content.
-
-**Spec:**
-- All shapes: `fill="none"`, `strokeWidth="1"`, sized to mostly bleed off-screen
-- Shape 1: Large circle (Steel Border `#3f4959` at 0.10 opacity), 120vw, bleeds top-left
-- Shape 2: Hexagon (Frost Link `#b6d9fc` at 0.08 opacity), 100vw, bleeds right
-- Shape 3: Rounded rectangle (Steel Border at 0.07 opacity), 80vw, bleeds bottom
-- Shape 4: Sweeping quadratic arc (Frost Link at 0.06 opacity), 150vw, bleeds top-right
-- No animation — fully static. Inline SVG for crisp rendering at any resolution
-- Rendered in a shared `<div>` within `<AmbientBackground />`, before the orbs in DOM order so orbs paint on top
-- `prefers-reduced-motion: reduce` has no effect on shapes (they're already static)
-
-### Hero Wordmark Lockup
-**Role:** Centered 'AuthKit' display headline with eyebrow above and subtitle below.
-
-Eyebrow: dotDigital 15px, 0.1em tracking, #81899b, flanked by short horizontal rules. Wordmark: aeonikPro 48px weight 500, #ffffff, line-height 1.14. Subtitle: Untitled Sans 18px weight 400, #9da7ba. Vertical rhythm roughly 16px / 24px / 16px.
-
-### Conic Border Frame
-**Role:** Thin glowing border that frames the hero section and the customization mockup.
-
-1px conic gradient at 50% -5% with stops transparent → rgba(124, 145, 182, 0.3) → 0.5 → 0.3 → transparent. Renders as a subtle arc of cool light at the top of the frame, hinting at an illuminated source above the viewport.
-
-## Do's and Don'ts
-
-### Do
-- Use Midnight Ink #05060f as the sole page background — never introduce a second canvas color.
-- Restrict the Electric Iris #663af3 fill to a single primary CTA per viewport; everything else is ghost, outlined, or neutral.
-- Reach for the aeonikPro 48px / weight 500 / line-height 1.14 pairing for any headline that introduces a new section.
-- Mark all structural eyebrows with dotDigital 15px / 0.1em tracking / 'tnum' tabular figures, never with Untitled Sans.
-- Build elevation from blue-tinted inset hairlines (rgba(186, 215, 247, 0.12)) and 96px inner glows, not from drop shadows.
-- Pair form controls (buttons, inputs) at 2px radius with cards at 10–16px and pills at 999px to maintain the sharp-to-soft hierarchy.
-- Set section gap to 120px and keep hero-to-section transitions centered on a single vertical axis.
-
-### Don't
-- Do not place saturated color on any element other than a primary or alternative-action button — no colored cards, banners, or backgrounds.
-- Do not use traditional colored drop shadows; shadows stay near-black or cool-blue, never warm.
-- Do not mix more than three typefaces on a single screen — Untitled Sans, aeonikPro, and dotDigital is the complete set.
-- Do not round buttons to anything other than 2px; pill-shaped action buttons break the sharp-utility rhythm.
-- Do not introduce a second brand color for a primary CTA — Electric Iris is the only first-class action color.
-- Do not use Untitled Sans at display sizes (28px+) when aeonikPro is available; the display face is reserved for headlines and the wordmark.
-- Do not place text below Glacier #d8ecf8 in luminance for headings — body can drop to Pebble/Fog, but titles must stay bright.
-
-## Surfaces
-
-| Level | Name | Value | Purpose |
-|-------|------|-------|---------|
-| 0 | Canvas | `#05060f` | Page background — near-black with faint grid overlay. |
-| 1 | Plate | `#2f343` | Card and previewed-UI surface, one shade lifted off canvas. |
-| 2 | Iris Lift | `#663af3` | Filled action surface — the only chromatic surface in the system. |
-
-## Elevation
-
-- **Glow accent (icons, highlights):** `0px 0px 6px 0px rgba(186, 207, 247, 0.32)`
-- **Ambient glow (secondary highlights):** `0px 0px 12px 0px rgba(238, 186, 247, 0.24)`
-- **Hairline inset (links, buttons, outlines):** `inset 0px 0px 0px 1px rgba(186, 215, 247, 0.12)`
-- **Card elevation:** `inset 0px 1px 1px 0px rgba(199, 211, 234, 0.12), inset 0px 24px 48px 0px rgba(199, 211, 234, 0.05), 0px 24px 32px 0px rgba(6, 6, 14, 0.7)`
-
-## Imagery
-
-No photography, no illustration, no product screenshots of third-party apps. The visual language is pure UI-on-canvas: sign-in widget previews rendered in CSS, icon glyphs drawn as 1.5px Moonlight strokes, and a faint architectural grid behind everything. The sign-in cards themselves are the imagery — they are the product shown inside the product page. Iconography is monochrome outlined with consistent 1.5px stroke weight, sitting in square Graphite Plate tiles. The only non-UI visual element is the Blueprint Glow gradient that washes the top of the hero, creating a sense of light falling onto the dark canvas.
-
-## Layout
-
-Centered, single-column hero anchored to a max-width of 1200px on a full-bleed Midnight Ink canvas. The hero stacks vertically: eyebrow → wordmark → subtitle → preview card, with the sign-in widget slightly oversized and centered, overlapping a faint background grid. Below the hero, content flows in centered max-width bands separated by 120px gaps, each with an eyebrow + heading + supporting text + a single visual (a feature row of icon tiles, or a full-width previewed UI mockup with annotation chips). The page never uses two-column text+image splits; it always centers. Navigation is a minimal top bar: brand wordmark left, single pill 'Get started' button right, with a small GitHub icon between them. No sidebar, no mega-menu, no sticky chrome beyond the nav.
-
-## Agent Prompt Guide
+- Page max-width: 1200 px (content areas may be wider when needed)
+- Card padding: 24 px (comfortable)
+- Element gap: 8–16 px
+- Always use **logical properties** (`ps-`, `pe-`, `ms-`, `me-`, `start-`, `end-`). Never `left`/`right`.
 
 ---
 
-## Implementation — CSS Utilities (added to `globals.css`)
+## 4. Core UI Rules (learned from production redesign)
 
-These `@utility` classes were implemented alongside the theme tokens and are used throughout the admin panel.
+### 4.1 Icons
+- Minimum visible size: **20–24 px** effective.
+- Stroke weight consistent across the page.
+- Never use 12–14 px icons that disappear on dark backgrounds.
+- Icon color: Moonlight by default; Electric Iris for active/current state.
+- Leading page-header icons must match the same scale as all other icons on the page.
 
-### Canvas & Grid
+### 4.2 Cards
+- Background: Graphite Plate
+- Radius: 10–16 px
+- Padding: 24 px
+- Soft inset hairline + optional subtle blue glow
+- Prefer **cards / stacked sections** over dense tables for any list that must work on mobile.
+- Tables are allowed only when the data is truly tabular **and** a responsive card fallback exists.
 
-```css
-@utility bg-blueprint-grid {
-  /* 1px lines at rgba(186, 215, 247, 0.04), 40px squares */
-}
+### 4.3 Process Progress / Stepper
+- Must be the most scannable element on any workflow page.
+- Horizontal on desktop, vertical on mobile.
+- Current step: Electric Iris + soft glow.
+- Completed: muted but readable.
+- Future: de-emphasized.
+- Labels, actor, and timestamp must be legible without hovering.
 
-@utility admin-canvas {
-  /* midnight-ink + radial glow + light grid — root layout surface */
-}
+### 4.4 History / Timeline
+- Vertical timeline with clear dots + connecting line.
+- Each entry: actor, action title, relative/absolute time, optional comment.
+- Expandable details.
+- **Never show raw MongoDB / object IDs.**  
+  When an ID appears, resolve it via the existing Server Action for that model and display the human-readable name.  
+  While loading → small non-blocking spinner.  
+  On failure → short Persian fallback (“اطلاعات در دسترس نیست”).
 
-@utility admin-canvas-animated {
-  /* midnight-ink + 3 soft radial gradients (shift over 45s) + light grid — animated depth */
-}
+### 4.5 Modals / Dialogs (elevated treatment)
+Every modal must follow this structure:
 
-@utility blueprint-glow {
-  /* radial-gradient ellipse 80% 60% at 50% -10% — subtle top wash */
-}
-
-@utility blueprint-radial-glow {
-  /* deeper radial glow for behind panels/sections */
-}
+```
+┌─────────────────────────────────────────┐
+│  HEADER  (title + optional subtitle + ✕) │  ← soft bottom divider
+├─────────────────────────────────────────┤
+│                                         │
+│  BODY   (generous 24–32 px padding)     │  ← soft internal dividers
+│                                         │
+├─────────────────────────────────────────┤
+│  FOOTER (actions)                       │  ← soft top divider
+└─────────────────────────────────────────┘
 ```
 
-### Background
+**Required visual treatment:**
+- Surface: Graphite Plate
+- Radius: 12–16 px
+- **Animated border stroke** (1.5–2 px) using Blueprint-glow blue.  
+  Slow, elegant travel or pulse.  
+  Respects `prefers-reduced-motion` → static thicker hairline.
+- Comfortable outer margin from viewport edges (never edge-to-edge).
+- Soft outer glow so the modal lifts off the dimmed backdrop.
+- Backdrop: stronger dim + optional subtle blur.
+- Entrance: short scale + fade or slight upward slide (GPU-friendly).
+- Close button: large hit area, Moonlight icon, subtle hover glow.
+- Primary button = Electric Iris, secondary = Ghost.
+- All text Persian-only.
 
-```css
-/* Static canvas layer:
-   - `admin-canvas` utility (midnight ink + radial glow + blueprint grid)
-   - `glass-card-conic-top` utility (1px conic arc at top edge)
-   - GPU-composited `blur-3xl` radial gradients (no repaints)
+### 4.6 Buttons
+- **Primary CTA:** Electric Iris fill, white text, 2 px radius, used at most once per viewport.
+- **Ghost:** transparent + inset hairline, Moonlight text.
+- **Pill / nav:** 999 px radius for top-bar links.
+- Padding: 10 px 16 px minimum.
+- Focus-visible ring required.
 
-   Ambient orb layer (animated, see AmbientBackground component):
-   - 3 radial-gradient orbs with filter: blur()
-   - Only transform animated — GPU-composited, no paint triggers
-   - Mounted via <AmbientBackground /> in admin layout
-*/
-```
+### 4.7 Persian-only rule
+- Every user-facing string (labels, badges, statuses, empty states, tooltips, validation, history actions, button text) **must** be Persian.
+- Backend enums or English keys must be mapped through a Persian filter/layer before render.
+- No English UI text is ever acceptable.
 
-### Cards & Glassmorphism
+### 4.8 Accessibility & Motion
+- Interactive elements need clear `focus-visible` rings.
+- All animations must respect `prefers-reduced-motion`.
+- Prefer `transform` + `opacity` for animations (GPU-composited).
+- Color contrast must remain readable on Midnight Ink.
 
-```css
-@utility glass-card {
-  /* backdrop-filter blur(20px), translucent bg (#2f343e at 0.55), multi-layer inset hairlines, near-black shadow */
-}
-
-@utility glass-card-hover {
-  /* &:hover brightens border + intensifies inset glow */
-}
-
-@utility glass-card-active {
-  /* Active/selected card with a rotating conic-gradient border.
-     Electric Iris → Frost Link arcs spin 360deg over 4s.
-     Uses @property --conic-angle to animate the gradient angle directly
-     (avoids transform+mask compositing bug that renders full rectangle).
-     Uses mask:content-box XOR for a clean 1px border-only gradient. */
-}
-
-@utility glass-card-hover-active {
-  /* Same conic-gradient border as glass-card-active, but hidden by default.
-     On hover, the border fades in (opacity 0→1) and begins spinning.
-     Subtle premium hover effect without distracting at rest.
-     See glass-card-active for animation technique notes. */
-}
-
-@utility glass-card-conic-top {
-  /* Thin 1px conic arc at the top edge — subtle blueprint glow accent.
-     Applied via ::after pseudo-element, stays out of content flow. */
-}
-
-@utility glass-dialog {
-  /* backdrop-filter blur(24px), 0.7 opacity, deeper shadows — for modal overlays */
-}
-
-@utility glass-header {
-  /* backdrop-filter blur(20px), midnight-ink at 0.75, subtle bottom hairline */
-}
-
-@utility glass-sidebar {
-  /* backdrop-filter blur(24px), midnight-ink at 0.85, right-edge hairline */
-}
-
-@utility conic-border-top {
-  /* 1px conic gradient border at top edge — framed section accent */
-}
-
-@utility hairline-inset {
-  /* box-shadow: rgba(186, 215, 247, 0.12) 0px 0px 0px 1px inset */
-}
-```
-
-### Animations
-
-```css
-@property --conic-angle {
-  /* <angle> registered property for animating conic gradient rotation.
-     Avoids transform+mask compositing issues that cause the full
-     pseudo-element rectangle to become visible when rotating. */
-}
-
-@keyframes conic-spin {
-  /* Animates --conic-angle from 0deg → 360deg over 4s, linear, infinite.
-     Only the custom property is animated — no layout/style recalculations.
-     The gradient's `from` angle shifts, creating the appearance of light
-     moving along the border without moving the element itself. */
-}
-
-@keyframes blueprint-shimmer {
-  /* background-position -200% → 200% over 2s — skeleton loading effect */
-}
-
-@utility skeleton-shimmer {
-  /* linear-gradient with #2f343e ↔ rgba(186, 215, 247, 0.08), background-size 200% */
-}
-```
+### 4.9 Background System (admin & main app shells)
+- Static Aurora Canvas: Midnight Ink + subtle SVG dot-grid.
+- Ambient Orb Layer: 3 large soft orbs (Electric Iris / Frost / Graphite blend), slow drift, `will-change: transform`, frozen under reduced-motion.
+- Optional faint geometric outline shapes for blueprint structure.
 
 ---
 
-## Implementation — shadcn/ui Component Patterns (Admin Panel)
+## 5. Component Inventory (shadcn + extensions)
 
-The following shadcn/ui components were aligned to AuthKit tokens during the admin panel refactoring:
+Use existing shadcn/ui primitives and extend only with Tailwind utilities that match the tokens above:
 
-| Component | Key Changes |
-|-----------|-------------|
-| `card.tsx` | `shadow-subtle-4` default elevation; `hover:border-[rgba(186,215,247,0.2)]` for default card hover; `variant="glass"` adds `glass-card-hover-active` — conic-gradient Electric Iris→Frost Link border that fades in + spins on hover via `@property --conic-angle` |
-| `button.tsx` | All variants use `rounded-sm` (2px); default: Electric Iris fill + subtle inset highlight + hover glow; ghost: `shadow-subtle` hairline + `hover:bg-white/[0.04]` + enhanced inset + `hover:shadow-sm` cool-blue glow; outline: `border-steel-border/60` → `hover:border-frost-link/30`; destructive: matched `border-destructive/10` with clean hover; `active:scale-[0.97]` on all variants; `transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]`; all non-primary variants use `focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50` (Frost Link cool-blue glow, unified with input) |
-| `input.tsx` | `rounded-sm` (2px) for sharp radius; rest `border-steel-border/60`; hover `border-frost-link/20`; focus `border-ring ring-3 ring-ring/50` (Frost Link glow, unified with button focus-visible) |
-| `select.tsx` | Trigger uses `rounded-sm` (2px) |
-| `dialog.tsx` | `rounded-lg` (10px) matches card radius |
-| `badge.tsx` | `rounded-md` (6px) per AuthKit badge spec |
-| `tabs.tsx` | `bg-graphite-plate` instead of `bg-muted` |
-| `table.tsx` + `data-table.tsx` | Container `rounded-lg glass-card`; header `bg-[#282c35] border-b border-steel-border/30`; alternating `bg-white/[0.012]` rows; `hover:bg-white/[0.02]` with left accent; responsive card view via `cardView`/`onViewToggle` props + `renderCard` custom renderer; `hideOnCard` column option; view toggle buttons (Table2/LayoutGrid icons); `card-list` loading skeleton variant |
-| `pagination.tsx` | Pill-shaped `rounded-full` nav buttons, ghost variant, `rtl:rotate-180` chevrons |
-| `empty-state.tsx` | Frost Link icon, Moonlight title, Fog description, ghost action button |
-| `error-state.tsx` | Ember icon, Moonlight title, Fog message, card container with `border-ember/20`, ghost retry button |
-| `status-badge.tsx` | `rounded-md px-2 py-0.5 shadow-subtle` with semantic color variants |
-| `search-input.tsx` | 2px radius via Input, Fog search icon, Pebble→Moonlight clear button |
-| `filter-bar.tsx` | shadcn Select (not native `<select>`), ghost reset button with RotateCcw |
-| `confirm-dialog.tsx` | Ember icon in `bg-ember/10 rounded-full` circle, Moonlight heading-sm title, Fog description, ghost cancel, Loader2 spinner for loading |
-| `skeleton.tsx` | `skeleton-shimmer` utility (blueprint-tinted gradient) replaces `animate-pulse bg-muted` |
-| `form.tsx` | `FormLabel` uses `text-pebble`; `FormMessage` uses `bg-destructive/5 rounded-sm` chip with AlertTriangle icon |
+- Card, Badge, Button, Dialog, Separator, Avatar, Tabs, Select, Input, Textarea, Form, Table (with card fallback), Skeleton, Tooltip, DropdownMenu, etc.
 
-### Admin Panel Page Patterns
-
-**Page wrapper:** Three-layer stack (static canvas → ambient orbs → content):
-
-```tsx
-<div className="relative flex h-screen overflow-hidden bg-[#05060f]">
-  {/* Layer 1: Static canvas — midnight ink + dot-grid texture */}
-  <div className="fixed inset-0 -z-10 bg-[#05060f]" aria-hidden="true">
-    <div className="absolute inset-0 opacity-40" style={{ backgroundImage: "url('data:image/svg+xml;base64,...')", backgroundSize: "60px 60px" }} />
-  </div>
-  {/* Layer 2: Ambient orbs — slow-drifting GPU-composited radial gradients */}
-  <AmbientBackground />
-  {/* Layer 3: Content — sidebar, header, main area */}
-  <AdminSidebar />
-  ...
-</div>
-```
-
-**Performance:** Canvas layer is fully static (no repaints). Orb layer uses `will-change: transform` on each orb for independent GPU compositing — only the `transform` matrix changes per frame, no paint or layout triggers. Confirmed 60fps during scroll; zero paint flashing in DevTools. The `filter: blur()` on orbs is applied once as a cached GPU texture.
-
-**Card styling:** Use `<Card variant="glass">` in the admin route. The `variant="glass"` prop applies the premium glassmorphism elevation stack plus the `glass-card-hover-active` conic border animation — on hover, a 1px Electric Iris → Frost Link conic-gradient border fades in (opacity 0→1) and begins rotating 360° over 4s via `@property --conic-angle`. The animation technique avoids `transform` on the pseudo-element (which causes mask compositing bugs where the full element rectangle becomes visible).
-
-**Content fade-in:** `<main className="... animate-in fade-in duration-300">` on the admin layout main element.
-
-**Dashboard layout:** 4 KPI cards in `grid gap-4 sm:grid-cols-2 lg:grid-cols-4` with the glass-card elevation stack above, Frost Link icons, Glacier heading-sm values, Fog labels, and hairline bottom gradient accent. Quick Actions in ghost pill buttons (`rounded-full`). System status via `StatusBadge`.
-
-**Data list pages:** `PageHeader` (Glacier heading-sm, Fog body-sm, `border-b border-steel-border/50`) → `FilterBar` → `DataTable` (glass-card container, responsive: table on desktop ↔ card list on mobile via `cardView` toggle + custom `renderCard`) → `Pagination` (responsive: stacked on mobile, horizontal on sm+).
-
-**Form pages:** Back `ArrowRight` link → `PageHeader` (borderless) → `FormCard` (`glass-card`) with `space-y-4` field spacing → button row (Electric Iris primary + Ghost cancel). Max width `max-w-2xl`.
-
-**Loading states:** Admin `loading.tsx` matched to page structure; `LoadingSkeleton` with `type="table"|"card"|"list"|"card-list"` for sub-pages; blueprint shimmer on all `<Skeleton>` elements; `card-list` variant matches the card view layout for seamless loading transitions.
-
-**Error handling:** `error.tsx` at `/admin/` root with `ErrorState` + `reset()`; not-found states per page use `ErrorState` + back navigation link.
+New or extended patterns that must be reused:
+- Animated-stroke Modal
+- Process Stepper
+- History Timeline (with ID resolution)
+- Status Badge (Persian mapped)
+- Icon container (consistent 20–24 px scale)
 
 ---
 
-## Quick Color Reference
-- text primary: #ffffff
-- text heading: #d8ecf8 (Glacier)
-- text body: #c7d3ea (Moonlight)
-- text muted: #81899b (Fog)
-- background: #05060f (Midnight Ink)
-- surface: #2f343e (Graphite Plate)
-- border: #3f4959 (Steel)
-- accent: #b6d9fc (Frost Link)
-- primary action: no distinct CTA color
+## 6. Development Conventions
 
-## 3-5 Example Component Prompts
+- Package manager: **pnpm** only.
+- Server Actions only for backend communication.
+- Logical CSS properties exclusively.
+- Mobile-first.
+- Never introduce new third-party UI libraries without explicit approval.
+- When adding any new page, the first question is: “Does this follow the same visual language as the already-redesigned request detail page?”
 
-**Hero Section**: Midnight Ink #05060f background with a faint 1px Blueprint Glow grid. Eyebrow in dotDigital 15px / 0.1em tracking / #81899b, reading 'Introducing'. Wordmark in aeonikPro 48px / weight 500 / #ffffff / line-height 1.14. Subtitle in Untitled Sans 18px / weight 400 / #9da7ba. A centered 2px-radius Electric Iris #663af3 'Get started' button sits below. Top of hero carries a conic gradient border in rgba(124, 145, 182, 0.5).
+---
 
-**Sign-In Widget Preview Card**: Graphite Plate #2f343e background, 10px radius, 24px padding. Card elevation stack: inset 0px 1px 1px 0px rgba(199, 211, 234, 0.12) + inset 0px 24px 48px 0px rgba(199, 211, 234, 0.05) + 0px 24px 32px 0px rgba(6, 6, 14, 0.7). Email input with 2px radius, 1px Steel Border #3f4959, 14px Untitled Sans placeholder. Primary 'Continue' button: 2px radius, Electric Iris #663af3, white text, 10px 16px padding. Two ghost social buttons below in Moonlight #c7d3ea with the same 2px hairline.
+## 7. Quick Checklist for Any New Page
 
-**Feature Icon Row**: Six 40px square Graphite Plate #2f343e tiles with 6px radius, each containing a 1.5px-stroke Moonlight #c7d3ea outlined icon. Labels below in Untitled Sans 12–14px / weight 400 / #81899b. Tiles connected by 1px Moonlight lines with a 6px rgba(186, 207, 247, 0.32) glow.
-
-**Theme Toggle Pill**: 999px radius pill, Graphite Plate #2f343e fill, 6px padding. Two 14px icon segments (moon and sun) in Moonlight #c7d3ea, active segment slightly brightened to Glacier #d8ecf8. Caption 'Light and dark modes supported.' below in Untitled Sans 14px / #81899b.
-
-**Customization Annotation Chip**: 10px radius, Graphite Plate #2f343e fill, 1px inset rgba(186, 215, 247, 0.12) hairline. Label in Untitled Sans 12px / weight 500 / #c7d3ea. Connects to its target element with a 1px Moonlight guideline. Inside the Colour chip, four 12px squares at 2px radius filled with Electric Iris #663af3, Ember #e46d4c, Azure #027dea, and Cipher Mint #269684.
-
-## Similar Brands
-
-- **Linear** — Same midnight-canvas + single saturated accent + thin-stroke outlined iconography + tight geometric sans display face.
-- **Vercel** — Dark blueprint aesthetic with a single vivid accent (their orange replaces AuthKit's iris), centered max-width hero, and product previews rendered as CSS rather than screenshots.
-- **Clerk** — Auth-adjacent developer tool with embedded sign-in widget previews on a dark canvas, a cool off-white type system, and a single chromatic action color.
-- **Resend** — Cool blue-gray dark palette, restrained color use, and centered single-column hero with a faint background pattern that frames the wordmark.
-
-## Quick Start
-
-### CSS Custom Properties
-
-```css
-:root {
-  /* Colors */
-  --color-midnight-ink: #05060f;
-  --color-graphite-plate: #2f343e;
-  --color-steel-border: #3f4959;
-  --color-fog: #81899b;
-  --color-pebble: #9da7ba;
-  --color-moonlight: #c7d3ea;
-  --color-ice: #d1e4fa;
-  --color-glacier: #d8ecf8;
-  --color-frost-link: #b6d9fc;
-  --color-electric-iris: #663af3;
-  --color-ember: #e46d4c;
-  --color-azure: #027dea;
-  --color-cipher-mint: #269684;
-  --color-blueprint-glow: #bacff7;
-  --gradient-blueprint-glow: linear-gradient(0deg, #d8ecf8 0%, #98c0ef 100%);
-
-  /* Typography — Font Families */
-  --font-untitled-sans: 'Untitled Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-aeonikpro: 'aeonikPro', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-dotdigital: 'dotDigital', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-
-  /* Typography — Scale */
-  --text-caption: 12px;
-  --leading-caption: 1.5;
-  --tracking-caption: -0.01px;
-  --text-body-sm: 14px;
-  --leading-body-sm: 1.43;
-  --tracking-body-sm: -0.01px;
-  --text-body: 16px;
-  --leading-body: 1.5;
-  --tracking-body: -0.01px;
-  --text-subheading: 18px;
-  --leading-subheading: 1.33;
-  --tracking-subheading: -0.01px;
-  --text-heading-sm: 24px;
-  --leading-heading-sm: 1.2;
-  --tracking-heading-sm: -0.01px;
-  --text-heading: 28px;
-  --leading-heading: 1.17;
-  --text-display: 48px;
-  --leading-display: 1.14;
-
-  /* Typography — Weights */
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-
-  /* Spacing */
-  --spacing-unit: 4px;
-  --spacing-4: 4px;
-  --spacing-8: 8px;
-  --spacing-12: 12px;
-  --spacing-16: 16px;
-  --spacing-20: 20px;
-  --spacing-24: 24px;
-  --spacing-32: 32px;
-  --spacing-36: 36px;
-  --spacing-40: 40px;
-  --spacing-48: 48px;
-  --spacing-56: 56px;
-  --spacing-100: 100px;
-  --spacing-120: 120px;
-  --spacing-200: 200px;
-
-  /* Layout */
-  --page-max-width: 1200px;
-  --section-gap: 120px;
-  --card-padding: 24px;
-  --element-gap: 8-16px;
-
-  /* Border Radius */
-  --radius-sm: 2px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
-  --radius-2xl: 16px;
-  --radius-3xl: 24px;
-  --radius-3xl-2: 28px;
-  --radius-3xl-3: 44px;
-  --radius-full: 999px;
-  --radius-full-2: 4999.5px;
-  --radius-full-3: 9999px;
-
-  /* Named Radii */
-  --radius-cards: 10-16px;
-  --radius-pills: 999px;
-  --radius-badges: 6px;
-  --radius-inputs: 2px;
-  --radius-buttons: 2px;
-
-  /* Shadows */
-  --shadow-sm: rgba(186, 207, 247, 0.32) 0px 0px 6px 0px;
-  --shadow-md: rgba(238, 186, 247, 0.24) 0px 0px 12px 0px;
-  --shadow-subtle: rgba(186, 215, 247, 0.12) 0px 0px 0px 1px inset;
-  --shadow-subtle-2: rgba(199, 211, 234, 0.12) -0.5px 0.5px 1px 0px inset, rgba(186, 215, 247, 0.08) 0px 0px 96px 0px inset;
-  --shadow-subtle-3: rgba(186, 214, 247, 0.06) 0px 0px 0px 1px inset;
-  --shadow-subtle-4: rgba(199, 211, 234, 0.12) 0px 1px 1px 0px inset, rgba(199, 211, 234, 0.05) 0px 24px 48px 0px inset, rgba(6, 6, 14, 0.7) 0px 24px 32px 0px;
-  --shadow-subtle-5: rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
-  --shadow-subtle-6: rgba(216, 236, 248, 0.2) 0px 1px 1px 0px inset, rgba(168, 216, 245, 0.06) 0px 24px 48px 0px inset, rgba(0, 0, 0, 0.3) 0px 16px 32px 0px;
-  --shadow-subtle-7: rgba(216, 236, 248, 0.2) 0px 1px 1px 0px inset, rgba(168, 216, 245, 0.06) 0px 24px 48px 0px inset;
-
-  /* Animations */
-  --animate-conic-spin: conic-spin 4s linear infinite;
-
-  /* Conic angle for gradient animation (registered via @property below) */
-  --conic-angle: 0deg;
-
-  /* Surfaces */
-  --surface-canvas: #05060f;
-  --surface-plate: #2f343;
-  --surface-iris-lift: #663af3;
-}
-
-@property --conic-angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-
-@keyframes slow-drift {
-  0%, 100% { transform: translate(0px, 0px); }
-  50% { transform: translate(-40px, 30px); }
-}
-```
-
-### Tailwind v4
-
-```css
-@theme {
-  /* Colors */
-  --color-midnight-ink: #05060f;
-  --color-graphite-plate: #2f343e;
-  --color-steel-border: #3f4959;
-  --color-fog: #81899b;
-  --color-pebble: #9da7ba;
-  --color-moonlight: #c7d3ea;
-  --color-ice: #d1e4fa;
-  --color-glacier: #d8ecf8;
-  --color-frost-link: #b6d9fc;
-  --color-electric-iris: #663af3;
-  --color-ember: #e46d4c;
-  --color-azure: #027dea;
-  --color-cipher-mint: #269684;
-  --color-blueprint-glow: #bacff7;
-
-  /* Typography */
-  --font-untitled-sans: 'Untitled Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-aeonikpro: 'aeonikPro', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-dotdigital: 'dotDigital', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-
-  /* Typography — Scale */
-  --text-caption: 12px;
-  --leading-caption: 1.5;
-  --tracking-caption: -0.01px;
-  --text-body-sm: 14px;
-  --leading-body-sm: 1.43;
-  --tracking-body-sm: -0.01px;
-  --text-body: 16px;
-  --leading-body: 1.5;
-  --tracking-body: -0.01px;
-  --text-subheading: 18px;
-  --leading-subheading: 1.33;
-  --tracking-subheading: -0.01px;
-  --text-heading-sm: 24px;
-  --leading-heading-sm: 1.2;
-  --tracking-heading-sm: -0.01px;
-  --text-heading: 28px;
-  --leading-heading: 1.17;
-  --text-display: 48px;
-  --leading-display: 1.14;
-
-  /* Spacing */
-  --spacing-4: 4px;
-  --spacing-8: 8px;
-  --spacing-12: 12px;
-  --spacing-16: 16px;
-  --spacing-20: 20px;
-  --spacing-24: 24px;
-  --spacing-32: 32px;
-  --spacing-36: 36px;
-  --spacing-40: 40px;
-  --spacing-48: 48px;
-  --spacing-56: 56px;
-  --spacing-100: 100px;
-  --spacing-120: 120px;
-  --spacing-200: 200px;
-
-  /* Border Radius */
-  --radius-sm: 2px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
-  --radius-2xl: 16px;
-  --radius-3xl: 24px;
-  --radius-3xl-2: 28px;
-  --radius-3xl-3: 44px;
-  --radius-full: 999px;
-  --radius-full-2: 4999.5px;
-  --radius-full-3: 9999px;
-
-  /* Animations */
-  --animate-conic-spin: conic-spin 4s linear infinite;
-
-  /* Shadows */
-  --shadow-sm: rgba(186, 207, 247, 0.32) 0px 0px 6px 0px;
-  --shadow-md: rgba(238, 186, 247, 0.24) 0px 0px 12px 0px;
-  --shadow-subtle: rgba(186, 215, 247, 0.12) 0px 0px 0px 1px inset;
-  --shadow-subtle-2: rgba(199, 211, 234, 0.12) -0.5px 0.5px 1px 0px inset, rgba(186, 215, 247, 0.08) 0px 0px 96px 0px inset;
-  --shadow-subtle-3: rgba(186, 214, 247, 0.06) 0px 0px 0px 1px inset;
-  --shadow-subtle-4: rgba(199, 211, 234, 0.12) 0px 1px 1px 0px inset, rgba(199, 211, 234, 0.05) 0px 24px 48px 0px inset, rgba(6, 6, 14, 0.7) 0px 24px 32px 0px;
-  --shadow-subtle-5: rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;
-  --shadow-subtle-6: rgba(216, 236, 248, 0.2) 0px 1px 1px 0px inset, rgba(168, 216, 245, 0.06) 0px 24px 48px 0px inset, rgba(0, 0, 0, 0.3) 0px 16px 32px 0px;
-  --shadow-subtle-7: rgba(216, 236, 248, 0.2) 0px 1px 1px 0px inset, rgba(168, 216, 245, 0.06) 0px 24px 48px 0px inset;
-}
-
-/* Required for conic-spin animation — registers --conic-angle so the
-   keyframe can interpolate it from 0deg → 360deg. Without this registration,
-   the conic border will still render (via fallback 0deg) but won't animate. */
-@property --conic-angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-```
+- [ ] All icons ≥ 20 px and consistent
+- [ ] Cards preferred over tables where mobile matters
+- [ ] Process / status progress is the most prominent element (if applicable)
+- [ ] History / activity resolves IDs to human names
+- [ ] Every modal uses the elevated animated-stroke treatment
+- [ ] Zero English UI strings
+- [ ] Soft blue glows + hairlines, no heavy shadows
+- [ ] Comfortable spacing & logical properties
+- [ ] Reduced-motion respected
+- [ ] Persian RTL throughout
