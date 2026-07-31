@@ -4,156 +4,169 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
-# LesanSatek Frontend - Next.js Application
+# LesanSatek Frontend — Next.js Application
 
 ## Project Overview
 
-LesanSatek frontend is a Next.js 16 application for an organizational process management system. It allows organizations to define and manage their purchasing processes through a visual process builder. Each organization can create departments, assign responsible employees, and build hierarchical unit structures (organization → department → employee → units/subunits in a tree). The system provides a flexible workflow engine for defining, approving, and executing purchasing workflows.
+LesanSatek frontend is a **Next.js 16** application for an organizational process management system. Organizations define and manage purchasing processes through a visual process builder. Each organization has a hierarchical **unit tree** (Organization → Unit → sub-units). **There is no Department model.** Users belong to organizations and units via **roles** (`roles[]`) and M:N membership relations (`units[]`, `organizations[]`). The system provides a flexible workflow engine for defining, approving, and executing purchasing workflows, with role scopes at organization, unit, and store level.
 
 ### Key Features
 
-- Secure JWT-based authentication with role-based access
-- Visual process builder for creating and managing purchasing workflows
-- Organization management with hierarchical unit tree
-- Department and employee management
-- Purchasing request management through defined processes
-- Full Persian (RTL) language support
-- Responsive, mobile-first design with dark/light theme support
-- Server Actions for all backend communication (secure and efficient)
+- Secure JWT-based authentication with role-based access (scopes: organization / unit / store)
+- Visual process builder with **auto process resolution** (no manual `processId` on submit)
+- Organization management with hierarchical unit tree and org-chart API
+- StoreHead panel for managing store inventory (stuff, wares, offers)
+- Purchasing requests: `Draft → Pending → step approvals → Completed` lifecycle, with `stuff` and `tender` selection modes
+- Tender offers, budget lines/allocations/encumbrances, goods receipts, payment orders, inventory, stock movements, consumption
+- Full Persian (fa) RTL support, dark/light/system theme
+- Server Actions for all backend communication
 
-### Architecture
+## Core Domain Concepts
 
-- **Frontend Framework**: Next.js 16 with App Router (Server Components by default)
-- **Styling**: Tailwind CSS v4 + shadcn/ui (Radix UI primitives)
-- **State Management**: Zustand for global state
-- **Forms**: React Hook Form + Zod validation
-- **RTL Layout**: Persian-only, RTL
-- **Theming**: next-themes for seamless dark/light/system mode
-- **API Communication**: Server Actions only (never direct client-side fetch for backend calls)
-- **Type Safety**: Generated declarations from backend + strict TypeScript
+| Concept | Description |
+|---|---|
+| Organization | Root entity. Owns units, users (M:N via `organizations[]`), processes, stores, wares. Scope type `organization`. |
+| Unit | Hierarchical tree node under an organization (parent/children). Types include `General`, `Warehouse`, `Logistics`, `Production`, `Administration`, `Finance`, `Expert`. |
+| User | People with `roles[]` plus M:N `units[]` and `organizations[]` membership. Roles are the single source of access truth. |
+| Role / Scope | `{ roleId, name, scopeType?, scopeId? }`. `scopeType` ∈ `organization` \| `unit` \| `store`. `scopeId` points to the record the role governs. |
+| Store | Physical store belonging to an organization; governed by a StoreHead (`scopeType: "store"`). Has `location` / `geoLocation` (GeoJSON). |
+| Stuff | Concrete store inventory item referencing a Ware; has `quantity`, `price`, `hasAbsolutePrice`, `pricePercentage`, `expiration`, `barcode`, `qrc`, payment-percentage fields (twoMonth…twentyFourMonth). |
+| Ware | Concrete product (5th node of ware hierarchy). Fields: `name`, `enName`, `brand`, `price`, `orderedNumber`, `irc`, `umdns`, `gtin`, `photoUrl`. |
+| PurchasingRequest | (PR) Flows through the process lifecycle. `selectionType`: `none` \| `stuff` \| `tender`. |
+| TenderOffer | Supplier offer for a PR tender. Lifecycle `submitted → accepted/rejected`. |
+| Process | Workflow definition; auto-resolved from scope chain for a PR. |
+| BudgetLine / BudgetEncumbrance / BudgetAllocation | Budget tracking; encumbrance auto-created on PR submit when `budgetLineId` + `estimatedAmount` present. |
+| GoodsReceipt / PaymentOrder | Post-finalization: goods receipt adds inventory and auto-creates a payment order. |
+| Inventory / StockMovement / Consumption | Ware-based inventory (`unit + ware` unique), system-created movements, consumption records. |
+
+## Roles
+
+Roles live on the User model via `roles: Role[]`. Each role:
+
+```ts
+{ roleId: string, name: string, scopeType?: "organization" | "unit" | "store", scopeId?: string }
+```
+
+**Single source of truth is `user.addOrRemoveRoles`.** Never assign access by mutating unit/user relations — always use `addOrRemoveRoles`. The old `headedUnit` / `headedOrganization` fields are **removed**; `organization` single relation is replaced by M:N `organizations[]`.
+
+| Role | Typical access |
+|---|---|
+| Manager | Global; manages users, units, org-wide everything. |
+| Admin | Global-ish; same high-level access as Manager. |
+| OrgHead | Scoped to one organization (`scopeType: "organization"`). Finalizes PRs, sees org analytics/org-chart. |
+| UnitHead | Scoped to one unit (`scopeType: "unit"`). Approves steps, registers PRs, dashboard statistics. |
+| StoreHead | Scoped to one store (`scopeType: "store"`). Manages stuff and offers for that store only. |
+| Employee | Can register/submit PRs (not approve). |
+| Ordinary | Read-only; cannot submit PRs. |
+
+The backend also enforces **feature flags** in roles/features, e.g. `canRegisterPurchaseRequest`, `canSubmitPurchaseRequest`, `canManageBudget`, `canIssuePaymentOrder`, `canViewBudgetReports`.
+
+## Architecture
+
+| Layer | Tech |
+|---|---|
+| Framework | Next.js 16 (App Router, Server Components by default) |
+| Styling | Tailwind CSS v4 + shadcn/ui (**base-ui primitives** — not Radix) |
+| Design System | `.agents/THEME/DESIGN.md` — "blueprint on midnight glass" (AuthKit). Mandatory for all public/marketing AND admin UI. |
+| State | Zustand |
+| Forms | React Hook Form + Zod |
+| RTL | Persian-only (fa), full RTL |
+| Theming | next-themes |
+| API | Server Actions only (never direct client fetch to backend) |
+| Auth | JWT in `httpOnly` cookie named `token`; sent as header `token` (no "Bearer" prefix) |
+| Types | Generated declarations (`src/types/declarations/selectInp`) + strict TS |
+| Package manager | **pnpm only** (never npm/yarn) |
+
+## Design System (Mandatory)
+
+Every page MUST follow `.agents/THEME/DESIGN.md`. Non-negotiable rules:
+
+- Canvas: **Midnight Ink** `#05060f`
+- Card surfaces: **Graphite Plate** `#2f343e`
+- **Electric Iris** `#663af3` — exactly **one** primary CTA per viewport
+- Icons ≥ 20–24 px
+- Persian (fa) only, RTL only
+- No templated SaaS defaults; no generic gradients/shadows outside the blueprint
+- Dark/light via Tailwind v4 `@custom-variant dark` + next-themes (no FOUC)
+- Logical CSS properties (`ps-`/`pe-`/`ms-`/`me-`/`start-`/`end-`) are REQUIRED. Never use `left`/`right` or physical padding/margin.
 
 ## Building and Running
 
-**IMPORTANT: This project uses `pnpm` as the package manager. Never use `npm` or `yarn`.**
-
-**ALWAYS use the most recent stable version of dependencies.** When installing packages, prefer the latest stable release unless a specific version is required for compatibility.
-
 ```bash
-# Install dependencies with pnpm (REQUIRED - do not use npm/yarn)
-pnpm install
-
-# Run the development server (uses Turbopack)
-pnpm dev
+pnpm install      # pnpm REQUIRED
+pnpm dev          # Next.js dev (Turbopack)
 ```
 
-The app will be available at `http://localhost:3000`.
+App runs at `http://localhost:3000`. Backend must be running at `http://localhost:1370` (`cd back && deno task bc-dev`). Backend playground: `http://localhost:1370/playground`.
 
-### Environment Configuration
+## Environment Configuration
 
-Key variables from `.env.frontend`:
-- `NEXT_PUBLIC_BACKEND_URL` – Public backend API URL (`http://localhost:1370`)
+Variables live in **`.env.local`** (the actual repo file — not `.env.frontend`):
+
+- `NEXT_PUBLIC_BACKEND_URL` – Public backend URL (`http://localhost:1370`)
 - `NEXT_PUBLIC_APP_URL` – Public app URL (`http://localhost:3000`)
 
-## Development Conventions
-
-### Code Structure
+## Code Structure
 
 ```
-front/
-├── src/
-│   ├── app/                    # Next.js App Router
-│   │   ├── (routes)/           # Public routes
-│   │   ├── admin/              # Admin panel
-│   │   ├── actions/            # Server actions
-│   │   │   ├── auth/           # Auth server actions
-│   │   │   ├── organization/   # Organization CRUD
-│   │   │   ├── department/     # Department CRUD
-│   │   │   ├── employee/       # Employee CRUD
-│   │   │   ├── unit/           # Unit/subunit CRUD
-│   │   │   ├── process/        # Process CRUD
-│   │   │   └── request/        # Purchasing request CRUD
-│   │   └── globals.css         # Global styles + Tailwind
-│   ├── components/             # React components
-│   │   ├── ui/                 # shadcn/ui components
-│   │   ├── form/               # Reusable form components
-│   │   ├── layout/             # Layout components
-│   │   └── providers/          # Context providers
-│   ├── stores/                 # Zustand stores
-│   ├── lib/                    # Utilities
-│   │   ├── utils.ts            # cn() function
-│   │   └── api.ts              # Lesan API client
-│   ├── types/                  # TypeScript types
-│   │   └── declarations/       # Backend-generated types
-│   └── hooks/                  # Custom React hooks
-
-├── public/                     # Static assets
-├── components.json             # shadcn/ui configuration
-└── next.config.ts              # Next.js configuration
+src/
+├── app/                      # App Router
+│   ├── (marketing routes)/   # about, blog, changelog, contact, docs, faq, pricing, privacy, register, terms, coming-soon
+│   ├── admin/                # Full admin panel (all models)
+│   ├── requests/             # Request center (my-requests, new, [id], consumption, inventory, stock-movements)
+│   ├── storehead/            # StoreHead panel (store, stuff, tenders, my-offers, purchasing-requests)
+│   ├── orghead/              # OrgHead panel (requests, processes, units, users, org-chart, settings, consumption, inventory, stock-movements)
+│   ├── unit-head/            # UnitHead panel (requests, finance, goods-receipt, consumption, inventory, stock-movements)
+│   ├── ordinary/             # Ordinary user home
+│   ├── login/                # Login page
+│   ├── actions/              # Server Actions (one folder per model)
+│   └── globals.css
+├── components/
+│   ├── ui/                   # shadcn/ui components (base-ui primitives)
+│   ├── form/                 # Reusable form components
+│   ├── layout/               # Layout components
+│   └── providers/
+├── stores/                   # Zustand stores
+├── lib/                      # api.ts, auth.ts, roles.ts, server-action.ts, process-scope.ts, client-active-role.ts, ...
+├── types/declarations/       # selectInp.ts → ReqType / DeepPartial
+└── hooks/
 ```
 
-### RTL Layout (Persian)
+## RTL & Persian
 
-- **CRITICAL:** This application is **Persian (fa) only**. Never introduce English or any second language.
-- **CRITICAL:** All user-facing text — labels, validation messages, notifications, tooltips, placeholders — MUST be in Persian.
-- \`dir="rtl"\` is set on the \`<html>\` element for full RTL layout.
-- **Never add i18n, locale switching, or multi-language support.**
+- **Persian (fa) only.** Never introduce English UI text or i18n/multi-language support.
+- All user-facing text — labels, validation messages, notifications, tooltips, placeholders — MUST be Persian.
+- `dir="rtl"` is set on `<html>`.
+- **RTL gotcha:** some `@base-ui/react` primitives default to `dir="ltr"`. Always pass `dir="rtl"` explicitly:
+  ```tsx
+  <Tabs defaultValue="list" className="w-full" dir="rtl" />
+  ```
 
-#### RTL Gotchas with base-ui Components
+## Authentication
 
-Some `@base-ui/react` primitives may inject `dir="ltr"` by default when no explicit `dir` prop is provided. Always explicitly pass `dir="rtl"`:
+- JWT stored in `httpOnly` cookie named `token`.
+- Token sent as header `token` (no "Bearer" prefix) — Lesan convention.
+- `activeRoleId` is required by most actions and is injected server-side from the `activeRoleId` cookie.
+- Helpers in `@/lib/auth`: `getToken()`, `getActiveRoleId()`. Also `@/lib/server-action.ts` (`getServerHeaders`, `withActiveRole`, `isSecureRequest`) and `@/lib/roles.ts` (`getAccessiblePanels`, `getDefaultPanel`, `getPanelForRole`, `getHighestRole`).
 
-```tsx
-// ❌ BAD – component defaults to dir="ltr", breaking all children
-<Tabs defaultValue="list" className="w-full">
+## Server Actions Architecture (Lesan Framework)
 
-// ✅ GOOD – Explicitly pass the direction
-<Tabs defaultValue="list" className="w-full" dir="rtl">
-```
-
-### Styling
-
-- **Tailwind CSS v4** as the core utility framework.
-- **shadcn/ui** as the primary component library (built on base-ui + Tailwind).
-  - Full RTL support (CLI generates logical properties when `rtl: true` in `components.json`).
-- Dark theme using Tailwind v4 `@custom-variant dark` + **next-themes** (no FOUC).
-- Mobile-first responsive design.
-- **Logical CSS properties (`ps-`, `pe-`, `ms-`, `me-`, `start-`, `end-`) are REQUIRED for all spacing and layout. Never use `left`/`right` or physical padding/margin properties.**
-
-### Authentication
-
-- JWT-based with secure cookie handling.
-- Token is stored in an `httpOnly` secure cookie named `token`.
-- Token is sent as `token` header (no "Bearer" prefix) per Lesan convention.
-- Auth state managed via React Context + Zustand where needed.
-
-## Server Actions Architecture (Lesan Framework Integration)
-
-### Overview
-
-Server Actions are the exclusive method for backend communication. They provide:
-- **Security**: All requests run server-side, hiding backend URLs and sensitive logic
-- **Type Safety**: Full TypeScript support via auto-generated `ReqType` declarations from Lesan
-- **Consistency**: Uniform CRUD pattern across all models
-- **Authentication**: Automatic JWT token extraction from secure cookies
-- **Selective Data Fetching**: Specify exactly which fields to return (GraphQL-like)
+Server Actions are the **exclusive** method for backend communication.
 
 ### Directory Structure
 
 ```
 src/app/actions/
-├── <model>/              # e.g., organization, department, employee, unit, process
-│   ├── add.ts           # Create a single record
-│   ├── get.ts           # Retrieve a single record by ID
-│   ├── gets.ts          # Retrieve multiple records (with pagination/filtering)
-│   ├── update.ts        # Update an existing record (pure fields only)
-│   ├── updateRelations.ts # Update relations separately (replace semantics)
-│   ├── remove.ts        # Delete a record
-│   └── count.ts         # Get count of records
-├── auth/                # Authentication-specific actions
-│   ├── login.ts
-│   └── logout.ts
-└── file/                # File-specific operations
-    └── upload.ts
+├── <model>/              # e.g., organization, unit, user, store, stuff, ware, ...
+│   ├── add.ts            # Create
+│   ├── get.ts            # Single by ID
+│   ├── gets.ts           # List (pagination/filtering)
+│   ├── update.ts         # Pure fields
+│   ├── updateRelations.ts# Relations (replace: true semantics)
+│   ├── remove.ts
+│   └── count.ts
+├── auth/                 # login.ts, logout.ts
+└── file/                 # upload.ts
 ```
 
 ### Standard Action Pattern
@@ -161,317 +174,226 @@ src/app/actions/
 ```ts
 "use server";
 import { AppApi } from "@/lib/api";
+import { getToken, getActiveRoleId } from "@/lib/auth";
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
-import { cookies } from "next/headers";
 
-export const <actionName> = async (
-  data: ReqType["main"]["<model>"]["<action>"]["set"],
-  getSelection?: DeepPartial<ReqType["main"]["<model>"]["<action>"]["get"]>
+export const add = async (
+  data: ReqType["main"]["<model>"]["add"]["set"],
+  getSelection?: DeepPartial<ReqType["main"]["<model>"]["add"]["get"]>
 ) => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
-
-  const response = await AppApi(undefined, token).send({
-    service: "main",
-    model: "<model>",
-    act: "<action>",
-    details: {
-      set: data,
-      get: getSelection || {},
-    },
-  });
-
-  return response;
+  try {
+    const token = await getToken();
+    const activeRoleId = await getActiveRoleId();
+    const result = await AppApi(undefined, token).send({
+      service: "main",
+      model: "<model>",
+      act: "<action>",
+      details: {
+        set: { ...data, activeRoleId },
+        get: getSelection || {},
+      },
+    });
+    return result;
+  } catch (error: unknown) {
+    return {
+      success: false,
+      body: { message: error instanceof Error ? error.message : "خطا در انجام عملیات" },
+    };
+  }
 };
 ```
 
 ### Action Types
 
-#### add - Create a Record
-```ts
-const newOrg = await add(
-  { name: "Org Name", ... },
-  { _id: 1, name: 1 },
-);
-```
+| Action | Notes |
+|---|---|
+| `add` | Create a record |
+| `get` | Single record by `_id` — body is an array (`body[0]`) |
+| `gets` | List with `{ page, limit, filter, ... }`; default `limit=50`, `page=1` |
+| `update` | Pure fields only |
+| `updateRelations` | Relation updates, `replace: true` semantics; supports `remove*` boolean flags; camelCase IDs in set |
+| `remove` | Delete |
+| `count` | `{ count: 1 }` in get |
 
-#### get - Retrieve a Single Record
-```ts
-const org = await get(
-  { _id: "507f1f77bcf86cd799439011" },
-  { _id: 1, name: 1, departments: { _id: 1, name: 1 } },
-);
-```
-
-#### gets - Retrieve Multiple Records
-```ts
-const orgs = await gets(
-  { page: 1, limit: 20, filter: { /* ... */ } },
-  { _id: 1, name: 1 },
-);
-```
-
-#### update - Modify a Record (Pure Fields Only)
-```ts
-const updated = await update(
-  { _id: "...", name: "Updated Name" },
-  { _id: 1, name: 1 },
-);
-```
-
-#### updateRelations — Modify Relations Separately
-
-**Use `updateRelations` for models that have dedicated relation-update actions** (e.g., `organization.updateRelations`, `user.updateUserRelations`, `unit.updateRelations`). This action uses `replace: true` semantics — all fields in the set are replaced; omitting a field leaves it unchanged.
-
-**Remove flags** — some models support explicit removal via boolean flags:
-```ts
-// Examples:
-await updateRelations(
-  {
-    activeRoleId: "",
-    _id: orgId,
-    state: "STATE_ID",
-    city: "CITY_ID",
-    removeLogo: true,
-    removeHead: true,
-  },
-  { _id: 1, name: 1 }
-);
-
-await updateUserRelations(
-  {
-    activeRoleId: "",
-    _id: userId,
-    organization: "ORG_ID",
-    state: "STATE_ID",
-    city: "CITY_ID",
-  },
-  { _id: 1, first_name: 1 }
-);
-```
-
-**Separate Relations Pages** — Each model's relations are managed on a standalone `/admin/<entity>/:id/relations` page accessible from:
-- The list view (Share2 icon button per row in DataTable)
-- The edit view (centered "ویرایش روابط" button below the pure-fields form)
-
-The relations page lives at `src/app/admin/<entity>/[id]/relations/page.tsx`, shares no form context with the pure-fields edit page, and uses the standalone `SearchSelect` component (not `FormSearchSelect`) since it manages state outside react-hook-form.
-
-#### remove - Delete a Record
-```ts
-const result = await remove(
-  { _id: "..." },
-  { _id: 1 },
-);
-```
-
-#### count - Get Record Count
-```ts
-const total = await count({ filter: { isActive: true } }, { count: 1 });
-```
-
-### Field Selection (`get` Parameter)
+### Field Selection (`get`)
 
 ```ts
-// Return only specific fields
-{ _id: 1, name: 1, email: 1 }
-
-// Include nested relations
-{
-  _id: 1,
-  name: 1,
-  departments: { _id: 1, name: 1, head: { _id: 1, first_name: 1 } }
-}
-
-// Return all fields (not recommended for performance)
-{}
+{ _id: 1, name: 1 }                          // specific fields
+{ _id: 1, organization: { _id: 1, name: 1 } } // nested relations (NOT 'organizationId')
+{}                                            // all fields — avoid
 ```
-
-**Best Practices:**
-- Always specify fields explicitly (never use `{}` unless necessary)
-- Only request fields you actually need
-- Use nested selections for related data (avoids N+1 queries)
 
 ### Field Naming Conventions
 
-#### 1. Field Projections in `get` Parameter
-Use nested objects to fetch related data, NOT camelCase IDs:
-```ts
-const departments = await gets(
-  { page: 1, limit: 20 },
-  {
-    _id: 1,
-    name: 1,
-    organization: { _id: 1, name: 1 },  // NOT 'organizationId'
-    head: { _id: 1, first_name: 1 },     // NOT 'headId'
-  }
-);
-```
-
-#### 2. Set Parameters in `add` and `update` Actions
-Use camelCase IDs when creating or updating records:
-```ts
-const newDept = await add(
-  {
-    name: "Department Name",
-    organizationId: "123...",  // camelCase ID
-    headId: "456...",          // camelCase ID
-  },
-  { _id: 1, name: 1 }
-);
-```
-
-#### 3. Update Relations Separately
-
-See the full `updateRelations` documentation under [Action Types](#updaterelations--modify-relations-separately).
+1. **`get` projections:** nested objects for relations — `organization: { _id: 1, name: 1 }`, NOT `organizationId`.
+2. **`set` in add/update:** camelCase IDs — `organizationId: "123..."`.
+3. **Backend filters (`filter`/`sort`):** dot notation for nested relations — `"unit._id"`.
 
 ### Response Structure
 
-All Lesan actions return a standardized response:
-```ts
-{ success: boolean, body: any }
-```
+All Lesan actions return `{ success: boolean, body: any }`.
 
-#### Response Body Format
-- **`act: "get"`** (standard) → `response.body` is an **array** with one element. Access via `response.body[0]`.
-- **Custom-named actions** (e.g., `getUser`, `getMe`) → `response.body` is a **single object**.
+- Standard `act: "get"` → `body` is an **array**; access `response.body[0]`.
+- Custom-named actions (`getMe`, `getPendingByUnit`, `dashboardStatistic`, `getOrgChart`, …) → `body` is a **single object** (or custom shape).
 
-```ts
-// Standard get — returns array
-const response = await get({ _id: id }, { name: 1 });
-const entity = response.body[0];
+### The AppApi Client
 
-// Custom get — returns single object
-const response = await getUser({ _id: id }, { first_name: 1 });
-const user = response.body;
-```
-
-### The AppApi Client (Type-Safe)
-
-The `AppApi` function (in `@/lib/api.ts`) wraps the auto-generated `lesanApi` from backend declarations for full type safety:
-
-```ts
-import { lesanApi } from "@/types/declarations/selectInp";
-
-export const AppApi = (lesanUrl?: string, token?: string) => {
-  return lesanApi({
-    URL: lesanUrl || getLesanUrl(),
-    baseHeaders: {
-      connection: "keep-alive",
-      ...(token ? { token } : {}), // No "Bearer" prefix!
-    },
-  });
-};
-```
-
-The `lesanApi` client provides a fully typed `send()` method that auto-suggests service, model, and action names with their corresponding `set`/`get` types from `ReqType`. You get intelligent autocompletion for all available actions and their parameters.
-
-### Environment Configuration
-
-Server actions rely on:
-- `NEXT_PUBLIC_BACKEND_URL` – Public backend URL (`http://localhost:1370`, client-side)
-- Server-side uses internal URL resolution automatically via `AppApi`
+`AppApi(lesanUrl?, token?)` in `@/lib/api.ts` wraps the auto-generated `lesanApi` from `@/types/declarations/selectInp` for full type safety and auto-completion.
 
 ### Best Practices
 
-1. **Always use Server Actions**: Never fetch backend APIs directly from client components
-2. **Be explicit with field selection**: Only request fields you need
-3. **Handle null returns**: Actions return `null` on failure — always check before accessing properties
-4. **Use TypeScript**: Leverage `ReqType` and `DeepPartial` from `@/types/declarations/selectInp` for complete type safety
-5. **Keep actions thin**: Actions should only handle API calls — put business logic in Server Components
-6. **Group related actions**: Keep model-specific actions in dedicated folders
-7. **Validate on both sides**: Client-side validation for UX, server-side for security
-8. **Return consistent shapes**: Standard actions return `body`, custom actions may return full response
+1. Always use Server Actions; never fetch backend directly from client components.
+2. Be explicit with field selection (no `{}`).
+3. Handle null returns — check `success`/`body` before accessing properties.
+4. Type with `ReqType` + `DeepPartial` from `@/types/declarations/selectInp`.
+5. Keep actions thin; put business logic in Server Components.
+6. Validate on both sides (client UX + server security).
+7. Wrap every action in `try…catch(error: unknown)` returning `{ success: false, body: { message } }`.
+
+## Role Management (Critical)
+
+- Roles are stored on the User model: `roles: [{ roleId, name, scopeType?, scopeId? }]`.
+- **Single source of truth:** `user.addOrRemoveRoles`. Frontend action at `src/app/actions/user/addOrRemoveRoles.ts`.
+- Users also have M:N `units[]` and `organizations[]` (managed via `updateUserRelations`).
+- `scopeType`: `organization` | `unit` | `store`.
+- StoreHead reverse relation: `user.managedStore`.
+
+## Important Models
+
+`user`, `organization`, `unit`, `store`, `stuff`, `ware`, `wareType`, `wareClass`, `wareGroup`, `wareModel`, `manufacturer`, `tag`, `state`, `city`, `process`, `processStep`, `stepApproval`, `purchasingRequest`, `tender`, `tenderOffer`, `budgetLine`, `budgetAllocation`, `budgetEncumbrance`, `fiscalYear`, `goodsReceipt`, `paymentOrder`, `stockMovement`, `inventory`, `consumption` (model key is `consumption`), `file`.
+
+There is **no** `department` and **no** `purchaseOrderItem` model (PurchaseOrderItem was eliminated).
+
+## Purchasing Request Lifecycle
+
+`add` (Draft) → `submit` (Pending; auto `processId` resolution + optional auto BudgetEncumbrance) → unit step approvals → Finance unit approval (`budgetLineId` required) → `Approved` → (Stuff assigned / tender awarded) → OrgHead `finalize` (PendingFinalization → Completed) → StoreHead delivery (`updateStuffStatus`: `assigned → ready_to_ship → shipped → delivered`) → `goodsReceipt.add` (adds inventory, auto-creates payment order) → `paymentOrder.markPaid`.
+
+Terminal states: `Completed`, `Rejected`, `Cancelled`.
+
+PR has `selectionType` (`none` | `stuff` | `tender`) + `selectedTenderOfferId`; UnitHead may add stuff or select a tender offer while the PR is in Draft. Tender award is deferred until the last approval step completes.
+
+## Route Groups
+
+| Route | Purpose |
+|---|---|
+| `/admin` | Full admin panel (all models) |
+| `/requests` | Request center: `my-requests`, `new`, `[id]`, `consumption`, `inventory`, `stock-movements` |
+| `/storehead` | StoreHead panel |
+| `/orghead` | OrgHead panel (requests, processes, units, users, org-chart, settings) |
+| `/unit-head` | UnitHead panel (requests, finance, goods-receipt, consumption, inventory, stock-movements) |
+| `/ordinary` | Ordinary user home |
+| `/login` | Login |
+| marketing | about, blog, changelog, coming-soon, contact, docs, faq, pricing, privacy, register, terms |
+
+## Backend Docs for Frontend Agents
+
+Source of truth: `backDocs/` at the frontend repo root. Read the relevant doc before touching a feature area.
+
+| # | Doc | Summary |
+|---|---|---|
+| 01 | ADMIN_UI_TODO | AuthKit "Midnight Blueprint" admin redesign; base on `.agents/THEME/DESIGN.md`. |
+| 02 | workflow_instructions | Dev/test guide: backend `deno task bc-dev` (1370), frontend `pnpm dev` (3000), 126-record e2e seed in `back/http/e2e.json`. |
+| 03 | new_backend_changes | `gets` pagination defaults (`limit=50`, `page=1`); dot-notation relation filters; 30 affected models. |
+| 04 | update_process | Auto process resolution `resolveProcessForPR()`; scope priority `unit → ware → wareModel → wareGroup → wareClass → wareType → org-wide`. |
+| 05 | submit_new_pr | `purchasingRequest.submit`; allowed roles; required/optional fields; auto BudgetEncumbrance. |
+| 06 | new_role_management | Role refactor; `addOrRemoveRoles`; `roles[]` shape; `organizations` M:N; `headedUnit`/`headedOrganization` removed. |
+| 07 | new_role_todo | Frontend TODO for role system migration. |
+| 08 | new_add_submit_pr | Split `add` (Draft) / `submit` (Pending); feature flags; `requestingUnitId` auto-derived. |
+| 09 | new_stuff_location_changes | PurchaseOrderItem **eliminated**; `addStuff` uses `stuffId`; geoLocation on Store/Unit/Organization. |
+| 10 | new_store_head_role | StoreHead role; `scopeType: "store"`; `managedStore` reverse relation. |
+| 11 | new_store_head_features | StoreHead feature list. |
+| 12 | store_features | Stuff fields + denormalized ware hierarchy relations. |
+| 13 | storehead_frontend_prompt | `/storehead` panel plan. |
+| 14 | storehead_stuff_workflow_prompt | StoreHead CRUD stuff workflow. |
+| 15 | stuff_gets_api_reference | `stuff.gets` API + auth pattern. |
+| 16 | tender_offer_api_reference | TenderOffer model/API. |
+| 17 | ware_gets_api_reference | Ware model + hierarchy + gets. |
+| 18 | tenderOffer_api_reference | `tenderOffer.get/gets`. |
+| 19 | pr-stuff-tender-selection-plan | PR `selectionType` + deferred tender award. |
+| 20 | getPendingByUnit | `purchasingRequest.getPendingByUnit`. |
+| 21 | orghead_dashboard | `/orghead` route; `finalize`; `finalWinner` (`stuff`/`tender`). |
+| 22 | finance-unit-budget-line-goods-receipt | Unit type `Finance`; `stepApproval.submitDecision` `budgetLineId`; goods-receipt rules. |
+| 23 | storehead-delivery-requester-receipt-orghead-payment | `updateStuffStatus` stages; full lifecycle; payment order. |
+| 24 | finance-unithead-budget-payment-authority | Budget/payment authority; feature flags; `budgetLine.deductDirect`. |
+| 25 | unithead-dashboard-statistic | `user.dashboardStatistic` type `unitHead`. |
+| 26 | consumption-inventory-warehouse-finalization | Inventory + StockMovement + InventoryManager; PR finalization. |
+| 27 | inventory-ware-based-changes | Inventory now per-**Ware** (unique `unit + ware`). |
+| 28 | consumption-model-docs | Consumption model (key `consumption`): add/get/gets/count/remove. |
+| 29 | getWarehouseInventory | `inventory.getWarehouseInventory` (central + unit warehouses). |
+| 30 | purchasingRequest-gets-count | PR `gets`/`count` full reference (filters, sorts, role scoping). |
+| 31 | orghead-dashboard-analytics | `dashboardStatistic` type `orgHead` + 14 analytics facets. |
+| 32 | unit-getOrgChart-api | `unit.getOrgChart` (OrgHead auto-resolved from `scopeId`). |
+| 33 | warehouse-hierarchy-models-and-multi-select-dropdown | Ware hierarchy `WareType → WareClass → WareGroup → WareModel → Ware → Stuff`; M:N multi-select dropdowns. |
+
+## Ware Hierarchy
+
+```
+WareType (1) → WareClass (2, requires wareType) → WareGroup (3, has wareClasses M:N)
+            → WareModel (4, requires wareType/wareClass/wareGroup) → Ware (5, concrete) → Stuff (store inventory w/ price+qty)
+```
+
+- Warehouse is a `Unit` whose `unit_type` is `"Warehouse"`.
+- Inventory is **Ware-based**: unique compound key `(unit, ware._id)`; the hierarchy fields (`wareModel`, `wareGroup`, `wareClass`, `wareType`) are auto-derived from `ware`.
+- WareModel is the SKU-ish reference used on `PurchasingRequest`.
 
 ## Admin Panel Best Practices
 
-### Admin Background & Card Conventions
+### Background Layers (bottom → top)
 
-**Background layers (bottom → top):**
-
-1. **Static canvas** — Midnight Ink (`#05060f`) + 60px dot-grid SVG overlay at 3% opacity. `z-[-10]`, GPU-composited, no animation. This is the fixed base layer.
-
-2. **Faint outline shapes** — 4 large thin-stroke SVG geometric shapes (circle, hexagon, rounded-rect, sweeping arc) using Steel Border / Frost Link hairline tones at 0.06–0.10 opacity. `fill="none"`, `strokeWidth="1"`. Sized to mostly bleed off-screen for an architectural blueprint feel. Fully static — no animation. Rendered before the orbs so orbs paint on top.
-
-3. **Ambient orbs** — `<AmbientBackground />` component renders 3 radial-gradient orbs (55vw/48vw/40vw, `filter: blur(100-130px)`, opacity 0.08–0.18) that drift in figure-eight paths using only `transform: translate() scale()` animation. Each orb is its own GPU composited layer (`will-change: transform`). `z-0`, `pointer-events: none`. Respects `prefers-reduced-motion: reduce` by freezing at static offsets. Mounted once in `admin/layout.tsx` so the animation persists across page navigation without restarting.
-
-4. **Content** — sidebar, header, main content at `z-[1]` and above.
+1. **Static canvas** — Midnight Ink `#05060f` + 60px dot-grid SVG overlay at 3% opacity. `z-[-10]`, no animation.
+2. **Faint outline shapes** — 4 large thin-stroke SVGs (circle, hexagon, rounded-rect, sweeping arc), `fill="none"`, `strokeWidth="1"`, opacity 0.06–0.10, static.
+3. **Ambient orbs** — `<AmbientBackground />` (3 radial-gradient orbs, `blur(100-130px)`, opacity 0.08–0.18, `transform: translate() scale()` only). `z-0`, `pointer-events: none`, respects `prefers-reduced-motion`. Mounted once in `admin/layout.tsx`.
+4. **Content** — sidebar, header, main at `z-[1]`+.
 
 ```tsx
-// admin/layout.tsx — the three-layer stack
 <div className="relative flex h-screen overflow-hidden bg-[#05060f]">
-  {/* Layer 1: static canvas */}
   <div className="fixed inset-0 -z-10 bg-[#05060f]" aria-hidden="true">
     <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,...')] bg-[length:60px_60px] opacity-40" />
   </div>
-  {/* Layer 2: ambient orbs */}
   <AmbientBackground />
-  {/* Layer 3: content */}
   <AdminSidebar />
   ...
 </div>
 ```
 
-**Card styling in admin:** Use `<Card variant="glass">` in the admin route. This applies the glass elevation stack AND the `glass-card-hover-active` conic-border animation — on hover, a 1px Electric Iris → Frost Link conic-gradient border fades in (opacity 0→1) and rotates 360° over 4s. Never use `bg-card` or `shadow-subtle-4` directly on card wrappers. For non-Card elements (e.g., card-view divs in DataTable), use `className="glass-card glass-card-hover-active"`.
+- Cards: use `<Card variant="glass">` (or `className="glass-card glass-card-hover-active"` on non-Card wrappers). Never `bg-card`/`shadow-subtle-4` directly. This gives the conic-border Electric Iris → Frost Link hover animation and keeps backdrop-blur working (`relative` stacking context required).
+- Inputs: `focus:border-ring focus:ring-3 focus:ring-ring/50` (Frost Link glow), `hover:border-frost-link/20`. Rest `border-steel-border/60`.
 
-This ensures the glass backdrop-blur works (parent must have `relative` stacking context) and prevents generic shadcn defaults from overriding the AuthKit elevation.
+### Standard Admin Page Pattern
 
-**Input focus state in admin:** The Input component uses `focus:border-ring focus:ring-3 focus:ring-ring/50` — a Frost Link cool-blue glow unified with button `focus-visible` rings. Also adds `hover:border-frost-link/20` for hover brightening. All form controls share the same interaction language: rest `border-steel-border/60`, hover brightens to Frost Link, focus shows Frost Link glow ring.
-
-### Standard Page Pattern (Server Component)
-
-Every admin listing page follows this structure:
 ```
 src/app/admin/<entity>/
-├── page.tsx              # Server Component: fetch data, pass to client
-├── <entity>-client.tsx   # Client component: view toggle (table/cards), pagination, actions
-└── loading.tsx           # Skeleton loading state
+├── page.tsx              # Server Component: fetch data, compute prev/next page URLs
+├── <entity>-client.tsx   # Client: DataTable + card view toggle + pagination + actions
+└── loading.tsx           # Skeleton loading
 ```
 
-**`page.tsx`** — Fetches data, computes pagination URLs, passes to client:
-```tsx
-export default async function AdminPage({ searchParams }) {
-  const resolvedSearchParams = await searchParams;
-  const page = Number(resolvedSearchParams.page) || 1;
-  const result = await gets(setQuery, projection);
-  const items = result.success ? result.body : [];
-  const prevPageUrl = page > 1 ? `/admin/<entity>?page=${page - 1}` : "";
-  const nextPageUrl = items.length >= limit ? `/admin/<entity>?page=${page + 1}` : "";
-  return <AdminClient items={items} prevPageUrl={prevPageUrl} nextPageUrl={nextPageUrl} />;
-}
-```
+`DataTable` supports table + card views (`cardView`/`onViewToggle`/`renderCard`, `hideOnCard` on columns). Relations managed on `/admin/<entity>/:id/relations` via standalone `SearchSelect` (not `FormSearchSelect`).
 
-**Responsive DataTable Pattern (`<entity>-client.tsx`)**:
-The `DataTable` component supports both table and card views. On desktop, a traditional table renders; on mobile (or via toggle), items render as stacked glass cards. Use `cardView`/`onViewToggle` state + `renderCard` prop:
-```tsx
-const [cardView, setCardView] = useState(false);
+### Loading & Error Handling
 
-<DataTable
-  columns={columns}
-  data={items}
-  keyExtractor={(item) => item._id}
-  cardView={cardView}
-  onViewToggle={() => setCardView((v) => !v)}
-  renderCard={(item) => (
-    <div className="glass-card glass-card-hover-active rounded-xl p-4 space-y-3">
-      {/* Card content matching column structure */}
-    </div>
-  )}
-/>
-```
-Use `hideOnCard: true` on column definitions to exclude fields from the auto-generated card view when no custom `renderCard` is provided.
+- `Skeleton` for lists, `loading.tsx` route files, `Loader2` + `animate-spin` in submitting buttons.
+- Error boundaries (`error.tsx`, `global-error.tsx`) with a "تلاش مجدد" (Try again) reset button.
 
-### Loading States
-- Use `shadcn/ui` `Skeleton` component for data lists while loading.
-- Use `loading.tsx` in Next.js App Router to automatically wrap Server Components with skeleton loaders.
-- Use the `Loader2` icon from `lucide-react` with `animate-spin` inside buttons during form submission.
+## Accessibility & Motion
 
-### Error Handling
-- All Server Actions **must** be wrapped in `try...catch(error: unknown)` and safely return `{ success: false, body: { message: error instanceof Error ? error.message : "Unknown error" } }`.
-- Use Next.js Error Boundaries (`error.tsx` and `global-error.tsx`).
-- Always provide user-friendly error messages and a "Try again" (reset) button.
+- Focus rings on all interactive elements: `focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background`.
+- Respect `prefers-reduced-motion: reduce` (orbs freeze; no decorative animation).
+- `next/image` for images; lazy-load heavy client components with `next/dynamic`.
 
-### Performance & Security
-- **Images**: Always use `next/image` (`<Image />`) instead of standard `<img>` tags.
-- **Code Splitting**: Lazy load heavy client components using `next/dynamic`.
-- **Cookies**: Authentication JWT tokens are stored in `httpOnly` secure cookies via Next.js Server Actions.
-- **Accessibility**: Interactive elements must have proper focus rings: `focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background`.
+## Git / Commit Conventions
+
+See the root `AGENTS.md` for the full convention. Summary:
+
+- When asked to `git commit`: use **Gitmoji + conventional commits** (e.g. `:sparkles: feat(ui): ...`, `:bug: fix(auth): ...`).
+- Group changes into logical, atomic commits (UI vs fix vs chore).
+- **Never** use `git reset` (data-loss risk).
+
+## Quick Agent Checklist
+
+1. Read `backDocs/` doc(s) relevant to the feature before coding.
+2. Follow `.agents/THEME/DESIGN.md` for every UI change.
+3. Persian (fa) only, RTL, logical CSS properties, explicit `dir="rtl"` on base-ui primitives.
+4. Server Actions only; type with `ReqType`/`DeepPartial`; inject `activeRoleId`; wrap in try/catch.
+5. Use `pnpm`, not npm/yarn. `Next.js 16` — consult `node_modules/next/dist/docs/` on any doubt.
+6. No Department model. No PurchaseOrderItem. Roles via `user.addOrRemoveRoles`.
