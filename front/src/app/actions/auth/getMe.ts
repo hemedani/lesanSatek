@@ -48,7 +48,10 @@ export const getMe = async (
       const currentActiveRoleId = cookieStore.get("activeRoleId")?.value;
       const currentRoleName = cookieStore.get("roleName")?.value;
       if (result.body.roles?.length > 0) {
-        if (!currentActiveRoleId) {
+        const activeRole = result.body.roles.find(
+          (r: { roleId: string }) => r.roleId === currentActiveRoleId
+        );
+        if (!currentActiveRoleId || !activeRole) {
           const highest = getHighestRole(result.body.roles);
           const selected = highest || result.body.roles[0];
           cookieStore.set("activeRoleId", selected.roleId, {
@@ -65,17 +68,14 @@ export const getMe = async (
             path: "/",
             maxAge: 60 * 60 * 24 * 7,
           });
-        } else if (!currentRoleName) {
-          const activeRole = result.body.roles.find((r: { roleId: string }) => r.roleId === currentActiveRoleId);
-          if (activeRole) {
-            cookieStore.set("roleName", activeRole.name, {
-              httpOnly: false,
-              secure,
-              sameSite: "lax",
-              path: "/",
-              maxAge: 60 * 60 * 24 * 7,
-            });
-          }
+        } else if (currentRoleName !== activeRole.name) {
+          cookieStore.set("roleName", activeRole.name, {
+            httpOnly: false,
+            secure,
+            sameSite: "lax",
+            path: "/",
+            maxAge: 60 * 60 * 24 * 7,
+          });
         }
       }
     }

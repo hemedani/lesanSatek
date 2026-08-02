@@ -6,4 +6,5 @@ export const logout = async () => {
   const cookieStore = await cookies();
   cookieStore.delete("token");
   cookieStore.delete("activeRoleId");
+  cookieStore.delete("roleName");
 };

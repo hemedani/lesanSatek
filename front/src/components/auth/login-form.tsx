@@ -50,7 +50,8 @@ function LoginForm() {
       }
       const defaultPanel = getDefaultPanel(user)
       const redirect = new URLSearchParams(window.location.search).get("redirect")
-      router.push(redirect || defaultPanel)
+      const isSafeRedirect = !!redirect && redirect.startsWith(defaultPanel)
+      router.push(isSafeRedirect ? redirect : defaultPanel)
     } else {
       setError(result.body?.message || "ایمیل یا رمز عبور اشتباه است")
     }

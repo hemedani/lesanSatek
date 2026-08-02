@@ -12,14 +12,32 @@ const panelRoutes = [
   "/orghead",
 ]
 
+const rolePanelMap: Record<string, string> = {
+  OrgHead: "/orghead",
+  Manager: "/admin",
+  Admin: "/admin",
+  UnitHead: "/unit-head",
+  StoreHead: "/storehead",
+  Employee: "/requests",
+  Ordinary: "/ordinary",
+}
+
 export function middleware(request: NextRequest) {
+  // Server Functions (Server Actions) are POST requests to the route where
+  // they are used. Redirecting them here breaks the client (e.g. "An
+  // unexpected response was received from the server"), and auth is enforced
+  // inside each action anyway. Never redirect POSTs.
+  if (request.method === "POST") {
+    return NextResponse.next()
+  }
+
   const { pathname } = request.nextUrl
   const token = request.cookies.get("token")?.value
 
   if (publicRoutes.includes(pathname)) {
     if (token) {
       const roleName = request.cookies.get("roleName")?.value
-      const target = roleName === "OrgHead" ? "/orghead" : "/admin"
+      const target = (roleName && rolePanelMap[roleName]) || "/admin"
       return NextResponse.redirect(new URL(target, request.url))
     }
     return NextResponse.next()
