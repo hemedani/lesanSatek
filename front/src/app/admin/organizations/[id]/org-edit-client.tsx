@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form"
 import { zodV4Resolver } from "@/lib/zod-v4-resolver"
 import { z } from "zod"
 import { toast } from "sonner"
-import { ArrowRight, Building2, MapPin, ClipboardList, MapPinned, Loader2, Check, X } from "lucide-react"
+import { ArrowRight, Building2, ClipboardList, Loader2, Check, X, Share2, Trash2, MapPinned } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
@@ -17,25 +17,32 @@ import { PageHeader } from "@/components/ui/page-header"
 import { FormInput } from "@/components/form/form-input"
 import { FormTextarea } from "@/components/form/form-textarea"
 import { FormCheckbox } from "@/components/form/form-checkbox"
-import { FormSearchSelect } from "@/components/form/form-search-select"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { LocationPicker } from "@/components/ui/location-picker"
 import type { GeoPoint } from "@/components/ui/location-picker"
-import { add as addOrganization } from "@/app/actions/organization/add"
-import { gets as getStates } from "@/app/actions/state/gets"
-import { gets as getCities } from "@/app/actions/city/gets"
-import type { ReqType } from "@/types/declarations/selectInp"
+import { update } from "@/app/actions/organization/update"
+import { remove } from "@/app/actions/organization/remove"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
 
 const orgSchema = z.object({
   name: z.string().min(1, "نام سازمان الزامی است"),
   enName: z.string().optional(),
   description: z.string().optional(),
-  state: z.string().optional(),
-  city: z.string().optional(),
   isActive: z.boolean(),
 })
 
 type OrgData = z.infer<typeof orgSchema>
+
+interface OrgEditFormProps {
+  org: {
+    _id: string
+    name?: string
+    enName?: string
+    description?: string
+    isActive?: boolean
+    location?: GeoPoint
+  }
+}
 
 function SectionCard({
   icon: Icon,
@@ -68,47 +75,64 @@ function SectionCard({
   )
 }
 
-export default function AddOrganizationPage() {
+export function OrgEditClient({ org }: OrgEditFormProps) {
   const router = useRouter()
-  const [geoLocation, setGeoLocation] = useState<GeoPoint>(null)
+  const [showDelete, setShowDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [geoLocation, setGeoLocation] = useState<GeoPoint>(org.location || null)
 
   const form = useForm<OrgData>({
     resolver: zodV4Resolver(orgSchema),
     defaultValues: {
-      name: "",
-      enName: "",
-      description: "",
-      state: "",
-      city: "",
-      isActive: true,
+      name: org.name || "",
+      enName: org.enName || "",
+      description: org.description || "",
+      isActive: org.isActive ?? true,
     },
   })
 
-  const selectedState = form.watch("state")
-
   const onSubmit = async (data: OrgData) => {
     try {
-      const result = await addOrganization(
+      const result = await update(
         {
           activeRoleId: getActiveRoleIdFromStore(),
+          _id: org._id,
           name: data.name,
           enName: data.enName || undefined,
           description: data.description || undefined,
-          state: data.state || undefined,
-          city: data.city || undefined,
           isActive: data.isActive,
           ...(geoLocation ? { location: geoLocation } : {}),
         },
         { _id: 1, name: 1 },
       )
       if (result.success) {
-        toast.success("سازمان با موفقیت ایجاد شد")
-        router.push("/admin/organizations")
+        toast.success("سازمان با موفقیت به‌روزرسانی شد")
+        router.refresh()
       } else {
-        toast.error(result.body?.message || "خطا در ایجاد سازمان")
+        toast.error(result.body?.message || "خطا در به‌روزرسانی سازمان")
       }
     } catch {
-      toast.error("خطا در ایجاد سازمان")
+      toast.error("خطا در به‌روزرسانی سازمان")
+    }
+  }
+
+  const handleDelete = async () => {
+    setDeleting(true)
+    try {
+      const result = await remove({
+        activeRoleId: getActiveRoleIdFromStore(),
+        _id: org._id,
+      })
+      if (result.success) {
+        toast.success("سازمان با موفقیت حذف شد")
+        router.push("/admin/organizations")
+      } else {
+        toast.error(result.body?.message || "خطا در حذف سازمان")
+        setDeleting(false)
+      }
+    } catch {
+      toast.error("خطا در حذف سازمان")
+      setDeleting(false)
     }
   }
 
@@ -117,8 +141,8 @@ export default function AddOrganizationPage() {
   return (
     <div className="mx-auto w-full max-w-2xl space-y-6">
       <PageHeader
-        title="افزودن سازمان"
-        description="اطلاعات اولیه سازمان را وارد کنید؛ پس از ایجاد، می‌توانید واحدها و کاربران را تعریف کنید."
+        title={org.name || "ویرایش سازمان"}
+        description="ویرایش اطلاعات سازمان"
       >
         <Link href="/admin/organizations">
           <Button variant="ghost" className="gap-2 px-4">
@@ -126,6 +150,20 @@ export default function AddOrganizationPage() {
             بازگشت به سازمان‌ها
           </Button>
         </Link>
+        <Link href={`/admin/organizations/${org._id}/relations`}>
+          <Button variant="ghost" className="gap-2 px-4">
+            <Share2 className="size-5" />
+            ویرایش روابط
+          </Button>
+        </Link>
+        <Button
+          variant="ghost"
+          onClick={() => setShowDelete(true)}
+          className="gap-2 px-4 text-ember hover:bg-ember/5 hover:text-ember"
+        >
+          <Trash2 className="size-5" />
+          حذف
+        </Button>
       </PageHeader>
 
       <Form {...form}>
@@ -150,57 +188,6 @@ export default function AddOrganizationPage() {
               placeholder="Example: Sample Inc."
               disabled={submitting}
             />
-          </SectionCard>
-
-          <SectionCard
-            icon={MapPin}
-            iconClassName="bg-emerald-500/10 text-emerald-400 ring-emerald-500/15"
-            title="موقعیت"
-          >
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              <FormSearchSelect
-                control={form.control}
-                name="state"
-                label="استان"
-                placeholder="انتخاب استان…"
-                disabled={submitting}
-                fetcher={async (search?: string) => {
-                  const result = await getStates(
-                    { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-                    { _id: 1, name: 1 },
-                  )
-                  if (!result.success || !result.body) return []
-                  return result.body.map((s: { _id?: string; name?: string }) => ({
-                    _id: s._id || "",
-                    name: s.name || "",
-                  }))
-                }}
-              />
-              <FormSearchSelect
-                control={form.control}
-                name="city"
-                label="شهر"
-                placeholder="انتخاب شهر…"
-                disabled={submitting}
-                fetcher={async (search?: string) => {
-                  const result = await getCities(
-                    {
-                      activeRoleId: getActiveRoleIdFromStore(),
-                      page: 1,
-                      limit: 50,
-                      search: search || undefined,
-                      ...(selectedState ? { stateId: selectedState } : {}),
-                    } as unknown as ReqType["main"]["city"]["gets"]["set"],
-                    { _id: 1, name: 1 },
-                  )
-                  if (!result.success || !result.body) return []
-                  return result.body.map((c: { _id?: string; name?: string }) => ({
-                    _id: c._id || "",
-                    name: c.name || "",
-                  }))
-                }}
-              />
-            </div>
           </SectionCard>
 
           <SectionCard
@@ -244,7 +231,7 @@ export default function AddOrganizationPage() {
                   ) : (
                     <Check className="size-5" />
                   )}
-                  ثبت سازمان
+                  ذخیره تغییرات
                 </Button>
                 <Button
                   type="button"
@@ -262,6 +249,16 @@ export default function AddOrganizationPage() {
           </div>
         </form>
       </Form>
+
+      <ConfirmDialog
+        open={showDelete}
+        onOpenChange={setShowDelete}
+        title="حذف سازمان"
+        description="آیا از حذف این سازمان اطمینان دارید؟ این اقدام قابل بازگشت نیست."
+        confirmLabel="حذف"
+        onConfirm={handleDelete}
+        loading={deleting}
+      />
     </div>
   )
 }
