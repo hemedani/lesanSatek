@@ -1,4 +1,4 @@
-import { boolean, object, objectIdValidation, optional, string } from "lesan";
+import { array, boolean, number, object, objectIdValidation, optional, string } from "lesan";
 import { selectStruct } from "../../../mod.ts";
 import { activeRoleMixin } from "@lib";
 
@@ -11,6 +11,10 @@ export const updateValidator = () => {
 			enName: optional(string()),
 			description: optional(string()),
 			isActive: optional(boolean()),
+			location: optional(object({
+				type: string(),
+				coordinates: array(number()),
+			})),
 		}),
 		get: selectStruct("organization", 1),
 	});

@@ -11,6 +11,7 @@ export const update = async (
     enName?: string;
     description?: string;
     isActive?: boolean;
+    location?: { type: "Point"; coordinates: [number, number] } | null;
   },
   getSelection?: Record<string, unknown>
 ) => {

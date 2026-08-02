@@ -24,6 +24,10 @@ export const addValidator = () => {
       allowWareClassIds: optional(array(string())),
       allowWareGroupIds: optional(array(string())),
       allowWareModelIds: optional(array(string())),
+      location: optional(object({
+        type: string(),
+        coordinates: array(number()),
+      })),
       organizationId: optional(objectIdValidation),
       parentUnitId: optional(objectIdValidation),
       creatorId: optional(objectIdValidation),
