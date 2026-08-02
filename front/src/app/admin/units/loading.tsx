@@ -1,18 +1,57 @@
 import { Skeleton } from "@/components/ui/skeleton"
-import { LoadingSkeleton } from "@/components/ui/loading-skeleton"
 
 export default function UnitsLoading() {
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between pb-4 border-b border-steel-border/50">
-        <div>
-          <Skeleton className="h-6 w-28" />
-          <Skeleton className="h-3 w-44 mt-1.5" />
+      <div className="flex flex-col gap-3 border-b border-steel-border/30 pb-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-2.5">
+          <Skeleton className="h-7 w-32" />
+          <Skeleton className="h-4 w-64" />
         </div>
-        <Skeleton className="h-9 w-32 rounded-sm" />
+        <Skeleton className="h-11 w-36 rounded-sm" />
       </div>
-      <Skeleton className="h-9 w-56 rounded-sm" />
-      <LoadingSkeleton type="list" count={5} />
+
+      <div className="flex flex-col gap-2.5 lg:flex-row">
+        <Skeleton className="h-11 w-full rounded-sm lg:max-w-md" />
+        <div className="flex flex-wrap gap-2.5">
+          <Skeleton className="h-11 w-44 rounded-sm" />
+          <Skeleton className="h-11 w-40 rounded-sm" />
+          <Skeleton className="h-11 w-44 rounded-sm" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-5">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="glass-card rounded-2xl p-5 space-y-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <Skeleton className="size-11 rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-5 w-32" />
+                  <Skeleton className="h-4 w-20 rounded-full" />
+                </div>
+              </div>
+              <Skeleton className="h-6 w-14 rounded-md" />
+            </div>
+            <div className="grid grid-cols-3 gap-px overflow-hidden rounded-xl bg-white/[0.06] ring-1 ring-inset ring-white/[0.06]">
+              {Array.from({ length: 3 }).map((_, j) => (
+                <div key={j} className="bg-[#05060f]/60 p-3 space-y-1.5 text-center">
+                  <Skeleton className="h-3 w-10 mx-auto" />
+                  <Skeleton className="h-4 w-16 mx-auto" />
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-between border-t border-steel-border/15 pt-3">
+              <Skeleton className="h-4 w-24" />
+              <div className="flex gap-1">
+                <Skeleton className="size-9 rounded-sm" />
+                <Skeleton className="size-9 rounded-sm" />
+                <Skeleton className="size-9 rounded-sm" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
-  );
+  )
 }

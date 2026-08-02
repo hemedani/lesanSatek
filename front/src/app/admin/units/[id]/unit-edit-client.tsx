@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form"
 import { zodV4Resolver } from "@/lib/zod-v4-resolver"
 import { z } from "zod"
 import { toast } from "sonner"
-import { ArrowRight, Building2, GitBranch, MapPin, MapPinned, Loader2, Check, X, Warehouse } from "lucide-react"
+import { ArrowRight, Building2, MapPin, MapPinned, Loader2, Check, X, Share2, Trash2, Warehouse } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
@@ -18,13 +18,11 @@ import { FormInput } from "@/components/form/form-input"
 import { FormTextarea } from "@/components/form/form-textarea"
 import { FormCheckbox } from "@/components/form/form-checkbox"
 import { FormSelect } from "@/components/form/form-select"
-import { FormSearchSelect } from "@/components/form/form-search-select"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { LocationPicker } from "@/components/ui/location-picker"
 import type { GeoPoint } from "@/components/ui/location-picker"
-import { add as addUnit } from "@/app/actions/unit/add"
-import { gets as getOrgs } from "@/app/actions/organization/gets"
-import { gets as getUnits } from "@/app/actions/unit/gets"
-import { getUsers } from "@/app/actions/user/getUsers"
+import { update } from "@/app/actions/unit/update"
+import { remove } from "@/app/actions/unit/remove"
 import type { ReqType } from "@/types/declarations/selectInp"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
 
@@ -34,9 +32,6 @@ const unitSchema = z.object({
   description: z.string().optional(),
   type: z.string().min(1, "نوع واحد الزامی است"),
   isActive: z.boolean(),
-  organizationId: z.string().optional(),
-  parentUnitId: z.string().optional(),
-  headId: z.string().optional(),
   address: z.string().optional(),
   phone: z.string().optional(),
   email: z.string().optional(),
@@ -57,6 +52,25 @@ const unitTypeOptions = [
   { value: "Finance", label: "مالی" },
   { value: "Expert", label: "کارشناسی" },
 ]
+
+interface UnitEditFormProps {
+  unit: {
+    _id: string
+    name?: string
+    enName?: string
+    description?: string
+    type?: string
+    isActive?: boolean
+    address?: string
+    phone?: string
+    email?: string
+    warehouseCapacity?: number
+    hasColdStorage?: boolean
+    fleetSize?: number
+    serviceRadius?: number
+    location?: GeoPoint
+  }
+}
 
 function SectionCard({
   icon: Icon,
@@ -89,47 +103,43 @@ function SectionCard({
   )
 }
 
-export default function AddUnitPage() {
+export function UnitEditClient({ unit }: UnitEditFormProps) {
   const router = useRouter()
-  const [geoLocation, setGeoLocation] = useState<GeoPoint>(null)
+  const [showDelete, setShowDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [geoLocation, setGeoLocation] = useState<GeoPoint>(unit.location || null)
 
   const form = useForm<UnitData>({
     resolver: zodV4Resolver(unitSchema),
     defaultValues: {
-      name: "",
-      enName: "",
-      description: "",
-      type: "",
-      isActive: true,
-      organizationId: "",
-      parentUnitId: "",
-      headId: "",
-      address: "",
-      phone: "",
-      email: "",
-      warehouseCapacity: undefined,
-      hasColdStorage: false,
-      fleetSize: undefined,
-      serviceRadius: undefined,
+      name: unit.name || "",
+      enName: unit.enName || "",
+      description: unit.description || "",
+      type: unit.type || "",
+      isActive: unit.isActive ?? true,
+      address: unit.address || "",
+      phone: unit.phone || "",
+      email: unit.email || "",
+      warehouseCapacity: unit.warehouseCapacity ?? undefined,
+      hasColdStorage: unit.hasColdStorage ?? false,
+      fleetSize: unit.fleetSize ?? undefined,
+      serviceRadius: unit.serviceRadius ?? undefined,
     },
   })
 
-  const selectedOrg = form.watch("organizationId")
   const selectedType = form.watch("type")
 
   const onSubmit = async (data: UnitData) => {
     try {
-      const result = await addUnit(
+      const result = await update(
         {
           activeRoleId: getActiveRoleIdFromStore(),
+          _id: unit._id,
           name: data.name,
           enName: data.enName || undefined,
           description: data.description || undefined,
-          type: data.type as ReqType["main"]["unit"]["add"]["set"]["type"],
+          type: data.type as ReqType["main"]["unit"]["update"]["set"]["type"],
           isActive: data.isActive,
-          organizationId: data.organizationId || undefined,
-          parentUnitId: data.parentUnitId || undefined,
-          headId: data.headId || undefined,
           address: data.address || undefined,
           phone: data.phone || undefined,
           email: data.email || undefined,
@@ -142,13 +152,33 @@ export default function AddUnitPage() {
         { _id: 1, name: 1 },
       )
       if (result.success) {
-        toast.success("واحد با موفقیت ایجاد شد")
-        router.push("/admin/units")
+        toast.success("واحد با موفقیت به‌روزرسانی شد")
+        router.refresh()
       } else {
-        toast.error(result.body?.message || "خطا در ایجاد واحد")
+        toast.error(result.body?.message || "خطا در به‌روزرسانی واحد")
       }
     } catch {
-      toast.error("خطا در ایجاد واحد")
+      toast.error("خطا در به‌روزرسانی واحد")
+    }
+  }
+
+  const handleDelete = async () => {
+    setDeleting(true)
+    try {
+      const result = await remove({
+        activeRoleId: getActiveRoleIdFromStore(),
+        _id: unit._id,
+      })
+      if (result.success) {
+        toast.success("واحد با موفقیت حذف شد")
+        router.push("/admin/units")
+      } else {
+        toast.error(result.body?.message || "خطا در حذف واحد")
+        setDeleting(false)
+      }
+    } catch {
+      toast.error("خطا در حذف واحد")
+      setDeleting(false)
     }
   }
 
@@ -157,8 +187,8 @@ export default function AddUnitPage() {
   return (
     <div className="mx-auto w-full max-w-2xl space-y-6">
       <PageHeader
-        title="افزودن واحد"
-        description="اطلاعات واحد را وارد کنید؛ پس از ایجاد، می‌توانید سرپرست و زیرواحدها را تعریف کنید."
+        title={unit.name || "ویرایش واحد"}
+        description="ویرایش اطلاعات واحد"
       >
         <Link href="/admin/units">
           <Button variant="ghost" className="gap-2 px-4">
@@ -166,6 +196,20 @@ export default function AddUnitPage() {
             بازگشت به واحدها
           </Button>
         </Link>
+        <Link href={`/admin/units/${unit._id}/relations`}>
+          <Button variant="ghost" className="gap-2 px-4">
+            <Share2 className="size-5" />
+            ویرایش روابط
+          </Button>
+        </Link>
+        <Button
+          variant="ghost"
+          onClick={() => setShowDelete(true)}
+          className="gap-2 px-4 text-ember hover:bg-ember/5 hover:text-ember"
+        >
+          <Trash2 className="size-5" />
+          حذف
+        </Button>
       </PageHeader>
 
       <Form {...form}>
@@ -210,73 +254,6 @@ export default function AddUnitPage() {
               disabled={submitting}
             />
             <FormCheckbox control={form.control} name="isActive" label="فعال" disabled={submitting} />
-          </SectionCard>
-
-          <SectionCard
-            icon={GitBranch}
-            iconClassName="bg-emerald-500/10 text-emerald-400 ring-emerald-500/15"
-            title="سازمان و ساختار"
-          >
-            <FormSearchSelect
-              control={form.control}
-              name="organizationId"
-              label="سازمان"
-              placeholder="انتخاب سازمان…"
-              disabled={submitting}
-              fetcher={async (search?: string) => {
-                const result = await getOrgs(
-                  { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-                  { _id: 1, name: 1 },
-                )
-                if (!result.success || !result.body) return []
-                return result.body.map((o: { _id?: string; name?: string }) => ({
-                  _id: o._id || "",
-                  name: o.name || "",
-                }))
-              }}
-            />
-            <FormSearchSelect
-              control={form.control}
-              name="parentUnitId"
-              label="واحد والد"
-              placeholder="انتخاب واحد والد…"
-              disabled={submitting}
-              fetcher={async (search?: string) => {
-                const result = await getUnits(
-                  {
-                    activeRoleId: getActiveRoleIdFromStore(),
-                    page: 1,
-                    limit: 50,
-                    search: search || undefined,
-                    ...(selectedOrg ? { organizationId: selectedOrg } : {}),
-                  } as unknown as ReqType["main"]["unit"]["gets"]["set"],
-                  { _id: 1, name: 1 },
-                )
-                if (!result.success || !result.body) return []
-                return result.body.map((u: { _id?: string; name?: string }) => ({
-                  _id: u._id || "",
-                  name: u.name || "",
-                }))
-              }}
-            />
-            <FormSearchSelect
-              control={form.control}
-              name="headId"
-              label="سرپرست واحد"
-              placeholder="انتخاب سرپرست…"
-              disabled={submitting}
-              fetcher={async (search?: string) => {
-                const result = await getUsers(
-                  { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-                  { _id: 1, first_name: 1, last_name: 1 },
-                )
-                if (!result.success || !result.body) return []
-                return result.body.map((u: { _id?: string; first_name?: string; last_name?: string }) => ({
-                  _id: u._id || "",
-                  name: `${u.first_name || ""} ${u.last_name || ""}`.trim() || "—",
-                }))
-              }}
-            />
           </SectionCard>
 
           <SectionCard
@@ -377,7 +354,7 @@ export default function AddUnitPage() {
                   ) : (
                     <Check className="size-5" />
                   )}
-                  ثبت واحد
+                  ذخیره تغییرات
                 </Button>
                 <Button
                   type="button"
@@ -395,6 +372,16 @@ export default function AddUnitPage() {
           </div>
         </form>
       </Form>
+
+      <ConfirmDialog
+        open={showDelete}
+        onOpenChange={setShowDelete}
+        title="حذف واحد"
+        description="آیا از حذف این واحد اطمینان دارید؟ این اقدام قابل بازگشت نیست."
+        confirmLabel="حذف"
+        onConfirm={handleDelete}
+        loading={deleting}
+      />
     </div>
   )
 }
