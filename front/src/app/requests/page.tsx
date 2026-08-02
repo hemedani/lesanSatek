@@ -1,13 +1,14 @@
 import Link from "next/link"
-import { Plus, User, Warehouse, ScrollText, Activity } from "lucide-react"
+import { Plus, User, ShoppingCart, Warehouse, ScrollText, Activity } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
 import { Button } from "@/components/ui/button"
+import { NavCard } from "@/components/dashboard/nav-card"
 import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
 import { count as countPRs } from "@/app/actions/purchasingRequest/count"
 import { gets as getProcesses } from "@/app/actions/process/gets"
 import type { ReqType } from "@/types/declarations/selectInp"
 import { RequestsListClient } from "./requests-client"
-import type { PRItem, ProcessOption } from "./requests-client"
+import type { PRItem, ProcessOption, RequestCounts } from "./requests-client"
 
 const LIMIT = 12
 
@@ -52,35 +53,62 @@ export default async function RequestsPage({
   const processId = typeof resolvedSearchParams.processId === "string" ? resolvedSearchParams.processId : ""
   const sort: "asc" | "desc" = resolvedSearchParams.sort === "asc" ? "asc" : "desc"
 
-  const [prsResult, processesResult, countResult] = await Promise.all([
-    getPRs(
-      {
-        page,
-        limit: LIMIT,
-        sortBy: "createdAt",
-        sortOrder: sort,
-        ...(search ? { search } : {}),
-        ...(status ? { status } : {}),
-        ...(processId ? { processId } : {}),
-      },
-      PR_PROJECTION,
-    ),
+  const listSet = {
+    page,
+    limit: LIMIT,
+    sortBy: "createdAt" as const,
+    sortOrder: sort,
+    ...(search ? { search } : {}),
+    ...(status ? { status } : {}),
+    ...(processId ? { processId } : {}),
+  }
+  const countSet = {
+    ...(search ? { search } : {}),
+    ...(status ? { status } : {}),
+    ...(processId ? { processId } : {}),
+  }
+
+  const [
+    prsResult,
+    processesResult,
+    filteredCountResult,
+    totalCountResult,
+    draftCountResult,
+    pendingCountResult,
+    inProgressCountResult,
+    approvedCountResult,
+    rejectedCountResult,
+    cancelledCountResult,
+  ] = await Promise.all([
+    getPRs(listSet, PR_PROJECTION),
     getProcesses({ page: 1, limit: 200 }, { _id: 1, name: 1, status: 1 }),
-    countPRs(
-      {
-        ...(search ? { search } : {}),
-        ...(status ? { status } : {}),
-        ...(processId ? { processId } : {}),
-      },
-      { qty: 1 },
-    ),
+    countPRs(countSet, { qty: 1 }),
+    countPRs({}, { qty: 1 }),
+    countPRs({ status: "Draft" }, { qty: 1 }),
+    countPRs({ status: "Pending" }, { qty: 1 }),
+    countPRs({ status: "InProgress" }, { qty: 1 }),
+    countPRs({ status: "Approved" }, { qty: 1 }),
+    countPRs({ status: "Rejected" }, { qty: 1 }),
+    countPRs({ status: "Cancelled" }, { qty: 1 }),
   ])
 
   const items = (prsResult.success ? prsResult.body || [] : []) as PRItem[]
   const processes = (processesResult.success ? processesResult.body || [] : []) as ProcessOption[]
   const activeProcesses = processes.filter((p) => p?.status !== "deactivated")
-  const total = countResult.success ? (countResult.body?.qty ?? items.length) : items.length
-  const totalPages = Math.max(1, Math.ceil(total / LIMIT))
+  const filteredTotal = filteredCountResult.success ? (filteredCountResult.body?.qty ?? items.length) : items.length
+  const totalPages = Math.max(1, Math.ceil(filteredTotal / LIMIT))
+
+  const counts: RequestCounts = {
+    total: totalCountResult.success ? (totalCountResult.body?.qty ?? 0) : 0,
+    draft: draftCountResult.success ? (draftCountResult.body?.qty ?? 0) : 0,
+    pending:
+      (pendingCountResult.success ? (pendingCountResult.body?.qty ?? 0) : 0) +
+      (inProgressCountResult.success ? (inProgressCountResult.body?.qty ?? 0) : 0),
+    approved: approvedCountResult.success ? (approvedCountResult.body?.qty ?? 0) : 0,
+    rejected:
+      (rejectedCountResult.success ? (rejectedCountResult.body?.qty ?? 0) : 0) +
+      (cancelledCountResult.success ? (cancelledCountResult.body?.qty ?? 0) : 0),
+  }
 
   const params = new URLSearchParams()
   if (search) params.set("search", search)
@@ -94,40 +122,63 @@ export default async function RequestsPage({
 
   return (
     <div className="space-y-6">
-      <PageHeader title="درخواست‌های خرید" description="ثبت، پیگیری و مدیریت درخواست‌های خرید سازمان">
-        <div className="flex flex-wrap items-center gap-2">
+      <PageHeader
+        title="درخواست‌های خرید"
+        description="ثبت، پیگیری و مدیریت درخواست‌های خرید خود در سازمان"
+      >
+        <div className="flex flex-wrap items-center gap-2.5">
           <Link href="/requests/my-requests">
-            <Button variant="ghost" size="sm" className="gap-1.5">
-              <User className="size-4" />
+            <Button variant="ghost" className="gap-2 px-4">
+              <User className="size-5" />
               درخواست‌های من
             </Button>
           </Link>
-          <Link href="/requests/inventory">
-            <Button variant="ghost" size="sm" className="gap-1.5">
-              <Warehouse className="size-4" />
-              انبار واحد
-            </Button>
-          </Link>
-          <Link href="/requests/consumption">
-            <Button variant="ghost" size="sm" className="gap-1.5">
-              <ScrollText className="size-4" />
-              مصرف کالا
-            </Button>
-          </Link>
-          <Link href="/requests/stock-movements">
-            <Button variant="ghost" size="sm" className="gap-1.5">
-              <Activity className="size-4" />
-              گردش کالا
-            </Button>
-          </Link>
           <Link href="/requests/new">
-            <Button className="gap-1.5">
-              <Plus className="size-4" />
+            <Button className="gap-2 px-5">
+              <Plus className="size-5" />
               ثبت درخواست جدید
             </Button>
           </Link>
         </div>
       </PageHeader>
+
+      <section className="space-y-4" aria-label="دسترسی سریع">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+          <NavCard
+            href="/requests/my-requests"
+            title="درخواست‌های من"
+            description="همه درخواست‌های ثبت‌شده من"
+            value={counts.total}
+            icon={ShoppingCart}
+            iconColor="text-electric-iris"
+            iconBg="bg-electric-iris/10"
+          />
+          <NavCard
+            href="/requests/inventory"
+            title="انبار واحد"
+            description="مشاهده موجودی کالا"
+            icon={Warehouse}
+            iconColor="text-emerald-400"
+            iconBg="bg-emerald-400/10"
+          />
+          <NavCard
+            href="/requests/consumption"
+            title="مصرف کالا"
+            description="ثبت و مشاهده مصرف"
+            icon={ScrollText}
+            iconColor="text-amber-400"
+            iconBg="bg-amber-400/10"
+          />
+          <NavCard
+            href="/requests/stock-movements"
+            title="گردش کالا"
+            description="تاریخچه جابه‌جایی کالا"
+            icon={Activity}
+            iconColor="text-sky-400"
+            iconBg="bg-sky-400/10"
+          />
+        </div>
+      </section>
 
       <RequestsListClient
         items={items}
@@ -140,6 +191,7 @@ export default async function RequestsPage({
         processId={processId}
         sort={sort}
         processes={activeProcesses}
+        counts={counts}
       />
     </div>
   )

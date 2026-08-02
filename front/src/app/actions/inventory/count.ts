@@ -5,8 +5,12 @@ import { getToken, getActiveRoleId } from "@/lib/auth";
 
 export const count = async (
   data: {
-    activeRoleId: string;
-  }
+    wareId?: string;
+    wareModelId?: string;
+    unitId?: string;
+    warehouseUnitId?: string;
+  } = {},
+  getSelection?: { qty?: 0 | 1 }
 ) => {
   try {
     const token = await getToken();
@@ -17,7 +21,7 @@ export const count = async (
       act: "count",
       details: {
         set: { ...data, activeRoleId },
-        get: { qty: 1 as const },
+        get: getSelection || { qty: 1 as const },
       },
     });
     return result;

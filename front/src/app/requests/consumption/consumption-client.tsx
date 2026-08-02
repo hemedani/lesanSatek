@@ -1,15 +1,29 @@
 "use client"
 
+import { useCallback } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ScrollText, ArrowRight, User, Building2, MessageSquareText, CalendarDays, ClipboardList, FolderTree, Factory } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { DataTable } from "@/components/ui/data-table"
-import type { Column } from "@/components/ui/data-table"
-import { PageHeader } from "@/components/ui/page-header"
+import {
+  ScrollText,
+  Boxes,
+  Package,
+  User,
+  Building2,
+  MessageSquareText,
+  CalendarDays,
+  ClipboardList,
+  ArrowDownUp,
+  RotateCcw,
+} from "lucide-react"
+import { StatCard } from "@/components/dashboard/stat-card"
+import { Button } from "@/components/ui/button"
 import { Pagination } from "@/components/ui/pagination"
-import { Badge } from "@/components/ui/badge"
+import { EmptyState } from "@/components/ui/empty-state"
+import { SearchField } from "@/components/ui/search-field"
+import { FilterSelect } from "@/components/ui/filter-select"
+import type { FilterOption } from "@/components/ui/filter-select"
 
-interface ConsumptionRecord {
+export interface ConsumptionRecord {
   _id: string
   quantity?: number
   notes?: string
@@ -20,234 +34,271 @@ interface ConsumptionRecord {
   unit?: { _id: string; name?: string; type?: string }
   consumedBy?: { _id: string; first_name?: string; last_name?: string }
   inventory?: { _id: string; quantity?: number }
-  ware?: { _id: string; name?: string; enName?: string; brand?: string }
-  wareModel?: { _id: string; name?: string; enName?: string }
-  wareGroup?: { _id: string; name?: string }
-  wareClass?: { _id: string; name?: string }
+  ware?: { _id: string; name?: string; brand?: string }
+  wareModel?: { _id: string; name?: string }
   wareType?: { _id: string; name?: string }
+}
+
+export interface ConsumptionCounts {
+  total: number
+  totalQuantity: number
+  averagePerRecord: number
 }
 
 interface ConsumptionClientProps {
   items: ConsumptionRecord[]
-  prevPageUrl?: string
-  nextPageUrl?: string
-  page?: number
+  prevUrl: string
+  nextUrl: string
+  page: number
+  totalPages?: number
+  search: string
+  sort: string
+  counts: ConsumptionCounts
 }
 
-const columns: Column<ConsumptionRecord>[] = [
-  {
-    key: "ware",
-    label: "کالا",
-    render: (item) => (
-      <Link href={`/requests/consumption/${item._id}`} className="flex items-center gap-3 min-w-0 max-w-[280px] group">
-        <div className="size-9 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0 ring-1 ring-inset ring-amber-500/15">
-          <ScrollText className="size-4 text-amber-400" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <span className="text-sm font-medium text-moonlight truncate leading-5 block group-hover:text-frost-link transition-colors">
-            {item.ware?.name || item.wareModel?.name || "—"}
-          </span>
-          {item.ware?.brand && (
-            <p className="text-[10px] text-fog/40 truncate leading-4">{item.ware.brand}</p>
-          )}
-        </div>
-      </Link>
-    ),
-  },
-  {
-    key: "quantity",
-    label: "مقدار",
-    render: (item) => (
-      <span className="text-sm font-semibold font-mono text-moonlight" dir="ltr">
-        {item.quantity != null ? item.quantity.toLocaleString("fa-IR") : "—"}
-      </span>
-    ),
-  },
-  {
-    key: "notes",
-    label: "توضیحات",
-    render: (item) => (
-      <span className="text-xs text-fog max-w-[200px] truncate">{item.notes || "—"}</span>
-    ),
-  },
-  {
-    key: "consumedAt",
-    label: "تاریخ مصرف",
-    hideOnCard: true,
-    render: (item) => (
-      <span className="text-xs text-fog">
-        {item.consumedAt ? new Date(item.consumedAt).toLocaleDateString("fa-IR") : "—"}
-      </span>
-    ),
-  },
-  {
-    key: "createdAt",
-    label: "تاریخ ثبت",
-    hideOnCard: true,
-    render: (item) => (
-      <span className="text-xs text-fog">
-        {item.createdAt ? new Date(item.createdAt).toLocaleDateString("fa-IR") : "—"}
-      </span>
-    ),
-  },
+const sortOptions: FilterOption[] = [
+  { value: "createdAt-desc", label: "جدیدترین" },
+  { value: "createdAt-asc", label: "قدیمی‌ترین" },
+  { value: "quantity-desc", label: "بیشترین مصرف" },
+  { value: "quantity-asc", label: "کمترین مصرف" },
 ]
 
-function ConsumptionClient({ items, prevPageUrl, nextPageUrl, page }: ConsumptionClientProps) {
+function ConsumptionCard({ item }: { item: ConsumptionRecord }) {
+  const wareName = item.ware?.name || item.wareModel?.name || "کالای بدون نام"
+  const consumedByName = item.consumedBy
+    ? [item.consumedBy.first_name, item.consumedBy.last_name].filter(Boolean).join(" ")
+    : ""
+
   return (
-    <div className="space-y-6">
-      <Link
-        href="/requests"
-        className="inline-flex items-center gap-1 text-sm text-fog hover:text-glacier transition-colors"
-      >
-        <ArrowRight className="size-4" />
-        بازگشت به داشبورد
-      </Link>
-
-      <PageHeader
-        title="مصرف کالا"
-        description="ثبت و مشاهده مصرف کالا"
-      />
-
-      <DataTable
-        columns={columns}
-        data={items}
-        keyExtractor={(item) => item._id}
-        cardView={true}
-        renderCard={(item) => (
-          <Link href={`/requests/consumption/${item._id}`} className="block">
-            <div className="glass-card glass-card-hover-active rounded-xl overflow-hidden transition-all duration-200">
-              <div className="flex items-center gap-3 p-4 border-b border-white/[0.04]">
-                <div className="size-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0 ring-1 ring-inset ring-amber-500/15">
-                  <ScrollText className="size-5 text-amber-400" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-moonlight truncate leading-5">
-                    {item.ware?.name || item.wareModel?.name || "—"}
-                  </p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    {item.ware?.brand && (
-                      <span className="text-[10px] text-fog/50 flex items-center gap-1">
-                        <Factory className="size-3" />
-                        {item.ware.brand}
-                      </span>
-                    )}
-                    {item.wareModel?.name && (
-                      <span className="text-[10px] text-fog/40">مدل: {item.wareModel.name}</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-px bg-white/[0.04]">
-                <div className="p-3 text-center bg-[#05060f]/60">
-                  <p className="text-[10px] text-fog/50">مقدار مصرف</p>
-                  <p className="text-lg font-bold font-mono text-amber-400 leading-7" dir="ltr">
-                    {item.quantity != null ? item.quantity.toLocaleString("fa-IR") : "—"}
-                  </p>
-                </div>
-                <div className="p-3 text-center bg-[#05060f]/60">
-                  <p className="text-[10px] text-fog/50">مصرف‌کننده</p>
-                  <p className="text-sm font-medium text-moonlight leading-7 truncate">
-                    {item.consumedBy?.first_name || "—"}
-                  </p>
-                </div>
-                <div className="p-3 text-center bg-[#05060f]/60">
-                  <p className="text-[10px] text-fog/50">تاریخ مصرف</p>
-                  <p className="text-sm font-medium text-moonlight leading-7">
-                    {item.consumedAt ? new Date(item.consumedAt).toLocaleDateString("fa-IR") : "—"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-4 space-y-1">
-                <div className="grid grid-cols-2 gap-x-6 gap-y-1">
-                  <div className="flex items-center gap-2">
-                    <Building2 className="size-3.5 text-fog/30 shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-[10px] text-fog/40">واحد</p>
-                      <p className="text-xs text-moonlight truncate">{item.unit?.name || "—"}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <User className="size-3.5 text-fog/30 shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-[10px] text-fog/40">مصرف‌شونده</p>
-                      <p className="text-xs text-moonlight truncate">{item.consumedFor || "—"}</p>
-                    </div>
-                  </div>
-                  {item.reason && (
-                    <div className="flex items-center gap-2">
-                      <MessageSquareText className="size-3.5 text-fog/30 shrink-0" />
-                      <div className="min-w-0">
-                        <p className="text-[10px] text-fog/40">دلیل</p>
-                        <p className="text-xs text-moonlight truncate">{item.reason}</p>
-                      </div>
-                    </div>
-                  )}
-                  {item.notes && (
-                    <div className="flex items-center gap-2">
-                      <ClipboardList className="size-3.5 text-fog/30 shrink-0" />
-                      <div className="min-w-0">
-                        <p className="text-[10px] text-fog/40">توضیحات</p>
-                        <p className="text-xs text-moonlight truncate">{item.notes}</p>
-                      </div>
-                    </div>
-                  )}
-                  {item.createdAt && (
-                    <div className="flex items-center gap-2">
-                      <CalendarDays className="size-3.5 text-fog/30 shrink-0" />
-                      <div className="min-w-0">
-                        <p className="text-[10px] text-fog/40">تاریخ ثبت</p>
-                        <p className="text-xs text-moonlight">{new Date(item.createdAt).toLocaleDateString("fa-IR")}</p>
-                      </div>
-                    </div>
-                  )}
-                  {item.inventory && (
-                    <div className="flex items-center gap-2">
-                      <ClipboardList className="size-3.5 text-fog/30 shrink-0" />
-                      <div className="min-w-0">
-                        <p className="text-[10px] text-fog/40">موجودی پس از مصرف</p>
-                        <p className="text-xs text-moonlight font-mono" dir="ltr">
-                          {item.inventory.quantity != null ? item.inventory.quantity.toLocaleString("fa-IR") : "—"}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {(item.wareType?.name || item.wareClass?.name || item.wareGroup?.name) && (
-                  <div className="flex flex-wrap items-center gap-1.5 pt-2 mt-2 border-t border-white/[0.04]">
-                    <FolderTree className="size-3 text-fog/30" />
-                    {item.wareType?.name && (
-                      <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-frost-link/5 text-fog border-white/[0.06]">
-                        {item.wareType.name}
-                      </Badge>
-                    )}
-                    {item.wareClass?.name && (
-                      <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-frost-link/5 text-fog border-white/[0.06]">
-                        {item.wareClass.name}
-                      </Badge>
-                    )}
-                    {item.wareGroup?.name && (
-                      <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-frost-link/5 text-fog border-white/[0.06]">
-                        {item.wareGroup.name}
-                      </Badge>
-                    )}
-                  </div>
+    <Link
+      href={`/requests/consumption/${item._id}`}
+      className="group block h-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-electric-iris/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    >
+      <div className="glass-card glass-card-hover-active flex h-full flex-col gap-4 rounded-2xl p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-start gap-3">
+            <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 ring-1 ring-inset ring-amber-500/15">
+              <ScrollText className="size-5 text-amber-400" />
+            </div>
+            <div className="min-w-0 space-y-1.5">
+              <p className="truncate text-base font-semibold text-moonlight transition-colors group-hover:text-glacier">
+                {wareName}
+              </p>
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                {item.wareModel?.name && (
+                  <span className="inline-flex items-center gap-1 text-xs text-fog/70">{item.wareModel.name}</span>
+                )}
+                {item.ware?.brand && (
+                  <span className="inline-flex items-center gap-1 text-xs text-fog/70">{item.ware.brand}</span>
                 )}
               </div>
             </div>
-          </Link>
-        )}
-        emptyTitle="مصرفی ثبت نشده"
-        emptyDescription="هنوز هیچ مصرف کالایی ثبت نشده است."
-      />
+          </div>
+          {item.wareType?.name && (
+            <span className="inline-flex shrink-0 items-center rounded-full bg-white/[0.04] px-2.5 py-0.5 text-[11px] text-fog ring-1 ring-inset ring-steel-border/25">
+              {item.wareType.name}
+            </span>
+          )}
+        </div>
 
-      <Pagination
-        page={page || 1}
-        prevUrl={prevPageUrl || ""}
-        nextUrl={nextPageUrl || ""}
-      />
+        <div className="grid grid-cols-3 gap-px overflow-hidden rounded-xl bg-white/[0.06] ring-1 ring-inset ring-white/[0.06]">
+          <div className="bg-[#05060f]/60 p-3 text-center">
+            <p className="text-[11px] text-fog/60">مقدار مصرف</p>
+            <p className="mt-1 text-lg font-bold tabular-nums text-amber-400 leading-7" dir="ltr">
+              {item.quantity != null ? item.quantity.toLocaleString("fa-IR") : "—"}
+            </p>
+          </div>
+          <div className="bg-[#05060f]/60 p-3 text-center">
+            <p className="text-[11px] text-fog/60">مصرف‌شونده</p>
+            <p className="mt-1 truncate text-sm font-medium text-moonlight leading-7">
+              {item.consumedFor || "—"}
+            </p>
+          </div>
+          <div className="bg-[#05060f]/60 p-3 text-center">
+            <p className="text-[11px] text-fog/60">تاریخ مصرف</p>
+            <p className="mt-1 text-sm font-medium text-moonlight leading-7">
+              {item.consumedAt ? new Date(item.consumedAt).toLocaleDateString("fa-IR") : "—"}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-steel-border/15 pt-3 text-body-sm text-fog">
+          {item.unit?.name && (
+            <span className="inline-flex items-center gap-1.5">
+              <Building2 className="size-4 text-fog/60" />
+              {item.unit.name}
+            </span>
+          )}
+          {item.reason && (
+            <span className="inline-flex items-center gap-1.5">
+              <MessageSquareText className="size-4 text-fog/60" />
+              {item.reason}
+            </span>
+          )}
+          {consumedByName && (
+            <span className="inline-flex items-center gap-1.5">
+              <User className="size-4 text-fog/60" />
+              {consumedByName}
+            </span>
+          )}
+          {item.inventory?.quantity != null && (
+            <span className="inline-flex items-center gap-1.5">
+              <Package className="size-4 text-fog/60" />
+              موجودی: {item.inventory.quantity.toLocaleString("fa-IR")}
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between gap-3 border-t border-steel-border/15 pt-3">
+          <span className="inline-flex items-center gap-1.5 text-body-sm text-fog/70">
+            <CalendarDays className="size-4 text-fog/60" />
+            {item.createdAt ? new Date(item.createdAt).toLocaleDateString("fa-IR") : "—"}
+          </span>
+          {item.notes && (
+            <span className="inline-flex min-w-0 items-center gap-1.5 truncate text-body-sm text-fog/70">
+              <ClipboardList className="size-4 shrink-0 text-fog/60" />
+              <span className="truncate">{item.notes}</span>
+            </span>
+          )}
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+function ConsumptionClient({
+  items,
+  prevUrl,
+  nextUrl,
+  page,
+  totalPages,
+  search,
+  sort,
+  counts,
+}: ConsumptionClientProps) {
+  const router = useRouter()
+
+  const makeParams = useCallback(
+    (next: { search?: string; sort?: string }) => {
+      const params = new URLSearchParams()
+      const nextSearch = (next.search ?? search).trim()
+      const nextSort = next.sort ?? sort
+      if (nextSearch) params.set("search", nextSearch)
+      if (nextSort && nextSort !== "createdAt-desc") params.set("sort", nextSort)
+      return params.toString()
+    },
+    [search, sort],
+  )
+
+  const go = useCallback(
+    (qs: string) => {
+      router.push(`/requests/consumption${qs ? `?${qs}` : ""}`)
+    },
+    [router],
+  )
+
+  const handleSearch = (value: string) => go(makeParams({ search: value }))
+  const handleSort = (value: string | null) => go(makeParams({ sort: value ?? "createdAt-desc" }))
+  const handleReset = () => router.push("/requests/consumption")
+
+  const hasFilters = Boolean(search || (sort && sort !== "createdAt-desc"))
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-5">
+        <StatCard
+          label="کل رکوردهای مصرف"
+          value={counts.total}
+          icon={ScrollText}
+          iconColor="text-amber-400"
+          iconBg="bg-amber-400/10"
+        />
+        <StatCard
+          label="مجموع مصرف"
+          value={counts.totalQuantity}
+          icon={Boxes}
+          iconColor="text-electric-iris"
+          iconBg="bg-electric-iris/10"
+        />
+        <StatCard
+          label="میانگین هر رکورد"
+          value={counts.averagePerRecord}
+          icon={Package}
+          iconColor="text-glacier"
+          iconBg="bg-frost-link/10"
+        />
+      </div>
+
+      <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">
+        <SearchField
+          value={search}
+          onChange={handleSearch}
+          placeholder="جستجو در نام مصرف‌شونده…"
+          ariaLabel="جستجو در مصرف کالا"
+          className="w-full lg:min-w-64 lg:max-w-md lg:flex-1"
+        />
+        <div className="flex flex-wrap items-stretch gap-2.5">
+          <FilterSelect
+            icon={ArrowDownUp}
+            placeholder="مرتب‌سازی"
+            ariaLabel="ترتیب نمایش مصرف‌ها"
+            value={sort}
+            onValueChange={handleSort}
+            options={sortOptions}
+          />
+          {hasFilters && (
+            <Button
+              variant="ghost"
+              onClick={handleReset}
+              className="h-11 gap-2 rounded-sm px-4 text-body-sm text-moonlight"
+            >
+              <RotateCcw className="size-5" strokeWidth={2} />
+              پاک کردن فیلترها
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {items.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-5">
+          {items.map((item) => (
+            <ConsumptionCard key={item._id} item={item} />
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          icon={ScrollText}
+          title={hasFilters ? "مصرفی یافت نشد" : "هنوز مصرفی ثبت نشده است"}
+          description={
+            hasFilters
+              ? "با تغییر جستجو یا مرتب‌سازی، رکورد موردنظر را پیدا کنید."
+              : "از صفحه موجودی انبار می‌توانید برای کالاها، مصرف ثبت کنید."
+          }
+          action={
+            hasFilters ? (
+              <Button variant="ghost" className="gap-2 px-4" onClick={handleReset}>
+                پاک کردن فیلترها
+              </Button>
+            ) : (
+              <Link href="/requests/inventory">
+                <Button variant="ghost" className="gap-2 px-4">
+                  رفتن به موجودی انبار
+                </Button>
+              </Link>
+            )
+          }
+        />
+      )}
+
+      {(prevUrl || nextUrl) && (
+        <Pagination
+          prevUrl={prevUrl}
+          nextUrl={nextUrl}
+          page={page}
+          totalPages={totalPages}
+          className="pt-2 border-t border-steel-border/15"
+        />
+      )}
     </div>
   )
 }

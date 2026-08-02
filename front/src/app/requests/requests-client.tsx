@@ -12,8 +12,13 @@ import {
   CalendarDays,
   GitBranch,
   Building2,
+  FileEdit,
+  Clock,
+  CheckCircle,
+  XCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { StatCard } from "@/components/dashboard/stat-card"
 import { RequestStatusBadge } from "@/components/purchasing/request-status-badge"
 import { Pagination } from "@/components/ui/pagination"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -40,6 +45,14 @@ export interface ProcessOption {
   status?: string
 }
 
+export interface RequestCounts {
+  total: number
+  draft: number
+  pending: number
+  approved: number
+  rejected: number
+}
+
 interface RequestsListClientProps {
   items: PRItem[]
   prevUrl: string
@@ -51,6 +64,7 @@ interface RequestsListClientProps {
   processId: string
   sort: "asc" | "desc"
   processes: ProcessOption[]
+  counts: RequestCounts
 }
 
 function RequestsListClient({
@@ -64,6 +78,7 @@ function RequestsListClient({
   processId,
   sort,
   processes,
+  counts,
 }: RequestsListClientProps) {
   const router = useRouter()
 
@@ -102,8 +117,71 @@ function RequestsListClient({
     label: p.name || "بدون نام",
   }))
 
+  const statItems = [
+    {
+      key: "all",
+      label: "کل درخواست‌ها",
+      value: counts.total,
+      icon: ShoppingCart,
+      iconColor: "text-electric-iris",
+      iconBg: "bg-electric-iris/10",
+      status: "",
+    },
+    {
+      key: "draft",
+      label: "پیش‌نویس",
+      value: counts.draft,
+      icon: FileEdit,
+      iconColor: "text-fog",
+      iconBg: "bg-white/[0.03]",
+      status: "Draft",
+    },
+    {
+      key: "pending",
+      label: "در انتظار / در جریان",
+      value: counts.pending,
+      icon: Clock,
+      iconColor: "text-amber-400",
+      iconBg: "bg-amber-400/10",
+      status: "Pending",
+    },
+    {
+      key: "approved",
+      label: "تایید شده",
+      value: counts.approved,
+      icon: CheckCircle,
+      iconColor: "text-emerald-400",
+      iconBg: "bg-emerald-400/10",
+      status: "Approved",
+    },
+    {
+      key: "rejected",
+      label: "رد شده / لغو شده",
+      value: counts.rejected,
+      icon: XCircle,
+      iconColor: "text-ember",
+      iconBg: "bg-ember/10",
+      status: "Rejected",
+    },
+  ]
+
   return (
     <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 lg:gap-5">
+        {statItems.map((stat) => (
+          <StatCard
+            key={stat.key}
+            label={stat.label}
+            value={stat.value}
+            icon={stat.icon}
+            iconColor={stat.iconColor}
+            iconBg={stat.iconBg}
+            active={status === stat.status}
+            onClick={() => go(makeParams({ status: stat.status }))}
+          />
+        ))}
+      </div>
+
       <RequestsFilterBar
         search={search}
         onSearchChange={handleSearch}
@@ -135,8 +213,8 @@ function RequestsListClient({
           }
           action={
             <Link href="/requests/new">
-              <Button className="gap-1.5">
-                <ShoppingCart className="size-4" />
+              <Button className="gap-2 px-5">
+                <ShoppingCart className="size-5" />
                 ثبت درخواست جدید
               </Button>
             </Link>
@@ -157,7 +235,7 @@ function RequestsListClient({
   )
 }
 
-function RequestListItem({ item }: { item: PRItem }) {
+function RequestListItem({ item, hideRequester }: { item: PRItem; hideRequester?: boolean }) {
   const requesterName = item.requester
     ? [item.requester.first_name, item.requester.last_name].filter(Boolean).join(" ")
     : ""
@@ -196,7 +274,7 @@ function RequestListItem({ item }: { item: PRItem }) {
         </div>
 
         <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-steel-border/15 pt-3 text-body-sm text-fog">
-          {requesterName && (
+          {requesterName && !hideRequester && (
             <span className="inline-flex items-center gap-1.5">
               <User className="size-4 text-fog/60" />
               {requesterName}
@@ -243,4 +321,4 @@ function RequestListItem({ item }: { item: PRItem }) {
   )
 }
 
-export { RequestsListClient }
+export { RequestsListClient, RequestListItem }

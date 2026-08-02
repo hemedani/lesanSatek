@@ -1,19 +1,41 @@
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Plus } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
+import { Button } from "@/components/ui/button"
 import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
+import { count as countPRs } from "@/app/actions/purchasingRequest/count"
+import { gets as getProcesses } from "@/app/actions/process/gets"
 import { getMe } from "@/app/actions/user/getMe"
-import { cookies } from "next/headers"
+import type { ReqType } from "@/types/declarations/selectInp"
 import { MyRequestsClient } from "./my-requests-client"
+import type { MyRequestCounts } from "./my-requests-client"
+import type { PRItem, ProcessOption } from "../requests-client"
 
-interface PRItem {
-  _id: string
-  title?: string
-  quantity?: number
-  status?: string
-  currentStep?: string
-  createdAt?: string
-}
+const LIMIT = 12
+
+const VALID_STATUSES: NonNullable<ReqType["main"]["purchasingRequest"]["gets"]["set"]["status"]>[] = [
+  "Draft",
+  "Pending",
+  "InProgress",
+  "Approved",
+  "PendingFinalization",
+  "Rejected",
+  "Completed",
+  "Cancelled",
+]
+
+const PR_PROJECTION = {
+  _id: 1,
+  title: 1,
+  status: 1,
+  currentStep: 1,
+  quantity: 1,
+  estimatedAmount: 1,
+  createdAt: 1,
+  requester: { _id: 1, first_name: 1, last_name: 1 },
+  process: { _id: 1, name: 1, unit: { _id: 1, name: 1 } },
+  wareModel: { _id: 1, name: 1 },
+} as const
 
 export default async function MyRequestsPage({
   searchParams,
@@ -21,64 +43,121 @@ export default async function MyRequestsPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const resolvedSearchParams = await searchParams
-  const page = Number(resolvedSearchParams.page) || 1
-  const limit = 20
-  const tab = typeof resolvedSearchParams.tab === "string" ? resolvedSearchParams.tab : undefined
 
-  let query: Record<string, unknown> = { page, limit }
+  const page = Math.max(1, Number(resolvedSearchParams.page) || 1)
+  const search = typeof resolvedSearchParams.search === "string" ? resolvedSearchParams.search : ""
+  const status =
+    typeof resolvedSearchParams.status === "string" &&
+    (VALID_STATUSES as readonly string[]).includes(resolvedSearchParams.status)
+      ? (resolvedSearchParams.status as NonNullable<ReqType["main"]["purchasingRequest"]["gets"]["set"]["status"]>)
+      : ""
+  const processId = typeof resolvedSearchParams.processId === "string" ? resolvedSearchParams.processId : ""
+  const sort: "asc" | "desc" = resolvedSearchParams.sort === "asc" ? "asc" : "desc"
 
-  if (tab === "receipt") {
-    const cookieStore = await cookies()
-    const activeRoleId = cookieStore.get("activeRoleId")?.value
-    if (activeRoleId) {
-      const userRes = await getMe({
-        _id: 1,
-        roles: 1,
-      }).catch(() => ({ success: false, body: null }))
-      const user = userRes.success ? userRes.body : null
-      if (user?._id) {
-        query = { page, limit, requesterId: user._id, stuffStatus: "delivered" }
-      }
-    }
+  const meRes = await getMe({ _id: 1 })
+  const meId = meRes.success && meRes.body?._id ? (meRes.body._id as string) : ""
+  const meFilter = meId ? { requesterId: meId } : {}
+
+  const listSet = {
+    page,
+    limit: LIMIT,
+    sortBy: "createdAt" as const,
+    sortOrder: sort,
+    ...meFilter,
+    ...(search ? { search } : {}),
+    ...(status ? { status } : {}),
+    ...(processId ? { processId } : {}),
+  }
+  const countSet = {
+    ...meFilter,
+    ...(search ? { search } : {}),
+    ...(status ? { status } : {}),
+    ...(processId ? { processId } : {}),
   }
 
-  const result = await getPRs(
-    query as any,
-    {
-      _id: 1,
-      title: 1,
-      quantity: 1,
-      status: 1,
-      currentStep: 1,
-      createdAt: 1,
-    },
-  )
+  const [
+    prsResult,
+    processesResult,
+    filteredCountResult,
+    totalCountResult,
+    draftCountResult,
+    pendingCountResult,
+    inProgressCountResult,
+    approvedCountResult,
+  ] = await Promise.all([
+    getPRs(listSet, PR_PROJECTION),
+    getProcesses({ page: 1, limit: 200 }, { _id: 1, name: 1, status: 1 }),
+    countPRs(countSet, { qty: 1 }),
+    countPRs(meFilter, { qty: 1 }),
+    countPRs({ ...meFilter, status: "Draft" }, { qty: 1 }),
+    countPRs({ ...meFilter, status: "Pending" }, { qty: 1 }),
+    countPRs({ ...meFilter, status: "InProgress" }, { qty: 1 }),
+    countPRs({ ...meFilter, status: "Approved" }, { qty: 1 }),
+  ])
 
-  const items: PRItem[] = result.success ? result.body || [] : []
-  const prevPageUrl = page > 1 ? `/requests/my-requests?page=${page - 1}${tab ? `&tab=${tab}` : ""}` : ""
-  const nextPageUrl = items.length >= limit ? `/requests/my-requests?page=${page + 1}${tab ? `&tab=${tab}` : ""}` : ""
+  const items = (prsResult.success ? prsResult.body || [] : []) as PRItem[]
+  const processes = (processesResult.success ? processesResult.body || [] : []) as ProcessOption[]
+  const activeProcesses = processes.filter((p) => p?.status !== "deactivated")
+  const filteredTotal = filteredCountResult.success
+    ? (filteredCountResult.body?.qty ?? items.length)
+    : items.length
+  const totalPages = Math.max(1, Math.ceil(filteredTotal / LIMIT))
+
+  const counts: MyRequestCounts = {
+    total: totalCountResult.success ? (totalCountResult.body?.qty ?? 0) : 0,
+    draft: draftCountResult.success ? (draftCountResult.body?.qty ?? 0) : 0,
+    pending:
+      (pendingCountResult.success ? (pendingCountResult.body?.qty ?? 0) : 0) +
+      (inProgressCountResult.success ? (inProgressCountResult.body?.qty ?? 0) : 0),
+    approved: approvedCountResult.success ? (approvedCountResult.body?.qty ?? 0) : 0,
+  }
+
+  const params = new URLSearchParams()
+  if (search) params.set("search", search)
+  if (status) params.set("status", status)
+  if (processId) params.set("processId", processId)
+  if (sort === "asc") params.set("sort", "asc")
+  const qs = params.toString()
+
+  const prevPageUrl =
+    page > 1 ? `/requests/my-requests?page=${page - 1}${qs ? `&${qs}` : ""}` : ""
+  const nextPageUrl =
+    page < totalPages ? `/requests/my-requests?page=${page + 1}${qs ? `&${qs}` : ""}` : ""
 
   return (
     <div className="space-y-6">
-      <Link
-        href="/requests"
-        className="inline-flex items-center gap-1 text-sm text-fog hover:text-glacier transition-colors"
-      >
-        <ArrowRight className="size-4" />
-        بازگشت به داشبورد
-      </Link>
-
       <PageHeader
-        title={tab === "receipt" ? "کالاهای آماده تحویل" : "درخواست‌های من"}
-        description={tab === "receipt" ? "درخواست‌هایی که کالای آنها آماده تحویل است" : "لیست درخواست‌های خرید ثبت شده"}
-      />
+        title="درخواست‌های من"
+        description="درخواست‌های خریدی که خودتان ثبت کرده‌اید — وضعیت، فرآیند و مراحل را دنبال کنید"
+      >
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Link href="/requests">
+            <Button variant="ghost" className="gap-2 px-4">
+              <ArrowRight className="size-5" />
+              همه درخواست‌ها
+            </Button>
+          </Link>
+          <Link href="/requests/new">
+            <Button className="gap-2 px-5">
+              <Plus className="size-5" />
+              ثبت درخواست جدید
+            </Button>
+          </Link>
+        </div>
+      </PageHeader>
 
       <MyRequestsClient
         items={items}
         prevUrl={prevPageUrl}
         nextUrl={nextPageUrl}
         page={page}
-        tab={tab}
+        totalPages={totalPages}
+        search={search}
+        status={status}
+        processId={processId}
+        sort={sort}
+        processes={activeProcesses}
+        counts={counts}
       />
     </div>
   )
