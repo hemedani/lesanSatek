@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form"
 import { zodV4Resolver } from "@/lib/zod-v4-resolver"
 import { z } from "zod"
 import { toast } from "sonner"
-import { ArrowRight, User, KeyRound, Building2, ShieldCheck, Loader2, Check, X, Info } from "lucide-react"
+import { ArrowRight, User, KeyRound, ShieldCheck, Shield, Share2, Loader2, Check, X, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
@@ -17,17 +17,38 @@ import { PageHeader } from "@/components/ui/page-header"
 import { FormInput } from "@/components/form/form-input"
 import { FormSelect } from "@/components/form/form-select"
 import { FormCheckbox } from "@/components/form/form-checkbox"
-import { FormPasswordInput } from "@/components/form/form-password-input"
 import { FormJalaliDatePicker } from "@/components/form/form-jalali-date-picker"
-import { FormSearchSelect } from "@/components/form/form-search-select"
-import { addUser } from "@/app/actions/user/addUser"
-import { gets as getOrganizations } from "@/app/actions/organization/gets"
-import { gets as getStates } from "@/app/actions/state/gets"
-import { gets as getCities } from "@/app/actions/city/gets"
+import { Badge } from "@/components/ui/badge"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
+import { updateUser } from "@/app/actions/user/updateUser"
+import { removeUser } from "@/app/actions/user/removeUser"
 import { FEATURES_OPTIONS } from "@/types/permissions"
 import type { FeatureName } from "@/types/permissions"
-import type { ReqType } from "@/types/declarations/selectInp"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
+
+export interface UserEditRole {
+  roleId?: string
+  name?: string
+  scopeType?: "organization" | "unit" | "store"
+  scopeId?: string
+}
+
+export interface UserEditData {
+  _id: string
+  first_name?: string
+  last_name?: string
+  email?: string
+  mobile?: string
+  gender?: "Male" | "Female"
+  isActive?: boolean
+  is_verified?: boolean
+  position?: string
+  birth_date?: string
+  roles?: UserEditRole[]
+  features?: string[]
+}
+
+export type ScopeNameMap = Record<string, string>
 
 const userSchema = z.object({
   first_name: z.string().min(1, "نام الزامی است"),
@@ -37,12 +58,8 @@ const userSchema = z.object({
   position: z.string().optional(),
   email: z.string().email("ایمیل نامعتبر است"),
   mobile: z.string().min(10, "شماره موبایل نامعتبر است"),
-  password: z.string().min(6, "رمز عبور باید حداقل ۶ کاراکتر باشد"),
   is_verified: z.boolean(),
   isActive: z.boolean(),
-  organization: z.string().optional(),
-  state: z.string().optional(),
-  city: z.string().optional(),
 })
 
 type UserData = z.infer<typeof userSchema>
@@ -51,6 +68,26 @@ const genderOptions = [
   { value: "Male", label: "مرد" },
   { value: "Female", label: "زن" },
 ]
+
+const ROLE_LABELS: Record<string, string> = {
+  Manager: "مدیر",
+  Admin: "ادمین",
+  OrgHead: "رئیس سازمان",
+  UnitHead: "رئیس واحد",
+  StoreHead: "رئیس انبار",
+  Employee: "کارمند",
+  Ordinary: "عادی",
+}
+
+const SCOPE_LABELS: Record<string, string> = {
+  organization: "سازمان",
+  unit: "واحد",
+  store: "انبار",
+}
+
+function roleLabel(name?: string): string {
+  return name ? ROLE_LABELS[name] ?? name : "عادی"
+}
 
 function SectionCard({
   icon: Icon,
@@ -83,30 +120,35 @@ function SectionCard({
   )
 }
 
-export default function AddUserPage() {
+interface UserEditClientProps {
+  user: UserEditData
+  scopeNameMap: ScopeNameMap
+}
+
+export function UserEditClient({ user, scopeNameMap }: UserEditClientProps) {
   const router = useRouter()
-  const [features, setFeatures] = useState<FeatureName[]>([])
+  const [features, setFeatures] = useState<FeatureName[]>(
+    (user.features || []).filter((f) => FEATURES_OPTIONS.some((o) => o.value === f)) as FeatureName[],
+  )
+  const [showDelete, setShowDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const form = useForm<UserData>({
     resolver: zodV4Resolver(userSchema),
     defaultValues: {
-      first_name: "",
-      last_name: "",
-      gender: "Male",
-      birth_date: "",
-      position: "",
-      email: "",
-      mobile: "",
-      password: "",
-      is_verified: false,
-      isActive: true,
-      organization: "",
-      state: "",
-      city: "",
+      first_name: user.first_name || "",
+      last_name: user.last_name || "",
+      gender: user.gender || "Male",
+      birth_date: user.birth_date || "",
+      position: user.position || "",
+      email: user.email || "",
+      mobile: user.mobile || "",
+      is_verified: user.is_verified ?? false,
+      isActive: user.isActive ?? true,
     },
   })
 
-  const selectedState = form.watch("state")
+  const fullName = [user.first_name, user.last_name].filter(Boolean).join(" ")
 
   const toggleFeature = (feature: FeatureName) => {
     setFeatures((prev) =>
@@ -116,35 +158,51 @@ export default function AddUserPage() {
 
   const onSubmit = async (data: UserData) => {
     try {
-      const { organization, ...rest } = data
-      const result = await addUser(
+      const result = await updateUser(
         {
           activeRoleId: getActiveRoleIdFromStore(),
-          first_name: rest.first_name,
-          last_name: rest.last_name,
-          gender: rest.gender,
-          birth_date: rest.birth_date || undefined,
-          position: rest.position || undefined,
-          isActive: rest.isActive,
-          mobile: rest.mobile,
-          email: rest.email,
-          password: rest.password,
-          is_verified: rest.is_verified,
-          ...(organization ? { organizations: [organization] } : {}),
-          ...(rest.state ? { state: rest.state } : {}),
-          ...(rest.city ? { city: rest.city } : {}),
+          _id: user._id,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          gender: data.gender,
+          birth_date: data.birth_date || undefined,
+          position: data.position || undefined,
+          email: data.email,
+          mobile: data.mobile,
+          is_verified: data.is_verified,
+          isActive: data.isActive,
           features: features.map((feature) => ({ feature })),
         },
-        { _id: 1, first_name: 1, last_name: 1, email: 1 },
+        { _id: 1, first_name: 1, last_name: 1 },
       )
       if (result.success) {
-        toast.success("کاربر با موفقیت ایجاد شد")
-        router.push("/admin/users")
+        toast.success("کاربر با موفقیت به‌روزرسانی شد")
+        router.refresh()
       } else {
-        toast.error(result.body?.message || "خطا در ایجاد کاربر")
+        toast.error(result.body?.message || "خطا در به‌روزرسانی کاربر")
       }
     } catch {
-      toast.error("خطا در ایجاد کاربر")
+      toast.error("خطا در به‌روزرسانی کاربر")
+    }
+  }
+
+  const handleDelete = async () => {
+    setDeleting(true)
+    try {
+      const result = await removeUser({
+        activeRoleId: getActiveRoleIdFromStore(),
+        _id: user._id,
+      })
+      if (result.success) {
+        toast.success("کاربر با موفقیت حذف شد")
+        router.push("/admin/users")
+      } else {
+        toast.error(result.body?.message || "خطا در حذف کاربر")
+        setDeleting(false)
+      }
+    } catch {
+      toast.error("خطا در حذف کاربر")
+      setDeleting(false)
     }
   }
 
@@ -153,8 +211,8 @@ export default function AddUserPage() {
   return (
     <div className="mx-auto w-full max-w-2xl space-y-6">
       <PageHeader
-        title="افزودن کاربر"
-        description="اطلاعات هویتی و ورود کاربر را وارد کنید؛ پس از ایجاد، می‌توانید نقش و سطح دسترسی را تعیین کنید."
+        title={fullName || "ویرایش کاربر"}
+        description="ویرایش اطلاعات هویتی، ورود و دسترسی‌های کاربر"
       >
         <Link href="/admin/users">
           <Button variant="ghost" className="gap-2 px-4">
@@ -162,6 +220,26 @@ export default function AddUserPage() {
             بازگشت به کاربران
           </Button>
         </Link>
+        <Link href={`/admin/users/${user._id}/roles`}>
+          <Button variant="ghost" className="gap-2 px-4">
+            <Shield className="size-5" />
+            مدیریت نقش‌ها
+          </Button>
+        </Link>
+        <Link href={`/admin/users/${user._id}/relations`}>
+          <Button variant="ghost" className="gap-2 px-4">
+            <Share2 className="size-5" />
+            ویرایش روابط
+          </Button>
+        </Link>
+        <Button
+          variant="ghost"
+          onClick={() => setShowDelete(true)}
+          className="gap-2 px-4 text-ember hover:bg-ember/5 hover:text-ember"
+        >
+          <Trash2 className="size-5" />
+          حذف
+        </Button>
       </PageHeader>
 
       <Form {...form}>
@@ -240,89 +318,55 @@ export default function AddUserPage() {
                 disabled={submitting}
               />
             </div>
-            <FormPasswordInput
-              control={form.control}
-              name="password"
-              label="رمز عبور"
-              placeholder="حداقل ۶ کاراکتر"
-              required
-              disabled={submitting}
-            />
-            <FormCheckbox
-              control={form.control}
-              name="is_verified"
-              label="حساب کاربر تایید شده است"
-              disabled={submitting}
-            />
+            <div className="flex flex-wrap gap-4">
+              <FormCheckbox
+                control={form.control}
+                name="is_verified"
+                label="حساب کاربر تایید شده است"
+                disabled={submitting}
+              />
+              <FormCheckbox
+                control={form.control}
+                name="isActive"
+                label="فعال"
+                disabled={submitting}
+              />
+            </div>
           </SectionCard>
 
           <SectionCard
-            icon={Building2}
+            icon={Shield}
             iconClassName="bg-frost-link/10 text-frost-link ring-frost-link/15"
-            title="سازمان و موقعیت"
+            title="نقش‌ها"
           >
-            <FormSearchSelect
-              control={form.control}
-              name="organization"
-              label="سازمان"
-              placeholder="انتخاب سازمان…"
-              disabled={submitting}
-              fetcher={async (search?: string) => {
-                const result = await getOrganizations(
-                  { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-                  { _id: 1, name: 1 },
-                )
-                if (!result.success || !result.body) return []
-                return result.body.map((o: { _id?: string; name?: string }) => ({
-                  _id: o._id || "",
-                  name: o.name || "",
-                }))
-              }}
-            />
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              <FormSearchSelect
-                control={form.control}
-                name="state"
-                label="استان"
-                placeholder="انتخاب استان…"
-                disabled={submitting}
-                fetcher={async (search?: string) => {
-                  const result = await getStates(
-                    { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-                    { _id: 1, name: 1 },
+            <p className="text-body-sm text-fog/70">
+              نقش‌ها و محدوده دسترسی این کاربر از صفحه اختصاصی نقش‌ها قابل مدیریت است.
+            </p>
+            {(user.roles || []).length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {user.roles?.map((role, i) => {
+                  const scopeName = role.scopeId ? scopeNameMap[role.scopeId] : undefined
+                  return (
+                    <Badge key={i} variant="outline" className="gap-1 px-2 py-0.5 text-[11px] font-normal">
+                      <Shield className="size-3 text-electric-iris" />
+                      {roleLabel(role.name)}
+                      {role.scopeType && (
+                        <span className="text-fog/60">
+                          · {SCOPE_LABELS[role.scopeType] ?? role.scopeType}
+                          {scopeName ? ` · ${scopeName}` : ""}
+                        </span>
+                      )}
+                    </Badge>
                   )
-                  if (!result.success || !result.body) return []
-                  return result.body.map((s: { _id?: string; name?: string }) => ({
-                    _id: s._id || "",
-                    name: s.name || "",
-                  }))
-                }}
-              />
-              <FormSearchSelect
-                control={form.control}
-                name="city"
-                label="شهر"
-                placeholder="انتخاب شهر…"
-                disabled={submitting}
-                fetcher={async (search?: string) => {
-                  const result = await getCities(
-                    {
-                      activeRoleId: getActiveRoleIdFromStore(),
-                      page: 1,
-                      limit: 50,
-                      search: search || undefined,
-                      ...(selectedState ? { stateId: selectedState } : {}),
-                    } as unknown as ReqType["main"]["city"]["gets"]["set"],
-                    { _id: 1, name: 1 },
-                  )
-                  if (!result.success || !result.body) return []
-                  return result.body.map((c: { _id?: string; name?: string }) => ({
-                    _id: c._id || "",
-                    name: c.name || "",
-                  }))
-                }}
-              />
-            </div>
+                })}
+              </div>
+            )}
+            <Link href={`/admin/users/${user._id}/roles`}>
+              <Button type="button" variant="outline" className="gap-2">
+                <Shield className="size-5" />
+                مدیریت نقش‌ها
+              </Button>
+            </Link>
           </SectionCard>
 
           <SectionCard
@@ -361,15 +405,7 @@ export default function AddUserPage() {
                 )
               })}
             </div>
-            <FormCheckbox control={form.control} name="isActive" label="فعال" disabled={submitting} />
           </SectionCard>
-
-          <div className="flex items-start gap-2.5 rounded-xl border border-frost-link/15 bg-frost-link/5 px-4 py-3 text-body-sm text-fog">
-            <Info className="mt-0.5 size-5 shrink-0 text-frost-link" />
-            <p>
-              نقش‌ها و محدوده دسترسی پس از ایجاد کاربر، از صفحه «نقش‌ها» برای هر کاربر قابل تنظیم است.
-            </p>
-          </div>
 
           <div className="sticky bottom-0 z-10">
             <div className="glass-card-conic-top flex flex-col-reverse gap-4 rounded-xl border border-white/8 bg-graphite-plate/70 p-5 shadow-[0_32px_64px_-32px_rgba(5,6,15,0.9),0_0_40px_-16px_rgba(182,217,252,0.2)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6">
@@ -388,7 +424,7 @@ export default function AddUserPage() {
                   ) : (
                     <Check className="size-5" />
                   )}
-                  ثبت کاربر
+                  ذخیره تغییرات
                 </Button>
                 <Button
                   type="button"
@@ -406,6 +442,16 @@ export default function AddUserPage() {
           </div>
         </form>
       </Form>
+
+      <ConfirmDialog
+        open={showDelete}
+        onOpenChange={setShowDelete}
+        title="حذف کاربر"
+        description={`آیا از حذف «${fullName || "این کاربر"}» اطمینان دارید؟ این اقدام قابل بازگشت نیست.`}
+        confirmLabel="حذف"
+        onConfirm={handleDelete}
+        loading={deleting}
+      />
     </div>
   )
 }
