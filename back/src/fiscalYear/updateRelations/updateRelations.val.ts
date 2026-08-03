@@ -7,11 +7,8 @@ export const updateRelationsValidator = () => {
     set: object({
       ...activeRoleMixin,
       _id: objectIdValidation,
-      fiscalYearId: optional(objectIdValidation),
       organizationId: optional(objectIdValidation),
-      unitId: optional(objectIdValidation),
-      wareTypeId: optional(objectIdValidation),
     }),
-    get: selectStruct("budgetLine", 2),
+    get: selectStruct("fiscalYear", 2),
   });
 };

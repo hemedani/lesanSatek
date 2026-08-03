@@ -167825,6 +167825,272 @@ updatedAt?: (0 | 1 );
 };
 
           
+            updateRelations: {
+set: {
+activeRoleId: string;
+_id: string;
+organizationId?: string;
+};
+get: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+logo?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+mimeType?: (0 | 1 );
+type?: (0 | 1 );
+alt_text?: (0 | 1 );
+};
+creator?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+head?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+};
+state?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+city?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+units?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+location?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+users?: {
+_id?: (0 | 1 );
+first_name?: (0 | 1 );
+last_name?: (0 | 1 );
+gender?: (0 | 1 );
+birth_date?: (0 | 1 );
+mobile?: (0 | 1 );
+email?: (0 | 1 );
+is_verified?: (0 | 1 );
+position?: (0 | 1 );
+isActive?: (0 | 1 );
+isGhost?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+roles?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+processes?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+description?: (0 | 1 );
+status?: (0 | 1 );
+version?: (0 | 1 );
+isActive?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+purchaseRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+finalizedAt?: (0 | 1 );
+postCompletionSteps?: (0 | 1 );
+quantity?: (0 | 1 );
+stuffStatus?: (0 | 1 );
+selectionType?: (0 | 1 );
+selectedTenderOfferId?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+fiscalYears?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+budgetLines?: {
+_id?: (0 | 1 );
+code?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+totalAllocated?: (0 | 1 );
+totalEncumbered?: (0 | 1 );
+totalSpent?: (0 | 1 );
+remainingBudget?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+fiscalYear?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+startDate?: (0 | 1 );
+endDate?: (0 | 1 );
+isActive?: (0 | 1 );
+status?: (0 | 1 );
+};
+organization?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+location?: (0 | 1 );
+};
+unit?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+description?: (0 | 1 );
+isActive?: (0 | 1 );
+type?: (0 | 1 );
+address?: (0 | 1 );
+phone?: (0 | 1 );
+email?: (0 | 1 );
+warehouseCapacity?: (0 | 1 );
+hasColdStorage?: (0 | 1 );
+fleetSize?: (0 | 1 );
+serviceRadius?: (0 | 1 );
+features?: (0 | 1 );
+allowWareTypeIds?: (0 | 1 );
+allowWareClassIds?: (0 | 1 );
+allowWareGroupIds?: (0 | 1 );
+allowWareModelIds?: (0 | 1 );
+location?: (0 | 1 );
+};
+wareType?: {
+_id?: (0 | 1 );
+name?: (0 | 1 );
+enName?: (0 | 1 );
+};
+purchasingRequests?: {
+_id?: (0 | 1 );
+title?: (0 | 1 );
+description?: (0 | 1 );
+estimatedAmount?: (0 | 1 );
+status?: (0 | 1 );
+currentStep?: (0 | 1 );
+requestedAt?: (0 | 1 );
+completedAt?: (0 | 1 );
+finalizedAt?: (0 | 1 );
+postCompletionSteps?: (0 | 1 );
+quantity?: (0 | 1 );
+stuffStatus?: (0 | 1 );
+selectionType?: (0 | 1 );
+selectedTenderOfferId?: (0 | 1 );
+history?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+allocations?: {
+_id?: (0 | 1 );
+amount?: (0 | 1 );
+description?: (0 | 1 );
+allocatedAt?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+encumbrances?: {
+_id?: (0 | 1 );
+amount?: (0 | 1 );
+status?: (0 | 1 );
+referenceType?: (0 | 1 );
+referenceId?: (0 | 1 );
+description?: (0 | 1 );
+createdAt?: (0 | 1 );
+updatedAt?: (0 | 1 );
+};
+};
+};
+};
+
+          
             close: {
 set: {
 activeRoleId: string;
@@ -170081,10 +170347,6 @@ totalAllocated?: number;
 totalEncumbered?: number;
 totalSpent?: number;
 remainingBudget?: number;
-fiscalYearId?: string;
-organizationId?: string;
-unitId?: string;
-wareTypeId?: string;
 };
 get: {
 _id?: (0 | 1 );
@@ -171033,6 +171295,9 @@ set: {
 activeRoleId: string;
 _id: string;
 fiscalYearId?: string;
+organizationId?: string;
+unitId?: string;
+wareTypeId?: string;
 };
 get: {
 _id?: (0 | 1 );

@@ -13,10 +13,6 @@ export const updateValidator = () => {
       ...activeRoleMixin,
       _id: objectIdValidation,
       ...optionalPure,
-      fiscalYearId: optional(objectIdValidation),
-      organizationId: optional(objectIdValidation),
-      unitId: optional(objectIdValidation),
-      wareTypeId: optional(objectIdValidation),
     }),
     get: selectStruct("budgetLine", 2),
   });

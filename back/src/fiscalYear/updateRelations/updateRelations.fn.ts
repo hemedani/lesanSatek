@@ -1,5 +1,5 @@
 import { type ActFn, ObjectId } from "lesan";
-import { budgetLine } from "../../../mod.ts";
+import { fiscalYear } from "../../../mod.ts";
 import { checkFinanceUnitAccess } from "../../../utils/checkFinanceUnitAccess.ts";
 
 export const updateRelationsFn: ActFn = async (body) => {
@@ -14,7 +14,7 @@ export const updateRelationsFn: ActFn = async (body) => {
   for (const [key, value] of Object.entries(relations)) {
     if (value) {
       const relationKey = key.endsWith("Id") ? key.slice(0, -2) : key;
-      await budgetLine.addRelation({
+      await fiscalYear.addRelation({
         filters: { _id: modelId },
         relations: {
           [relationKey]: {
@@ -28,7 +28,7 @@ export const updateRelationsFn: ActFn = async (body) => {
     }
   }
 
-  return await budgetLine.findOne({
+  return await fiscalYear.findOne({
     filters: { _id: modelId },
     projection: get,
   });
