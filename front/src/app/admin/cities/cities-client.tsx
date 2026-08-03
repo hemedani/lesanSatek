@@ -1,417 +1,308 @@
-"use client";
+"use client"
 
-import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, MapPin } from "lucide-react";
-import { toast } from "sonner";
-import { useForm } from "react-hook-form";
-import { zodV4Resolver } from "@/lib/zod-v4-resolver";
-import { z } from "zod";
-import { PageHeader } from "@/components/ui/page-header";
-import { DataTable } from "@/components/ui/data-table";
-import type { Column } from "@/components/ui/data-table";
-import { Pagination } from "@/components/ui/pagination";
-import { FilterBar } from "@/components/ui/filter-bar";
-import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
-import { FormInput } from "@/components/form/form-input";
-import { FormSearchSelect } from "@/components/form/form-search-select";
-import type { SearchSelectOption } from "@/components/form/form-search-select";
-import { remove } from "@/app/actions/city/remove";
-import { add } from "@/app/actions/city/add";
-import { update } from "@/app/actions/city/update";
-import { gets as getStates } from "@/app/actions/state/gets";
-import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
+import { useCallback, useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { Plus, MapPin, Pencil, Trash2, ArrowDownUp, RotateCcw, Building2, Share2, CalendarDays } from "lucide-react"
+import { toast } from "sonner"
+import { PageHeader } from "@/components/ui/page-header"
+import { Button } from "@/components/ui/button"
+import { Pagination } from "@/components/ui/pagination"
+import { EmptyState } from "@/components/ui/empty-state"
+import { SearchField } from "@/components/ui/search-field"
+import { FilterSelect } from "@/components/ui/filter-select"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
+import type { FilterOption } from "@/components/ui/filter-select"
+import { remove } from "@/app/actions/city/remove"
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
 
-interface City {
-  _id: string;
-  name?: string;
-  enName?: string;
-  createdAt?: string;
-  state?: { _id: string; name?: string };
+export interface City {
+  _id: string
+  name?: string
+  enName?: string
+  createdAt?: string
+  state?: { _id: string; name?: string }
 }
 
-interface State {
-  _id: string;
-  name?: string;
+export interface State {
+  _id: string
+  name?: string
 }
 
 interface CitiesClientProps {
-  items: City[];
-  states: State[];
-  prevPageUrl: string;
-  nextPageUrl: string;
-  page: number;
-  search?: string;
-  selectedStateId?: string;
+  items: City[]
+  states: State[]
+  prevUrl: string
+  nextUrl: string
+  page: number
+  totalPages: number
+  total: number
+  search: string
+  sort: string
+  stateId: string
 }
 
-const citySchema = z.object({
-  name: z.string().min(1, "نام شهر الزامی است"),
-  enName: z.string().optional(),
-  stateId: z.string().min(1, "انتخاب استان الزامی است"),
-});
+const sortOptions: FilterOption[] = [
+  { value: "createdAt-desc", label: "جدیدترین" },
+  { value: "createdAt-asc", label: "قدیمی‌ترین" },
+  { value: "name-asc", label: "نام" },
+  { value: "name-desc", label: "نام معکوس" },
+]
 
-type CityData = z.infer<typeof citySchema>;
+function faDate(iso?: string): string {
+  if (!iso) return "—"
+  return new Date(iso).toLocaleDateString("fa-IR", { year: "numeric", month: "long", day: "numeric" })
+}
 
-const stateFetcher = async (q?: string): Promise<SearchSelectOption[]> => {
-  const result = await getStates(
-    { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 100, search: q },
-    { _id: 1, name: 1 }
-  );
-  if (!result.success) return [];
-  const items: State[] = result.body;
-  return items.map((s) => ({ _id: s._id, name: s.name || "" }));
-};
+function CityCard({
+  item,
+  onDelete,
+}: {
+  item: City
+  onDelete: (item: City) => void
+}) {
+  return (
+    <div className="glass-card glass-card-hover-active flex h-full flex-col gap-4 rounded-2xl p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-electric-iris/10 ring-1 ring-inset ring-electric-iris/15">
+            <MapPin className="size-5 text-electric-iris" />
+          </div>
+          <div className="min-w-0 space-y-1.5">
+            <Link
+              href={`/admin/cities/${item._id}`}
+              className="block truncate text-base font-semibold text-moonlight transition-colors hover:text-electric-iris"
+            >
+              {item.name || "بدون نام"}
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-white/[0.06] ring-1 ring-inset ring-white/[0.06]">
+        <div className="min-w-0 bg-[#05060f]/60 p-3 text-center">
+          <p className="text-[11px] text-fog/60">استان</p>
+          <p className="mt-1 truncate text-sm font-medium text-moonlight leading-6" title={item.state?.name}>
+            {item.state?.name || "—"}
+          </p>
+        </div>
+        <div className="min-w-0 bg-[#05060f]/60 p-3 text-center">
+          <p className="text-[11px] text-fog/60">نام لاتین</p>
+          <p className="mt-1 truncate text-sm font-medium text-moonlight leading-6" dir="ltr">
+            {item.enName || "—"}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-auto flex items-center justify-between gap-3 border-t border-steel-border/15 pt-3">
+        <span className="inline-flex items-center gap-1.5 text-body-sm text-fog/70">
+          <CalendarDays className="size-4 text-fog/60" />
+          {faDate(item.createdAt)}
+        </span>
+        <div className="flex items-center gap-1">
+          <Link href={`/admin/cities/${item._id}`} title="ویرایش">
+            <Button variant="ghost" size="icon-lg" className="size-9 text-fog/60 hover:text-moonlight">
+              <Pencil className="size-5" />
+            </Button>
+          </Link>
+          <Link href={`/admin/cities/${item._id}/relations`} title="روابط">
+            <Button variant="ghost" size="icon-lg" className="size-9 text-fog/60 hover:text-frost-link">
+              <Share2 className="size-5" />
+            </Button>
+          </Link>
+          <Button
+            variant="ghost"
+            size="icon-lg"
+            className="size-9 text-fog/60 hover:text-ember hover:bg-ember/5"
+            title="حذف"
+            onClick={() => onDelete(item)}
+          >
+            <Trash2 className="size-5" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export function CitiesClient({
   items,
   states,
-  prevPageUrl,
-  nextPageUrl,
+  prevUrl,
+  nextUrl,
   page,
-  search = "",
-  selectedStateId = "",
+  totalPages,
+  total,
+  search,
+  sort,
+  stateId,
 }: CitiesClientProps) {
-  const router = useRouter();
-  const [cardView, setCardView] = useState(true);
-  const [deleteTarget, setDeleteTarget] = useState<City | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const [editTarget, setEditTarget] = useState<City | null>(null);
-  const [showDialog, setShowDialog] = useState(false);
+  const router = useRouter()
+  const [deleteTarget, setDeleteTarget] = useState<City | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
-  const form = useForm<CityData>({
-    resolver: zodV4Resolver(citySchema),
-    defaultValues: { name: "", enName: "", stateId: "" },
-  });
+  const stateOptions: FilterOption[] = states.map((s) => ({
+    value: s._id,
+    label: s.name || s._id,
+  }))
 
-  const handleSearch = (value: string) => {
-    const params = new URLSearchParams();
-    if (value.trim()) params.set("search", value.trim());
-    if (selectedStateId) params.set("stateId", selectedStateId);
-    router.push(`/admin/cities${params.toString() ? `?${params.toString()}` : ""}`);
-  };
+  const makeParams = useCallback(
+    (next: { search?: string; sort?: string; stateId?: string }) => {
+      const params = new URLSearchParams()
+      const nextSearch = (next.search ?? search).trim()
+      const nextSort = next.sort ?? sort
+      const nextStateId = next.stateId ?? stateId
+      if (nextSearch) params.set("search", nextSearch)
+      if (nextSort && nextSort !== "createdAt-desc") params.set("sort", nextSort)
+      if (nextStateId) params.set("stateId", nextStateId)
+      return params.toString()
+    },
+    [search, sort, stateId],
+  )
 
-  const handleStateFilter = (stateId: string) => {
-    const params = new URLSearchParams();
-    if (stateId) params.set("stateId", stateId);
-    if (search) params.set("search", search);
-    router.push(`/admin/cities${params.toString() ? `?${params.toString()}` : ""}`);
-  };
+  const go = useCallback(
+    (qs: string) => {
+      router.push(`/admin/cities${qs ? `?${qs}` : ""}`)
+    },
+    [router],
+  )
 
-  const openAdd = () => {
-    form.reset({ name: "", enName: "", stateId: "" });
-    setEditTarget(null);
-    setShowDialog(true);
-  };
+  const handleSearch = (value: string) => go(makeParams({ search: value }))
+  const handleSort = (value: string | null) => go(makeParams({ sort: value ?? "createdAt-desc" }))
+  const handleState = (value: string | null) => go(makeParams({ stateId: value ?? "" }))
+  const handleReset = () => router.push("/admin/cities")
 
-  const openEdit = (city: City) => {
-    form.reset({
-      name: city.name || "",
-      enName: city.enName || "",
-      stateId: city.state?._id || "",
-    });
-    setEditTarget(city);
-    setShowDialog(true);
-  };
-
-  const onSubmit = async (data: CityData) => {
-    if (editTarget) {
-      const result = await update(
-        { activeRoleId: getActiveRoleIdFromStore(), _id: editTarget._id, name: data.name, enName: data.enName || undefined },
-        { _id: 1, name: 1 }
-      );
-      if (result.success) {
-        toast.success("شهر با موفقیت به‌روزرسانی شد");
-        router.refresh();
-        setShowDialog(false);
-      } else {
-        toast.error(result.body?.message || "خطا در به‌روزرسانی شهر");
-      }
-    } else {
-      const result = await add(
-        { activeRoleId: getActiveRoleIdFromStore(), name: data.name, enName: data.enName || undefined, stateId: data.stateId },
-        { _id: 1, name: 1 }
-      );
-      if (result.success) {
-        toast.success("شهر با موفقیت ایجاد شد");
-        router.refresh();
-        setShowDialog(false);
-      } else {
-        toast.error(result.body?.message || "خطا در ایجاد شهر");
-      }
-    }
-  };
+  const hasFilters = Boolean(search || (sort && sort !== "createdAt-desc") || stateId)
 
   const handleDelete = async () => {
-    if (!deleteTarget) return;
-    setDeleting(true);
-    const result = await remove({ activeRoleId: getActiveRoleIdFromStore(), _id: deleteTarget._id });
-    if (result.success) {
-      toast.success("شهر با موفقیت حذف شد");
-      router.refresh();
-    } else {
-      toast.error(result.body?.message || "خطا در حذف شهر");
+    if (!deleteTarget) return
+    setDeleting(true)
+    try {
+      const result = await remove({
+        activeRoleId: getActiveRoleIdFromStore(),
+        _id: deleteTarget._id,
+      })
+      if (result.success) {
+        toast.success("شهر با موفقیت حذف شد")
+        router.refresh()
+      } else {
+        toast.error(result.body?.message || "خطا در حذف شهر")
+      }
+    } catch {
+      toast.error("خطا در حذف شهر")
+    } finally {
+      setDeleting(false)
+      setDeleteTarget(null)
     }
-    setDeleting(false);
-    setDeleteTarget(null);
-  };
-
-  const filteredItems = useMemo(() => {
-    if (!selectedStateId) return items;
-    return items.filter((city) => city.state?._id === selectedStateId);
-  }, [items, selectedStateId]);
-
-  const columns: Column<City>[] = [
-    {
-      key: "name",
-      label: "نام شهر",
-      render: (item) => (
-        <div className="flex items-center gap-3">
-          <div className="size-6 rounded-lg bg-electric-iris/10 flex items-center justify-center shrink-0">
-            <MapPin className="size-3.5 text-electric-iris" />
-          </div>
-          <span className="text-moonlight font-medium">{item.name || "—"}</span>
-        </div>
-      ),
-    },
-    {
-      key: "enName",
-      label: "نام انگلیسی",
-      render: (item) => (
-        <span className="text-fog text-sm font-mono" dir="ltr">
-          {item.enName || "—"}
-        </span>
-      ),
-    },
-    {
-      key: "state",
-      label: "استان",
-      render: (item) => (
-        <span className="text-fog text-sm">{item.state?.name || "—"}</span>
-      ),
-    },
-    {
-      key: "createdAt",
-      label: "تاریخ ایجاد",
-      render: (item) => (
-        <span className="text-fog text-sm">
-          {item.createdAt
-            ? new Date(item.createdAt).toLocaleDateString("fa-IR")
-            : "—"}
-        </span>
-      ),
-      hideOnCard: true,
-    },
-    {
-      key: "actions",
-      label: "",
-      render: (item) => (
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200"
-            onClick={() => openEdit(item)}
-          >
-            <Pencil className="size-3.5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200 text-fog/60 hover:text-destructive"
-            onClick={() => setDeleteTarget(item)}
-          >
-            <Trash2 className="size-3.5" />
-          </Button>
-        </div>
-      ),
-    },
-  ];
+  }
 
   return (
-    <div className="space-y-6 relative">
-      <div className="relative z-[1]">
-        <PageHeader
-          title="شهرها"
-          description="مدیریت شهرهای کشور"
-        >
-          <Button size="sm" className="gap-1.5" onClick={openAdd}>
-            <Plus className="size-4" />
-            شهر جدید
+    <div className="space-y-6">
+      <PageHeader
+        title="مدیریت شهرها"
+        description="مدیریت شهرهای کشور و ارتباط آن‌ها با استان‌ها"
+      >
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-body-sm text-fog">
+          <span className="size-1.5 rounded-full bg-electric-iris" aria-hidden="true" />
+          {total.toLocaleString("fa-IR")} شهر
+        </span>
+        <Link href="/admin/cities/add">
+          <Button className="gap-2 px-5">
+            <Plus className="size-5" />
+            افزودن شهر
           </Button>
-        </PageHeader>
+        </Link>
+      </PageHeader>
+
+      <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">
+        <SearchField
+          value={search}
+          onChange={handleSearch}
+          placeholder="جستجوی شهر…"
+          ariaLabel="جستجوی شهر"
+          className="w-full lg:min-w-64 lg:max-w-md lg:flex-1"
+        />
+        <div className="flex flex-wrap items-stretch gap-2.5">
+          <FilterSelect
+            icon={Building2}
+            placeholder="استان"
+            ariaLabel="فیلتر بر اساس استان"
+            value={stateId}
+            onValueChange={handleState}
+            options={stateOptions}
+          />
+          <FilterSelect
+            icon={ArrowDownUp}
+            placeholder="مرتب‌سازی"
+            ariaLabel="ترتیب نمایش شهرها"
+            value={sort}
+            onValueChange={handleSort}
+            options={sortOptions}
+          />
+          {hasFilters && (
+            <Button
+              variant="ghost"
+              onClick={handleReset}
+              className="h-11 gap-2 rounded-sm px-4 text-body-sm text-moonlight"
+            >
+              <RotateCcw className="size-5" strokeWidth={2} />
+              پاک کردن فیلترها
+            </Button>
+          )}
+        </div>
       </div>
 
-      <FilterBar
-        search={search}
-        onSearchChange={handleSearch}
-        searchPlaceholder="جستجوی شهر..."
-      >
-        <div className="flex items-center gap-2">
-          <select
-            value={selectedStateId}
-            onChange={(e) => handleStateFilter(e.target.value)}
-            className="h-9 rounded-sm border border-steel-border/60 bg-transparent px-3 text-sm text-moonlight outline-none transition-all duration-200 hover:border-frost-link/20 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-            dir="rtl"
-          >
-            <option value="">همه استان‌ها</option>
-            {states.map((s) => (
-              <option key={s._id} value={s._id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
+      {items.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-5">
+          {items.map((item) => (
+            <CityCard key={item._id} item={item} onDelete={setDeleteTarget} />
+          ))}
         </div>
-      </FilterBar>
-
-      <DataTable
-        columns={columns}
-        data={filteredItems}
-        keyExtractor={(item) => item._id}
-        cardView={cardView}
-        onViewToggle={() => setCardView((v) => !v)}
-        renderCard={(item) => (
-          <div
-            className="glass-card glass-card-hover-active rounded-xl p-5 transition-all duration-200 cursor-pointer"
-            onClick={() => openEdit(item)}
-          >
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="size-10 rounded-xl bg-electric-iris/10 flex items-center justify-center shrink-0">
-                  <MapPin className="size-5 text-electric-iris" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-base font-semibold text-moonlight leading-6 truncate">
-                    {item.name || "—"}
-                  </p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    {item.state?.name && (
-                      <span className="text-xs text-fog/60">{item.state.name}</span>
-                    )}
-                    {item.enName && (
-                      <span className="text-xs text-fog/40 font-mono" dir="ltr">
-                        {item.enName}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-1 shrink-0">
-                <Button
-                  variant="ghost"
-                  size="icon-xs"
-                  className="text-fog/60 hover:text-moonlight"
-                  onClick={(e) => { e.stopPropagation(); openEdit(item); }}
-                >
-                  <Pencil className="size-3.5" />
+      ) : (
+        <EmptyState
+          icon={MapPin}
+          title={hasFilters ? "شهری یافت نشد" : "هنوز شهری تعریف نشده است"}
+          description={
+            hasFilters
+              ? "با تغییر جستجو یا فیلترها، شهر موردنظر را پیدا کنید."
+              : "نخستین شهر را برای تکمیل سلسله‌مراتب موقعیت جغرافیایی ایجاد کنید."
+          }
+          action={
+            hasFilters ? (
+              <Button variant="ghost" className="gap-2 px-4" onClick={handleReset}>
+                پاک کردن فیلترها
+              </Button>
+            ) : (
+              <Link href="/admin/cities/add">
+                <Button className="gap-2 px-5">
+                  <Plus className="size-5" />
+                  ایجاد شهر
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="icon-xs"
-                  className="text-fog/60 hover:text-destructive"
-                  onClick={(e) => { e.stopPropagation(); setDeleteTarget(item); }}
-                >
-                  <Trash2 className="size-3.5" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-        emptyTitle="شهری یافت نشد"
-        emptyDescription={
-          selectedStateId
-            ? "برای این استان شهری ثبت نشده است."
-            : "هنوز هیچ شهری ثبت نشده است."
-        }
-        emptyAction={
-          <Button size="sm" className="gap-1.5" onClick={openAdd}>
-            <Plus className="size-4" />
-            ایجاد شهر
-          </Button>
-        }
-      />
-
-      {!selectedStateId && (
-        <Pagination
-          prevUrl={prevPageUrl}
-          nextUrl={nextPageUrl}
-          page={page}
+              </Link>
+            )
+          }
         />
       )}
 
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="sm:max-w-md" dir="rtl">
-          <DialogHeader>
-            <DialogTitle className="text-glacier">
-              {editTarget ? "ویرایش شهر" : "شهر جدید"}
-            </DialogTitle>
-            <DialogDescription className="text-fog/70">
-              {editTarget ? "اطلاعات شهر را ویرایش کنید" : "شهر جدید ایجاد کنید"}
-            </DialogDescription>
-          </DialogHeader>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-              <FormInput
-                control={form.control}
-                name="name"
-                label="نام شهر"
-                placeholder="مثال: تهران"
-                required
-                disabled={form.formState.isSubmitting}
-              />
-
-              <FormInput
-                control={form.control}
-                name="enName"
-                label="نام انگلیسی"
-                placeholder="مثال: Tehran"
-                disabled={form.formState.isSubmitting}
-              />
-
-              <FormSearchSelect
-                control={form.control}
-                name="stateId"
-                label="استان"
-                placeholder="استان را انتخاب کنید..."
-                fetcher={stateFetcher}
-                required
-                disabled={form.formState.isSubmitting}
-              />
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setShowDialog(false)}
-                  disabled={form.formState.isSubmitting}
-                >
-                  انصراف
-                </Button>
-                <Button type="submit" disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting
-                    ? "در حال ذخیره..."
-                    : editTarget ? "ذخیره تغییرات" : "ایجاد شهر"
-                  }
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+      {(prevUrl || nextUrl) && (
+        <Pagination
+          prevUrl={prevUrl}
+          nextUrl={nextUrl}
+          page={page}
+          totalPages={totalPages}
+          className="pt-2 border-t border-steel-border/15"
+        />
+      )}
 
       <ConfirmDialog
         open={!!deleteTarget}
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
         title="حذف شهر"
-        description={`آیا از حذف شهر "${deleteTarget?.name || ''}" اطمینان دارید؟ این اقدام قابل بازگشت نیست.`}
+        description={`آیا از حذف شهر «${deleteTarget?.name || "این شهر"}» اطمینان دارید؟ این اقدام قابل بازگشت نیست.`}
         confirmLabel="حذف"
         onConfirm={handleDelete}
         loading={deleting}
       />
     </div>
-  );
+  )
 }

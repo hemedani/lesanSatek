@@ -1,337 +1,278 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, Map } from "lucide-react";
-import { toast } from "sonner";
-import { useForm } from "react-hook-form";
-import { zodV4Resolver } from "@/lib/zod-v4-resolver";
-import { z } from "zod";
-import { PageHeader } from "@/components/ui/page-header";
-import { DataTable } from "@/components/ui/data-table";
-import type { Column } from "@/components/ui/data-table";
-import { Pagination } from "@/components/ui/pagination";
-import { FilterBar } from "@/components/ui/filter-bar";
-import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
-import { FormInput } from "@/components/form/form-input";
-import { remove } from "@/app/actions/state/remove";
-import { add } from "@/app/actions/state/add";
-import { update } from "@/app/actions/state/update";
-import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
+import { useCallback, useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { Plus, Map, Pencil, Trash2, ArrowDownUp, RotateCcw, CalendarDays } from "lucide-react"
+import { toast } from "sonner"
+import { PageHeader } from "@/components/ui/page-header"
+import { Button } from "@/components/ui/button"
+import { Pagination } from "@/components/ui/pagination"
+import { EmptyState } from "@/components/ui/empty-state"
+import { SearchField } from "@/components/ui/search-field"
+import { FilterSelect } from "@/components/ui/filter-select"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
+import type { FilterOption } from "@/components/ui/filter-select"
+import { remove } from "@/app/actions/state/remove"
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
 
-interface State {
-  _id: string;
-  name?: string;
-  enName?: string;
-  createdAt?: string;
+export interface State {
+  _id: string
+  name?: string
+  enName?: string
+  createdAt?: string
+  cities?: { _id: string }[]
 }
 
 interface StatesClientProps {
-  items: State[];
-  prevPageUrl: string;
-  nextPageUrl: string;
-  page: number;
-  search?: string;
+  items: State[]
+  prevUrl: string
+  nextUrl: string
+  page: number
+  totalPages: number
+  total: number
+  search: string
+  sort: string
 }
 
-const stateSchema = z.object({
-  name: z.string().min(1, "نام استان الزامی است"),
-  enName: z.string().optional(),
-});
+const sortOptions: FilterOption[] = [
+  { value: "createdAt-desc", label: "جدیدترین" },
+  { value: "createdAt-asc", label: "قدیمی‌ترین" },
+  { value: "name-asc", label: "نام" },
+  { value: "name-desc", label: "نام معکوس" },
+]
 
-type StateData = z.infer<typeof stateSchema>;
+function faDate(iso?: string): string {
+  if (!iso) return "—"
+  return new Date(iso).toLocaleDateString("fa-IR", { year: "numeric", month: "long", day: "numeric" })
+}
+
+function StateCard({
+  item,
+  onDelete,
+}: {
+  item: State
+  onDelete: (item: State) => void
+}) {
+  return (
+    <div className="glass-card glass-card-hover-active flex h-full flex-col gap-4 rounded-2xl p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-electric-iris/10 ring-1 ring-inset ring-electric-iris/15">
+            <Map className="size-5 text-electric-iris" />
+          </div>
+          <div className="min-w-0 space-y-1.5">
+            <Link
+              href={`/admin/states/${item._id}`}
+              className="block truncate text-base font-semibold text-moonlight transition-colors hover:text-electric-iris"
+            >
+              {item.name || "بدون نام"}
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-white/[0.06] ring-1 ring-inset ring-white/[0.06]">
+        <div className="min-w-0 bg-[#05060f]/60 p-3 text-center">
+          <p className="text-[11px] text-fog/60">نام لاتین</p>
+          <p className="mt-1 truncate text-sm font-medium text-moonlight leading-6" dir="ltr">
+            {item.enName || "—"}
+          </p>
+        </div>
+        <div className="min-w-0 bg-[#05060f]/60 p-3 text-center">
+          <p className="text-[11px] text-fog/60">شمار شهرها</p>
+          <p className="mt-1 truncate text-sm font-medium text-moonlight leading-6">
+            {(item.cities?.length || 0).toLocaleString("fa-IR")} شهر
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-auto flex items-center justify-between gap-3 border-t border-steel-border/15 pt-3">
+        <span className="inline-flex items-center gap-1.5 text-body-sm text-fog/70">
+          <CalendarDays className="size-4 text-fog/60" />
+          {faDate(item.createdAt)}
+        </span>
+        <div className="flex items-center gap-1">
+          <Link href={`/admin/states/${item._id}`} title="ویرایش">
+            <Button variant="ghost" size="icon-lg" className="size-9 text-fog/60 hover:text-moonlight">
+              <Pencil className="size-5" />
+            </Button>
+          </Link>
+          <Button
+            variant="ghost"
+            size="icon-lg"
+            className="size-9 text-fog/60 hover:text-ember hover:bg-ember/5"
+            title="حذف"
+            onClick={() => onDelete(item)}
+          >
+            <Trash2 className="size-5" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export function StatesClient({
   items,
-  prevPageUrl,
-  nextPageUrl,
+  prevUrl,
+  nextUrl,
   page,
-  search = "",
+  totalPages,
+  total,
+  search,
+  sort,
 }: StatesClientProps) {
-  const router = useRouter();
-  const [cardView, setCardView] = useState(true);
-  const [deleteTarget, setDeleteTarget] = useState<State | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const [editTarget, setEditTarget] = useState<State | null>(null);
-  const [showDialog, setShowDialog] = useState(false);
+  const router = useRouter()
+  const [deleteTarget, setDeleteTarget] = useState<State | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
-  const form = useForm<StateData>({
-    resolver: zodV4Resolver(stateSchema),
-    defaultValues: { name: "", enName: "" },
-  });
+  const makeParams = useCallback(
+    (next: { search?: string; sort?: string }) => {
+      const params = new URLSearchParams()
+      const nextSearch = (next.search ?? search).trim()
+      const nextSort = next.sort ?? sort
+      if (nextSearch) params.set("search", nextSearch)
+      if (nextSort && nextSort !== "createdAt-desc") params.set("sort", nextSort)
+      return params.toString()
+    },
+    [search, sort],
+  )
 
-  const handleSearch = (value: string) => {
-    if (value.trim()) {
-      router.push(`/admin/states?search=${encodeURIComponent(value.trim())}`);
-    } else {
-      router.push("/admin/states");
-    }
-  };
+  const go = useCallback(
+    (qs: string) => {
+      router.push(`/admin/states${qs ? `?${qs}` : ""}`)
+    },
+    [router],
+  )
 
-  const openAdd = () => {
-    form.reset({ name: "", enName: "" });
-    setEditTarget(null);
-    setShowDialog(true);
-  };
+  const handleSearch = (value: string) => go(makeParams({ search: value }))
+  const handleSort = (value: string | null) => go(makeParams({ sort: value ?? "createdAt-desc" }))
+  const handleReset = () => router.push("/admin/states")
 
-  const openEdit = (state: State) => {
-    form.reset({
-      name: state.name || "",
-      enName: state.enName || "",
-    });
-    setEditTarget(state);
-    setShowDialog(true);
-  };
-
-  const onSubmit = async (data: StateData) => {
-    if (editTarget) {
-      const result = await update(
-        { activeRoleId: getActiveRoleIdFromStore(), _id: editTarget._id, ...data },
-        { _id: 1, name: 1 }
-      );
-      if (result.success) {
-        toast.success("استان با موفقیت به‌روزرسانی شد");
-        router.refresh();
-        setShowDialog(false);
-      } else {
-        toast.error(result.body?.message || "خطا در به‌روزرسانی استان");
-      }
-    } else {
-      const result = await add(
-        { activeRoleId: getActiveRoleIdFromStore(), ...data },
-        { _id: 1, name: 1 }
-      );
-      if (result.success) {
-        toast.success("استان با موفقیت ایجاد شد");
-        router.refresh();
-        setShowDialog(false);
-      } else {
-        toast.error(result.body?.message || "خطا در ایجاد استان");
-      }
-    }
-  };
+  const hasFilters = Boolean(search || (sort && sort !== "createdAt-desc"))
 
   const handleDelete = async () => {
-    if (!deleteTarget) return;
-    setDeleting(true);
-    const result = await remove({ activeRoleId: getActiveRoleIdFromStore(), _id: deleteTarget._id });
-    if (result.success) {
-      toast.success("استان با موفقیت حذف شد");
-      router.refresh();
-    } else {
-      toast.error(result.body?.message || "خطا در حذف استان");
+    if (!deleteTarget) return
+    setDeleting(true)
+    try {
+      const result = await remove({
+        activeRoleId: getActiveRoleIdFromStore(),
+        _id: deleteTarget._id,
+      })
+      if (result.success) {
+        toast.success("استان با موفقیت حذف شد")
+        router.refresh()
+      } else {
+        toast.error(result.body?.message || "خطا در حذف استان")
+      }
+    } catch {
+      toast.error("خطا در حذف استان")
+    } finally {
+      setDeleting(false)
+      setDeleteTarget(null)
     }
-    setDeleting(false);
-    setDeleteTarget(null);
-  };
-
-  const columns: Column<State>[] = [
-    {
-      key: "name",
-      label: "نام استان",
-      render: (item) => (
-        <div className="flex items-center gap-3">
-          <div className="size-6 rounded-lg bg-electric-iris/10 flex items-center justify-center shrink-0">
-            <Map className="size-3.5 text-electric-iris" />
-          </div>
-          <span className="text-moonlight font-medium">{item.name || "—"}</span>
-        </div>
-      ),
-    },
-    {
-      key: "enName",
-      label: "نام انگلیسی",
-      render: (item) => (
-        <span className="text-fog text-sm font-mono" dir="ltr">
-          {item.enName || "—"}
-        </span>
-      ),
-    },
-    {
-      key: "createdAt",
-      label: "تاریخ ایجاد",
-      render: (item) => (
-        <span className="text-fog text-sm">
-          {item.createdAt
-            ? new Date(item.createdAt).toLocaleDateString("fa-IR")
-            : "—"}
-        </span>
-      ),
-      hideOnCard: true,
-    },
-    {
-      key: "actions",
-      label: "",
-      render: (item) => (
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200"
-            onClick={() => openEdit(item)}
-          >
-            <Pencil className="size-3.5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            className="opacity-60 group-hover/row:opacity-100 transition-opacity duration-200 text-fog/60 hover:text-destructive"
-            onClick={() => setDeleteTarget(item)}
-          >
-            <Trash2 className="size-3.5" />
-          </Button>
-        </div>
-      ),
-    },
-  ];
+  }
 
   return (
-    <div className="space-y-6 relative">
-      <div className="relative z-[1]">
-        <PageHeader
-          title="استان‌ها"
-          description="مدیریت استان‌های کشور"
-        >
-          <Button size="sm" className="gap-1.5" onClick={openAdd}>
-            <Plus className="size-4" />
-            استان جدید
+    <div className="space-y-6">
+      <PageHeader
+        title="مدیریت استان‌ها"
+        description="مدیریت استان‌های کشور و شمار شهرهای هر استان"
+      >
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-body-sm text-fog">
+          <span className="size-1.5 rounded-full bg-electric-iris" aria-hidden="true" />
+          {total.toLocaleString("fa-IR")} استان
+        </span>
+        <Link href="/admin/states/add">
+          <Button className="gap-2 px-5">
+            <Plus className="size-5" />
+            افزودن استان
           </Button>
-        </PageHeader>
+        </Link>
+      </PageHeader>
+
+      <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">
+        <SearchField
+          value={search}
+          onChange={handleSearch}
+          placeholder="جستجوی استان…"
+          ariaLabel="جستجوی استان"
+          className="w-full lg:min-w-64 lg:max-w-md lg:flex-1"
+        />
+        <div className="flex flex-wrap items-stretch gap-2.5">
+          <FilterSelect
+            icon={ArrowDownUp}
+            placeholder="مرتب‌سازی"
+            ariaLabel="ترتیب نمایش استان‌ها"
+            value={sort}
+            onValueChange={handleSort}
+            options={sortOptions}
+          />
+          {hasFilters && (
+            <Button
+              variant="ghost"
+              onClick={handleReset}
+              className="h-11 gap-2 rounded-sm px-4 text-body-sm text-moonlight"
+            >
+              <RotateCcw className="size-5" strokeWidth={2} />
+              پاک کردن فیلترها
+            </Button>
+          )}
+        </div>
       </div>
 
-      <FilterBar
-        search={search}
-        onSearchChange={handleSearch}
-        searchPlaceholder="جستجوی استان..."
-      />
-
-      <DataTable
-        columns={columns}
-        data={items}
-        keyExtractor={(item) => item._id}
-        cardView={cardView}
-        onViewToggle={() => setCardView((v) => !v)}
-        renderCard={(item) => (
-          <div
-            className="glass-card glass-card-hover-active rounded-xl p-5 transition-all duration-200 cursor-pointer"
-            onClick={() => openEdit(item)}
-          >
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="size-10 rounded-xl bg-electric-iris/10 flex items-center justify-center shrink-0">
-                  <Map className="size-5 text-electric-iris" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-base font-semibold text-moonlight leading-6 truncate">
-                    {item.name || "—"}
-                  </p>
-                  {item.enName && (
-                    <p className="text-sm text-fog/60 leading-5 truncate mt-0.5 font-mono" dir="ltr">
-                      {item.enName}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center gap-1 shrink-0">
-                <Button
-                  variant="ghost"
-                  size="icon-xs"
-                  className="text-fog/60 hover:text-moonlight"
-                  onClick={(e) => { e.stopPropagation(); openEdit(item); }}
-                >
-                  <Pencil className="size-3.5" />
+      {items.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-5">
+          {items.map((item) => (
+            <StateCard key={item._id} item={item} onDelete={setDeleteTarget} />
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          icon={Map}
+          title={hasFilters ? "استانی یافت نشد" : "هنوز استانی تعریف نشده است"}
+          description={
+            hasFilters
+              ? "با تغییر جستجو یا مرتب‌سازی، استان موردنظر را پیدا کنید."
+              : "نخستین استان را برای ساماندهی موقعیت جغرافیایی ایجاد کنید."
+          }
+          action={
+            hasFilters ? (
+              <Button variant="ghost" className="gap-2 px-4" onClick={handleReset}>
+                پاک کردن فیلترها
+              </Button>
+            ) : (
+              <Link href="/admin/states/add">
+                <Button className="gap-2 px-5">
+                  <Plus className="size-5" />
+                  ایجاد استان
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="icon-xs"
-                  className="text-fog/60 hover:text-destructive"
-                  onClick={(e) => { e.stopPropagation(); setDeleteTarget(item); }}
-                >
-                  <Trash2 className="size-3.5" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-        emptyTitle="استانی یافت نشد"
-        emptyDescription="هنوز هیچ استانی ثبت نشده است."
-        emptyAction={
-          <Button size="sm" className="gap-1.5" onClick={openAdd}>
-            <Plus className="size-4" />
-            ایجاد استان
-          </Button>
-        }
-      />
+              </Link>
+            )
+          }
+        />
+      )}
 
-      <Pagination
-        prevUrl={prevPageUrl}
-        nextUrl={nextPageUrl}
-        page={page}
-      />
-
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="sm:max-w-md" dir="rtl">
-          <DialogHeader>
-            <DialogTitle className="text-glacier">
-              {editTarget ? "ویرایش استان" : "استان جدید"}
-            </DialogTitle>
-            <DialogDescription className="text-fog/70">
-              {editTarget ? "اطلاعات استان را ویرایش کنید" : "استان جدید ایجاد کنید"}
-            </DialogDescription>
-          </DialogHeader>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-              <FormInput
-                control={form.control}
-                name="name"
-                label="نام استان"
-                placeholder="مثال: تهران"
-                required
-                disabled={form.formState.isSubmitting}
-              />
-
-              <FormInput
-                control={form.control}
-                name="enName"
-                label="نام انگلیسی"
-                placeholder="مثال: Tehran"
-                disabled={form.formState.isSubmitting}
-              />
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setShowDialog(false)}
-                  disabled={form.formState.isSubmitting}
-                >
-                  انصراف
-                </Button>
-                <Button type="submit" disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting
-                    ? "در حال ذخیره..."
-                    : editTarget ? "ذخیره تغییرات" : "ایجاد استان"
-                  }
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+      {(prevUrl || nextUrl) && (
+        <Pagination
+          prevUrl={prevUrl}
+          nextUrl={nextUrl}
+          page={page}
+          totalPages={totalPages}
+          className="pt-2 border-t border-steel-border/15"
+        />
+      )}
 
       <ConfirmDialog
         open={!!deleteTarget}
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
         title="حذف استان"
-        description={`آیا از حذف استان "${deleteTarget?.name || ''}" اطمینان دارید؟ این اقدام قابل بازگشت نیست.`}
+        description={`آیا از حذف استان «${deleteTarget?.name || "این استان"}» اطمینان دارید؟ این اقدام قابل بازگشت نیست.`}
         confirmLabel="حذف"
         onConfirm={handleDelete}
         loading={deleting}
       />
     </div>
-  );
+  )
 }
