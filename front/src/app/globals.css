@@ -212,6 +212,30 @@
   background-size: 40px 40px;
 }
 
+/* Transparent variant — grid lines only, no solid fill. Used on the
+   process graph canvas so the page background shows through. */
+
+@utility bg-blueprint-grid-clear {
+  background-image:
+    linear-gradient(rgba(186, 215, 247, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(186, 215, 247, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── Blueprint Edge Flow (animated connector dash) ────────── */
+/* Slow-traveling dash on graph edges. Animates only stroke-dashoffset
+   (GPU composited); the connector line itself stays static. */
+
+@keyframes blueprint-dash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+@utility animate-blueprint-dash {
+  animation: blueprint-dash 1.8s linear infinite;
+}
+
 /* ── Admin Canvas (midnight ink + static radial glow + blueprint grid) ──── */
 /* GPU-friendly: only static background layers, no animated repaints */
 
@@ -625,6 +649,11 @@
   .glass-dialog-live::before {
     animation: none;
     background: rgba(186, 215, 247, 0.12);
+  }
+
+  /* Graph edges: freeze the traveling dash at a static dashed stroke. */
+  .animate-blueprint-dash {
+    animation: none;
   }
 
   [data-slot="dialog-content"] {

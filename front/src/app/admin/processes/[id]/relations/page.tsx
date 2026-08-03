@@ -1,134 +1,238 @@
-"use client";
+"use client"
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState, use } from "react";
-import { toast } from "sonner";
-import { Loader2, ArrowRight, Share2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { FormCard } from "@/components/form/form-card";
-import { Breadcrumbs } from "@/components/layout/breadcrumbs";
-import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
-import { ErrorState } from "@/components/ui/error-state";
-import { SearchSelect } from "@/components/form/form-search-select";
-import { ProcessScopeFieldsStandalone } from "@/components/process/process-scope-fields";
-import type { ProcessScopeValues } from "@/components/process/process-scope-fields";
-import { get } from "@/app/actions/process/get";
-import { updateRelations } from "@/app/actions/process/updateRelations";
-import { gets as getOrgs } from "@/app/actions/organization/gets";
-import Link from "next/link";
-import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
+import { useEffect, useState, use, useCallback } from "react"
+import Link from "next/link"
+import { ArrowRight, Plus, Share2, Workflow } from "lucide-react"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { PageHeader } from "@/components/ui/page-header"
+import { LoadingSkeleton } from "@/components/ui/loading-skeleton"
+import { ErrorState } from "@/components/ui/error-state"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
+import { RelationCard } from "@/components/process/relation-card"
+import { RelationModal } from "@/components/process/relation-modal"
+import type { ProcessScopeValues } from "@/components/process/process-scope-fields"
+import { get } from "@/app/actions/process/get"
+import { updateRelations } from "@/app/actions/process/updateRelations"
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
+import { Landmark, Building2, Tags, Layers, Package, Boxes, Box } from "lucide-react"
 
-const scopeFetcher = <T extends { _id?: string; name?: string }>(
-  action: (data: { activeRoleId: string; page: number; limit: number; search?: string }, sel: Record<string, unknown>) => Promise<{ success: boolean; body?: T[] }>
-) => {
-  return async (search?: string) => {
-    const result = await action(
-      { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-      { _id: 1, name: 1 }
-    );
-    if (!result.success || !result.body) return [];
-    return result.body.map((item) => ({
-      _id: item._id || "",
-      name: item.name || "",
-    }));
-  };
-};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ProcessData = any
+
+type ScopeKey = "unit" | "wareType" | "wareClass" | "wareGroup" | "wareModel" | "ware"
+
+const SCOPE_ID_KEY: Record<ScopeKey, keyof ProcessScopeValues> = {
+  unit: "unitId",
+  wareType: "wareTypeId",
+  wareClass: "wareClassId",
+  wareGroup: "wareGroupId",
+  wareModel: "wareModelId",
+  ware: "wareId",
+}
+
+const RELATION_LEVELS: {
+  key: ScopeKey | "organization"
+  label: string
+  icon: React.ElementType
+  tone: { icon: string; badge: string }
+}[] = [
+  {
+    key: "organization",
+    label: "سازمان",
+    icon: Landmark,
+    tone: {
+      icon: "border-electric-iris/25 bg-electric-iris/10 text-electric-iris ring-electric-iris/15",
+      badge: "border-electric-iris/25 bg-electric-iris/10 text-electric-iris",
+    },
+  },
+  {
+    key: "unit",
+    label: "واحد",
+    icon: Building2,
+    tone: {
+      icon: "border-frost-link/25 bg-frost-link/10 text-frost-link ring-frost-link/15",
+      badge: "border-frost-link/25 bg-frost-link/10 text-frost-link",
+    },
+  },
+  {
+    key: "wareType",
+    label: "نوع کالا",
+    icon: Tags,
+    tone: {
+      icon: "border-azure/25 bg-azure/10 text-azure ring-azure/15",
+      badge: "border-azure/25 bg-azure/10 text-azure",
+    },
+  },
+  {
+    key: "wareClass",
+    label: "رده کالا",
+    icon: Layers,
+    tone: {
+      icon: "border-amber-400/25 bg-amber-400/10 text-amber-400 ring-amber-400/15",
+      badge: "border-amber-400/25 bg-amber-400/10 text-amber-400",
+    },
+  },
+  {
+    key: "wareGroup",
+    label: "گروه کالا",
+    icon: Package,
+    tone: {
+      icon: "border-emerald-400/25 bg-emerald-400/10 text-emerald-400 ring-emerald-400/15",
+      badge: "border-emerald-400/25 bg-emerald-400/10 text-emerald-400",
+    },
+  },
+  {
+    key: "wareModel",
+    label: "مدل کالا",
+    icon: Boxes,
+    tone: {
+      icon: "border-white/15 bg-white/[0.04] text-fog ring-white/10",
+      badge: "border-white/15 bg-white/[0.04] text-fog",
+    },
+  },
+  {
+    key: "ware",
+    label: "کالا",
+    icon: Box,
+    tone: {
+      icon: "border-white/15 bg-white/[0.04] text-fog ring-white/10",
+      badge: "border-white/15 bg-white/[0.04] text-fog",
+    },
+  },
+]
 
 export default function ProcessRelationsPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>
 }) {
-  const router = useRouter();
-  const { id } = use(params);
-  const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [orgId, setOrgId] = useState("");
-  const [scope, setScope] = useState<ProcessScopeValues>({
-    unitId: "",
-    wareTypeId: "",
-    wareClassId: "",
-    wareGroupId: "",
-    wareModelId: "",
-    wareId: "",
-  });
+  const { id } = use(params)
+  const [loading, setLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
+  const [process, setProcess] = useState<ProcessData>(null)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<ScopeKey | null>(null)
+  const [deleting, setDeleting] = useState(false)
+
+  const fetchProcess = useCallback(async () => {
+    const result = await get(
+      { activeRoleId: getActiveRoleIdFromStore(), _id: id },
+      {
+        _id: 1,
+        name: 1,
+        organization: { _id: 1, name: 1 },
+        unit: { _id: 1, name: 1 },
+        wareType: { _id: 1, name: 1 },
+        wareClass: { _id: 1, name: 1 },
+        wareGroup: { _id: 1, name: 1 },
+        wareModel: { _id: 1, name: 1 },
+        ware: { _id: 1, name: 1 },
+      }
+    )
+    return result
+  }, [id])
+
+  const reload = useCallback(async () => {
+    const result = await fetchProcess()
+    if (result.success && result.body?.[0]) {
+      setProcess(result.body[0])
+      setNotFound(false)
+    } else {
+      setNotFound(true)
+    }
+  }, [fetchProcess])
 
   useEffect(() => {
-    const load = async () => {
-      const result = await get(
-        { activeRoleId: getActiveRoleIdFromStore(), _id: id },
-        {
-          _id: 1,
-          name: 1,
-          organization: { _id: 1, name: 1 },
-          unit: { _id: 1, name: 1 },
-          wareType: { _id: 1, name: 1 },
-          wareClass: { _id: 1, name: 1 },
-          wareGroup: { _id: 1, name: 1 },
-          wareModel: { _id: 1, name: 1 },
-          ware: { _id: 1, name: 1 },
-        }
-      );
+    let cancelled = false
+    ;(async () => {
+      const result = await fetchProcess()
+      if (cancelled) return
       if (result.success && result.body?.[0]) {
-        const p = result.body[0];
-        setOrgId(p.organization?._id || "");
-        setScope({
-          unitId: p.unit?._id || "",
-          wareTypeId: p.wareType?._id || "",
-          wareClassId: p.wareClass?._id || "",
-          wareGroupId: p.wareGroup?._id || "",
-          wareModelId: p.wareModel?._id || "",
-          wareId: p.ware?._id || "",
-        });
+        setProcess(result.body[0])
+        setNotFound(false)
       } else {
-        setNotFound(true);
+        setNotFound(true)
       }
-      setLoading(false);
-    };
-    load();
-  }, [id]);
+      setLoading(false)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [fetchProcess])
 
-  const handleScopeChange = (key: keyof ProcessScopeValues, value: string) => {
-    setScope((prev) => ({ ...prev, [key]: value }));
-  };
+  const orgId = process?.organization?._id || ""
+  const scope: ProcessScopeValues = {
+    unitId: process?.unit?._id || "",
+    wareTypeId: process?.wareType?._id || "",
+    wareClassId: process?.wareClass?._id || "",
+    wareGroupId: process?.wareGroup?._id || "",
+    wareModelId: process?.wareModel?._id || "",
+    wareId: process?.ware?._id || "",
+  }
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
+  const activeRelations = RELATION_LEVELS.filter(({ key }) => {
+    if (key === "organization") return !!orgId
+    return !!scope[SCOPE_ID_KEY[key]]
+  })
+
+  const handleSave = async (newOrgId: string, newScope: ProcessScopeValues) => {
     const result = await updateRelations(
       {
         activeRoleId: getActiveRoleIdFromStore(),
         _id: id,
-        ...(orgId ? { organizationId: orgId } : {}),
-        ...(scope.unitId ? { unitId: scope.unitId } : {}),
-        ...(scope.wareTypeId ? { wareTypeId: scope.wareTypeId } : {}),
-        ...(scope.wareClassId ? { wareClassId: scope.wareClassId } : {}),
-        ...(scope.wareGroupId ? { wareGroupId: scope.wareGroupId } : {}),
-        ...(scope.wareModelId ? { wareModelId: scope.wareModelId } : {}),
-        ...(scope.wareId ? { wareId: scope.wareId } : {}),
+        ...(newOrgId ? { organizationId: newOrgId } : {}),
+        ...(newScope.unitId ? { unitId: newScope.unitId } : {}),
+        ...(newScope.wareTypeId ? { wareTypeId: newScope.wareTypeId } : {}),
+        ...(newScope.wareClassId ? { wareClassId: newScope.wareClassId } : {}),
+        ...(newScope.wareGroupId ? { wareGroupId: newScope.wareGroupId } : {}),
+        ...(newScope.wareModelId ? { wareModelId: newScope.wareModelId } : {}),
+        ...(newScope.wareId ? { wareId: newScope.wareId } : {}),
       },
       { _id: 1, name: 1 }
-    );
-    setSubmitting(false);
+    )
     if (result.success) {
-      toast.success("روابط با موفقیت به‌روزرسانی شد");
-      router.refresh();
-    } else {
-      toast.error(result.body?.message || "خطا در به‌روزرسانی روابط");
+      toast.success("ارتباط‌ها با موفقیت به‌روزرسانی شدند")
+      await reload()
+      return true
     }
-  };
+    toast.error(result.body?.message || "خطا در به‌روزرسانی ارتباط‌ها")
+    return false
+  }
 
-  if (loading) return <LoadingSkeleton type="card" count={1} />;
+  const clearFrom = (key: ScopeKey): ProcessScopeValues => {
+    const order: ScopeKey[] = ["unit", "wareType", "wareClass", "wareGroup", "wareModel", "ware"]
+    const fromIdx = order.indexOf(key)
+    const next: ProcessScopeValues = { ...scope }
+    for (let i = fromIdx; i < order.length; i++) {
+      next[SCOPE_ID_KEY[order[i]]] = ""
+    }
+    return next
+  }
 
-  if (notFound) {
+  const handleDelete = async () => {
+    if (!deleteTarget) return
+    setDeleting(true)
+    const ok = await handleSave(orgId, clearFrom(deleteTarget))
+    setDeleting(false)
+    setDeleteTarget(null)
+    if (ok) {
+      toast.success("ارتباط با موفقیت حذف شد")
+    }
+  }
+
+  if (loading) {
+    return <LoadingSkeleton type="card-list" count={3} />
+  }
+
+  if (notFound || !process) {
     return (
       <div>
         <ErrorState
           title="فرآیند مورد نظر یافت نشد"
           message="فرآیندی با این شناسه در سامانه وجود ندارد."
         />
-        <div className="flex justify-center mt-4">
+        <div className="mt-4 flex justify-center">
           <Link href="/admin/processes">
             <Button variant="ghost" size="sm" className="text-frost-link">
               <ArrowRight className="size-4 ms-1" />
@@ -137,72 +241,91 @@ export default function ProcessRelationsPage({
           </Link>
         </div>
       </div>
-    );
+    )
   }
 
+  const hasScopeRelations = activeRelations.some(({ key }) => key !== "organization")
+
   return (
-    <div className="space-y-8 max-w-2xl mx-auto">
-      <div className="space-y-4">
-        <Breadcrumbs />
-        <div className="flex items-start gap-4">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-electric-iris/10 border border-electric-iris/20">
-            <Share2 className="size-5 text-electric-iris" />
-          </div>
-          <div className="space-y-1.5">
-            <h1 className="text-heading-sm font-medium text-glacier tracking-tight leading-tight">
-              ویرایش روابط فرآیند
-            </h1>
-            <p className="text-body-sm text-fog/70 leading-relaxed">
-              سازمان و حوزه کاربرد فرآیند را تعیین کنید.
-            </p>
-          </div>
+    <div className="space-y-6">
+      <PageHeader
+        title={process.name || "ارتباط‌های فرآیند"}
+        description="سازمان و حوزه کاربرد فرآیند را مشخص کنید"
+      >
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-body-sm text-fog">
+          <Share2 className="size-4 text-electric-iris" />
+          {(activeRelations.length).toLocaleString("fa-IR")} ارتباط
+        </span>
+        <Link href={`/admin/processes/${id}`}>
+          <Button variant="ghost" className="gap-2 px-4">
+            <ArrowRight className="size-5" />
+            بازگشت به فرآیند
+          </Button>
+        </Link>
+        <Button onClick={() => setModalOpen(true)} className="gap-2 px-5">
+          <Plus className="size-5" />
+          افزودن ارتباط
+        </Button>
+      </PageHeader>
+
+      <div className="mx-auto w-full max-w-3xl">
+        <div className="space-y-4">
+          {activeRelations.map(({ key, label, icon, tone }, index) => (
+            <RelationCard
+              key={key}
+              label={label}
+              name={key === "organization" ? process?.organization?.name || "—" : process?.[key]?.name || "—"}
+              icon={icon}
+              tone={tone}
+              isLast={index === activeRelations.length - 1}
+              deletable={key !== "organization"}
+              busy={deleting && deleteTarget === key}
+              onEdit={() => setModalOpen(true)}
+              onDelete={key === "organization" ? undefined : () => setDeleteTarget(key as ScopeKey)}
+            />
+          ))}
+
+          {!hasScopeRelations && (
+            <div className="flex flex-col items-center justify-center gap-5 rounded-2xl border border-dashed border-white/10 bg-transparent px-6 py-14 text-center">
+              <div className="flex size-16 items-center justify-center rounded-2xl border border-electric-iris/15 bg-electric-iris/5 shadow-[0_0_30px_-8px_rgba(102,58,243,0.4)]">
+                <Workflow className="size-8 text-electric-iris/80" />
+              </div>
+              <div>
+                <p className="text-body font-medium text-moonlight">
+                  هنوز ارتباطی بین مراحل تعریف نشده است
+                </p>
+                <p className="mt-1.5 text-body-sm text-fog/60">
+                  حوزه کاربرد فرآیند را مشخص کنید تا در اینجا نمایش داده شود.
+                </p>
+              </div>
+              <Button onClick={() => setModalOpen(true)} className="gap-2 px-5">
+                <Plus className="size-5" />
+                افزودن اولین ارتباط
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-6">
-        <FormCard title="روابط فرآیند" description="سازمان مرتبط با فرآیند">
-          <div className="space-y-2">
-            <label className="text-xs text-fog/70 block font-medium">سازمان</label>
-            <SearchSelect
-              value={orgId}
-              onChange={setOrgId}
-              placeholder="انتخاب سازمان..."
-              fetcher={scopeFetcher(getOrgs)}
-              label="سازمان"
-              disabled={submitting}
-            />
-          </div>
-        </FormCard>
+      <RelationModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        orgId={orgId}
+        scope={scope}
+        onSave={handleSave}
+      />
 
-        <FormCard
-          title="حوزه کاربرد"
-          description="فرآیند را به واحد یا سلسله‌مراتب کالا محدود کنید. در صورت عدم انتخاب، فرآیند عمومی خواهد بود. هر سطح، گزینه‌های سطح بعد را فیلتر می‌کند."
-        >
-          <ProcessScopeFieldsStandalone
-            values={scope}
-            onChange={handleScopeChange}
-            disabled={submitting}
-          />
-        </FormCard>
-
-        <div className="sticky bottom-0 z-10 bg-[rgba(5,6,15,0.85)] backdrop-blur-xl border border-steel-border/15 rounded-xl p-4 flex items-center justify-end gap-3 shadow-[0_-8px_32px_rgba(0,0,0,0.4)]">
-          <Link href={`/admin/processes/${id}`}>
-            <Button type="button" variant="ghost" disabled={submitting}>
-              انصراف
-            </Button>
-          </Link>
-          <Button type="submit" disabled={submitting} className="gap-1.5 min-w-[120px]">
-            {submitting ? (
-              <>
-                <Loader2 className="size-4 animate-spin" />
-                در حال ذخیره...
-              </>
-            ) : (
-              "ذخیره روابط"
-            )}
-          </Button>
-        </div>
-      </form>
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(val) => {
+          if (!val) setDeleteTarget(null)
+        }}
+        title="حذف ارتباط"
+        description="آیا از حذف این ارتباط اطمینان دارید؟ سطوح پایین‌تر حوزه کاربرد نیز حذف خواهند شد."
+        confirmLabel="حذف"
+        onConfirm={handleDelete}
+        loading={deleting}
+      />
     </div>
-  );
+  )
 }

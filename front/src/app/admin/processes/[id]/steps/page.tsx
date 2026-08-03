@@ -1,180 +1,215 @@
-"use client";
+"use client"
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState, use } from "react";
-import { useForm } from "react-hook-form";
-import { zodV4Resolver } from "@/lib/zod-v4-resolver";
-import { z } from "zod";
-import { toast } from "sonner";
-import { ArrowRight, Loader2, Save } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
-import { PageHeader } from "@/components/ui/page-header";
-import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
-import { ErrorState } from "@/components/ui/error-state";
-import { ProcessBuilder } from "@/components/process/process-builder";
-import { get } from "@/app/actions/process/get";
-import { add as addStep } from "@/app/actions/processStep/add";
-import { update as updateStep } from "@/app/actions/processStep/update";
-import { remove as removeStep } from "@/app/actions/processStep/remove";
-import Link from "next/link";
-import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
+import { useEffect, useState, use, useCallback, useMemo } from "react"
+import Link from "next/link"
+import { ArrowRight, Plus, Workflow } from "lucide-react"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { PageHeader } from "@/components/ui/page-header"
+import { LoadingSkeleton } from "@/components/ui/loading-skeleton"
+import { ErrorState } from "@/components/ui/error-state"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
+import { StepCard, type StepCardStep } from "@/components/process/step-card"
+import { ProcessStepModal } from "@/components/process/process-step-modal"
+import { get } from "@/app/actions/process/get"
+import { get as getUnit } from "@/app/actions/unit/get"
+import { update as updateStep } from "@/app/actions/processStep/update"
+import { remove as removeStep } from "@/app/actions/processStep/remove"
+import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
 
-const stepSchema = z.object({
-  name: z.string().min(1, "نام گام الزامی است"),
-  description: z.string().optional(),
-  stepType: z.string(),
-  order: z.number(),
-  required: z.boolean(),
-  groupsOperator: z.string(),
-  assigneeGroups: z.array(z.object({
-    operator: z.string(),
-    unitId: z.string().optional(),
-  })),
-});
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ProcessData = any
 
-const formSchema = z.object({
-  steps: z.array(stepSchema),
-});
-
-type FormData = z.infer<typeof formSchema>;
+interface StepUnitData {
+  _id: string
+  name?: string
+  type?: string
+}
 
 export default function EditProcessStepsPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>
 }) {
-  const router = useRouter();
-  const { id } = use(params);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [notFound, setNotFound] = useState(false);
-  const [processName, setProcessName] = useState("");
-  const [originalSteps, setOriginalSteps] = useState<{ _id?: string }[]>([]);
+  const { id } = use(params)
+  const [loading, setLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
+  const [process, setProcess] = useState<ProcessData>(null)
+  const [steps, setSteps] = useState<StepCardStep[]>([])
+  const [unitsMap, setUnitsMap] = useState<Record<string, StepUnitData>>({})
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editingStep, setEditingStep] = useState<StepCardStep | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<StepCardStep | null>(null)
+  const [moving, setMoving] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
-  const form = useForm<FormData>({
-    resolver: zodV4Resolver(formSchema),
-    defaultValues: {
-      steps: [],
-    },
-  });
-
-  useEffect(() => {
-    const load = async () => {
-      const result = await get(
-        { activeRoleId: getActiveRoleIdFromStore(), _id: id },
-        {
+  const fetchProcess = useCallback(async () => {
+    const result = await get(
+      { activeRoleId: getActiveRoleIdFromStore(), _id: id },
+      {
+        _id: 1,
+        name: 1,
+        status: 1,
+        version: 1,
+        steps: {
           _id: 1,
           name: 1,
-          steps: { _id: 1, name: 1, description: 1, stepType: 1, order: 1, required: 1, groupsOperator: 1, assigneeGroups: 1 },
-        }
-      );
+          description: 1,
+          stepType: 1,
+          order: 1,
+          required: 1,
+          groupsOperator: 1,
+          assigneeGroups: 1,
+        },
+      }
+    )
+    return result
+  }, [id])
+
+  const reload = useCallback(async () => {
+    const result = await fetchProcess()
+    if (result.success && result.body?.[0]) {
+      const p = result.body[0]
+      setProcess(p)
+      setNotFound(false)
+      setSteps(
+        (p.steps || []).slice().sort((a: { order?: number }, b: { order?: number }) => (a.order || 0) - (b.order || 0))
+      )
+    } else {
+      setNotFound(true)
+    }
+  }, [fetchProcess])
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const result = await fetchProcess()
+      if (cancelled) return
       if (result.success && result.body?.[0]) {
-        const p = result.body[0];
-        setProcessName(p.name || "");
-        const steps = (p.steps || []).sort((a: { order?: number }, b: { order?: number }) => (a.order || 0) - (b.order || 0));
-        setOriginalSteps(steps);
-
-        const mappedSteps = steps.map((s: { _id?: string; assigneeGroups?: { operator: string; unitIds?: string[] }[] }) => ({
-          ...s,
-          assigneeGroups: (s.assigneeGroups || []).map((g) => ({
-            operator: g.operator,
-            unitId: (g.unitIds || [])[0] || "",
-          })),
-        }));
-
-        form.reset({ steps: mappedSteps });
+        const p = result.body[0]
+        setProcess(p)
+        setNotFound(false)
+        setSteps(
+          (p.steps || []).slice().sort((a: { order?: number }, b: { order?: number }) => (a.order || 0) - (b.order || 0))
+        )
       } else {
-        setNotFound(true);
+        setNotFound(true)
       }
-      setLoading(false);
-    };
-    load();
-  }, [form, id]);
-
-  const onSubmit = async (data: FormData) => {
-    setSaving(true);
-    const activeRoleId = getActiveRoleIdFromStore();
-
-    const existingIds = new Set(originalSteps.map((s) => s._id));
-    const formIds = new Set(data.steps.map((s) => (s as { _id?: string })._id).filter(Boolean));
-    const toRemove = originalSteps.filter((s) => s._id && !formIds.has(s._id));
-
-    let hasError = false;
-
-    for (const step of toRemove) {
-      const result = await removeStep({ activeRoleId, _id: step._id! }, {});
-      if (!result.success) {
-        toast.error(`خطا در حذف گام "${step._id}": ${result.body?.message || "خطا"}`);
-        hasError = true;
-      }
+      setLoading(false)
+    })()
+    return () => {
+      cancelled = true
     }
+  }, [fetchProcess])
 
-    for (let i = 0; i < data.steps.length; i++) {
-      if (hasError) break;
-      const step = data.steps[i];
-      const assigneeGroups = step.assigneeGroups
-        .filter((g) => g.unitId)
-        .map((g) => ({
-          operator: g.operator as "AND" | "OR",
-          unitIds: [g.unitId as string],
-        }));
+  const unitIds = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          steps.flatMap((s) => (s.assigneeGroups || []).flatMap((g) => g.unitIds || []).filter(Boolean))
+        )
+      ),
+    [steps]
+  )
 
-      const stepPayload = {
-        activeRoleId,
-        name: step.name,
-        description: step.description || undefined,
-        stepType: step.stepType as "Approval" | "Review" | "Notification" | "Action" | "Delivery" | "Receipt" | "Payment",
-        order: i + 1,
-        required: step.required,
-        groupsOperator: step.groupsOperator as "AND" | "OR",
-        assigneeGroups: assigneeGroups.length > 0 ? assigneeGroups : [{ operator: "AND" as const, unitIds: [] as string[] }],
-      };
-
-      const stepId = (step as { _id?: string })._id;
-
-      if (stepId && existingIds.has(stepId)) {
-        const result = await updateStep(
-          { ...stepPayload, _id: stepId } as Parameters<typeof updateStep>[0],
-          { _id: 1 }
-        );
-        if (!result.success) {
-          toast.error(`خطا در به‌روزرسانی گام "${step.name}": ${result.body?.message || "خطا"}`);
-          hasError = true;
-        }
-      } else if (!stepId) {
-        const result = await addStep(
-          { ...stepPayload, processId: id },
-          { _id: 1 }
-        );
-        if (!result.success) {
-          toast.error(`خطا در ایجاد گام "${step.name}": ${result.body?.message || "خطا"}`);
-          hasError = true;
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      if (unitIds.length === 0) {
+        setUnitsMap({})
+        return
+      }
+      const results = await Promise.allSettled(
+        unitIds.map((uid) =>
+          getUnit({ activeRoleId: getActiveRoleIdFromStore(), _id: uid }, { _id: 1, name: 1, type: 1 })
+        )
+      )
+      if (cancelled) return
+      const map: Record<string, StepUnitData> = {}
+      for (const result of results) {
+        if (result.status === "fulfilled" && result.value.success && result.value.body?.[0]) {
+          const unit = result.value.body[0]
+          map[unit._id] = unit
         }
       }
+      setUnitsMap(map)
+    })()
+    return () => {
+      cancelled = true
     }
+  }, [unitIds])
 
-    setSaving(false);
+  const moveStep = useCallback(
+    async (index: number, dir: -1 | 1) => {
+      const target = index + dir
+      if (target < 0 || target >= steps.length) return
+      const a = steps[index]
+      const b = steps[target]
+      if (!a._id || !b._id) return
+      setMoving(a._id)
+      const orderA = a.order ?? index + 1
+      const orderB = b.order ?? target + 1
+      setSteps((prev) => {
+        const next = [...prev]
+        next[index] = { ...b, order: orderA }
+        next[target] = { ...a, order: orderB }
+        return next
+      })
+      const results = await Promise.all([
+        updateStep({ activeRoleId: getActiveRoleIdFromStore(), _id: a._id, order: orderB }, { _id: 1 }),
+        updateStep({ activeRoleId: getActiveRoleIdFromStore(), _id: b._id, order: orderA }, { _id: 1 }),
+      ])
+      setMoving(null)
+      if (results.every((r) => r.success)) {
+        toast.success("ترتیب گام‌ها با موفقیت به‌روزرسانی شد")
+        await reload()
+      } else {
+        toast.error("خطا در تغییر ترتیب گام‌ها")
+        await reload()
+      }
+    },
+    [steps, reload]
+  )
 
-    if (!hasError) {
-      toast.success("گام‌ها با موفقیت ذخیره شدند");
-      router.refresh();
-      router.push("/admin/processes");
-    }
-  };
-
-  if (loading) {
-    return <LoadingSkeleton type="card" count={1} />;
+  const openAdd = () => {
+    setEditingStep(null)
+    setModalOpen(true)
   }
 
-  if (notFound) {
+  const openEdit = (step: StepCardStep) => {
+    setEditingStep(step)
+    setModalOpen(true)
+  }
+
+  const handleDelete = async () => {
+    if (!deleteTarget?._id) return
+    setDeleting(true)
+    const result = await removeStep({
+      activeRoleId: getActiveRoleIdFromStore(),
+      _id: deleteTarget._id,
+    })
+    setDeleting(false)
+    setDeleteTarget(null)
+    if (result.success) {
+      toast.success("گام با موفقیت حذف شد")
+      await reload()
+    } else {
+      toast.error(result.body?.message || "خطا در حذف گام")
+    }
+  }
+
+  if (loading) {
+    return <LoadingSkeleton type="card-list" count={4} />
+  }
+
+  if (notFound || !process) {
     return (
       <div>
         <ErrorState
           title="فرآیند مورد نظر یافت نشد"
           message="فرآیندی با این شناسه در سامانه وجود ندارد."
         />
-        <div className="flex justify-center mt-4">
+        <div className="mt-4 flex justify-center">
           <Link href="/admin/processes">
             <Button variant="ghost" size="sm" className="text-frost-link">
               <ArrowRight className="size-4 ms-1" />
@@ -183,44 +218,87 @@ export default function EditProcessStepsPage({
           </Link>
         </div>
       </div>
-    );
+    )
   }
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
-      <div className="flex items-center gap-3">
-        <Link
-          href="/admin/processes"
-          className="text-fog hover:text-moonlight transition-colors"
-        >
-          <ArrowRight className="size-5" />
+    <div className="space-y-6">
+      <PageHeader
+        title={process.name || "گام‌های فرآیند"}
+        description={`مدیریت گام‌های گردش کار · نسخه ${process.version || 1}`}
+      >
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-body-sm text-fog">
+          <Workflow className="size-4 text-electric-iris" />
+          {(steps.length).toLocaleString("fa-IR")} مرحله
+        </span>
+        <Link href={`/admin/processes/${id}`}>
+          <Button variant="ghost" className="gap-2 px-4">
+            <ArrowRight className="size-5" />
+            بازگشت به فرآیند
+          </Button>
         </Link>
-        <PageHeader
-          title={`گام‌های فرآیند: ${processName}`}
-          description="افزودن، ویرایش و مرتب‌سازی گام‌های فرآیند"
-          className="border-none mb-0 pb-0"
-        />
-      </div>
+        <Button onClick={openAdd} className="gap-2 px-5">
+          <Plus className="size-5" />
+          افزودن مرحله
+        </Button>
+      </PageHeader>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          <ProcessBuilder control={form.control as any} />
-
-          <div className="flex items-center gap-2 justify-end sticky bottom-0 py-4 bg-[#05060f] border-t border-steel-border/10">
-            <Link href="/admin/processes">
-              <Button type="button" variant="outline" size="sm">
-                انصراف
-              </Button>
-            </Link>
-            <Button type="submit" disabled={saving} className="gap-1.5">
-              {saving && <Loader2 className="size-4 animate-spin" />}
-              <Save className="size-4" />
-              ذخیره تغییرات
-            </Button>
+      {steps.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-5 rounded-2xl border border-white/8 bg-transparent px-6 py-20 text-center">
+          <div className="flex size-16 items-center justify-center rounded-2xl border border-electric-iris/15 bg-electric-iris/5 shadow-[0_0_30px_-8px_rgba(102,58,243,0.4)]">
+            <Workflow className="size-8 text-electric-iris/80" />
           </div>
-        </form>
-      </Form>
+          <div>
+            <p className="text-body font-medium text-moonlight">هنوز مرحله‌ای تعریف نشده است</p>
+            <p className="mt-1.5 text-body-sm text-fog/60">
+              برای شروع، اولین گام گردش کار این فرآیند را اضافه کنید.
+            </p>
+          </div>
+          <Button onClick={openAdd} className="gap-2 px-5">
+            <Plus className="size-5" />
+            افزودن اولین مرحله
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {steps.map((step, index) => (
+            <StepCard
+              key={step._id || index}
+              step={step}
+              index={index}
+              unitsMap={unitsMap}
+              isFirst={index === 0}
+              isLast={index === steps.length - 1}
+              moving={moving === step._id}
+              onMoveUp={() => moveStep(index, -1)}
+              onMoveDown={() => moveStep(index, 1)}
+              onEdit={() => openEdit(step)}
+              onDelete={() => setDeleteTarget(step)}
+            />
+          ))}
+        </div>
+      )}
+
+      <ProcessStepModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        processId={id}
+        step={editingStep}
+        nextOrder={steps.length > 0 ? Math.max(...steps.map((s) => s.order || 0)) + 1 : 1}
+        onSaved={reload}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(val) => {
+          if (!val) setDeleteTarget(null)
+        }}
+        title="حذف گام"
+        description={`آیا از حذف «${deleteTarget?.name || "این گام"}» اطمینان دارید؟ این اقدام قابل بازگشت نیست.`}
+        confirmLabel="حذف"
+        onConfirm={handleDelete}
+        loading={deleting}
+      />
     </div>
-  );
+  )
 }
