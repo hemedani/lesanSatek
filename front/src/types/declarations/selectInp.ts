@@ -20934,6 +20934,10 @@ name?: string;
 enName?: string;
 description?: string;
 isActive?: boolean;
+location?: {
+type: string;
+coordinates: number[];
+};
 };
 get: {
 _id?: (0 | 1 );
@@ -22850,6 +22854,10 @@ allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
 allowWareGroupIds?: string[];
 allowWareModelIds?: string[];
+location?: {
+type: string;
+coordinates: number[];
+};
 organizationId?: string;
 parentUnitId?: string;
 creatorId?: string;
@@ -23119,6 +23127,10 @@ allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
 allowWareGroupIds?: string[];
 allowWareModelIds?: string[];
+location?: {
+type: string;
+coordinates: number[];
+};
 organizationId?: string;
 };
 get: {
@@ -95078,6 +95090,7 @@ updatedAt?: (0 | 1 );
 set: {
 activeRoleId: string;
 _id: string;
+stateId?: string;
 };
 get: {
 _id?: (0 | 1 );

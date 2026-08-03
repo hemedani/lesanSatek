@@ -18,12 +18,18 @@ export const update = async (
   try {
     const token = await getToken();
     const activeRoleId = await getActiveRoleId();
+    const { location, ...rest } = data;
+    const set = {
+      ...rest,
+      ...(location ? { location } : {}),
+      activeRoleId,
+    };
     const result = await AppApi(undefined, token).send({
       service: "main",
       model: "organization",
       act: "update",
       details: {
-        set: { ...data, activeRoleId },
+        set,
         get: getSelection || { _id: 1, name: 1 },
       },
     });
