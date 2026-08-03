@@ -2,20 +2,22 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
-import { Loader2, Save, Send, ShoppingCart, FileText } from "lucide-react";
+import { Loader2, Save, Send, ShoppingCart, FileText, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
+import { PageHeader } from "@/components/ui/page-header";
+import { SectionCard } from "@/components/form/section-card";
 import { FormInput } from "@/components/form/form-input";
 import { FormTextarea } from "@/components/form/form-textarea";
 import { FormSearchSelect } from "@/components/form/form-search-select";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 import { add } from "@/app/actions/purchasingRequest/add";
-import { submit } from "@/app/actions/purchasingRequest/submit";
+import { submit as submitRequest } from "@/app/actions/purchasingRequest/submit";
 import { gets as getWareModels } from "@/app/actions/wareModel/gets";
 
 const newPRSchema = z.object({
@@ -30,6 +32,7 @@ type NewPRData = z.infer<typeof newPRSchema>;
 export function NewPurchasingRequestForm() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [mode, setMode] = useState<"submit" | "draft">("submit");
 
   const form = useForm<NewPRData>({
     resolver: zodV4Resolver(newPRSchema),
@@ -42,33 +45,25 @@ export function NewPurchasingRequestForm() {
   });
 
   const handleSaveDraft = async (values: NewPRData) => {
-    setSaving(true);
-    try {
-      const result = await add(
-        {
-          activeRoleId: getActiveRoleIdFromStore(),
-          title: values.title,
-          description: values.description || undefined,
-          quantity: Number(values.quantity),
-          wareModelId: values.wareModelId,
-        },
-        { _id: 1, title: 1, status: 1 }
-      );
-      if (result.success && result.body?._id) {
-        toast.success("پیش‌نویس درخواست خرید ذخیره شد.");
-        router.push(`/admin/purchasing-requests/${result.body._id}`);
-      } else {
-        toast.error(result.body?.message || "خطا در ذخیره پیش‌نویس");
-      }
-    } catch {
-      toast.error("خطا در ذخیره پیش‌نویس");
-    } finally {
-      setSaving(false);
+    const result = await add(
+      {
+        activeRoleId: getActiveRoleIdFromStore(),
+        title: values.title,
+        description: values.description || undefined,
+        quantity: Number(values.quantity),
+        wareModelId: values.wareModelId,
+      },
+      { _id: 1, title: 1, status: 1 }
+    );
+    if (result.success && result.body?._id) {
+      toast.success("پیش‌نویس درخواست خرید ذخیره شد.");
+      router.push(`/admin/purchasing-requests/${result.body._id}`);
+    } else {
+      toast.error(result.body?.message || "خطا در ذخیره پیش‌نویس");
     }
   };
 
   const handleSaveAndSubmit = async (values: NewPRData) => {
-    setSaving(true);
     try {
       const result = await add(
         {
@@ -82,11 +77,10 @@ export function NewPurchasingRequestForm() {
       );
       if (!result.success || !result.body?._id) {
         toast.error(result.body?.message || "خطا در ایجاد درخواست خرید");
-        setSaving(false);
         return;
       }
       const draftId = result.body._id;
-      const submitResult = await submit(
+      const submitResult = await submitRequest(
         { activeRoleId: getActiveRoleIdFromStore(), _id: draftId },
         { _id: 1, title: 1, status: 1 }
       );
@@ -99,75 +93,85 @@ export function NewPurchasingRequestForm() {
       }
     } catch {
       toast.error("خطا در ثبت درخواست خرید");
+    }
+  };
+
+  const submit = async (values: NewPRData) => {
+    setSaving(true);
+    try {
+      if (mode === "draft") {
+        await handleSaveDraft(values);
+      } else {
+        await handleSaveAndSubmit(values);
+      }
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <Form {...form}>
-      <form className="space-y-6 relative z-[1]">
-        {/* Basic Info */}
-        <Card variant="glass">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="size-9 rounded-xl bg-electric-iris/10 flex items-center justify-center">
-                <FileText className="size-4.5 text-electric-iris" />
-              </div>
-              <div>
-                <CardTitle>اطلاعات اولیه</CardTitle>
-                <CardDescription>عنوان، توضیحات و تعداد درخواست</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+    <div className="mx-auto w-full max-w-2xl space-y-6">
+      <PageHeader
+        title="درخواست خرید جدید"
+        description="ثبت درخواست خرید جدید و ارسال برای فرآیند تأیید"
+      >
+
+        <Link href="/admin/purchasing-requests">
+          <Button variant="ghost" className="gap-2 px-4">
+            <ArrowRight className="size-5" />
+            بازگشت به درخواست‌ها
+          </Button>
+        </Link>
+      </PageHeader>
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(submit)} className="space-y-6">
+          <SectionCard
+            icon={FileText}
+            iconClassName="bg-electric-iris/10 text-electric-iris ring-electric-iris/15"
+            title="اطلاعات اولیه"
+            description="عنوان، توضیحات و تعداد درخواست"
+          >
             <FormInput
               control={form.control}
               name="title"
               label="عنوان درخواست"
               placeholder="مثال: خرید تجهیزات اداری"
               required
+              disabled={saving}
             />
             <FormTextarea
               control={form.control}
               name="description"
               label="توضیحات"
-              placeholder="توضیحات تکمیلی..."
+              placeholder="توضیحات تکمیلی…"
               rows={3}
+              disabled={saving}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormInput
-                control={form.control}
-                name="quantity"
-                label="تعداد"
-                placeholder="۱"
-                type="number"
-                required
-              />
-            </div>
-          </CardContent>
-        </Card>
+            <FormInput
+              control={form.control}
+              name="quantity"
+              label="تعداد"
+              placeholder="۱"
+              type="number"
+              required
+              disabled={saving}
+            />
+          </SectionCard>
 
-        {/* Product Selection */}
-        <Card variant="glass">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="size-9 rounded-xl bg-electric-iris/10 flex items-center justify-center">
-                <ShoppingCart className="size-4.5 text-electric-iris" />
-              </div>
-              <div>
-                <CardTitle>کالا</CardTitle>
-                <CardDescription>انتخاب مدل کالا برای خرید</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+          <SectionCard
+            icon={ShoppingCart}
+            iconClassName="bg-frost-link/10 text-frost-link ring-frost-link/15"
+            title="کالا"
+            description="انتخاب مدل کالا برای خرید"
+          >
             <FormSearchSelect
               control={form.control}
               name="wareModelId"
               label="مدل کالا"
-              placeholder="جستجوی مدل کالا..."
+              placeholder="مدل کالا را جستجو و انتخاب کنید…"
               required
+              disabled={saving}
               fetcher={async (search?: string) => {
                 const result = await getWareModels(
                   { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
@@ -181,50 +185,64 @@ export function NewPurchasingRequestForm() {
                 }));
               }}
             />
-          </CardContent>
-        </Card>
+            <div className="flex items-center gap-2 rounded-lg bg-white/[0.02] p-3 ring-1 ring-inset ring-steel-border/30">
+              <p className="text-body-sm text-fog/60">
+                فرآیند تأیید به‌صورت خودکار بر اساس کالا و واحد درخواست‌کننده انتخاب می‌شود. واحد
+                درخواست‌کننده به‌صورت پیش‌فرض از نقش فعال شما استفاده می‌شود.
+              </p>
+            </div>
+          </SectionCard>
 
-        {/* Unit Note */}
-        <div className="flex items-center gap-2 p-3 rounded-lg bg-white/[0.02] border border-steel-border/30">
-          <p className="text-xs text-fog/50">
-            فرآیند تأیید به‌صورت خودکار بر اساس کالا و واحد درخواست‌کننده انتخاب می‌شود.
-            واحد درخواست‌کننده به‌صورت پیش‌فرض از نقش فعال شما استفاده می‌شود.
-          </p>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-3 pt-2">
-          <Button type="button" disabled={saving} className="gap-2 min-w-[160px]" onClick={form.handleSubmit(handleSaveAndSubmit)}>
-            {saving ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Send className="size-4" />
-            )}
-            {saving ? "در حال ثبت..." : "ثبت و ارسال"}
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            disabled={saving}
-            className="gap-2"
-            onClick={form.handleSubmit(handleSaveDraft)}
-          >
-            {saving ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Save className="size-4" />
-            )}
-            ذخیره به عنوان پیش‌نویس
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => router.back()}
-          >
-            انصراف
-          </Button>
-        </div>
-      </form>
-    </Form>
+          <div className="sticky bottom-0 z-10">
+            <div className="glass-card-conic-top flex flex-col-reverse gap-4 rounded-xl border border-white/8 bg-graphite-plate/70 p-5 shadow-[0_32px_64px_-32px_rgba(5,6,15,0.9),0_0_40px_-16px_rgba(182,217,252,0.2)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6">
+              <p className="hidden text-caption text-fog/60 sm:block">
+                فیلدهای ستاره‌دار الزامی هستند
+              </p>
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={saving}
+                  onClick={() => setMode("submit")}
+                  className="flex-1 gap-2 px-5 sm:flex-none"
+                >
+                  {saving && mode === "submit" ? (
+                    <Loader2 className="size-5 animate-spin" />
+                  ) : (
+                    <Send className="size-5" />
+                  )}
+                  {saving && mode === "submit" ? "در حال ثبت…" : "ثبت و ارسال"}
+                </Button>
+                <Button
+                  type="submit"
+                  variant="secondary"
+                  size="lg"
+                  disabled={saving}
+                  onClick={() => setMode("draft")}
+                  className="gap-2 px-5"
+                >
+                  {saving && mode === "draft" ? (
+                    <Loader2 className="size-5 animate-spin" />
+                  ) : (
+                    <Save className="size-5" />
+                  )}
+                  ذخیره به عنوان پیش‌نویس
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="lg"
+                  disabled={saving}
+                  onClick={() => router.back()}
+                  className="gap-2 px-5"
+                >
+                  انصراف
+                </Button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 }
