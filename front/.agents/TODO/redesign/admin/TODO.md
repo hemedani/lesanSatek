@@ -11,21 +11,21 @@
 ## 📋 Remaining Pages to Redesign
 
 ### 1. Financial & Budgeting
-- [ ] `/admin/fiscal-years` (List, Add, Edit, Detail)
-- [ ] `/admin/budget-lines` (List, Add, Edit, Detail)
-- [ ] `/admin/budget-reports` (List, Filters, Detail views)
+- [x] `/admin/fiscal-years` (List, Add, Edit, Detail)
+- [x] `/admin/budget-lines` (List, Add, Edit, Relations)
+- [x] `/admin/budget-reports` (Filters, Budget Report, Year-End Report)
 
 ### 2. Procurement & Requests
-- [ ] `/admin/purchasing-requests` (List, Add, Edit, Detail, Relations/Steps if applicable)
-- [ ] `/admin/tenders` (List, Add, Edit, Detail, Bids sub-route)
-- [ ] `/admin/goods-receipts` (List, Add, Edit, Detail, Items sub-route)
-- [ ] `/admin/payment-orders` (List, Add, Edit, Detail, Approvals sub-route)
+- [x] `/admin/purchasing-requests` (List, Add, Edit, Detail, Relations/Steps if applicable)
+- [x] `/admin/tenders` (List, Add, Edit, Detail, Bids sub-route)
+- [x] `/admin/goods-receipts` (List, Add, Edit, Detail, Items sub-route)
+- [x] `/admin/payment-orders` (List, Add, Edit, Detail, Approvals sub-route)
 
 ### 3. Inventory & Operations
-- [ ] `/admin/inventory` (List, Detail, Stock levels)
-- [ ] `/admin/stock-movements` (List, Add, Detail, Filters)
-- [ ] `/admin/stuff` (List, Add, Edit, Detail)
-- [ ] `/admin/consumption` (List, Add, Detail, Reports)
+- [x] `/admin/inventory` (List, Detail, Stock levels)
+- [x] `/admin/stock-movements` (List, Add, Detail, Filters)
+- [x] `/admin/stuff` (List, Add, Edit, Detail)
+- [x] `/admin/consumption` (List, Add, Detail, Reports)
 
 ---
 **⚠️ CRITICAL REMINDER FOR AGENT:** 

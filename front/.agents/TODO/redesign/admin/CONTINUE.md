@@ -1,8 +1,8 @@
 # Admin Panel Redesign: Master Protocol & Continuation Guide
 
 ## 📊 Progress Report
-- **✅ COMPLETED & APPROVED**: `/admin/processes` (all sub-routes), `/admin/ware*` (types, classes, groups, models, wares, manufacturers), `/admin/stores`, `/admin/states`, `/admin/cities`.
-- **🔄 REMAINING**: 11 core domains (Fiscal Years, Budget Lines, Budget Reports, Purchasing Requests, Tenders, Goods Receipts, Payment Orders, Inventory, Stock Movements, Stuff, Consumption).
+- **✅ COMPLETED & APPROVED**: `/admin/processes` (all sub-routes), `/admin/ware*` (types, classes, groups, models, wares, manufacturers), `/admin/stores`, `/admin/states`, `/admin/cities`, `/admin/fiscal-years`, `/admin/budget-lines`, `/admin/budget-reports` (Filters, Budget Report, Year-End Report).
+- **🔄 REMAINING**: 8 core domains (Purchasing Requests, Tenders, Goods Receipts, Payment Orders, Inventory, Stock Movements, Stuff, Consumption).
 - **🎯 GOAL**: Complete all remaining pages with **zero deviations** from the established "Authkit / Midnight Glass" design system.
 
 ---
