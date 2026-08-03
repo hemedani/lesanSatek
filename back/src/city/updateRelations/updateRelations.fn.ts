@@ -3,26 +3,26 @@ import { city } from "../../../mod.ts";
 
 export const updateRelationsFn: ActFn = async (body) => {
 	const {
-		set: { _id, ...relations },
+		set: { _id, stateId },
 		get,
 	} = body.details;
 
 	const modelId = new ObjectId(_id);
 
-	for (const [key, value] of Object.entries(relations)) {
-		if (value) {
-			await city.addRelation({
-				filters: { _id: modelId },
-				relations: {
-					[key]: {
-						_ids: new ObjectId(value as string),
-						relatedRelations: {},
+	if (stateId !== undefined) {
+		await city.addRelation({
+			filters: { _id: modelId },
+			relations: {
+				state: {
+					_ids: new ObjectId(stateId as string),
+					relatedRelations: {
+						cities: true,
 					},
 				},
-				projection: get,
-				replace: true,
-			});
-		}
+			},
+			projection: get,
+			replace: true,
+		});
 	}
 
 	return await city.findOne({
