@@ -3,47 +3,30 @@ import Link from "next/link"
 import { get } from "@/app/actions/store/get"
 import { Button } from "@/components/ui/button"
 import { ErrorState } from "@/components/ui/error-state"
-import { StoreForm } from "../store-form"
+import { StoreRelationsClient } from "./store-relations-client"
 
 interface Props {
   params: Promise<{ id: string }>
 }
 
-const PROJECTION = {
-  _id: 1,
-  name: 1,
-  ceoname: 1,
-  address: 1,
-  contact: 1,
-  email: 1,
-  workingHours: 1,
-  economicCode: 1,
-  postalCode: 1,
-  nationalId: 1,
-  registerNumber: 1,
-  certificateNumber: 1,
-  legalPerson: 1,
-  bankCardNumber: 1,
-  shebaNumber: 1,
-  nameOfAccountHolder: 1,
-  bankName: 1,
-  fastDelivery: 1,
-  isAvailableInHolidays: 1,
-  score: 1,
-  status: 1,
-  geoLocation: 1,
-  storeHead: { _id: 1, first_name: 1, last_name: 1 },
-  city: { _id: 1, name: 1 },
-  state: { _id: 1, name: 1 },
-  wareTypes: { _id: 1, name: 1 },
-} as const
-
-export default async function EditStorePage({ params }: Props) {
+export default async function StoreRelationsPage({ params }: Props) {
   const { id } = await params
-  const result = await get({ _id: id }, PROJECTION)
-  const item = result.success && result.body?.[0] ? result.body[0] : null
 
-  if (!item) {
+  const result = await get(
+    { _id: id },
+    {
+      _id: 1,
+      name: 1,
+      storeHead: { _id: 1, first_name: 1, last_name: 1 },
+      city: { _id: 1, name: 1 },
+      state: { _id: 1, name: 1 },
+      wareTypes: { _id: 1, name: 1 },
+    }
+  )
+
+  const store = result.success && result.body?.[0] ? result.body[0] : null
+
+  if (!store) {
     return (
       <div>
         <ErrorState
@@ -62,5 +45,5 @@ export default async function EditStorePage({ params }: Props) {
     )
   }
 
-  return <StoreForm item={item} />
+  return <StoreRelationsClient store={store} />
 }
