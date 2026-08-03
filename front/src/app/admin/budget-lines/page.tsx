@@ -1,62 +1,139 @@
-"use client";
+import { cookies } from "next/headers"
+import { gets } from "@/app/actions/budgetLine/gets"
+import { count } from "@/app/actions/budgetLine/count"
+import { gets as getFiscalYears } from "@/app/actions/fiscalYear/gets"
+import { gets as getOrganizations } from "@/app/actions/organization/gets"
+import { gets as getUnits } from "@/app/actions/unit/gets"
+import { BudgetLinesClient } from "./budget-lines-client"
+import type { BudgetLine } from "./budget-lines-client"
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { Calculator, Plus, ExternalLink } from "lucide-react";
-import { PageHeader } from "@/components/ui/page-header";
-import { DataTable } from "@/components/ui/data-table";
-import type { Column } from "@/components/ui/data-table";
-import { Pagination } from "@/components/ui/pagination";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
-import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
-import { gets } from "@/app/actions/budgetLine/gets";
+const LIMIT = 20
 
-interface BudgetLine {
-  _id: string;
-  code?: string;
-  title?: string;
-  description?: string;
-  totalAllocated?: number;
-  totalEncumbered?: number;
-  totalSpent?: number;
-  remainingBudget?: number;
+const BL_PROJECTION = {
+  _id: 1,
+  code: 1,
+  title: 1,
+  description: 1,
+  totalAllocated: 1,
+  totalEncumbered: 1,
+  totalSpent: 1,
+  remainingBudget: 1,
+  createdAt: 1,
+  fiscalYear: { _id: 1, name: 1 },
+  organization: { _id: 1, name: 1 },
+  unit: { _id: 1, name: 1 },
+  wareType: { _id: 1, name: 1 },
+} as const
+
+type SortKey =
+  | "createdAt-desc"
+  | "createdAt-asc"
+  | "code-asc"
+  | "code-desc"
+  | "title-asc"
+  | "title-desc"
+  | "totalAllocated-desc"
+  | "totalAllocated-asc"
+const SORT_MAP: Record<SortKey, { sortBy: "createdAt" | "code" | "title" | "totalAllocated"; sortOrder: "asc" | "desc" }> = {
+  "createdAt-desc": { sortBy: "createdAt", sortOrder: "desc" },
+  "createdAt-asc": { sortBy: "createdAt", sortOrder: "asc" },
+  "code-asc": { sortBy: "code", sortOrder: "asc" },
+  "code-desc": { sortBy: "code", sortOrder: "desc" },
+  "title-asc": { sortBy: "title", sortOrder: "asc" },
+  "title-desc": { sortBy: "title", sortOrder: "desc" },
+  "totalAllocated-desc": { sortBy: "totalAllocated", sortOrder: "desc" },
+  "totalAllocated-asc": { sortBy: "totalAllocated", sortOrder: "asc" },
+}
+function isSortKey(value: string): value is SortKey {
+  return value in SORT_MAP
 }
 
-export default function BudgetLinesPage() {
-  const router = useRouter();
-  const [items, setItems] = useState<BudgetLine[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const limit = 30;
+export default async function BudgetLinesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; search?: string; sort?: string; fiscalYearId?: string; organizationId?: string; unitId?: string }>
+}) {
+  const resolvedSearchParams = await searchParams
+  const page = Math.max(1, Number(resolvedSearchParams.page) || 1)
+  const search = typeof resolvedSearchParams.search === "string" ? resolvedSearchParams.search : ""
+  const sort: SortKey = isSortKey(resolvedSearchParams.sort || "") ? (resolvedSearchParams.sort as SortKey) : "createdAt-desc"
+  const { sortBy, sortOrder } = SORT_MAP[sort]
+  const fiscalYearId = typeof resolvedSearchParams.fiscalYearId === "string" ? resolvedSearchParams.fiscalYearId : ""
+  const organizationId = typeof resolvedSearchParams.organizationId === "string" ? resolvedSearchParams.organizationId : ""
+  const unitId = typeof resolvedSearchParams.unitId === "string" ? resolvedSearchParams.unitId : ""
 
-  const fetchItems = async (p: number) => {
-    setLoading(true);
-    const result = await gets({ activeRoleId: getActiveRoleIdFromStore(), page: p, limit }, { _id: 1, code: 1, title: 1, totalAllocated: 1, totalEncumbered: 1, totalSpent: 1, remainingBudget: 1 });
-    if (result.success) setItems(result.body || []);
-    setLoading(false);
-  };
+  const cookieStore = await cookies()
+  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
 
-  useEffect(() => { fetchItems(page); }, [page]);
+  const listSet = {
+    activeRoleId,
+    page,
+    limit: LIMIT,
+    sortBy,
+    sortOrder,
+    ...(search ? { title: search } : {}),
+    ...(fiscalYearId ? { fiscalYearId } : {}),
+    ...(organizationId ? { organizationId } : {}),
+    ...(unitId ? { unitId } : {}),
+  }
 
-  const columns: Column<BudgetLine>[] = [
-    { key: "code", label: "کد", render: (item) => (<div className="flex items-center gap-3"><Calculator className="size-4 text-electric-iris" /><span className="text-moonlight font-mono font-medium">{item.code || "—"}</span></div>) },
-    { key: "title", label: "عنوان", render: (item) => <span className="text-fog text-sm">{item.title || "—"}</span> },
-    { key: "totalAllocated", label: "تخصیص یافته", render: (item) => <span className="text-fog font-mono text-sm" dir="ltr">{item.totalAllocated?.toLocaleString("fa-IR") || "—"}</span> },
-    { key: "remainingBudget", label: "باقی‌مانده", render: (item) => (<span className={cn("font-mono text-sm", (item.remainingBudget || 0) < 0 ? "text-rose-400" : "text-emerald-400")} dir="ltr">{item.remainingBudget?.toLocaleString("fa-IR") || "—"}</span>) },
-    { key: "actions", label: "", render: (item) => <Button variant="ghost" size="icon-xs" onClick={() => router.push(`/admin/budget-lines/${item._id}`)}><ExternalLink className="size-3.5" /></Button> },
-  ];
+  const totalSet = {
+    activeRoleId,
+    ...(fiscalYearId ? { fiscalYearId } : {}),
+    ...(organizationId ? { organizationId } : {}),
+    ...(unitId ? { unitId } : {}),
+  }
 
-  if (loading && page === 1) return <div className="space-y-6">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-12 rounded-lg" />)}</div>;
+  const [listResult, countResult, fiscalYearsResult, organizationsResult, unitsResult] = await Promise.all([
+    gets(listSet, BL_PROJECTION),
+    search
+      ? gets({ ...listSet, page: 1, limit: 100 }, { _id: 1 })
+      : count(totalSet),
+    getFiscalYears({ activeRoleId, page: 1, limit: 100, sortBy: "name", sortOrder: "asc" }, { _id: 1, name: 1 }),
+    getOrganizations({ activeRoleId, page: 1, limit: 100, sortBy: "name", sortOrder: "asc" }, { _id: 1, name: 1 }),
+    getUnits({ activeRoleId, page: 1, limit: 100, sortBy: "name", sortOrder: "asc" }, { _id: 1, name: 1 }),
+  ])
+
+  const items = (listResult.success ? listResult.body || [] : []) as BudgetLine[]
+  const all = (countResult.success ? countResult.body || [] : []) as { _id: string }[]
+  const total = search
+    ? (countResult.success ? all.length : items.length)
+    : (countResult.success && typeof all === "object" && all && "qty" in all
+      ? (all as unknown as { qty: number }).qty
+      : items.length)
+  const totalPages = Math.max(1, Math.ceil(total / LIMIT))
+
+  const fiscalYears = (fiscalYearsResult.success ? fiscalYearsResult.body || [] : []) as { _id: string; name?: string }[]
+  const organizations = (organizationsResult.success ? organizationsResult.body || [] : []) as { _id: string; name?: string }[]
+  const units = (unitsResult.success ? unitsResult.body || [] : []) as { _id: string; name?: string }[]
+
+  const params = new URLSearchParams()
+  if (search) params.set("search", search)
+  if (sort !== "createdAt-desc") params.set("sort", sort)
+  if (fiscalYearId) params.set("fiscalYearId", fiscalYearId)
+  if (organizationId) params.set("organizationId", organizationId)
+  if (unitId) params.set("unitId", unitId)
+  const qs = params.toString()
+
+  const prevPageUrl = page > 1 ? `/admin/budget-lines?page=${page - 1}${qs ? `&${qs}` : ""}` : ""
+  const nextPageUrl = page < totalPages ? `/admin/budget-lines?page=${page + 1}${qs ? `&${qs}` : ""}` : ""
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="ردیف‌های بودجه" description="لیست ردیف‌های بودجه و مانده‌ها" />
-      <DataTable columns={columns} data={items} keyExtractor={(i) => i._id} cardView={false} renderCard={(item) => (<div className="glass-card glass-card-hover-active rounded-xl p-4"><p className="font-semibold text-moonlight">{item.code} — {item.title}</p><div className="flex gap-4 mt-2 text-xs text-fog/50"><span>تخصیص: {item.totalAllocated?.toLocaleString("fa-IR")}</span><span>باقی: {item.remainingBudget?.toLocaleString("fa-IR")}</span></div></div>)} emptyTitle="ردیف بودجه‌ای یافت نشد" emptyDescription="هیچ ردیف بودجه‌ای ثبت نشده است." />
-      <Pagination prevUrl={page > 1 ? "#" : ""} nextUrl={items.length >= limit ? "#" : ""} page={page} />
-    </div>
-  );
+    <BudgetLinesClient
+      items={items}
+      fiscalYears={fiscalYears}
+      organizations={organizations}
+      units={units}
+      prevUrl={prevPageUrl}
+      nextUrl={nextPageUrl}
+      page={page}
+      totalPages={totalPages}
+      total={total}
+      search={search}
+      sort={sort}
+      fiscalYearId={fiscalYearId}
+      organizationId={organizationId}
+      unitId={unitId}
+    />
+  )
 }

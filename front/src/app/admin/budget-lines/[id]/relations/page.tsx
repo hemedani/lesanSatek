@@ -3,7 +3,7 @@ import Link from "next/link"
 import { get } from "@/app/actions/budgetLine/get"
 import { Button } from "@/components/ui/button"
 import { ErrorState } from "@/components/ui/error-state"
-import { BudgetLineEditClient } from "./budget-line-edit-client"
+import { BudgetLineRelationsClient } from "./budget-line-relations-client"
 
 interface Props {
   params: Promise<{ id: string }>
@@ -13,18 +13,13 @@ const PROJECTION = {
   _id: 1,
   code: 1,
   title: 1,
-  description: 1,
-  totalAllocated: 1,
-  totalEncumbered: 1,
-  totalSpent: 1,
-  remainingBudget: 1,
   fiscalYear: { _id: 1, name: 1 },
   organization: { _id: 1, name: 1 },
   unit: { _id: 1, name: 1 },
   wareType: { _id: 1, name: 1 },
 } as const
 
-export default async function EditBudgetLinePage({ params }: Props) {
+export default async function BudgetLineRelationsPage({ params }: Props) {
   const { id } = await params
   const result = await get({ _id: id }, PROJECTION)
   const item = result.success && result.body?.[0] ? result.body[0] : null
@@ -48,5 +43,5 @@ export default async function EditBudgetLinePage({ params }: Props) {
     )
   }
 
-  return <BudgetLineEditClient budgetLine={item} />
+  return <BudgetLineRelationsClient budgetLine={item} />
 }

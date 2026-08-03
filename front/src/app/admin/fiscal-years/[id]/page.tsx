@@ -1,9 +1,9 @@
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { get } from "@/app/actions/budgetLine/get"
+import { get } from "@/app/actions/fiscalYear/get"
 import { Button } from "@/components/ui/button"
 import { ErrorState } from "@/components/ui/error-state"
-import { BudgetLineEditClient } from "./budget-line-edit-client"
+import { FiscalYearEditClient } from "./fiscal-year-edit-client"
 
 interface Props {
   params: Promise<{ id: string }>
@@ -11,20 +11,15 @@ interface Props {
 
 const PROJECTION = {
   _id: 1,
-  code: 1,
-  title: 1,
-  description: 1,
-  totalAllocated: 1,
-  totalEncumbered: 1,
-  totalSpent: 1,
-  remainingBudget: 1,
-  fiscalYear: { _id: 1, name: 1 },
+  name: 1,
+  startDate: 1,
+  endDate: 1,
+  status: 1,
+  isActive: 1,
   organization: { _id: 1, name: 1 },
-  unit: { _id: 1, name: 1 },
-  wareType: { _id: 1, name: 1 },
 } as const
 
-export default async function EditBudgetLinePage({ params }: Props) {
+export default async function EditFiscalYearPage({ params }: Props) {
   const { id } = await params
   const result = await get({ _id: id }, PROJECTION)
   const item = result.success && result.body?.[0] ? result.body[0] : null
@@ -33,14 +28,14 @@ export default async function EditBudgetLinePage({ params }: Props) {
     return (
       <div>
         <ErrorState
-          title="ردیف بودجه یافت نشد"
-          message="ردیف بودجه‌ای با این شناسه در سامانه وجود ندارد."
+          title="سال مالی یافت نشد"
+          message="سال مالی با این شناسه در سامانه وجود ندارد."
         />
         <div className="mt-4 flex justify-center">
-          <Link href="/admin/budget-lines">
+          <Link href="/admin/fiscal-years">
             <Button variant="ghost" className="gap-2 px-4">
               <ArrowRight className="size-5" />
-              بازگشت به ردیف‌های بودجه
+              بازگشت به سال‌های مالی
             </Button>
           </Link>
         </div>
@@ -48,5 +43,5 @@ export default async function EditBudgetLinePage({ params }: Props) {
     )
   }
 
-  return <BudgetLineEditClient budgetLine={item} />
+  return <FiscalYearEditClient fiscalYear={item} />
 }
