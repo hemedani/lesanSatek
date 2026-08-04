@@ -1,4 +1,4 @@
-import { PanelLayout } from "@/components/layout/panel-layout"
+import { PanelShell } from "@/components/layout/panel-shell"
 import { PanelGuard } from "@/components/auth/panel-guard"
 
 export default function StoreHeadLayout({
@@ -8,9 +8,7 @@ export default function StoreHeadLayout({
 }) {
   return (
     <PanelGuard requiredRoles={["StoreHead"]}>
-      <PanelLayout title="پنل مدیریت فروشگاه" description="مدیریت فروشگاه، کالاها و مناقصات">
-        {children}
-      </PanelLayout>
+      <PanelShell panel="storehead">{children}</PanelShell>
     </PanelGuard>
   )
 }

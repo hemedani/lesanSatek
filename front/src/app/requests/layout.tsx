@@ -1,4 +1,4 @@
-import { PanelLayout } from "@/components/layout/panel-layout"
+import { PanelShell } from "@/components/layout/panel-shell"
 import { PanelGuard } from "@/components/auth/panel-guard"
 
 export default function RequestsLayout({
@@ -8,9 +8,7 @@ export default function RequestsLayout({
 }) {
   return (
     <PanelGuard requiredRoles={["Employee"]}>
-      <PanelLayout title="درخواست‌های خرید" description="ثبت و پیگیری درخواست‌ها">
-        {children}
-      </PanelLayout>
+      <PanelShell panel="requests">{children}</PanelShell>
     </PanelGuard>
   )
 }

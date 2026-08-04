@@ -1,4 +1,4 @@
-import { PanelLayout } from "@/components/layout/panel-layout"
+import { PanelShell } from "@/components/layout/panel-shell"
 import { PanelGuard } from "@/components/auth/panel-guard"
 
 export default function UnitHeadLayout({
@@ -8,9 +8,7 @@ export default function UnitHeadLayout({
 }) {
   return (
     <PanelGuard requiredRoles={["UnitHead"]}>
-      <PanelLayout title="پنل واحد" description="تایید درخواست‌های خرید">
-        {children}
-      </PanelLayout>
+      <PanelShell panel="unit-head">{children}</PanelShell>
     </PanelGuard>
   )
 }
