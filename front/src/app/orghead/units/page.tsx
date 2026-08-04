@@ -1,4 +1,5 @@
 import { gets } from "@/app/actions/unit/gets"
+import { count } from "@/app/actions/unit/count"
 import { UnitsClient } from "./units-client"
 
 export default async function OrgHeadUnitsPage({
@@ -27,7 +28,14 @@ export default async function OrgHeadUnitsPage({
     },
   )
 
+  const [totalResult, activeResult] = await Promise.all([
+    count({}, { qty: 1 }),
+    count({ isActive: true }, { qty: 1 }),
+  ])
+
   const items = result.success ? result.body : []
+  const total = totalResult.success ? (totalResult.body?.qty ?? 0) : 0
+  const active = activeResult.success ? (activeResult.body?.qty ?? 0) : 0
   const prevPageUrl = page > 1 ? `/orghead/units?page=${page - 1}${resolvedSearchParams.search ? `&search=${resolvedSearchParams.search}` : ""}` : ""
   const nextPageUrl = items.length >= limit ? `/orghead/units?page=${page + 1}${resolvedSearchParams.search ? `&search=${resolvedSearchParams.search}` : ""}` : ""
 
@@ -38,6 +46,8 @@ export default async function OrgHeadUnitsPage({
       nextPageUrl={nextPageUrl}
       page={page}
       search={resolvedSearchParams.search || ""}
+      total={total}
+      active={active}
     />
   )
 }
