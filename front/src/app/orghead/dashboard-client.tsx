@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Building2,
   Clock,
-  CheckCircle,
   ShoppingCart,
-  Wallet,
   Warehouse,
   ScrollText,
   Activity,
@@ -14,11 +13,16 @@ import {
   BarChart3,
   Timer,
   Landmark,
+  Users,
+  GitBranch,
+  Network,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { KpiMetricCard } from "@/components/orghead/charts/kpi-metric-card";
+import { PageHeader } from "@/components/ui/page-header";
+import { StatCard } from "@/components/dashboard/stat-card";
+import { NavCard } from "@/components/dashboard/nav-card";
 import { PrStatusDonut } from "@/components/orghead/charts/pr-status-donut";
 import { PrMonthlyBar } from "@/components/orghead/charts/pr-monthly-bar";
 import { SelectionBreakdownPie } from "@/components/orghead/charts/selection-breakdown-pie";
@@ -142,6 +146,7 @@ interface Props {
 }
 
 export function OrgHeadDashboardClient({ organization, stats }: Props) {
+  const router = useRouter();
   const prCounts = stats?.purchasingRequestCounts;
   const pendingFinalization = stats?.prStatusDistribution?.pendingFinalization ?? 0;
   const cycleTime = stats?.prCycleTime;
@@ -155,6 +160,25 @@ export function OrgHeadDashboardClient({ organization, stats }: Props) {
 
   return (
     <div className="space-y-8">
+      {/* Page Header */}
+      <PageHeader
+        title="داشبورد سازمان"
+        description={organization ? `نمای کلی عملکرد سازمان «${organization.name}»` : "نمای کلی عملکرد سازمان"}
+      >
+        {totalPRs > 0 && (
+          <Badge variant="outline" className="gap-1.5 border-electric-iris/25 bg-electric-iris/5 text-frost-link">
+            <ShoppingCart className="size-5" />
+            {totalPRs.toLocaleString("fa-IR")} درخواست خرید
+          </Badge>
+        )}
+        <Link href="/orghead/requests">
+          <Button size="sm" className="gap-1.5">
+            <ShoppingCart className="size-5" />
+            مدیریت درخواست‌ها
+          </Button>
+        </Link>
+      </PageHeader>
+
       {/* Section 1: Org Banner */}
       {organization && (
         <Card variant="glass" className="relative overflow-hidden">
@@ -175,21 +199,25 @@ export function OrgHeadDashboardClient({ organization, stats }: Props) {
 
       {/* Section 2: KPI Row */}
       <div className="grid gap-5 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-        <KpiMetricCard
+        <StatCard
           label="کل درخواست‌ها"
-          value={totalPRs.toLocaleString("fa-IR")}
+          value={totalPRs}
           icon={ShoppingCart}
           iconColor="text-electric-iris"
           iconBg="bg-electric-iris/10"
+          subtitle="مشاهده همه درخواست‌ها"
+          onClick={() => router.push("/orghead/requests")}
         />
-        <KpiMetricCard
+        <StatCard
           label="در انتظار تأیید نهایی"
-          value={pendingFinalization.toLocaleString("fa-IR")}
+          value={pendingFinalization}
           icon={Clock}
           iconColor="text-violet-400"
           iconBg="bg-violet-500/10"
+          subtitle="نیازمند بررسی"
+          onClick={() => router.push("/orghead/requests?tab=pending")}
         />
-        <KpiMetricCard
+        <StatCard
           label="میانگین زمان تأیید"
           value={cycleTime ? `${Math.round(cycleTime.averageDays)} روز` : "—"}
           icon={Timer}
@@ -197,7 +225,7 @@ export function OrgHeadDashboardClient({ organization, stats }: Props) {
           iconBg="bg-amber-500/10"
           subtitle={cycleTime ? `حداقل ${Math.round(cycleTime.minDays)} - حداکثر ${Math.round(cycleTime.maxDays)} روز` : undefined}
         />
-        <KpiMetricCard
+        <StatCard
           label="مصرف بودجه"
           value={budgetUtilizationPct ? `${budgetUtilizationPct}%` : "—"}
           icon={BarChart3}
@@ -205,12 +233,14 @@ export function OrgHeadDashboardClient({ organization, stats }: Props) {
           iconBg={budgetUtilizationPct > 80 ? "bg-ember/10" : "bg-emerald-400/10"}
           subtitle={budgetBurn ? `${formatCurrency(budgetBurn.totalRemaining)} باقی‌مانده` : undefined}
         />
-        <KpiMetricCard
+        <StatCard
           label="کالاهای کم‌موجودی"
-          value={lowStockCount.toLocaleString("fa-IR")}
+          value={lowStockCount}
           icon={AlertTriangle}
           iconColor={lowStockCount > 0 ? "text-ember" : "text-emerald-400"}
           iconBg={lowStockCount > 0 ? "bg-ember/10" : "bg-emerald-400/10"}
+          subtitle="موجودی انبار"
+          onClick={() => router.push("/orghead/inventory")}
         />
       </div>
 
@@ -218,7 +248,7 @@ export function OrgHeadDashboardClient({ organization, stats }: Props) {
       {(stats?.prStatusDistribution || stats?.prMonthlyTrend || stats?.selectionBreakdown) && (
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <ShoppingCart className="size-4 text-frost-link" />
+            <ShoppingCart className="size-5 text-frost-link" />
             <h2 className="text-sm font-medium text-fog tracking-wide">نمای کلی درخواست‌های خرید</h2>
           </div>
           <div className="grid gap-6 lg:grid-cols-3">
@@ -239,7 +269,7 @@ export function OrgHeadDashboardClient({ organization, stats }: Props) {
       {(stats?.budgetBurnDown || stats?.budgetLineBreakdown) && (
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <Landmark className="size-4 text-frost-link" />
+            <Landmark className="size-5 text-frost-link" />
             <h2 className="text-sm font-medium text-fog tracking-wide">وضعیت بودجه</h2>
           </div>
           <div className="grid gap-6 lg:grid-cols-2">
@@ -257,7 +287,7 @@ export function OrgHeadDashboardClient({ organization, stats }: Props) {
       {(stats?.inventorySummary || stats?.inventoryLowStock) && (
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <Warehouse className="size-4 text-frost-link" />
+            <Warehouse className="size-5 text-frost-link" />
             <h2 className="text-sm font-medium text-fog tracking-wide">موجودی انبار</h2>
           </div>
           <div className="grid gap-6 lg:grid-cols-2">
@@ -275,7 +305,7 @@ export function OrgHeadDashboardClient({ organization, stats }: Props) {
       {(stats?.consumptionTrend || stats?.consumptionByUnit || stats?.consumptionByCategory) && (
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <ScrollText className="size-4 text-frost-link" />
+            <ScrollText className="size-5 text-frost-link" />
             <h2 className="text-sm font-medium text-fog tracking-wide">تحلیل مصرف</h2>
           </div>
           <div className="grid gap-6 lg:grid-cols-3">
@@ -296,7 +326,7 @@ export function OrgHeadDashboardClient({ organization, stats }: Props) {
       {(stats?.procurementByStore || stats?.stepBottleneck || stats?.stockMovementSummary) && (
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <Activity className="size-4 text-frost-link" />
+            <Activity className="size-5 text-frost-link" />
             <h2 className="text-sm font-medium text-fog tracking-wide">تدارکات و فرآیند</h2>
           </div>
           <div className="grid gap-6 lg:grid-cols-3">
@@ -313,7 +343,7 @@ export function OrgHeadDashboardClient({ organization, stats }: Props) {
         </div>
       )}
 
-      {/* Section 8: Quick Actions */}
+      {/* Section 8: Quick Access Nav Cards */}
       <Card variant="glass">
         <CardHeader className="pb-3">
           <p className="text-sm font-medium text-fog tracking-wide">دسترسی سریع</p>
@@ -322,49 +352,72 @@ export function OrgHeadDashboardClient({ organization, stats }: Props) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/orghead/requests?tab=pending">
-              <Button variant="outline" className="gap-2">
-                <Clock className="size-4" />
-                در انتظار تأیید نهایی
-              </Button>
-            </Link>
-            <Link href="/orghead/requests?tab=payment">
-              <Button variant="outline" className="gap-2">
-                <Wallet className="size-4" />
-                نیازمند پرداخت
-              </Button>
-            </Link>
-            <Link href="/orghead/requests?tab=completed">
-              <Button variant="outline" className="gap-2">
-                <CheckCircle className="size-4" />
-                تکمیل شده
-              </Button>
-            </Link>
-            <Link href="/orghead/requests">
-              <Button variant="outline" className="gap-2">
-                <ShoppingCart className="size-4" />
-                همه درخواست‌ها
-              </Button>
-            </Link>
-            <Link href="/orghead/inventory">
-              <Button variant="outline" className="gap-2">
-                <Warehouse className="size-4" />
-                موجودی انبار
-              </Button>
-            </Link>
-            <Link href="/orghead/consumption">
-              <Button variant="outline" className="gap-2">
-                <ScrollText className="size-4" />
-                مصرف کالا
-              </Button>
-            </Link>
-            <Link href="/orghead/stock-movements">
-              <Button variant="outline" className="gap-2">
-                <Activity className="size-4" />
-                گردش کالا
-              </Button>
-            </Link>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+            <NavCard
+              href="/orghead/requests"
+              title="درخواست‌های خرید"
+              description="مدیریت و بررسی همه درخواست‌ها"
+              value={totalPRs}
+              icon={ShoppingCart}
+              iconColor="text-electric-iris"
+              iconBg="bg-electric-iris/10"
+            />
+            <NavCard
+              href="/orghead/units"
+              title="واحدها"
+              description="ساختار درختی واحدهای سازمان"
+              icon={Building2}
+              iconColor="text-sky-400"
+              iconBg="bg-sky-400/10"
+            />
+            <NavCard
+              href="/orghead/users"
+              title="کاربران"
+              description="مدیریت کاربران و نقش‌ها"
+              icon={Users}
+              iconColor="text-emerald-400"
+              iconBg="bg-emerald-400/10"
+            />
+            <NavCard
+              href="/orghead/processes"
+              title="فرآیندها"
+              description="طراحی و مدیریت گردش کار"
+              icon={GitBranch}
+              iconColor="text-violet-400"
+              iconBg="bg-violet-500/10"
+            />
+            <NavCard
+              href="/orghead/inventory"
+              title="موجودی انبار"
+              description="مشاهده موجودی کالاهای انبار"
+              icon={Warehouse}
+              iconColor="text-amber-400"
+              iconBg="bg-amber-400/10"
+            />
+            <NavCard
+              href="/orghead/consumption"
+              title="مصرف کالا"
+              description="ثبت و مشاهده مصرف"
+              icon={ScrollText}
+              iconColor="text-frost-link"
+              iconBg="bg-frost-link/10"
+            />
+            <NavCard
+              href="/orghead/stock-movements"
+              title="گردش کالا"
+              description="تاریخچه جابه‌جایی کالا"
+              icon={Activity}
+              iconColor="text-ember"
+              iconBg="bg-ember/10"
+            />
+            <NavCard
+              href="/orghead/org-chart"
+              title="چارت سازمان"
+              description="نمایش درختی ساختار سازمان"
+              icon={Network}
+              iconColor="text-cyan-400"
+              iconBg="bg-cyan-400/10"
+            />
           </div>
         </CardContent>
       </Card>
@@ -374,7 +427,7 @@ export function OrgHeadDashboardClient({ organization, stats }: Props) {
         <Card variant="glass">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
-              <Landmark className="size-4 text-frost-link" />
+              <Landmark className="size-5 text-frost-link" />
               <CardTitle className="text-sm font-medium text-fog">سال مالی جاری</CardTitle>
             </div>
           </CardHeader>

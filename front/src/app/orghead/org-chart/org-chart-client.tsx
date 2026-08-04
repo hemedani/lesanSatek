@@ -2,11 +2,13 @@
 
 import { useState, useMemo, useRef, useCallback, useEffect } from "react"
 import Link from "next/link"
-import { Network, User, ZoomIn, ZoomOut, RotateCcw } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Network, User, ZoomIn, ZoomOut, RotateCcw, Building2, ShieldCheck, CornerDownRight, ArrowDownWideNarrow } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/ui/page-header"
 import { EmptyState } from "@/components/ui/empty-state"
+import { StatCard } from "@/components/dashboard/stat-card"
 
 interface UnitNode {
   _id: string
@@ -122,6 +124,7 @@ function OrgChartTree({ roots }: { roots: TreeNode[] }) {
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const [scale, setScale] = useState(1)
   const [dragging, setDragging] = useState(false)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const dragStart = useRef({ x: 0, y: 0 })
   const panStart = useRef({ x: 0, y: 0 })
 
@@ -197,17 +200,17 @@ function OrgChartTree({ roots }: { roots: TreeNode[] }) {
   return (
     <div className="relative">
       <div className="absolute top-4 end-4 z-10 flex items-center gap-1">
-        <Button variant="ghost" size="icon-xs" onClick={() => setScale((s) => Math.min(s * 1.2, 3))} className="size-7 text-fog/60 hover:text-moonlight">
-          <ZoomIn className="size-4" />
+        <Button variant="ghost" size="icon-xs" onClick={() => setScale((s) => Math.min(s * 1.2, 3))} className="size-8 text-fog/60 hover:text-moonlight">
+          <ZoomIn className="size-5" />
         </Button>
         <span className="text-xs text-fog/50 tabular-nums min-w-[3rem] text-center">
           {Math.round(scale * 100)}%
         </span>
-        <Button variant="ghost" size="icon-xs" onClick={() => setScale((s) => Math.max(s * 0.8, 0.25))} className="size-7 text-fog/60 hover:text-moonlight">
-          <ZoomOut className="size-4" />
+        <Button variant="ghost" size="icon-xs" onClick={() => setScale((s) => Math.max(s * 0.8, 0.25))} className="size-8 text-fog/60 hover:text-moonlight">
+          <ZoomOut className="size-5" />
         </Button>
-        <Button variant="ghost" size="icon-xs" onClick={resetView} className="size-7 text-fog/60 hover:text-moonlight">
-          <RotateCcw className="size-3.5" />
+        <Button variant="ghost" size="icon-xs" onClick={resetView} className="size-8 text-fog/60 hover:text-moonlight">
+          <RotateCcw className="size-5" />
         </Button>
       </div>
 
@@ -255,54 +258,77 @@ function OrgChartTree({ roots }: { roots: TreeNode[] }) {
           </svg>
 
           {layoutNodes.map((node) => (
-            <Link
+            <div
               key={node._id}
-              href={`/orghead/units/${node._id}`}
-              className="absolute block no-underline"
+              className="absolute block"
               style={{
                 left: node.layoutX - NODE_W / 2,
                 top: node.layoutY,
               }}
             >
-              <div
-                className={cn(
-                  "glass-card glass-card-hover-active rounded-xl p-3 transition-all duration-200 hover:shadow-[0_0_20px_rgba(102,58,243,0.15)]",
-                  "border border-steel-border/30 hover:border-electric-iris/40",
-                )}
-                style={{ width: NODE_W }}
+              <button
+                type="button"
+                onClick={() => setSelectedId((prev) => (prev === node._id ? null : node._id))}
+                className="block w-full text-start outline-none focus-visible:ring-2 focus-visible:ring-electric-iris/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl"
+                aria-pressed={selectedId === node._id}
               >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <div
-                    className="size-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: typeColors[node.type || ""] || "#663af3" }}
-                  />
-                  <span className="text-xs font-medium text-moonlight truncate leading-5">
-                    {node.name || "—"}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/[0.04] text-fog/60 border border-steel-border/20 whitespace-nowrap">
-                    {typeLabels[node.type || ""] || node.type || "—"}
-                  </span>
-                  <span className={cn(
-                    "text-[10px] px-1.5 py-0.5 rounded-full",
-                    node.isActive !== false
-                      ? "bg-emerald-500/10 text-emerald-400"
-                      : "bg-rose-500/10 text-rose-400",
-                  )}>
-                    {node.isActive !== false ? "فعال" : "غیرفعال"}
-                  </span>
-                </div>
-                {node.head && (
-                  <div className="flex items-center gap-1.5 text-[11px] text-fog/50">
-                    <User className="size-3 shrink-0" />
-                    <span className="truncate leading-4">
-                      {node.head.first_name} {node.head.last_name}
+                <div
+                  className={cn(
+                    "glass-card glass-card-hover-active rounded-xl p-3 transition-all duration-200",
+                    "border border-steel-border/30 hover:border-electric-iris/40 hover:shadow-[0_0_24px_rgba(102,58,243,0.25)]",
+                    selectedId === node._id &&
+                      "border-electric-iris/60 shadow-[0_0_28px_rgba(102,58,243,0.45)] ring-2 ring-inset ring-electric-iris/30",
+                  )}
+                  style={{ width: NODE_W }}
+                >
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div
+                      className="size-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: typeColors[node.type || ""] || "#663af3" }}
+                    />
+                    <span className="text-xs font-medium text-moonlight truncate leading-5">
+                      {node.name || "—"}
                     </span>
                   </div>
-                )}
-              </div>
-            </Link>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/[0.04] text-fog/60 border border-steel-border/20 whitespace-nowrap">
+                      {typeLabels[node.type || ""] || node.type || "—"}
+                    </span>
+                    <span className={cn(
+                      "text-[10px] px-1.5 py-0.5 rounded-full",
+                      node.isActive !== false
+                        ? "bg-emerald-500/10 text-emerald-400"
+                        : "bg-rose-500/10 text-rose-400",
+                    )}>
+                      {node.isActive !== false ? "فعال" : "غیرفعال"}
+                    </span>
+                  </div>
+                  {node.head && (
+                    <div className="flex items-center gap-1.5 text-[11px] text-fog/50">
+                      <User className="size-4 shrink-0" />
+                      <span className="truncate leading-4">
+                        {node.head.first_name} {node.head.last_name}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-steel-border/15">
+                    <Link
+                      href={`/orghead/units/${node._id}`}
+                      className="inline-flex items-center gap-1 text-[11px] text-frost-link hover:text-electric-iris transition-colors"
+                    >
+                      <CornerDownRight className="size-3.5" />
+                      مشاهده واحد
+                    </Link>
+                    {node.children.length > 0 && (
+                      <span className="inline-flex items-center gap-1 text-[10px] text-fog/40">
+                        <ArrowDownWideNarrow className="size-3.5" />
+                        {node.children.length.toLocaleString("fa-IR")} زیرواحد
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </button>
+            </div>
           ))}
         </div>
       </div>
@@ -326,7 +352,16 @@ interface OrgChartClientProps {
 }
 
 export function OrgChartClient({ units, organization }: OrgChartClientProps) {
+  const router = useRouter()
   const roots = useMemo(() => buildTree(units), [units])
+
+  const totalUnits = units.length
+  const activeUnits = units.filter((u) => u.isActive !== false).length
+  const maxDepth = useMemo(() => {
+    const walk = (nodes: TreeNode[], depth: number): number =>
+      nodes.reduce((m, n) => Math.max(m, walk(n.children, depth + 1)), depth)
+    return roots.length ? walk(roots, 0) : 0
+  }, [roots])
 
   return (
     <div className="space-y-6">
@@ -334,6 +369,42 @@ export function OrgChartClient({ units, organization }: OrgChartClientProps) {
         title={organization?.name ? `نمودار سازمانی ${organization.name}` : "نمودار سازمان"}
         description="نمایش درختی واحدها و زیرواحدهای سازمان"
       />
+
+      <div className="grid gap-4 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 lg:gap-5">
+        <StatCard
+          label="کل واحدها"
+          value={totalUnits}
+          icon={Building2}
+          iconColor="text-electric-iris"
+          iconBg="bg-electric-iris/10"
+          subtitle="واحدهای تعریف‌شده سازمان"
+          onClick={() => router.push("/orghead/units")}
+        />
+        <StatCard
+          label="واحدهای فعال"
+          value={activeUnits}
+          icon={ShieldCheck}
+          iconColor="text-emerald-400"
+          iconBg="bg-emerald-400/10"
+          subtitle="در حال فعالیت"
+        />
+        <StatCard
+          label="سازمان‌های اصلی"
+          value={roots.length}
+          icon={Network}
+          iconColor="text-violet-400"
+          iconBg="bg-violet-500/10"
+          subtitle="ریشه‌های درخت سازمان"
+        />
+        <StatCard
+          label="عمق ساختار"
+          value={maxDepth}
+          icon={ArrowDownWideNarrow}
+          iconColor="text-amber-400"
+          iconBg="bg-amber-400/10"
+          subtitle="بیشترین سطح سلسله‌مراتب"
+        />
+      </div>
 
       {roots.length === 0 ? (
         <EmptyState
