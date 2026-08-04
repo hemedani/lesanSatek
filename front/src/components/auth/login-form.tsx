@@ -5,11 +5,11 @@ import { zodV4Resolver } from "@/lib/zod-v4-resolver"
 import { z } from "zod"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { Loader2 } from "lucide-react"
+import { AlertCircle, ArrowLeft, Lock, Mail } from "lucide-react"
 
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Form } from "@/components/ui/form"
+import { AuthInput } from "@/components/auth/auth-input"
+import { AuthButton } from "@/components/auth/auth-button"
 import { login } from "@/app/actions/auth/login"
 import { useAuthStore } from "@/stores/authStore"
 
@@ -61,60 +61,50 @@ function LoginForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
         {error && (
-          <div className="rounded-sm bg-destructive/10 px-3 py-2.5 text-sm text-destructive">
-            {error}
+          <div
+            role="alert"
+            className="flex items-center gap-2 rounded-lg border border-ember/25 bg-ember/10 px-3.5 py-2.5 text-sm text-ember motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-top-1 motion-safe:duration-200"
+          >
+            <AlertCircle className="size-4.5 shrink-0" aria-hidden="true" />
+            <span>{error}</span>
           </div>
         )}
 
-        <FormField
+        <AuthInput
           control={form.control}
           name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>ایمیل یا شماره موبایل</FormLabel>
-              <FormControl>
-                <Input
-                  type="text"
-                  placeholder="example@email.com"
-                  dir="rtl"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label="ایمیل یا شماره موبایل"
+          icon={Mail}
+          type="text"
+          placeholder="example@email.com"
+          autoComplete="username"
+          dir="ltr"
         />
 
-        <FormField
+        <AuthInput
           control={form.control}
           name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>رمز عبور</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  dir="rtl"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label="رمز عبور"
+          icon={Lock}
+          password
+          placeholder="••••••••"
+          autoComplete="current-password"
+          dir="ltr"
         />
 
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={form.formState.isSubmitting}
-        >
-          {form.formState.isSubmitting ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            "ورود"
-          )}
-        </Button>
+        <div className="flex justify-end">
+          <a
+            href="#"
+            onClick={(e) => e.preventDefault()}
+            className="text-sm text-frost-link/80 transition-colors hover:text-frost-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-electric-iris/40 rounded-sm"
+          >
+            رمز عبور خود را فراموش کرده‌اید؟
+          </a>
+        </div>
+
+        <AuthButton loading={form.formState.isSubmitting} icon={ArrowLeft}>
+          ورود به سامانه
+        </AuthButton>
       </form>
     </Form>
   )

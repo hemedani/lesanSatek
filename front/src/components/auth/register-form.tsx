@@ -5,11 +5,11 @@ import { zodV4Resolver } from "@/lib/zod-v4-resolver"
 import { z } from "zod"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { Loader2 } from "lucide-react"
+import { AlertCircle, CheckCheck, Lock, Mail, Phone, Sparkles, User } from "lucide-react"
 
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Form } from "@/components/ui/form"
+import { AuthInput } from "@/components/auth/auth-input"
+import { AuthButton } from "@/components/auth/auth-button"
 import { register } from "@/app/actions/auth/register"
 
 const registerSchema = z.object({
@@ -61,8 +61,9 @@ function RegisterForm() {
 
   if (success) {
     return (
-      <div className="rounded-sm bg-cipher-mint/10 px-4 py-3 text-sm text-cipher-mint text-center">
-        ثبت‌نام با موفقیت انجام شد. به صفحه ورود هدایت می‌شوید...
+      <div className="flex items-center gap-2.5 rounded-lg border border-cipher-mint/25 bg-cipher-mint/10 px-4 py-3.5 text-sm text-cipher-mint motion-safe:animate-in motion-safe:fade-in-0 motion-safe:zoom-in-95 motion-safe:duration-300">
+        <CheckCheck className="size-4.5 shrink-0" aria-hidden="true" />
+        <span>ثبت‌نام با موفقیت انجام شد. به صفحه ورود هدایت می‌شوید...</span>
       </div>
     )
   }
@@ -71,109 +72,70 @@ function RegisterForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         {error && (
-          <div className="rounded-sm bg-destructive/10 px-3 py-2 text-sm text-destructive">
-            {error}
+          <div
+            role="alert"
+            className="flex items-center gap-2 rounded-lg border border-ember/25 bg-ember/10 px-3.5 py-2.5 text-sm text-ember motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-top-1 motion-safe:duration-200"
+          >
+            <AlertCircle className="size-4.5 shrink-0" aria-hidden="true" />
+            <span>{error}</span>
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
+        <div className="grid grid-cols-2 gap-3">
+          <AuthInput
             control={form.control}
             name="first_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>نام</FormLabel>
-                <FormControl>
-                  <Input placeholder="علی" dir="rtl" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="نام"
+            icon={User}
+            placeholder="علی"
+            autoComplete="given-name"
           />
 
-          <FormField
+          <AuthInput
             control={form.control}
             name="last_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>نام خانوادگی</FormLabel>
-                <FormControl>
-                  <Input placeholder="احمدی" dir="rtl" className="h-10" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="نام خانوادگی"
+            icon={User}
+            placeholder="احمدی"
+            autoComplete="family-name"
           />
         </div>
 
-        <FormField
+        <AuthInput
           control={form.control}
           name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>ایمیل</FormLabel>
-              <FormControl>
-                <Input
-                  type="email"
-                  placeholder="example@email.com"
-                  dir="rtl"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label="ایمیل"
+          icon={Mail}
+          type="email"
+          placeholder="example@email.com"
+          autoComplete="email"
+          dir="ltr"
         />
 
-        <FormField
+        <AuthInput
           control={form.control}
           name="mobile"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>شماره موبایل</FormLabel>
-              <FormControl>
-                <Input
-                  type="tel"
-                  placeholder="۰۹۱۲۳۴۵۶۷۸۹"
-                  dir="rtl"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label="شماره موبایل"
+          icon={Phone}
+          type="tel"
+          placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+          autoComplete="tel"
         />
 
-        <FormField
+        <AuthInput
           control={form.control}
           name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>رمز عبور</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="حداقل ۶ کاراکتر"
-                  dir="rtl"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label="رمز عبور"
+          icon={Lock}
+          password
+          placeholder="حداقل ۶ کاراکتر"
+          autoComplete="new-password"
+          dir="ltr"
         />
 
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={form.formState.isSubmitting}
-        >
-          {form.formState.isSubmitting ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            "ثبت‌نام"
-          )}
-        </Button>
+        <AuthButton loading={form.formState.isSubmitting} icon={Sparkles}>
+          ایجاد حساب کاربری
+        </AuthButton>
       </form>
     </Form>
   )

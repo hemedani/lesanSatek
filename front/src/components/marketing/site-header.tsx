@@ -64,13 +64,13 @@ export function SiteHeader() {
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="hidden sm:inline-flex h-8 items-center justify-center rounded-sm border border-steel-border/60 bg-transparent px-3 text-xs font-medium text-moonlight transition-all hover:border-frost-link/30 hover:text-glacier"
+              className="hidden sm:inline-flex h-[32px] items-center justify-center rounded-sm border border-steel-border/60 bg-transparent px-3 text-xs font-medium text-moonlight transition-all hover:border-frost-link/30 hover:text-glacier"
             >
               ورود
             </Link>
             <Link
               href="/register"
-              className="inline-flex h-8 items-center justify-center rounded-sm bg-electric-iris px-4 text-xs font-medium text-white transition-all hover:bg-electric-iris/80 gap-1.5"
+              className="inline-flex h-[32px] items-center justify-center rounded-sm bg-electric-iris px-4 text-xs font-medium text-white transition-all hover:bg-electric-iris/80 gap-1.5"
             >
               شروع کنید
               <ArrowLeft className="size-3" />
@@ -118,14 +118,14 @@ export function SiteHeader() {
               <Link
                 href="/login"
                 onClick={() => setMobileOpen(false)}
-                className="flex-1 inline-flex h-9 items-center justify-center rounded-sm border border-steel-border/60 bg-transparent px-3 text-xs font-medium text-moonlight transition-all hover:border-frost-link/30 hover:text-glacier"
+                className="flex-1 inline-flex h-[36px] items-center justify-center rounded-sm border border-steel-border/60 bg-transparent px-3 text-xs font-medium text-moonlight transition-all hover:border-frost-link/30 hover:text-glacier"
               >
                 ورود
               </Link>
               <Link
                 href="/register"
                 onClick={() => setMobileOpen(false)}
-                className="flex-1 inline-flex h-9 items-center justify-center rounded-sm bg-electric-iris px-3 text-xs font-medium text-white transition-all hover:bg-electric-iris/80 gap-1.5"
+                className="flex-1 inline-flex h-[36px] items-center justify-center rounded-sm bg-electric-iris px-3 text-xs font-medium text-white transition-all hover:bg-electric-iris/80 gap-1.5"
               >
                 شروع کنید
                 <ArrowLeft className="size-3" />

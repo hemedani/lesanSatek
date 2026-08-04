@@ -1,33 +1,28 @@
-import { RegisterForm } from "@/components/auth/register-form"
+import { Sparkles } from "lucide-react"
 import Link from "next/link"
+
+import { RegisterForm } from "@/components/auth/register-form"
+import { AuthPage } from "@/components/auth/auth-page"
 
 export default function RegisterPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-semibold text-glacier">
-            ساتک
-          </h1>
-          <p className="mt-1 text-sm text-fog">
-            ایجاد حساب کاربری جدید
-          </p>
-        </div>
-
-        <div className="rounded-xl bg-graphite-plate p-6 ring-1 ring-foreground/10 shadow-subtle-4">
-          <h2 className="mb-6 text-base font-medium text-moonlight">
-            ثبت‌نام
-          </h2>
-          <RegisterForm />
-        </div>
-
-        <p className="mt-4 text-center text-sm text-fog">
+    <AuthPage
+      icon={Sparkles}
+      title="ایجاد حساب کاربری"
+      subtitle="در چند ثانیه ثبت‌نام کنید و مدیریت خرید سازمان خود را آغاز کنید"
+      toggle={
+        <>
           قبلاً ثبت‌نام کرده‌اید؟{" "}
-          <Link href="/login" className="text-frost-link hover:underline">
-            ورود
+          <Link
+            href="/login"
+            className="font-medium text-frost-link transition-colors hover:text-glacier focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-electric-iris/40 rounded-sm"
+          >
+            وارد شوید
           </Link>
-        </p>
-      </div>
-    </div>
+        </>
+      }
+    >
+      <RegisterForm />
+    </AuthPage>
   )
 }
