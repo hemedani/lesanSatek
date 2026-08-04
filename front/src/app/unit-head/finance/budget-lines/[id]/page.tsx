@@ -1,13 +1,28 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowRight, Calculator, ListTodo, Lock, Wallet } from "lucide-react"
+import { ArrowRight, Calculator, Lock, Wallet } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { get as getBudgetLine } from "@/app/actions/budgetLine/get"
 import { gets as getBudgetAllocations } from "@/app/actions/budgetAllocation/gets"
 import { gets as getBudgetEncumbrances } from "@/app/actions/budgetEncumbrance/gets"
 import { DirectDeductionForm } from "./direct-deduction-form"
+
+interface AllocationItem {
+  _id: string
+  amount?: number
+  description?: string
+  allocatedAt?: string
+  allocatedBy?: { _id?: string; first_name?: string; last_name?: string }
+}
+
+interface EncumbranceItem {
+  _id: string
+  amount?: number
+  status?: string
+  description?: string
+  createdAt?: string
+}
 
 export default async function UnitHeadFinanceBudgetLineDetailPage({
   params,
@@ -39,8 +54,8 @@ export default async function UnitHeadFinanceBudgetLineDetailPage({
   if (!blRes.success || !blRes.body?.[0]) notFound()
 
   const budgetLine = blRes.body[0]
-  const allocations = allocationsRes.success ? allocationsRes.body || [] : []
-  const encumbrances = encumbrancesRes.success ? encumbrancesRes.body || [] : []
+  const allocations: AllocationItem[] = allocationsRes.success ? allocationsRes.body || [] : []
+  const encumbrances: EncumbranceItem[] = encumbrancesRes.success ? encumbrancesRes.body || [] : []
 
   function remainingColor(remaining?: number, allocated?: number) {
     if (!remaining || !allocated) return "text-fog"
@@ -129,8 +144,8 @@ export default async function UnitHeadFinanceBudgetLineDetailPage({
                 <p className="text-sm text-fog/50">هیچ تخصیصی ثبت نشده است.</p>
               ) : (
                 <div className="divide-y divide-steel-border/10">
-                  {allocations.map((a: any) => {
-                    const allocatedBy = a.allocatedBy as any | undefined
+                  {allocations.map((a) => {
+                    const allocatedBy = a.allocatedBy
                     return (
                       <div key={String(a._id)} className="py-3 first:pt-0 last:pb-0 flex items-center justify-between">
                         <div>
@@ -172,7 +187,7 @@ export default async function UnitHeadFinanceBudgetLineDetailPage({
                 <p className="text-sm text-fog/50">هیچ تعهدی ثبت نشده است.</p>
               ) : (
                 <div className="divide-y divide-steel-border/10">
-                  {encumbrances.map((e: any) => (
+                  {encumbrances.map((e) => (
                     <div key={String(e._id)} className="py-3 first:pt-0 last:pb-0 flex items-center justify-between">
                       <div>
                         <p className="text-sm text-moonlight" dir="ltr">

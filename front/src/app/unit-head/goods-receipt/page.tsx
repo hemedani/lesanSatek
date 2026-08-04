@@ -39,8 +39,8 @@ export default async function GoodsReceiptPage() {
 
   if (currentUserId) {
     const warehouseUnitsRes = await getUnits(
-      { page: 1, limit: 50, type: "Warehouse" } as any,
-      { _id: 1, name: 1, head: { _id: 1 } } as any
+      { page: 1, limit: 50, type: "Warehouse" },
+      { _id: 1, name: 1, head: { _id: 1 } }
     ).catch(() => ({ success: false, body: null }))
     if (warehouseUnitsRes.success && warehouseUnitsRes.body) {
       const userWarehouse = warehouseUnitsRes.body.find(
@@ -77,7 +77,7 @@ export default async function GoodsReceiptPage() {
   }
 
   const result = await getPRs(
-    { page: 1, limit: 50, unitId: warehouseUnitId, stuffStatus: "delivered" } as any,
+    { page: 1, limit: 50, unitId: warehouseUnitId, stuffStatus: "delivered" },
     {
       _id: 1,
       title: 1,

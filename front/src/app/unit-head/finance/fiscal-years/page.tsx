@@ -1,10 +1,13 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
-import { Calendar, Plus, Lock, Loader2 } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useMemo, useState, useEffect, useCallback } from "react"
+import { Calendar, Plus, Lock, Loader2, RotateCcw, Search, ArrowDownUp } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { StatCard } from "@/components/dashboard/stat-card"
+import { SearchField } from "@/components/ui/search-field"
+import { FilterSelect } from "@/components/ui/filter-select"
+import type { FilterOption } from "@/components/ui/filter-select"
 import { PageHeader } from "@/components/ui/page-header"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
@@ -45,6 +48,13 @@ const statusColor: Record<string, string> = {
   planning: "bg-amber-500/10 text-amber-400 border-amber-500/20",
 }
 
+const statusOptions: FilterOption[] = [
+  { value: "open", label: "باز" },
+  { value: "active", label: "فعال" },
+  { value: "planning", label: "در برنامه‌ریزی" },
+  { value: "closed", label: "بسته شده" },
+]
+
 const addSchema = z.object({
   name: z.string().min(1, "نام سال مالی الزامی است"),
   startDate: z.string().min(1, "تاریخ شروع الزامی است"),
@@ -56,6 +66,8 @@ type AddFormData = z.infer<typeof addSchema>
 export default function UnitHeadFinanceFiscalYearsPage() {
   const [items, setItems] = useState<FiscalYearItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState("")
+  const [statusFilter, setStatusFilter] = useState("")
   const [showAdd, setShowAdd] = useState(false)
   const [closingId, setClosingId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -66,7 +78,6 @@ export default function UnitHeadFinanceFiscalYearsPage() {
   })
 
   const fetch = useCallback(async () => {
-    setLoading(true)
     const result = await getFiscalYears(
       { page: 1, limit: 50, sortBy: "startDate", sortOrder: "desc" },
       { _id: 1, name: 1, startDate: 1, endDate: 1, isActive: 1, status: 1 },
@@ -75,7 +86,18 @@ export default function UnitHeadFinanceFiscalYearsPage() {
     setLoading(false)
   }, [])
 
-  useEffect(() => { fetch() }, [fetch])
+  useEffect(() => {
+    let active = true
+    getFiscalYears(
+      { page: 1, limit: 50, sortBy: "startDate", sortOrder: "desc" },
+      { _id: 1, name: 1, startDate: 1, endDate: 1, isActive: 1, status: 1 },
+    ).then((result) => {
+      if (!active) return
+      if (result.success) setItems(result.body || [])
+      setLoading(false)
+    })
+    return () => { active = false }
+  }, [])
 
   const handleAdd = async (values: AddFormData) => {
     setSaving(true)
@@ -129,9 +151,22 @@ export default function UnitHeadFinanceFiscalYearsPage() {
   const canClose = (item: FiscalYearItem) =>
     item.status !== "closed" && item.isActive !== false
 
+  const filtered = useMemo(() => {
+    const q = search.trim()
+    return items.filter((item) => {
+      if (statusFilter && item.status !== statusFilter) return false
+      if (q && !(item.name || "").toLowerCase().includes(q.toLowerCase())) return false
+      return true
+    })
+  }, [items, search, statusFilter])
+
+  const hasFilters = Boolean(search.trim() || statusFilter)
+  const openCount = items.filter((i) => i.status === "open" || i.status === "active").length
+  const closedCount = items.filter((i) => i.status === "closed").length
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <PageHeader title="سال‌های مالی" description="مدیریت سال‌های مالی سازمان" />
         <Button variant="outline" size="sm" className="gap-2" onClick={() => setShowAdd(true)}>
           <Plus className="size-4" />
@@ -139,58 +174,104 @@ export default function UnitHeadFinanceFiscalYearsPage() {
         </Button>
       </div>
 
+      {/* 1. KPI cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:gap-5">
+        <StatCard label="کل سال‌های مالی" value={items.length} icon={Calendar} iconColor="text-violet-400" iconBg="bg-violet-400/10" />
+        <StatCard label="باز / فعال" value={openCount} icon={Calendar} iconColor="text-emerald-400" iconBg="bg-emerald-400/10" />
+        <StatCard label="بسته شده" value={closedCount} icon={Lock} iconColor="text-fog" iconBg="bg-white/[0.03]" />
+      </div>
+
+      {/* 2. Filter bar */}
+      <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">
+        <SearchField
+          value={search}
+          onChange={setSearch}
+          placeholder="جستجو در نام سال مالی…"
+          ariaLabel="جستجو در سال‌های مالی"
+          className="w-full lg:min-w-64 lg:max-w-md lg:flex-1"
+        />
+        <div className="flex flex-wrap items-stretch gap-2.5">
+          <FilterSelect
+            icon={ArrowDownUp}
+            placeholder="وضعیت"
+            ariaLabel="فیلتر وضعیت سال مالی"
+            value={statusFilter}
+            onValueChange={(v) => setStatusFilter(v || "")}
+            options={statusOptions}
+          />
+          {hasFilters && (
+            <Button
+              variant="ghost"
+              onClick={() => { setSearch(""); setStatusFilter("") }}
+              className="h-11 gap-2 rounded-sm px-4 text-body-sm text-moonlight"
+            >
+              <RotateCcw className="size-5" strokeWidth={2} />
+              پاک کردن فیلترها
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* 3. Rich cards */}
       {loading ? (
-        <div className="flex justify-center py-12">
+        <div className="glass-card rounded-xl py-12 flex justify-center">
           <Loader2 className="size-6 animate-spin text-moonlight" />
         </div>
-      ) : items.length === 0 ? (
-        <Card variant="glass">
-          <CardContent className="py-12">
-            <EmptyState icon={Calendar} title="سال مالی یافت نشد" description="هنوز هیچ سال مالی ثبت نشده است." />
-          </CardContent>
-        </Card>
+      ) : filtered.length === 0 ? (
+        <div className="glass-card rounded-xl py-12">
+          <EmptyState
+            icon={hasFilters ? Search : Calendar}
+            title={hasFilters ? "سال مالی‌ای یافت نشد" : "سال مالی یافت نشد"}
+            description={hasFilters ? "با تغییر جستجو یا فیلتر، سال مالی موردنظر را پیدا کنید." : "هنوز هیچ سال مالی ثبت نشده است."}
+            action={
+              hasFilters ? (
+                <Button variant="ghost" className="gap-2 px-4" onClick={() => { setSearch(""); setStatusFilter("") }}>
+                  پاک کردن فیلترها
+                </Button>
+              ) : undefined
+            }
+          />
+        </div>
       ) : (
         <div className="grid gap-4">
-          {items.map((item) => (
-            <Card key={item._id} variant="glass">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-violet-500/10 ring-1 ring-inset ring-violet-500/15">
-                      <Calendar className="size-5 text-violet-400" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-sm font-medium text-frost-link">
-                        {item.name || "—"}
-                      </CardTitle>
-                      <div className="flex items-center gap-2 mt-1">
-                        {item.startDate && (
-                          <span className="text-xs text-fog/50">
-                            از {new Date(item.startDate).toLocaleDateString("fa-IR")}
-                          </span>
-                        )}
-                        {item.endDate && (
-                          <span className="text-xs text-fog/50">
-                            تا {new Date(item.endDate).toLocaleDateString("fa-IR")}
-                          </span>
-                        )}
-                      </div>
-                    </div>
+          {filtered.map((item) => (
+            <div key={item._id} className="glass-card glass-card-hover-active rounded-2xl p-5 transition-all duration-200">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 ring-1 ring-inset ring-violet-500/15">
+                    <Calendar className="size-5 text-violet-400" />
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="outline" className={`text-[11px] px-2 py-0.5 font-medium ${statusColor[item.status || ""] || ""}`}>
-                      {statusLabel[item.status || ""] || item.status || "—"}
-                    </Badge>
-                    {canClose(item) && (
-                      <Button variant="outline" size="sm" className="gap-1.5 text-amber-400 border-amber-400/30 hover:bg-amber-400/10" onClick={() => setClosingId(item._id)}>
-                        <Lock className="size-3.5" />
-                        بستن
-                      </Button>
-                    )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-moonlight leading-6">
+                      {item.name || "—"}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      {item.startDate && (
+                        <span className="text-xs text-fog/50">
+                          از {new Date(item.startDate).toLocaleDateString("fa-IR")}
+                        </span>
+                      )}
+                      {item.endDate && (
+                        <span className="text-xs text-fog/50">
+                          تا {new Date(item.endDate).toLocaleDateString("fa-IR")}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </CardHeader>
-            </Card>
+                <div className="flex items-center gap-3 shrink-0">
+                  <Badge variant="outline" className={`text-[11px] px-2 py-0.5 font-medium ${statusColor[item.status || ""] || ""}`}>
+                    {statusLabel[item.status || ""] || item.status || "—"}
+                  </Badge>
+                  {canClose(item) && (
+                    <Button variant="outline" size="sm" className="gap-1.5 text-amber-400 border-amber-400/30 hover:bg-amber-400/10" onClick={() => setClosingId(item._id)}>
+                      <Lock className="size-3.5" />
+                      بستن
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       )}

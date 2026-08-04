@@ -1,13 +1,15 @@
 import Link from "next/link"
-import { ArrowRight, Warehouse } from "lucide-react"
+import { ArrowRight, Warehouse, ScrollText, Activity } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
 import { Card, CardContent } from "@/components/ui/card"
+import { NavCard } from "@/components/dashboard/nav-card"
 import { cookies } from "next/headers"
 import { gets as getInventories } from "@/app/actions/inventory/gets"
 import { getWarehouseInventory } from "@/app/actions/inventory/getWarehouseInventory"
 import { getMe } from "@/app/actions/user/getMe"
 import { get as getUnit } from "@/app/actions/unit/get"
 import { InventoryClient } from "./inventory-client"
+import type { Inventory, InventoryCounts } from "./inventory-client"
 
 export default async function UnitHeadInventoryPage() {
   const cookieStore = await cookies()
@@ -50,7 +52,7 @@ export default async function UnitHeadInventoryPage() {
     wareType: { _id: 1, name: 1 },
   } as const
 
-  let items: any[] = []
+  let items: Inventory[] = []
 
   if (isWarehouse) {
     const result = await getWarehouseInventory(
@@ -58,7 +60,7 @@ export default async function UnitHeadInventoryPage() {
       projection,
     )
     if (result.success && result.body) {
-      const body = result.body as any
+      const body = result.body as { centralWarehouse?: { items?: Inventory[] }; unitWarehouses?: { items?: Inventory[] } }
       const central = body.centralWarehouse?.items || []
       const units = body.unitWarehouses?.items || []
       items = [...central, ...units]
@@ -71,6 +73,19 @@ export default async function UnitHeadInventoryPage() {
     if (result.success) {
       items = result.body || []
     }
+  }
+
+  let lowStock = 0
+  let totalQuantity = 0
+  for (const it of items) {
+    if (it.quantity != null) totalQuantity += it.quantity
+    if (it.minQuantity != null && it.quantity != null && it.quantity < it.minQuantity) lowStock++
+  }
+
+  const counts: InventoryCounts = {
+    total: items.length,
+    lowStock,
+    totalQuantity,
   }
 
   if (items.length === 0) {
@@ -100,8 +115,40 @@ export default async function UnitHeadInventoryPage() {
         <ArrowRight className="size-4" />
         بازگشت به داشبورد
       </Link>
-      <PageHeader title="موجودی انبار" description="مشاهده موجودی کالا در واحد شما" />
-      <InventoryClient items={items} isWarehouseGrouped={isWarehouse} userUnitId={userUnitId} />
+      <PageHeader
+        title="موجودی انبار"
+        description="مشاهده موجودی کالا در واحد شما — مقدار، حداقل و حداکثر، انبار و موقعیت هر قلم"
+      />
+
+      <section className="space-y-4" aria-label="دسترسی سریع">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-5">
+          <NavCard
+            href="/unit-head/consumption"
+            title="مصرف کالا"
+            description="ثبت و مشاهده مصرف کالا"
+            icon={ScrollText}
+            iconColor="text-amber-400"
+            iconBg="bg-amber-400/10"
+            footerLabel="رفتن به مصرف کالا"
+          />
+          <NavCard
+            href="/unit-head/stock-movements"
+            title="گردش کالا"
+            description="تاریخچه جابه‌جایی کالا"
+            icon={Activity}
+            iconColor="text-sky-400"
+            iconBg="bg-sky-400/10"
+            footerLabel="رفتن به گردش کالا"
+          />
+        </div>
+      </section>
+
+      <InventoryClient
+        items={items}
+        counts={counts}
+        isWarehouseGrouped={isWarehouse}
+        userUnitId={userUnitId}
+      />
     </div>
   )
 }

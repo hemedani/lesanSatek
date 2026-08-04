@@ -1,7 +1,17 @@
 import Link from "next/link"
-import { Calculator, Receipt, FileSpreadsheet, Wallet, TrendingDown, Calendar, Landmark } from "lucide-react"
+import {
+  ArrowRight,
+  Calculator,
+  Receipt,
+  FileSpreadsheet,
+  TrendingDown,
+  Calendar,
+  Landmark,
+} from "lucide-react"
+import { PageHeader } from "@/components/ui/page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { StatCard } from "@/components/dashboard/stat-card"
+import { NavCard } from "@/components/dashboard/nav-card"
 import { dashboardStatistic } from "@/app/actions/user/dashboardStatistic"
 
 export default async function UnitHeadFinanceDashboard() {
@@ -24,173 +34,125 @@ export default async function UnitHeadFinanceDashboard() {
   const totalSpent = finance?.totalSpent ?? 0
   const totalRemaining = finance?.totalRemaining ?? 0
 
-  const stats = [
-    {
-      label: "بودجه کل",
-      value: `${totalAllocated.toLocaleString("fa-IR")} ریال`,
-      icon: Landmark,
-      color: "text-electric-iris",
-      bg: "bg-electric-iris/10",
-    },
-    {
-      label: "مصرف شده",
-      value: `${totalSpent.toLocaleString("fa-IR")} ریال`,
-      icon: TrendingDown,
-      color: "text-amber-400",
-      bg: "bg-amber-400/10",
-    },
-    {
-      label: "باقی‌مانده",
-      value: `${totalRemaining.toLocaleString("fa-IR")} ریال`,
-      icon: Calculator,
-      color: totalRemaining > 0 ? "text-emerald-400" : "text-ember",
-      bg: "bg-emerald-400/10",
-    },
-    {
-      label: "پرداخت‌های در انتظار",
-      value: paymentOrders?.sent_to_finance ?? 0,
-      icon: Receipt,
-      color: "text-amber-400",
-      bg: "bg-amber-400/10",
-    },
-  ]
-
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-xl font-semibold text-glacier">داشبورد مالی</h1>
-        <p className="text-sm text-fog mt-1">خلاصه وضعیت بودجه و پرداخت‌ها</p>
+    <div className="space-y-6">
+      <Link
+        href="/unit-head"
+        className="inline-flex items-center gap-1.5 rounded-sm text-body-sm text-fog transition-colors hover:text-glacier focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+      >
+        <ArrowRight className="size-4" />
+        بازگشت به داشبورد
+      </Link>
+
+      <PageHeader
+        title="داشبورد مالی"
+        description="خلاصه وضعیت بودجه و پرداخت‌ها در واحد شما"
+      />
+
+      {/* 1. Summary stats */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5">
+        <StatCard
+          label="بودجه کل"
+          value={`${totalAllocated.toLocaleString("fa-IR")} ریال`}
+          icon={Landmark}
+          iconColor="text-electric-iris"
+          iconBg="bg-electric-iris/10"
+        />
+        <StatCard
+          label="مصرف شده"
+          value={`${totalSpent.toLocaleString("fa-IR")} ریال`}
+          icon={TrendingDown}
+          iconColor="text-amber-400"
+          iconBg="bg-amber-400/10"
+        />
+        <StatCard
+          label="باقی‌مانده"
+          value={`${totalRemaining.toLocaleString("fa-IR")} ریال`}
+          icon={Calculator}
+          iconColor={totalRemaining > 0 ? "text-emerald-400" : "text-ember"}
+          iconBg={totalRemaining > 0 ? "bg-emerald-400/10" : "bg-ember/10"}
+        />
+        <StatCard
+          label="پرداخت‌های در انتظار"
+          value={paymentOrders?.sent_to_finance ?? 0}
+          icon={Receipt}
+          iconColor="text-amber-400"
+          iconBg="bg-amber-400/10"
+        />
       </div>
 
-      {/* Summary stats */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon
-          return (
-            <Card key={stat.label} variant="glass">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <div className={`flex size-10 items-center justify-center rounded-lg ${stat.bg} ring-1 ring-inset ring-white/[0.06]`}>
-                    <Icon className={`size-5 ${stat.color}`} />
-                  </div>
-                  <CardTitle className="text-sm font-medium text-fog leading-5">{stat.label}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-semibold text-glacier leading-8">{stat.value}</p>
-                <div className="mt-4 h-px bg-gradient-to-r from-transparent via-frost-link/15 to-transparent" />
-              </CardContent>
-            </Card>
-          )
-        })}
+      {/* 2. Navigation cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+        <NavCard
+          href="/unit-head/finance/budget-lines"
+          title="ردیف‌های بودجه"
+          description="مشاهده و مدیریت ردیف‌های بودجه"
+          icon={Calculator}
+          iconColor="text-electric-iris"
+          iconBg="bg-electric-iris/10"
+          value={finance?.budgetLineCount ?? 0}
+          footerLabel="رفتن به ردیف‌های بودجه"
+        />
+        <NavCard
+          href="/unit-head/finance/payment-orders"
+          title="دستورات پرداخت"
+          description="پرداخت‌های ارسال شده به واحد مالی"
+          icon={Receipt}
+          iconColor="text-amber-400"
+          iconBg="bg-amber-400/10"
+          value={paymentOrders?.sent_to_finance ?? 0}
+          footerLabel="رفتن به دستورات پرداخت"
+        />
+        <NavCard
+          href="/unit-head/finance/budget-reports"
+          title="گزارش بودجه"
+          description="گزارش‌های تحلیلی بودجه"
+          icon={FileSpreadsheet}
+          iconColor="text-frost-link"
+          iconBg="bg-frost-link/10"
+          footerLabel="رفتن به گزارش بودجه"
+        />
+        {fiscalYear?.active ? (
+          <NavCard
+            href="/unit-head/finance/fiscal-years"
+            title="سال مالی جاری"
+            description={`${new Date(fiscalYear.active.startDate).toLocaleDateString("fa-IR")} — ${new Date(fiscalYear.active.endDate).toLocaleDateString("fa-IR")}`}
+            icon={Calendar}
+            iconColor="text-violet-400"
+            iconBg="bg-violet-500/10"
+            value={fiscalYear.count ?? 0}
+            footerLabel={`${fiscalYear.active.name || "سال مالی"} — ${fiscalYear.count ?? 0} سال`}
+          />
+        ) : null}
       </div>
 
-      {/* Budget lines and payment orders cards */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {fiscalYear?.active && (
-          <Link href="/unit-head/finance/fiscal-years">
-            <Card variant="glass" className="cursor-pointer hover:border-frost-link/30 transition-colors h-full">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-violet-500/10 ring-1 ring-inset ring-violet-500/15">
-                    <Calendar className="size-5 text-violet-400" />
-                  </div>
-                  <CardTitle className="text-sm font-medium text-frost-link leading-5">سال مالی جاری</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm font-medium text-glacier">{fiscalYear.active.name}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-fog/50">
-                    {new Date(fiscalYear.active.startDate).toLocaleDateString("fa-IR")} — {new Date(fiscalYear.active.endDate).toLocaleDateString("fa-IR")}
-                  </span>
-                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-emerald-500/10 text-emerald-400 border-emerald-500/20">فعال</Badge>
-                </div>
-                <p className="text-xs text-fog/50 mt-2">{fiscalYear.count} سال مالی</p>
-              </CardContent>
-            </Card>
-          </Link>
-        )}
-
-        <Link href="/unit-head/finance/budget-lines">
-          <Card variant="glass" className="cursor-pointer hover:border-frost-link/30 transition-colors">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-electric-iris/10 ring-1 ring-inset ring-electric-iris/15">
-                  <Calculator className="size-5 text-electric-iris" />
-                </div>
-                <CardTitle className="text-sm font-medium text-frost-link leading-5">
-                  ردیف‌های بودجه
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-fog">مشاهده و مدیریت ردیف‌های بودجه</p>
-              <p className="text-xs text-fog/50 mt-1">{finance?.budgetLineCount ?? 0} ردیف</p>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Link href="/unit-head/finance/payment-orders">
-          <Card variant="glass" className="cursor-pointer hover:border-frost-link/30 transition-colors">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-amber-400/10 ring-1 ring-inset ring-amber-400/15">
-                  <Receipt className="size-5 text-amber-400" />
-                </div>
-                <CardTitle className="text-sm font-medium text-frost-link leading-5">
-                  دستورات پرداخت
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-fog">پرداخت‌های ارسال شده به واحد مالی</p>
-              <p className="text-xs text-fog/50 mt-1">{paymentOrders?.sent_to_finance ?? 0} در انتظار</p>
-            </CardContent>
-          </Card>
-        </Link>
-
-        <Link href="/unit-head/finance/budget-reports">
-          <Card variant="glass" className="cursor-pointer hover:border-frost-link/30 transition-colors">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-frost-link/10 ring-1 ring-inset ring-frost-link/15">
-                  <FileSpreadsheet className="size-5 text-frost-link" />
-                </div>
-                <CardTitle className="text-sm font-medium text-frost-link leading-5">
-                  گزارش بودجه
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-fog">گزارش‌های تحلیلی بودجه</p>
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
-
-      {/* Payment orders breakdown */}
+      {/* 3. Payment orders breakdown */}
       {paymentOrders && (
         <Card variant="glass">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-frost-link">وضعیت پرداخت‌ها</CardTitle>
+            <div className="flex items-center gap-2.5">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-amber-400/10 ring-1 ring-inset ring-amber-400/15">
+                <Receipt className="size-4 text-amber-400" />
+              </div>
+              <CardTitle className="text-sm font-medium text-moonlight">وضعیت پرداخت‌ها</CardTitle>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-4 gap-4 text-center">
-              <div>
-                <p className="text-xl font-semibold text-fog">{paymentOrders.draft}</p>
+            <div className="grid grid-cols-2 gap-4 text-center sm:grid-cols-4">
+              <div className="rounded-xl border border-steel-border/15 bg-[#05060f]/40 p-4">
+                <p className="text-xl font-semibold text-fog tabular-nums" dir="ltr">{paymentOrders.draft.toLocaleString("fa-IR")}</p>
                 <p className="text-xs text-fog/50 mt-1">پیش‌نویس</p>
               </div>
-              <div>
-                <p className="text-xl font-semibold text-sky-400">{paymentOrders.sent_to_finance}</p>
+              <div className="rounded-xl border border-steel-border/15 bg-[#05060f]/40 p-4">
+                <p className="text-xl font-semibold text-sky-400 tabular-nums" dir="ltr">{paymentOrders.sent_to_finance.toLocaleString("fa-IR")}</p>
                 <p className="text-xs text-fog/50 mt-1">ارجاع شده</p>
               </div>
-              <div>
-                <p className="text-xl font-semibold text-emerald-400">{paymentOrders.paid}</p>
+              <div className="rounded-xl border border-steel-border/15 bg-[#05060f]/40 p-4">
+                <p className="text-xl font-semibold text-emerald-400 tabular-nums" dir="ltr">{paymentOrders.paid.toLocaleString("fa-IR")}</p>
                 <p className="text-xs text-fog/50 mt-1">پرداخت شده</p>
               </div>
-              <div>
-                <p className="text-xl font-semibold text-rose-400">{paymentOrders.cancelled}</p>
+              <div className="rounded-xl border border-steel-border/15 bg-[#05060f]/40 p-4">
+                <p className="text-xl font-semibold text-rose-400 tabular-nums" dir="ltr">{paymentOrders.cancelled.toLocaleString("fa-IR")}</p>
                 <p className="text-xs text-fog/50 mt-1">لغو شده</p>
               </div>
             </div>

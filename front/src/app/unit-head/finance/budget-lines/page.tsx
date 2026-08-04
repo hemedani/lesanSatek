@@ -1,9 +1,10 @@
 import Link from "next/link"
-import { Calculator, Plus } from "lucide-react"
+import { Calculator, Plus, Landmark, TrendingDown, Wallet } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Card as GlassCard } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/ui/page-header"
+import { StatCard } from "@/components/dashboard/stat-card"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Pagination } from "@/components/ui/pagination"
 import { gets as getBudgetLines } from "@/app/actions/budgetLine/gets"
@@ -56,9 +57,18 @@ export default async function UnitHeadFinanceBudgetLinesPage({
   const prevPageUrl = page > 1 ? `/unit-head/finance/budget-lines?page=${page - 1}` : ""
   const nextPageUrl = items.length >= limit ? `/unit-head/finance/budget-lines?page=${page + 1}` : ""
 
+  let totalAllocated = 0
+  let totalSpent = 0
+  let totalRemaining = 0
+  for (const it of items) {
+    if (it.totalAllocated != null) totalAllocated += it.totalAllocated
+    if (it.totalSpent != null) totalSpent += it.totalSpent
+    if (it.remainingBudget != null) totalRemaining += it.remainingBudget
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <PageHeader title="ردیف‌های بودجه" description="مدیریت ردیف‌های بودجه سازمان" />
         <Link href="/unit-head/finance/budget-lines/new">
           <Button variant="outline" size="sm" className="gap-2">
@@ -66,6 +76,38 @@ export default async function UnitHeadFinanceBudgetLinesPage({
             ردیف جدید
           </Button>
         </Link>
+      </div>
+
+      {/* 1. KPI cards */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5">
+        <StatCard
+          label="تعداد ردیف‌ها"
+          value={items.length}
+          icon={Calculator}
+          iconColor="text-electric-iris"
+          iconBg="bg-electric-iris/10"
+        />
+        <StatCard
+          label="مجموع تخصیص"
+          value={`${totalAllocated.toLocaleString("fa-IR")} ریال`}
+          icon={Landmark}
+          iconColor="text-frost-link"
+          iconBg="bg-frost-link/10"
+        />
+        <StatCard
+          label="مجموع مصرف"
+          value={`${totalSpent.toLocaleString("fa-IR")} ریال`}
+          icon={TrendingDown}
+          iconColor="text-amber-400"
+          iconBg="bg-amber-400/10"
+        />
+        <StatCard
+          label="باقی‌مانده کل"
+          value={`${totalRemaining.toLocaleString("fa-IR")} ریال`}
+          icon={Wallet}
+          iconColor={totalRemaining > 0 ? "text-emerald-400" : "text-ember"}
+          iconBg={totalRemaining > 0 ? "bg-emerald-400/10" : "bg-ember/10"}
+        />
       </div>
 
       {items.length === 0 ? (

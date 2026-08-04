@@ -1,13 +1,36 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Warehouse, ArrowRightLeft, Building2, ChevronDown, ChevronUp, Package, Barcode, MapPin, CalendarDays, Factory, FolderTree, Box } from "lucide-react"
+import Link from "next/link"
+import {
+  Warehouse,
+  ArrowRightLeft,
+  Building2,
+  ChevronDown,
+  ChevronUp,
+  Package,
+  Boxes,
+  AlertTriangle,
+  Barcode,
+  MapPin,
+  CalendarDays,
+  Factory,
+  FolderTree,
+  Box,
+  ArrowDownUp,
+  RotateCcw,
+  ArrowLeft,
+} from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { StatCard } from "@/components/dashboard/stat-card"
+import { SearchField } from "@/components/ui/search-field"
+import { FilterSelect } from "@/components/ui/filter-select"
+import type { FilterOption } from "@/components/ui/filter-select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { SearchSelect } from "@/components/form/form-search-select"
 import type { SearchSelectOption } from "@/components/form/form-search-select"
@@ -15,7 +38,7 @@ import { transferWithAudit } from "@/app/actions/inventory/transferWithAudit"
 import { gets as getUnits } from "@/app/actions/unit/gets"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
 
-interface Inventory {
+export interface Inventory {
   _id: string
   quantity?: number
   minQuantity?: number
@@ -34,8 +57,15 @@ interface Inventory {
   wareType?: { _id: string; name?: string }
 }
 
+export interface InventoryCounts {
+  total: number
+  lowStock: number
+  totalQuantity: number
+}
+
 interface InventoryClientProps {
   items: Inventory[]
+  counts: InventoryCounts
   isWarehouseGrouped?: boolean
   userUnitId?: string
 }
@@ -46,175 +76,189 @@ const unitFetcher = async (q?: string): Promise<SearchSelectOption[]> => {
   return result.body.map((s: { _id: string; name?: string }) => ({ _id: s._id, name: s.name || "" }))
 }
 
+const sortOptions: FilterOption[] = [
+  { value: "createdAt-desc", label: "جدیدترین" },
+  { value: "createdAt-asc", label: "قدیمی‌ترین" },
+  { value: "quantity-desc", label: "بیشترین موجودی" },
+  { value: "quantity-asc", label: "کمترین موجودی" },
+]
+
+type SortKey = "createdAt-desc" | "createdAt-asc" | "quantity-desc" | "quantity-asc"
+
+function isSortKey(value: string): value is SortKey {
+  return sortOptions.some((o) => o.value === value)
+}
+
+function matchesSearch(item: Inventory, q: string): boolean {
+  if (!q) return true
+  const haystack = [
+    item.ware?.name,
+    item.ware?.enName,
+    item.ware?.brand,
+    item.wareModel?.name,
+    item.wareType?.name,
+    item.wareClass?.name,
+    item.wareGroup?.name,
+    item.unit?.name,
+    item.warehouseUnit?.name,
+    item.batchNo,
+    item.location,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase()
+  return haystack.includes(q.toLowerCase())
+}
+
 function InvCard({ item, userUnitId }: { item: Inventory; userUnitId?: string }) {
   const isOwn = userUnitId ? item.unit?._id === userUnitId : false
   const isLowStock = item.minQuantity != null && item.quantity != null && item.quantity < item.minQuantity
 
   return (
-    <div className={cn(
-      "rounded-xl overflow-hidden transition-all",
-      isOwn
-        ? "glass-card glass-card-hover-active border-electric-iris/20"
-        : "glass-card glass-card-hover-active border-steel-border/15",
-    )}>
-      {/* Header */}
-      <div className={cn(
-        "flex items-center gap-3 p-4 border-b",
-        isOwn ? "border-electric-iris/10" : "border-white/[0.04]",
-        isLowStock && "bg-ember/[0.02]",
-      )}>
-        <div className={cn(
-          "size-10 rounded-xl flex items-center justify-center shrink-0 ring-1 ring-inset",
-          isOwn
-            ? "bg-electric-iris/10 ring-electric-iris/15"
-            : "bg-white/[0.03] ring-steel-border/15",
-        )}>
-          {isOwn ? (
-            <Box className="size-5 text-electric-iris" />
-          ) : (
-            <Building2 className="size-5 text-fog/50" />
-          )}
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold text-moonlight truncate leading-5">
-              {item.ware?.name || item.wareModel?.name || "—"}
-            </p>
-            {isLowStock && (
-              <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-ember/10 text-ember border-ember/20 shrink-0">
-                کم‌موجودی
-              </Badge>
-            )}
-          </div>
-          <div className="flex items-center gap-2 mt-0.5">
-            {item.ware?.brand && (
-              <span className={cn(
-                "text-[10px] flex items-center gap-1",
-                isOwn ? "text-electric-iris/60" : "text-fog/50",
-              )}>
-                <Factory className="size-3" />
-                {item.ware.brand}
-              </span>
-            )}
-            {item.wareModel?.name && (
-              <span className="text-[10px] text-fog/40">مدل: {item.wareModel.name}</span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Quantity row */}
-      <div className={cn(
-        "grid grid-cols-3 gap-px",
-        isOwn ? "bg-electric-iris/[0.06]" : "bg-white/[0.04]",
-      )}>
-        <div className={cn(
-          "p-3 text-center",
-          isOwn ? "bg-[#05060f]/60" : "bg-[#05060f]/60",
-        )}>
-          <p className="text-[10px] text-fog/50">موجودی</p>
-          <p className={cn(
-            "text-lg font-bold font-mono leading-7",
-            isLowStock ? "text-ember" : "text-glacier",
-          )} dir="ltr">
-            {item.quantity != null ? item.quantity.toLocaleString("fa-IR") : "—"}
-          </p>
-        </div>
-        <div className="p-3 text-center bg-[#05060f]/60">
-          <p className="text-[10px] text-fog/50">حداقل</p>
-          <p className="text-lg font-bold font-mono text-fog leading-7" dir="ltr">
-            {item.minQuantity != null ? item.minQuantity.toLocaleString("fa-IR") : "—"}
-          </p>
-        </div>
-        <div className="p-3 text-center bg-[#05060f]/60">
-          <p className="text-[10px] text-fog/50">حداکثر</p>
-          <p className="text-lg font-bold font-mono text-fog leading-7" dir="ltr">
-            {item.maxQuantity != null ? item.maxQuantity.toLocaleString("fa-IR") : "—"}
-          </p>
-        </div>
-      </div>
-
-      {/* Details */}
-      <div className="p-4 space-y-1">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-1">
-          <div className="flex items-center gap-2">
-            <Building2 className="size-3.5 text-fog/30 shrink-0" />
-            <div className="min-w-0">
-              <p className="text-[10px] text-fog/40">واحد مصرف‌کننده</p>
-              <p className={cn(
-                "text-xs truncate",
-                isOwn ? "text-electric-iris" : "text-moonlight",
-              )}>{item.unit?.name || "—"}</p>
+    <Link
+      href={`/unit-head/inventory/${item._id}`}
+      className="group block h-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-electric-iris/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    >
+      <div className="glass-card glass-card-hover-active flex h-full flex-col gap-4 rounded-2xl p-5">
+        {/* Top section */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-start gap-3">
+            <div
+              className={cn(
+                "flex size-11 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset",
+                isOwn
+                  ? "bg-electric-iris/10 ring-electric-iris/15"
+                  : isLowStock
+                    ? "bg-ember/10 ring-ember/15"
+                    : "bg-white/[0.03] ring-steel-border/15",
+              )}
+            >
+              <Box className={cn("size-5", isOwn ? "text-electric-iris" : isLowStock ? "text-ember" : "text-fog")} />
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Warehouse className="size-3.5 text-fog/30 shrink-0" />
-            <div className="min-w-0">
-              <p className="text-[10px] text-fog/40">انبار</p>
-              <p className="text-xs text-moonlight truncate">{item.warehouseUnit?.name || "—"}</p>
-            </div>
-          </div>
-          {item.batchNo && (
-            <div className="flex items-center gap-2">
-              <Barcode className="size-3.5 text-fog/30 shrink-0" />
-              <div className="min-w-0">
-                <p className="text-[10px] text-fog/40">سریال</p>
-                <p className="text-xs text-moonlight font-mono" dir="ltr">{item.batchNo}</p>
+            <div className="min-w-0 space-y-1.5">
+              <p className="truncate text-base font-semibold text-moonlight transition-colors group-hover:text-glacier">
+                {item.ware?.name || item.wareModel?.name || "—"}
+              </p>
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                {item.ware?.brand && (
+                  <span className="inline-flex items-center gap-1 text-xs text-fog/70">
+                    <Factory className="size-3.5" />
+                    {item.ware.brand}
+                  </span>
+                )}
+                {item.wareModel?.name && (
+                  <span className="inline-flex items-center gap-1 text-xs text-fog/70">مدل: {item.wareModel.name}</span>
+                )}
               </div>
             </div>
+          </div>
+          {isLowStock && (
+            <Badge variant="outline" className="shrink-0 rounded-full bg-ember/10 px-2.5 py-0.5 text-[11px] font-medium text-ember border-ember/20">
+              کم‌موجودی
+            </Badge>
+          )}
+        </div>
+
+        {/* Quantity row */}
+        <div
+          className={cn(
+            "grid grid-cols-3 gap-px overflow-hidden rounded-xl bg-white/[0.06] ring-1 ring-inset ring-white/[0.06]",
+            isLowStock && "bg-ember/10",
+          )}
+        >
+          <div className="bg-[#05060f]/60 p-3 text-center">
+            <p className="text-[11px] text-fog/60">موجودی</p>
+            <p className={cn("mt-1 text-lg font-bold tabular-nums leading-7", isLowStock ? "text-ember" : "text-glacier")} dir="ltr">
+              {item.quantity != null ? item.quantity.toLocaleString("fa-IR") : "—"}
+            </p>
+          </div>
+          <div className="bg-[#05060f]/60 p-3 text-center">
+            <p className="text-[11px] text-fog/60">حداقل</p>
+            <p className="mt-1 text-lg font-semibold tabular-nums text-fog leading-7" dir="ltr">
+              {item.minQuantity != null ? item.minQuantity.toLocaleString("fa-IR") : "—"}
+            </p>
+          </div>
+          <div className="bg-[#05060f]/60 p-3 text-center">
+            <p className="text-[11px] text-fog/60">حداکثر</p>
+            <p className="mt-1 text-lg font-semibold tabular-nums text-fog leading-7" dir="ltr">
+              {item.maxQuantity != null ? item.maxQuantity.toLocaleString("fa-IR") : "—"}
+            </p>
+          </div>
+        </div>
+
+        {/* Bottom metadata section */}
+        <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-steel-border/15 pt-3 text-body-sm text-fog">
+          {item.unit?.name && (
+            <span className="inline-flex items-center gap-1.5">
+              <Building2 className="size-4 text-fog/60" />
+              {item.unit.name}
+            </span>
+          )}
+          {item.warehouseUnit?.name && (
+            <span className="inline-flex items-center gap-1.5">
+              <Warehouse className="size-4 text-fog/60" />
+              {item.warehouseUnit.name}
+            </span>
           )}
           {item.location && (
-            <div className="flex items-center gap-2">
-              <MapPin className="size-3.5 text-fog/30 shrink-0" />
-              <div className="min-w-0">
-                <p className="text-[10px] text-fog/40">موقعیت</p>
-                <p className="text-xs text-moonlight truncate">{item.location}</p>
-              </div>
-            </div>
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="size-4 text-fog/60" />
+              {item.location}
+            </span>
           )}
-          {item.expirationDate && (
-            <div className="flex items-center gap-2">
-              <CalendarDays className="size-3.5 text-fog/30 shrink-0" />
-              <div className="min-w-0">
-                <p className="text-[10px] text-fog/40">تاریخ انقضا</p>
-                <p className="text-xs text-moonlight">{new Date(item.expirationDate).toLocaleDateString("fa-IR")}</p>
-              </div>
-            </div>
+          {item.batchNo && (
+            <span className="inline-flex items-center gap-1.5 font-mono" dir="ltr">
+              <Barcode className="size-4 text-fog/60" />
+              {item.batchNo}
+            </span>
           )}
-          {item.createdAt && (
-            <div className="flex items-center gap-2">
-              <CalendarDays className="size-3.5 text-fog/30 shrink-0" />
-              <div className="min-w-0">
-                <p className="text-[10px] text-fog/40">تاریخ ثبت</p>
-                <p className="text-xs text-moonlight">{new Date(item.createdAt).toLocaleDateString("fa-IR")}</p>
-              </div>
-            </div>
-          )}
+        </div>
+
+        {/* Footer row */}
+        <div className="flex items-center justify-between gap-3 border-t border-steel-border/15 pt-3">
+          <div className="flex flex-wrap items-center gap-3">
+            {item.expirationDate && (
+              <span className="inline-flex items-center gap-1.5 text-body-sm text-fog/70">
+                <CalendarDays className="size-4 text-fog/60" />
+                انقضا: {new Date(item.expirationDate).toLocaleDateString("fa-IR")}
+              </span>
+            )}
+            {item.createdAt && (
+              <span className="inline-flex items-center gap-1.5 text-body-sm text-fog/70">
+                <CalendarDays className="size-4 text-fog/60" />
+                {new Date(item.createdAt).toLocaleDateString("fa-IR")}
+              </span>
+            )}
+          </div>
+          <span className="inline-flex items-center gap-1.5 text-body-sm text-frost-link opacity-0 transition-opacity group-hover:opacity-100">
+            جزئیات
+            <ArrowLeft className="size-4" />
+          </span>
         </div>
 
         {/* Category badges */}
         {(item.wareType?.name || item.wareClass?.name || item.wareGroup?.name) && (
-          <div className="flex flex-wrap items-center gap-1.5 pt-2 mt-2 border-t border-white/[0.04]">
-            <FolderTree className="size-3 text-fog/30" />
+          <div className="flex flex-wrap items-center gap-1.5 border-t border-steel-border/15 pt-3">
+            <FolderTree className="size-3.5 text-fog/40" />
             {item.wareType?.name && (
-              <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-frost-link/5 text-fog border-white/[0.06]">
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-frost-link/5 text-fog border-white/[0.06]">
                 {item.wareType.name}
               </Badge>
             )}
             {item.wareClass?.name && (
-              <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-frost-link/5 text-fog border-white/[0.06]">
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-frost-link/5 text-fog border-white/[0.06]">
                 {item.wareClass.name}
               </Badge>
             )}
             {item.wareGroup?.name && (
-              <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-frost-link/5 text-fog border-white/[0.06]">
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-frost-link/5 text-fog border-white/[0.06]">
                 {item.wareGroup.name}
               </Badge>
             )}
           </div>
         )}
       </div>
-    </div>
+    </Link>
   )
 }
 
@@ -224,7 +268,10 @@ function InvRow({ item, userUnitId, onTransfer }: { item: Inventory; userUnitId?
   const isLow = item.minQuantity != null && qty < item.minQuantity
 
   return (
-    <div className="flex items-center gap-4 px-5 py-3.5 border-b border-steel-border/10 last:border-b-0 transition-colors hover:bg-white/[0.02]">
+    <Link
+      href={`/unit-head/inventory/${item._id}`}
+      className="group flex items-center gap-4 px-5 py-3.5 border-b border-steel-border/10 last:border-b-0 transition-colors hover:bg-white/[0.02] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-electric-iris/40"
+    >
       <div className={cn(
         "size-8 rounded-lg flex items-center justify-center shrink-0 ring-1 ring-inset",
         isOwn
@@ -308,11 +355,16 @@ function InvRow({ item, userUnitId, onTransfer }: { item: Inventory; userUnitId?
         variant="ghost"
         size="icon-xs"
         className="text-emerald-400/60 hover:text-emerald-400 shrink-0"
-        onClick={() => onTransfer(item)}
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          onTransfer(item)
+        }}
+        aria-label={`انتقال ${item.ware?.name || item.wareModel?.name || "کالا"}`}
       >
         <ArrowRightLeft className="size-3.5" />
       </Button>
-    </div>
+    </Link>
   )
 }
 
@@ -389,20 +441,66 @@ function GroupSection({
   )
 }
 
-export function InventoryClient({ items, isWarehouseGrouped, userUnitId }: InventoryClientProps) {
+function EmptyInventoryState({ onReset, hasFilters }: { onReset: () => void; hasFilters: boolean }) {
+  return (
+    <Card variant="glass">
+      <CardContent className="py-12 text-center">
+        <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-white/[0.03] ring-1 ring-steel-border/15">
+          <Package className="size-6 text-fog/30" />
+        </div>
+        <p className="text-sm font-medium text-fog/50">{hasFilters ? "کالایی یافت نشد" : "موجودی‌ای ثبت نشده است"}</p>
+        <p className="text-xs text-fog/30 mt-1">
+          {hasFilters
+            ? "با تغییر جستجو یا مرتب‌سازی، کالای موردنظر را پیدا کنید."
+            : "هنوز هیچ موجودی برای واحد شما ثبت نشده است."}
+        </p>
+        {hasFilters && (
+          <Button variant="ghost" className="mt-4 gap-2 px-4" onClick={onReset}>
+            <RotateCcw className="size-4" />
+            پاک کردن فیلترها
+          </Button>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+export function InventoryClient({ items, counts, isWarehouseGrouped, userUnitId }: InventoryClientProps) {
   const router = useRouter()
+  const [search, setSearch] = useState("")
+  const [sort, setSort] = useState<SortKey>("createdAt-desc")
   const [transferTarget, setTransferTarget] = useState<Inventory | null>(null)
   const [toUnitId, setToUnitId] = useState("")
   const [transferQuantity, setTransferQuantity] = useState("")
   const [transferDescription, setTransferDescription] = useState("")
   const [transferring, setTransferring] = useState(false)
 
+  const filtered = useMemo(() => {
+    const q = search.trim()
+    const list = items.filter((i) => matchesSearch(i, q))
+    const sortAsc = sort.endsWith("-asc")
+    let sorted = list
+    if (sort.startsWith("createdAt")) {
+      sorted = [...list].sort((a, b) => (a.createdAt || "").localeCompare(b.createdAt || ""))
+    } else {
+      sorted = [...list].sort((a, b) => (a.quantity ?? 0) - (b.quantity ?? 0))
+    }
+    return sortAsc ? sorted : sorted.reverse()
+  }, [items, search, sort])
+
   const centralItems = isWarehouseGrouped && userUnitId
-    ? items.filter((i) => i.unit?._id === userUnitId)
-    : items
+    ? filtered.filter((i) => i.unit?._id === userUnitId)
+    : filtered
   const unitItems = isWarehouseGrouped && userUnitId
-    ? items.filter((i) => i.unit?._id !== userUnitId)
+    ? filtered.filter((i) => i.unit?._id !== userUnitId)
     : []
+
+  const hasFilters = Boolean(search.trim() || sort !== "createdAt-desc")
+
+  const handleReset = () => {
+    setSearch("")
+    setSort("createdAt-desc")
+  }
 
   const handleTransfer = (item: Inventory) => {
     setTransferTarget(item)
@@ -411,93 +509,135 @@ export function InventoryClient({ items, isWarehouseGrouped, userUnitId }: Inven
     setTransferDescription("")
   }
 
-  if (isWarehouseGrouped) {
-    return (
-      <div className="space-y-4">
-        <GroupSection
-          title="انبار مرکزی"
-          icon={Warehouse}
-          items={centralItems}
-          userUnitId={userUnitId}
-          accentColor="iris"
-          defaultExpanded
-          onTransfer={handleTransfer}
+  return (
+    <div className="space-y-6">
+      {/* 1. KPI cards */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-5">
+        <StatCard
+          label="کل اقلام موجودی"
+          value={counts.total}
+          icon={Package}
+          iconColor="text-electric-iris"
+          iconBg="bg-electric-iris/10"
         />
-
-        {unitItems.length > 0 && (
-          <GroupSection
-            title="سایر واحدها"
-            icon={Building2}
-            items={unitItems}
-            userUnitId={userUnitId}
-            accentColor="muted"
-            defaultExpanded={false}
-            onTransfer={handleTransfer}
-          />
-        )}
-
-        {centralItems.length === 0 && unitItems.length === 0 && (
-          <Card variant="glass">
-            <CardContent className="py-12 text-center">
-              <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-white/[0.03] ring-1 ring-steel-border/15">
-                <Package className="size-6 text-fog/30" />
-              </div>
-              <p className="text-sm font-medium text-fog/50">موجودی‌ای یافت نشد</p>
-              <p className="text-xs text-fog/30 mt-1">هنوز هیچ موجودی برای واحد شما ثبت نشده است.</p>
-            </CardContent>
-          </Card>
-        )}
-
-        <TransferDialog
-          transferTarget={transferTarget}
-          toUnitId={toUnitId}
-          setToUnitId={setToUnitId}
-          transferQuantity={transferQuantity}
-          setTransferQuantity={setTransferQuantity}
-          transferDescription={transferDescription}
-          setTransferDescription={setTransferDescription}
-          transferring={transferring}
-          setTransferring={setTransferring}
-          onClose={() => setTransferTarget(null)}
-          onSuccess={() => { setTransferTarget(null); router.refresh() }}
+        <StatCard
+          label="کم‌موجودی"
+          value={counts.lowStock}
+          icon={AlertTriangle}
+          iconColor="text-ember"
+          iconBg="bg-ember/10"
+          subtitle={counts.lowStock > 0 ? "نیازمند توجه" : undefined}
+        />
+        <StatCard
+          label="مجموع موجودی"
+          value={counts.totalQuantity}
+          icon={Boxes}
+          iconColor="text-glacier"
+          iconBg="bg-frost-link/10"
         />
       </div>
-    )
-  }
 
-  return (
-    <div className="space-y-4">
-      {items.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {items.map((item) => (
-            <InvCard key={item._id} item={item} userUnitId={userUnitId} />
-          ))}
+      {/* 2. Filter bar */}
+      <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">
+        <SearchField
+          value={search}
+          onChange={setSearch}
+          placeholder="جستجو در کالاها…"
+          ariaLabel="جستجو در موجودی انبار"
+          className="w-full lg:min-w-64 lg:max-w-md lg:flex-1"
+        />
+        <div className="flex flex-wrap items-stretch gap-2.5">
+          <FilterSelect
+            icon={ArrowDownUp}
+            placeholder="مرتب‌سازی"
+            ariaLabel="ترتیب نمایش موجودی"
+            value={sort}
+            onValueChange={(v) => setSort(isSortKey(v || "") ? v as SortKey : "createdAt-desc")}
+            options={sortOptions}
+          />
+          {hasFilters && (
+            <Button
+              variant="ghost"
+              onClick={handleReset}
+              className="h-11 gap-2 rounded-sm px-4 text-body-sm text-moonlight"
+            >
+              <RotateCcw className="size-5" strokeWidth={2} />
+              پاک کردن فیلترها
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* 3. Rich cards / grouped list */}
+      {isWarehouseGrouped ? (
+        <div className="space-y-4">
+          <GroupSection
+            title="انبار مرکزی"
+            icon={Warehouse}
+            items={centralItems}
+            userUnitId={userUnitId}
+            accentColor="iris"
+            defaultExpanded
+            onTransfer={handleTransfer}
+          />
+
+          {unitItems.length > 0 && (
+            <GroupSection
+              title="سایر واحدها"
+              icon={Building2}
+              items={unitItems}
+              userUnitId={userUnitId}
+              accentColor="muted"
+              defaultExpanded={false}
+              onTransfer={handleTransfer}
+            />
+          )}
+
+          {centralItems.length === 0 && unitItems.length === 0 && (
+            <EmptyInventoryState onReset={handleReset} hasFilters={hasFilters} />
+          )}
+
+          <TransferDialog
+            transferTarget={transferTarget}
+            toUnitId={toUnitId}
+            setToUnitId={setToUnitId}
+            transferQuantity={transferQuantity}
+            setTransferQuantity={setTransferQuantity}
+            transferDescription={transferDescription}
+            setTransferDescription={setTransferDescription}
+            transferring={transferring}
+            setTransferring={setTransferring}
+            onClose={() => setTransferTarget(null)}
+            onSuccess={() => { setTransferTarget(null); router.refresh() }}
+          />
         </div>
       ) : (
-        <Card variant="glass">
-          <CardContent className="py-12 text-center">
-            <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-white/[0.03] ring-1 ring-steel-border/15">
-              <Package className="size-6 text-fog/30" />
+        <div className="space-y-4">
+          {filtered.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-5">
+              {filtered.map((item) => (
+                <InvCard key={item._id} item={item} userUnitId={userUnitId} />
+              ))}
             </div>
-            <p className="text-sm font-medium text-fog/50">موجودی‌ای یافت نشد</p>
-            <p className="text-xs text-fog/30 mt-1">هنوز هیچ موجودی برای واحد شما ثبت نشده است.</p>
-          </CardContent>
-        </Card>
-      )}
+          ) : (
+            <EmptyInventoryState onReset={handleReset} hasFilters={hasFilters} />
+          )}
 
-      <TransferDialog
-        transferTarget={transferTarget}
-        toUnitId={toUnitId}
-        setToUnitId={setToUnitId}
-        transferQuantity={transferQuantity}
-        setTransferQuantity={setTransferQuantity}
-        transferDescription={transferDescription}
-        setTransferDescription={setTransferDescription}
-        transferring={transferring}
-        setTransferring={setTransferring}
-        onClose={() => setTransferTarget(null)}
-        onSuccess={() => { setTransferTarget(null); router.refresh() }}
-      />
+          <TransferDialog
+            transferTarget={transferTarget}
+            toUnitId={toUnitId}
+            setToUnitId={setToUnitId}
+            transferQuantity={transferQuantity}
+            setTransferQuantity={setTransferQuantity}
+            transferDescription={transferDescription}
+            setTransferDescription={setTransferDescription}
+            transferring={transferring}
+            setTransferring={setTransferring}
+            onClose={() => setTransferTarget(null)}
+            onSuccess={() => { setTransferTarget(null); router.refresh() }}
+          />
+        </div>
+      )}
     </div>
   )
 }

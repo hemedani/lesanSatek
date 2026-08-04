@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowRight, ShoppingCart, Building2, Landmark, Store, Package, ClipboardList, FileText, Clock, BadgeCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
+import type { ReqType, DeepPartial } from "@/types/declarations/selectInp"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { get as getPR } from "@/app/actions/purchasingRequest/get"
@@ -41,6 +42,137 @@ type StepWithApprovals = {
   groupsOperator?: string
   assigneeGroups?: { operator?: string; unitIds?: string[] }[]
   approvals?: StepApprovalInline[]
+}
+
+type PersonBrief = {
+  _id?: string
+  first_name?: string
+  last_name?: string
+  position?: string
+  roles?: { name?: string }[]
+}
+
+type UnitBrief = {
+  _id?: string
+  name?: string
+  head?: PersonBrief
+}
+
+type PrStepApproval = {
+  _id: string
+  status: string
+  comment?: string
+  decidedAt?: string
+  processStep?: { _id?: string; name?: string }
+  unit?: UnitBrief
+  decidedBy?: PersonBrief
+}
+
+type PrHistoryEntry = {
+  action?: string
+  performed?: { by?: string; name?: string; at?: string; role?: { id?: string; name?: string; scopeType?: string; scopeId?: string } }
+  unit?: { _id?: string; name?: string }
+  details?: Record<string, unknown>
+}
+
+type PrGoodsReceiptItem = {
+  quantityReceived?: number
+  wareModelName?: string
+  wareName?: string
+}
+
+type PrGoodsReceipt = {
+  _id?: string
+  receiptNumber?: string
+  status?: string
+  receivedAt?: string
+  notes?: string
+  items?: PrGoodsReceiptItem[]
+  receivingUnit?: { _id?: string; name?: string }
+  receivedBy?: PersonBrief
+}
+
+type PrPaymentOrder = {
+  _id?: string
+  title?: string
+  amount?: number
+  status?: string
+  paidAt?: string
+}
+
+type PrTenderOffer = {
+  _id: string
+  price?: number
+  deliveryTime?: string
+  paymentTerms?: string
+  status?: string
+  store?: { _id: string; name?: string }
+}
+
+type PrTender = {
+  _id: string
+  title?: string
+  status?: string
+  deadline?: string
+  offers?: PrTenderOffer[]
+}
+
+type UnitRecord = {
+  _id?: string
+  name?: string
+  type?: string
+  head?: PersonBrief
+}
+
+type WarehouseInventoryItem = {
+  _id?: string
+  quantity?: number
+  minQuantity?: number
+  maxQuantity?: number
+  batchNo?: string
+  expirationDate?: string
+  location?: string
+  unit?: { _id?: string; name?: string; type?: string }
+  ware?: { _id?: string; name?: string }
+  wareModel?: { _id?: string; name?: string }
+}
+
+type WarehouseInventoryGroup = {
+  items: WarehouseInventoryItem[]
+  total: number
+}
+
+type PrDetail = {
+  _id?: string
+  title?: string
+  description?: string
+  quantity?: number
+  status?: string
+  currentStep?: number
+  createdAt?: string
+  updatedAt?: string
+  completedAt?: string
+  selectionType?: string
+  selectedTenderOfferId?: string
+  stuffStatus?: string
+  estimatedAmount?: number
+  requester?: PersonBrief
+  process?: {
+    _id?: string
+    name?: string
+    description?: string
+    steps?: StepWithApprovals[]
+  }
+  wareModel?: { _id?: string; name?: string }
+  requestingUnit?: { _id?: string; name?: string }
+  budgetLine?: { _id?: string; code?: string; title?: string; totalAllocated?: number; totalEncumbered?: number }
+  store?: { _id?: string; name?: string; address?: string }
+  stuff?: { _id?: string; quantity?: number; price?: number }
+  history?: PrHistoryEntry[]
+  stepApprovals?: PrStepApproval[]
+  goodsReceipts?: PrGoodsReceipt[]
+  paymentOrders?: PrPaymentOrder[]
+  tenders?: PrTender[]
 }
 
 const statusMap: Record<string, string> = {
@@ -127,14 +259,14 @@ export default async function UnitHeadRequestDetailPage({
         deadline: 1,
         offers: { _id: 1, price: 1, deliveryTime: 1, paymentTerms: 1, status: 1, store: { _id: 1, name: 1 } },
       },
-    } as any,
+    } satisfies DeepPartial<ReqType["main"]["purchasingRequest"]["get"]["get"]>,
   )
 
   if (!prRes.success || !prRes.body?.[0]) {
     notFound()
   }
 
-  const pr = prRes.body[0]
+  const pr: PrDetail = prRes.body[0]
 
   const cookieStore = await cookies()
   const activeRoleId = cookieStore.get("activeRoleId")?.value
@@ -145,7 +277,7 @@ export default async function UnitHeadRequestDetailPage({
     const userRes = await getMe({
       _id: 1,
       roles: 1,
-    } as any).catch(() => ({ success: false, body: null }))
+    }).catch(() => ({ success: false, body: null }))
     const currentUser = userRes.success ? userRes.body : null
     const activeRole = currentUser?.roles?.find((r: { roleId?: string }) => r.roleId === activeRoleId)
     if (activeRole?.scopeType === "unit" && activeRole.scopeId) {
@@ -185,16 +317,16 @@ export default async function UnitHeadRequestDetailPage({
     (s) => !s.approvals || s.approvals.length === 0
   )
 
-  let unitsById: Record<string, any> = {}
+  const unitsById: Record<string, UnitRecord> = {}
   if (allUnitIds.length > 0 && hasStepsWithoutPendingApprovals) {
     const unitsRes = await getUnits(
-      { page: 1, limit: 200 } as any,
+      { page: 1, limit: 200 },
       {
         _id: 1,
         name: 1,
         type: 1,
-        head: { _id: 1, first_name: 1, last_name: 1, position: 1, roles: { name: 1 } },
-      } as any,
+        head: { _id: 1, first_name: 1, last_name: 1, position: 1, roles: 1 },
+      },
     )
     if (unitsRes.success) {
       const allUnits = unitsRes.body || []
@@ -207,9 +339,9 @@ export default async function UnitHeadRequestDetailPage({
     }
   }
 
-  const stepResponsibleUnits: Record<string, any[]> = {}
+  const stepResponsibleUnits: Record<string, UnitRecord[]> = {}
   for (const step of sortedSteps) {
-    const inlineUnits: any[] = []
+    const inlineUnits: UnitRecord[] = []
     const seenIds = new Set<string>()
     for (const a of step.approvals || []) {
       if (a.unit?._id && !seenIds.has(a.unit._id)) {
@@ -222,18 +354,18 @@ export default async function UnitHeadRequestDetailPage({
     } else {
       const groups = step.assigneeGroups || []
       const unitIds = [...new Set(groups.flatMap((g) => g.unitIds || []))]
-      stepResponsibleUnits[step._id] = (unitIds as string[]).map((id) => unitsById[id]).filter(Boolean)
+      stepResponsibleUnits[step._id] = unitIds.map((id) => unitsById[id]).filter(Boolean)
     }
   }
 
   const currentStep = sortedSteps[currentStepIdx] || null
 
   function isStepFullyApproved(stepId: string): boolean {
-    const stepApprovals = (pr.stepApprovals || []).filter((a: any) => a.processStep?._id === stepId)
+    const stepApprovals = (pr.stepApprovals || []).filter((a) => a.processStep?._id === stepId)
     const stepUnits = stepResponsibleUnits[stepId] || []
     if (stepUnits.length === 0) return false
-    return stepUnits.every((unit: any) =>
-      stepApprovals.some((a: any) => a.unit?._id === unit._id && a.status === "approved")
+    return stepUnits.every((unit) =>
+      stepApprovals.some((a) => a.unit?._id === unit._id && a.status === "approved")
     )
   }
 
@@ -248,9 +380,9 @@ export default async function UnitHeadRequestDetailPage({
     }
   }
 
-  const actionableTender = tenders.find((t: any) => t.status === "active" || t.status === "open" || t.status === "closed")
+  const actionableTender = tenders.find((t) => t.status === "active" || t.status === "open" || t.status === "closed")
   const tenderWithSelection = pr.selectionType === "tender"
-  const completedTender = tenders.find((t: any) => t.status === "awarded" || t.status === "closed")
+  const completedTender = tenders.find((t) => t.status === "awarded" || t.status === "closed")
   const hasActiveTenderOrSelected = actionableTender || completedTender || tenderWithSelection
 
   const isWarehouseUnitHead = userUnitType === "Warehouse"
@@ -260,7 +392,7 @@ export default async function UnitHeadRequestDetailPage({
     effectiveStep?._id &&
     (effectiveStep.assigneeGroups || []).some((g) => (g.unitIds || []).includes(userUnitId))
   )
-  let warehouseInventoryBody: { centralWarehouse: { items: any[]; total: number }; unitWarehouses: { items: any[]; total: number } } | null = null
+  let warehouseInventoryBody: { centralWarehouse: WarehouseInventoryGroup; unitWarehouses: WarehouseInventoryGroup } | null = null
   if (isAssignedToWarehouseStep && pr.wareModel?._id) {
     const invRes = await getWarehouseInventory(
       { wareModelId: pr.wareModel._id },
@@ -278,7 +410,7 @@ export default async function UnitHeadRequestDetailPage({
       },
     )
     if (invRes.success && invRes.body) {
-      warehouseInventoryBody = invRes.body as any
+      warehouseInventoryBody = invRes.body
     }
   }
 
@@ -469,11 +601,11 @@ export default async function UnitHeadRequestDetailPage({
               </CardHeader>
               <CardContent>
                 <div className="divide-y divide-steel-border/10">
-                  {goodsReceipts.map((gr: any) => {
-                    const items = (Array.isArray(gr.items) ? gr.items : []) as Array<any>
+                  {goodsReceipts.map((gr) => {
+                    const items = Array.isArray(gr.items) ? gr.items : []
                     const totalQty = items.reduce((sum, item) => sum + Number(item.quantityReceived || 0), 0)
-                    const receivingUnit = gr.receivingUnit as any | undefined
-                    const receivedBy = gr.receivedBy as any | undefined
+                    const receivingUnit = gr.receivingUnit
+                    const receivedBy = gr.receivedBy
                     return (
                       <div key={String(gr._id)} className="py-3 first:pt-0 last:pb-0 space-y-2">
                         <div className="flex items-center justify-between">
@@ -531,7 +663,7 @@ export default async function UnitHeadRequestDetailPage({
               </CardHeader>
               <CardContent>
                 <div className="divide-y divide-steel-border/10">
-                  {paymentOrders.map((po: any) => (
+                  {paymentOrders.map((po) => (
                     <div key={String(po._id)} className="py-3 first:pt-0 last:pb-0">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-medium text-moonlight">
@@ -628,8 +760,8 @@ export default async function UnitHeadRequestDetailPage({
                     <p className="text-xs text-fog">تعداد رسید</p>
                     <p className="text-moonlight font-medium">{goodsReceipts.length.toLocaleString("fa-IR")} رسید</p>
                     {(() => {
-                      const totalReceived = goodsReceipts.reduce((sum: number, gr: any) => {
-                        const items = (Array.isArray(gr.items) ? gr.items : []) as Array<any>
+                      const totalReceived = goodsReceipts.reduce((sum, gr) => {
+                        const items = Array.isArray(gr.items) ? gr.items : []
                         return sum + items.reduce((s, item) => s + Number(item.quantityReceived || 0), 0)
                       }, 0)
                       return (

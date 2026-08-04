@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { AddStuffDialog } from "@/components/purchasing/add-stuff-dialog"
 import { TenderCreateDialog } from "@/components/purchasing/tender-create-dialog"
 import { SubmitPRButton } from "@/app/requests/[id]/submit-pr-button"
-import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
 import { removeTenderSelection } from "@/app/actions/purchasingRequest/removeTenderSelection"
 
 interface UnitHeadActionsProps {
