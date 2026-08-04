@@ -1,10 +1,9 @@
-import { Gavel } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
-import { EmptyState } from "@/components/ui/empty-state"
-import { cookies } from "next/headers"
 import { gets } from "@/app/actions/tender/gets"
+import { count } from "@/app/actions/tender/count"
 import { TendersListClient } from "./tenders-list-client"
+
+const VALID_STATUSES = ["open", "closed", "awarded", "cancelled"]
 
 export default async function StoreTendersPage({
   searchParams,
@@ -12,44 +11,74 @@ export default async function StoreTendersPage({
   searchParams: Promise<{ page?: string; search?: string; status?: string }>
 }) {
   const resolvedSearchParams = await searchParams
-  const page = Number(resolvedSearchParams.page) || 1
+  const page = Math.max(1, Number(resolvedSearchParams.page) || 1)
   const limit = 20
-  const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
 
-  const result = await gets(
-    { activeRoleId, page, limit, status: (resolvedSearchParams.status || "open") as any },
-    {
-      _id: 1,
-      title: 1,
-      deadline: 1,
-      status: 1,
-      description: 1,
-      purchasingRequest: { _id: 1, title: 1 },
-    },
-  )
+  const search = typeof resolvedSearchParams.search === "string" ? resolvedSearchParams.search : ""
+  const status =
+    typeof resolvedSearchParams.status === "string" &&
+    (VALID_STATUSES as readonly string[]).includes(resolvedSearchParams.status)
+      ? resolvedSearchParams.status
+      : ""
+
+  const listSet = {
+    page,
+    limit,
+    ...(search ? { search } : {}),
+    ...(status ? { status: status as "open" | "closed" | "awarded" | "cancelled" } : {}),
+  }
+
+  const [result, totalRes, openRes, awardedRes, closedRes] = await Promise.all([
+    gets(
+      { activeRoleId: "", ...listSet },
+      {
+        _id: 1,
+        title: 1,
+        deadline: 1,
+        status: 1,
+        description: 1,
+        purchasingRequest: { _id: 1, title: 1 },
+      },
+    ),
+    count({ activeRoleId: "" }),
+    count({ activeRoleId: "", status: "open" }),
+    count({ activeRoleId: "", status: "awarded" }),
+    count({ activeRoleId: "", status: "closed" }),
+  ])
 
   const items = result.success ? result.body || [] : []
+  const totalCount = totalRes.success && totalRes.body ? totalRes.body.qty ?? 0 : 0
+  const totalPages = Math.max(1, Math.ceil(totalCount / limit))
+
+  const counts = {
+    total: totalCount,
+    open: openRes.success && openRes.body ? openRes.body.qty ?? 0 : 0,
+    awarded: awardedRes.success && awardedRes.body ? awardedRes.body.qty ?? 0 : 0,
+    closed: closedRes.success && closedRes.body ? closedRes.body.qty ?? 0 : 0,
+  }
+
   const prevPageUrl = page > 1 ? `/storehead/tenders?page=${page - 1}` : ""
-  const nextPageUrl = items.length >= limit ? `/storehead/tenders?page=${page + 1}` : ""
+
+  const params = new URLSearchParams()
+  if (search) params.set("search", search)
+  if (status) params.set("status", status)
+  const qs = params.toString()
+  const nextPageUrl = page < totalPages ? `/storehead/tenders?page=${page + 1}${qs ? `&${qs}` : ""}` : ""
 
   return (
     <div className="space-y-6">
-      <PageHeader title="مناقصات" description="مناقصات قابل شرکت" />
+      <PageHeader title="مناقصات" description="مناقصات قابل شرکت برای فروشگاه شما" />
 
-      {items.length === 0 ? (
-        <Card variant="glass">
-          <CardContent className="py-12">
-            <EmptyState icon={Gavel} title="مناقصه‌ای یافت نشد" description="در حال حاضر هیچ مناقصه بازی وجود ندارد" />
-          </CardContent>
-        </Card>
-      ) : (
-        <Card variant="glass">
-          <CardContent className="p-0">
-            <TendersListClient items={items} prevPageUrl={prevPageUrl} nextPageUrl={nextPageUrl} page={page} />
-          </CardContent>
-        </Card>
-      )}
+      <TendersListClient
+        items={items}
+        prevPageUrl={prevPageUrl}
+        nextPageUrl={nextPageUrl}
+        page={page}
+        totalPages={totalPages}
+        search={search}
+        status={status}
+        counts={counts}
+      />
     </div>
   )
 }

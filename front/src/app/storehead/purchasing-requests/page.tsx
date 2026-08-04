@@ -2,7 +2,6 @@ import { PageHeader } from "@/components/ui/page-header"
 import { gets } from "@/app/actions/purchasingRequest/gets"
 import { count } from "@/app/actions/purchasingRequest/count"
 import { PRListClient } from "./pr-list-client"
-
 export default async function StorePurchasingRequestsPage({
   searchParams,
 }: {
@@ -19,16 +18,18 @@ export default async function StorePurchasingRequestsPage({
   const sortBy = typeof resolvedSearchParams.sortBy === "string" ? resolvedSearchParams.sortBy : undefined
   const sortOrder = typeof resolvedSearchParams.sortOrder === "string" ? resolvedSearchParams.sortOrder : undefined
 
-  const filterParams = {
+  type PRFilter = NonNullable<Parameters<typeof gets>[0]>
+
+  const filterParams: PRFilter = {
     search,
-    stuffStatus: stuffStatus as any,
-    goodsReceiptStatus: goodsReceiptStatus as any,
-    paymentOrderStatus: paymentOrderStatus as any,
-    sortBy: sortBy as any,
-    sortOrder: sortOrder as any,
+    stuffStatus: stuffStatus as PRFilter["stuffStatus"],
+    goodsReceiptStatus: goodsReceiptStatus as PRFilter["goodsReceiptStatus"],
+    paymentOrderStatus: paymentOrderStatus as PRFilter["paymentOrderStatus"],
+    sortBy: sortBy as PRFilter["sortBy"],
+    sortOrder: sortOrder as PRFilter["sortOrder"],
   }
 
-  const [result, countResult] = await Promise.all([
+  const [result, countResult, needsDeliveryRes, pendingReceiptRes, completedReceiptRes] = await Promise.all([
     gets(
       { activeRoleId: "", page, limit, ...filterParams },
       {
@@ -40,16 +41,25 @@ export default async function StorePurchasingRequestsPage({
         stuffStatus: 1,
         createdAt: 1,
         process: { _id: 1, name: 1 },
+        requestingUnit: { _id: 1, name: 1 },
         store: { _id: 1, name: 1 },
         paymentOrders: { _id: 1, status: 1, amount: 1 },
       },
     ),
     count({ activeRoleId: "", ...filterParams }),
+    count({ activeRoleId: "", goodsReceiptStatus: "none" }),
+    count({ activeRoleId: "", goodsReceiptStatus: "pending" }),
+    count({ activeRoleId: "", goodsReceiptStatus: "completed" }),
   ])
 
   const items = result.success ? result.body || [] : []
   const total = countResult.success && countResult.body ? countResult.body.qty ?? 0 : 0
   const totalPages = Math.ceil(total / limit)
+
+  const totalCount = countResult.success && countResult.body ? countResult.body.qty ?? 0 : 0
+  const needsDeliveryCount = needsDeliveryRes.success && needsDeliveryRes.body ? needsDeliveryRes.body.qty ?? 0 : 0
+  const pendingReceiptCount = pendingReceiptRes.success && pendingReceiptRes.body ? pendingReceiptRes.body.qty ?? 0 : 0
+  const completedReceiptCount = completedReceiptRes.success && completedReceiptRes.body ? completedReceiptRes.body.qty ?? 0 : 0
 
   const buildUrl = (p: number) => {
     const params = new URLSearchParams()
@@ -66,6 +76,13 @@ export default async function StorePurchasingRequestsPage({
 
   const prevPageUrl = page > 1 ? buildUrl(page - 1) : ""
   const nextPageUrl = page < totalPages ? buildUrl(page + 1) : ""
+
+  const counts = {
+    total: totalCount,
+    needsDelivery: needsDeliveryCount,
+    pendingReceipt: pendingReceiptCount,
+    completedReceipt: completedReceiptCount,
+  }
 
   return (
     <div className="space-y-6">
@@ -86,6 +103,7 @@ export default async function StorePurchasingRequestsPage({
         paymentOrderStatusFilter={paymentOrderStatus || ""}
         sortBy={sortBy || ""}
         sortOrder={sortOrder || ""}
+        counts={counts}
       />
     </div>
   )
