@@ -6,15 +6,16 @@ import { useForm } from "react-hook-form"
 import { zodV4Resolver } from "@/lib/zod-v4-resolver"
 import { z } from "zod"
 import { toast } from "sonner"
-import { Loader2, UserPlus, Shield, X } from "lucide-react"
+import { ArrowRight, Loader2, User, Shield, X, KeyRound, UserCog, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { FormInput } from "@/components/form/form-input"
 import { FormSelect } from "@/components/form/form-select"
 import { FormPasswordInput } from "@/components/form/form-password-input"
 import { FormCheckbox } from "@/components/form/form-checkbox"
-import { FormSection } from "@/components/form/form-section"
-import { FormSearchSelect, SearchSelect } from "@/components/form/form-search-select"
+import { SectionCard } from "@/components/form/section-card"
+import { SearchSelect } from "@/components/form/form-search-select"
 import { Form } from "@/components/ui/form"
+import { PageHeader } from "@/components/ui/page-header"
 import { addUser } from "@/app/actions/user/addUser"
 import { gets as getUnits } from "@/app/actions/unit/gets"
 import { ROLE_OPTIONS, SCOPE_OPTIONS } from "@/types/permissions"
@@ -78,71 +79,88 @@ export default function AddUserPage() {
   }
 
   const onSubmit = async (data: UserData) => {
-    const result = await addUser(
-      {
-        activeRoleId: getActiveRoleIdFromStore(),
-        first_name: data.first_name,
-        last_name: data.last_name,
-        email: data.email,
-        mobile: data.mobile,
-        password: data.password,
-        gender: data.gender,
-        position: data.position || undefined,
-        isActive: data.isActive,
-        is_verified: data.is_verified,
-        roles: roles.map((r) => ({
-          name: r.name as "Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary",
-          ...(r.scopeType ? { scopeType: r.scopeType as "organization" | "unit" } : {}),
-          ...(r.scopeId ? { scopeId: r.scopeId } : {}),
-        })),
-      },
-      { _id: 1, first_name: 1, last_name: 1, email: 1 },
-    )
-    if (result.success) {
-      toast.success("کاربر با موفقیت ایجاد شد")
-      router.push("/orghead/users")
-    } else {
-      toast.error(result.body?.message || "خطا در ایجاد کاربر")
+    try {
+      const result = await addUser(
+        {
+          activeRoleId: getActiveRoleIdFromStore(),
+          first_name: data.first_name,
+          last_name: data.last_name,
+          email: data.email,
+          mobile: data.mobile,
+          password: data.password,
+          gender: data.gender,
+          position: data.position || undefined,
+          isActive: data.isActive,
+          is_verified: data.is_verified,
+          roles: roles.map((r) => ({
+            name: r.name as "Manager" | "Admin" | "OrgHead" | "UnitHead" | "Employee" | "Ordinary",
+            ...(r.scopeType ? { scopeType: r.scopeType as "organization" | "unit" } : {}),
+            ...(r.scopeId ? { scopeId: r.scopeId } : {}),
+          })),
+        },
+        { _id: 1, first_name: 1, last_name: 1, email: 1 },
+      )
+      if (result.success) {
+        toast.success("کاربر با موفقیت ایجاد شد")
+        router.push("/orghead/users")
+      } else {
+        toast.error(result.body?.message || "خطا در ایجاد کاربر")
+      }
+    } catch {
+      toast.error("خطا در ایجاد کاربر")
     }
   }
 
   const isSubmitting = form.formState.isSubmitting
 
   return (
-    <div className="space-y-8 max-w-2xl mx-auto">
-      <div className="space-y-4">
-        <div className="flex items-start gap-4">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-electric-iris/10 border border-electric-iris/20">
-            <UserPlus className="size-5 text-electric-iris" />
-          </div>
-          <div className="space-y-1.5">
-            <h1 className="text-heading-sm font-medium text-glacier tracking-tight leading-tight">کاربر جدید</h1>
-            <p className="text-body-sm text-fog/70 leading-relaxed">ایجاد کاربر جدید در سازمان.</p>
-          </div>
-        </div>
-      </div>
+    <div className="mx-auto w-full max-w-2xl space-y-6">
+      <PageHeader
+        title="افزودن کاربر"
+        description="اطلاعات هویتی و ورود کاربر را وارد کنید و نقش‌های دسترسی را مشخص کنید."
+      >
+        <Link href="/orghead/users">
+          <Button variant="ghost" className="gap-2 px-4">
+            <ArrowRight className="size-5" />
+            بازگشت به کاربران
+          </Button>
+        </Link>
+      </PageHeader>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormSection title="اطلاعات هویتی" description="نام، نام خانوادگی و مشخصات فردی کاربر">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <SectionCard
+            icon={UserCog}
+            iconClassName="bg-electric-iris/10 text-electric-iris ring-electric-iris/15"
+            title="اطلاعات هویتی"
+          >
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <FormInput control={form.control} name="first_name" label="نام" placeholder="مثال: علی" required disabled={isSubmitting} />
               <FormInput control={form.control} name="last_name" label="نام خانوادگی" placeholder="مثال: محمدی" required disabled={isSubmitting} />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <FormSelect control={form.control} name="gender" label="جنسیت" options={[{ value: "Male", label: "مرد" }, { value: "Female", label: "زن" }]} disabled={isSubmitting} />
               <FormInput control={form.control} name="position" label="سمت" placeholder="مثال: مدیر مالی" disabled={isSubmitting} />
             </div>
-          </FormSection>
+          </SectionCard>
 
-          <FormSection title="اطلاعات ورود" description="ایمیل، شماره موبایل و رمز عبور کاربر">
+          <SectionCard
+            icon={KeyRound}
+            iconClassName="bg-emerald-500/10 text-emerald-400 ring-emerald-500/15"
+            title="اطلاعات ورود"
+          >
             <FormInput control={form.control} name="email" label="ایمیل" placeholder="example@email.com" type="email" required disabled={isSubmitting} />
             <FormInput control={form.control} name="mobile" label="شماره موبایل" placeholder="۰۹۱۲۳۴۵۶۷۸۹" required disabled={isSubmitting} />
             <FormPasswordInput control={form.control} name="password" label="رمز عبور" placeholder="حداقل ۶ کاراکتر" required disabled={isSubmitting} />
             <FormCheckbox control={form.control} name="is_verified" label="حساب کاربر تایید شده است" disabled={isSubmitting} />
-          </FormSection>
+          </SectionCard>
 
-          <FormSection title="نقش‌ها" description="تعیین نقش و محدوده دسترسی کاربر">
+          <SectionCard
+            icon={User}
+            iconClassName="bg-frost-link/10 text-frost-link ring-frost-link/15"
+            title="نقش‌ها"
+            description="تعیین نقش و محدوده دسترسی کاربر"
+          >
             <div className="space-y-3">
               {roles.map((role, index) => (
                 <div key={index} className="flex items-start gap-2 p-3.5 rounded-lg bg-white/[0.02] border border-steel-border/20">
@@ -223,15 +241,40 @@ export default function AddUserPage() {
                 افزودن نقش
               </Button>
             </div>
-          </FormSection>
+          </SectionCard>
 
-          <div className="sticky bottom-0 z-10 bg-[rgba(5,6,15,0.85)] backdrop-blur-xl border border-steel-border/15 rounded-xl p-4 flex items-center justify-end gap-3 shadow-[0_-8px_32px_rgba(0,0,0,0.4)]">
-            <Link href="/orghead/users">
-              <Button type="button" variant="ghost" disabled={isSubmitting}>انصراف</Button>
-            </Link>
-            <Button type="submit" disabled={isSubmitting} className="gap-1.5 min-w-[120px]">
-              {isSubmitting ? <><Loader2 className="size-4 animate-spin" /> در حال ایجاد...</> : "ایجاد کاربر"}
-            </Button>
+          <div className="sticky bottom-0 z-10">
+            <div className="glass-card-conic-top flex flex-col-reverse gap-4 rounded-xl border border-white/8 bg-graphite-plate/70 p-5 shadow-[0_32px_64px_-32px_rgba(5,6,15,0.9),0_0_40px_-16px_rgba(182,217,252,0.2)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6">
+              <p className="hidden text-caption text-fog/60 sm:block">
+                فیلدهای ستاره‌دار الزامی هستند
+              </p>
+              <div className="flex items-center gap-3 sm:gap-4">
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={isSubmitting}
+                  className="flex-1 gap-2 px-5 sm:flex-none"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="size-5 animate-spin" />
+                  ) : (
+                    <Check className="size-5" />
+                  )}
+                  ثبت کاربر
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="lg"
+                  disabled={isSubmitting}
+                  onClick={() => router.push("/orghead/users")}
+                  className="gap-2 px-5"
+                >
+                  <X className="size-5" />
+                  انصراف
+                </Button>
+              </div>
+            </div>
           </div>
         </form>
       </Form>
