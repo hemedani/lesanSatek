@@ -564,6 +564,79 @@
   }
 }
 
+/* ── Landing: Marquee (infinite logo scroll) ────────────── */
+/* GPU-friendly: only the track transform is animated. */
+
+@keyframes marquee-x {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@utility animate-marquee {
+  animation: marquee-x 36s linear infinite;
+}
+
+/* ── Landing: Breathing glow (hero mockup under-glow) ──── */
+
+@keyframes glow-breath {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.07);
+  }
+}
+
+@utility animate-glow-breath {
+  animation: glow-breath 6s ease-in-out infinite;
+}
+
+/* ── Landing: Gentle float (hero floating mini cards) ──── */
+
+@keyframes float-y {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@utility animate-float {
+  animation: float-y 6s ease-in-out infinite;
+}
+
+@utility animate-float-delayed {
+  animation: float-y 7.5s ease-in-out 1.4s infinite;
+}
+
+/* ── Landing: Glowing pulse dot (workflow steps list) ──── */
+
+@keyframes dot-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(102, 58, 243, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(102, 58, 243, 0);
+  }
+}
+
+@utility animate-dot-glow {
+  animation: dot-glow 2.6s ease-in-out infinite;
+}
+
+/* ── Landing: Scroll reveal base state ─────────────────── */
+/* [data-reveal] elements are revealed by the Reveal component via an
+   IntersectionObserver; under reduced-motion the CSS below keeps them
+   permanently visible so no JS state is required for accessibility. */
+
+[data-reveal] {
+  will-change: transform, opacity;
+}
+
 /* ── Ambient Orb Background ────────────────────────────── */
 /* 2–3 large, soft, slow-drifting light sources (radial gradient orbs)
    sitting behind admin content. Only transform is animated — no paint,
@@ -662,5 +735,21 @@
 
   [data-slot="dialog-overlay"] {
     animation: none !important;
+  }
+
+  /* Landing: freeze marquee / glow / float / pulse animations. */
+  .animate-marquee,
+  .animate-glow-breath,
+  .animate-float,
+  .animate-float-delayed,
+  .animate-dot-glow {
+    animation: none;
+  }
+
+  /* Landing: scroll-reveal elements stay fully visible. */
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 }
