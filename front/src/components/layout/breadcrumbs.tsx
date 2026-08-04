@@ -27,10 +27,18 @@ const routeLabels: Record<string, string> = {
   "org-chart": "نمودار سازمان",
   settings: "تنظیمات",
   "fiscal-years": "سال‌های مالی",
-  "budget-lines": "ره‌بودجه",
+  "budget-lines": "ردیف‌های بودجه",
   "budget-reports": "گزارش بودجه",
   dashboard: "داشبورد",
   add: "افزودن",
+  edit: "ویرایش",
+  relations: "روابط",
+  graph: "نمودار",
+  steps: "مراحل",
+  roles: "نقش‌ها",
+  states: "استان‌ها",
+  cities: "شهرها",
+  manufacturers: "تولیدکنندگان",
 
   // Non-admin panels
   orghead: "داشبورد سازمان",
@@ -51,6 +59,10 @@ const routeLabels: Record<string, string> = {
   new: "جدید",
   offers: "پیشنهادها",
   show: "مشاهده",
+  pending: "در انتظار تأیید",
+  drafts: "پیش‌نویس‌ها",
+  "goods-receipt": "رسید کالا",
+  offer: "پیشنهاد",
 }
 
 function isObjectId(segment: string): boolean {
@@ -77,23 +89,33 @@ function Breadcrumbs({ className }: { className?: string }) {
   })
 
   return (
-    <nav className={cn("flex items-center gap-1 text-xs sm:text-sm", className)}>
+    <nav
+      key={pathname}
+      aria-label="مسیر فعلی"
+      className={cn(
+        "flex min-w-0 items-center gap-1 text-xs animate-in fade-in-0 duration-300 sm:text-sm",
+        className,
+      )}
+    >
       {crumbs.map((crumb) => (
-        <div key={crumb.href} className="flex items-center">
+        <div key={crumb.href} className="flex min-w-0 items-center">
           {!crumb.isLast ? (
             <Link
               href={crumb.href}
-              className="flex items-center rounded-md px-1.5 sm:px-2 py-1 text-fog hover:text-moonlight hover:bg-white/[0.04] transition-colors whitespace-nowrap"
+              className="flex items-center rounded-md px-1.5 py-1 text-fog transition-colors hover:bg-white/[0.04] hover:text-moonlight sm:px-2 whitespace-nowrap"
             >
               {crumb.label}
             </Link>
           ) : (
-            <span className="flex items-center px-1.5 sm:px-2 py-1 text-moonlight font-medium whitespace-nowrap">
+            <span
+              aria-current="page"
+              className="flex items-center px-1.5 py-1 font-medium text-moonlight sm:px-2 truncate whitespace-nowrap"
+            >
               {crumb.label}
             </span>
           )}
           {!crumb.isLast && (
-            <ChevronLeft className="size-3.5 sm:size-4 text-fog/60 rtl:rotate-180 shrink-0" />
+            <ChevronLeft className="size-3.5 shrink-0 text-fog/60 rtl:rotate-180 sm:size-4" aria-hidden="true" />
           )}
         </div>
       ))}

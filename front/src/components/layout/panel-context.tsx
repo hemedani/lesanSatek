@@ -41,17 +41,17 @@ function PanelContext() {
   if (!orgName && !displayUnit && !roleLabel) return null
 
   return (
-    <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] ring-1 ring-inset ring-steel-border/15">
+    <div className="hidden md:flex items-center gap-2.5 px-3 py-2 rounded-lg bg-white/[0.03] ring-1 ring-inset ring-steel-border/15">
       {orgName && (
         <div className="flex items-center gap-1.5 text-xs text-fog/60">
-          <Building2 className="size-3 text-frost-link/50" />
+          <Building2 className="size-5 text-frost-link/50" />
           <span>{orgName}</span>
         </div>
       )}
       {orgName && (displayUnit || roleLabel) && <span className="text-fog/15 mx-0.5">/</span>}
       {displayUnit && (
         <div className="flex items-center gap-1.5 text-xs text-fog/60">
-          <Users className="size-3 text-frost-link/50" />
+          <Users className="size-5 text-frost-link/50" />
           <span>{displayUnit}</span>
         </div>
       )}
