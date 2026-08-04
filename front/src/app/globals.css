@@ -613,6 +613,19 @@
   animation: float-y 7.5s ease-in-out 1.4s infinite;
 }
 
+/* ── Navigation: active-state Electric Iris glow pulse ──── */
+/* Soft breathing pulse on the active nav item's accent bar / glow.
+   Only opacity is animated (GPU composited); frozen under reduced-motion. */
+
+@keyframes nav-glow-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+@utility animate-nav-glow-pulse {
+  animation: nav-glow-pulse 2s ease-in-out infinite;
+}
+
 /* ── Landing: Glowing pulse dot (workflow steps list) ──── */
 
 @keyframes dot-glow {
@@ -742,7 +755,8 @@
   .animate-glow-breath,
   .animate-float,
   .animate-float-delayed,
-  .animate-dot-glow {
+  .animate-dot-glow,
+  .animate-nav-glow-pulse {
     animation: none;
   }
 
