@@ -5,13 +5,13 @@ import { useForm } from "react-hook-form"
 import { zodV4Resolver } from "@/lib/zod-v4-resolver"
 import { z } from "zod"
 import { toast } from "sonner"
-import { Loader2, Workflow, Target } from "lucide-react"
+import { ArrowRight, ClipboardList, Loader2, Check, X, GitBranch, Workflow } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FormInput } from "@/components/form/form-input"
 import { FormTextarea } from "@/components/form/form-textarea"
-import { FormSection } from "@/components/form/form-section"
+import { SectionCard } from "@/components/form/section-card"
 import { Form } from "@/components/ui/form"
+import { PageHeader } from "@/components/ui/page-header"
 import { ProcessBuilder } from "@/components/process/process-builder"
 import { ProcessScopeFields } from "@/components/process/process-scope-fields"
 import { add as addProcess } from "@/app/actions/process/add"
@@ -80,6 +80,8 @@ export default function AddProcessPage() {
       steps: [],
     },
   })
+
+  const submitting = form.formState.isSubmitting
 
   const onSubmit = async (data: ProcessData) => {
     const scope = useAuthStore.getState().getActiveScope();
@@ -155,71 +157,98 @@ export default function AddProcessPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-3xl mx-auto">
-      <div className="space-y-4">
-        <div className="flex items-start gap-4">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-electric-iris/10 border border-electric-iris/20">
-            <Workflow className="size-5 text-electric-iris" />
-          </div>
-          <div className="space-y-1.5">
-            <h1 className="text-heading-sm font-medium text-glacier tracking-tight leading-tight">
-              فرآیند جدید
-            </h1>
-            <p className="text-body-sm text-fog/70 leading-relaxed">
-              ایجاد فرآیند خرید جدید. گام‌های فرآیند را به ترتیب تعریف کنید.
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className="mx-auto w-full max-w-2xl space-y-6">
+      <PageHeader
+        title="افزودن فرآیند"
+        description="اطلاعات اولیه فرآیند را وارد کنید؛ گام‌های گردش کار را به ترتیب تعریف کنید."
+      >
+        <Link href="/orghead/processes">
+          <Button variant="ghost" className="gap-2 px-4">
+            <ArrowRight className="size-5" />
+            بازگشت به فرآیندها
+          </Button>
+        </Link>
+      </PageHeader>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormSection title="اطلاعات فرآیند" description="نام، توضیحات و حوزه کاربرد">
-            <FormInput control={form.control} name="name" label="نام فرآیند" placeholder="مثال: فرآیند خرید مستقیم" required disabled={form.formState.isSubmitting} />
-            <FormTextarea control={form.control} name="description" label="توضیحات" placeholder="توضیحات مختصری درباره فرآیند..." rows={3} disabled={form.formState.isSubmitting} />
-          </FormSection>
+          <SectionCard
+            icon={ClipboardList}
+            iconClassName="bg-electric-iris/10 text-electric-iris ring-electric-iris/15"
+            title="اطلاعات اصلی"
+          >
+            <FormInput
+              control={form.control}
+              name="name"
+              label="نام فرآیند"
+              placeholder="مثال: فرآیند خرید مستقیم"
+              required
+              disabled={submitting}
+            />
+            <FormTextarea
+              control={form.control}
+              name="description"
+              label="توضیحات"
+              placeholder="توضیحات مختصری درباره فرآیند…"
+              rows={3}
+              disabled={submitting}
+            />
+          </SectionCard>
 
-          <Card variant="glass">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="size-9 rounded-xl bg-electric-iris/10 flex items-center justify-center">
-                  <Target className="size-4.5 text-electric-iris" />
-                </div>
-                <div>
-                  <CardTitle className="text-glacier">حوزه کاربرد فرآیند</CardTitle>
-                  <p className="text-sm text-fog/70 leading-relaxed mt-1">
-                    فرآیند را به یک واحد یا سطحی از سلسله‌مراتب کالا محدود کنید. در صورت عدم انتخاب، فرآیند عمومی سازمان خواهد بود. انتخاب هر سطح، سطوح پایین‌تر را به صورت هوشمند فیلتر می‌کند.
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ProcessScopeFields form={form} disabled={form.formState.isSubmitting} />
-            </CardContent>
-          </Card>
+          <SectionCard
+            icon={GitBranch}
+            iconClassName="bg-emerald-500/10 text-emerald-400 ring-emerald-500/15"
+            title="حوزه کاربرد فرآیند"
+            description="فرآیند را به یک واحد یا سطحی از سلسله‌مراتب کالا محدود کنید. در صورت عدم انتخاب، فرآیند عمومی سازمان خواهد بود. انتخاب هر سطح، سطوح پایین‌تر را به صورت هوشمند فیلتر می‌کند."
+          >
+            <ProcessScopeFields form={form} disabled={submitting} />
+          </SectionCard>
 
-          <div className="space-y-4">
-            <h2 className="text-heading-sm font-medium text-glacier tracking-tight leading-tight">
-              گام‌های فرآیند
-            </h2>
+          <SectionCard
+            icon={Workflow}
+            iconClassName="bg-frost-link/10 text-frost-link ring-frost-link/15"
+            title="گام‌های فرآیند"
+            description="گام‌های گردش کار را به ترتیب تعریف کنید."
+          >
             <ProcessBuilder
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               control={form.control as any}
-              disabled={form.formState.isSubmitting}
+              disabled={submitting}
             />
-          </div>
+          </SectionCard>
 
-          <div className="sticky bottom-0 z-10 bg-[rgba(5,6,15,0.85)] backdrop-blur-xl border border-steel-border/15 rounded-xl p-4 flex items-center justify-end gap-3 shadow-[0_-8px_32px_rgba(0,0,0,0.4)]">
-            <Link href="/orghead/processes">
-              <Button type="button" variant="ghost" disabled={form.formState.isSubmitting}>
-                انصراف
-              </Button>
-            </Link>
-            <Button type="submit" disabled={form.formState.isSubmitting} className="gap-1.5 min-w-[140px]">
-              {form.formState.isSubmitting ? (
-                <><Loader2 className="size-4 animate-spin" /> در حال ایجاد...</>
-              ) : "ایجاد فرآیند"}
-            </Button>
+          <div className="sticky bottom-0 z-10">
+            <div className="glass-card-conic-top flex flex-col-reverse gap-4 rounded-xl border border-white/8 bg-graphite-plate/70 p-5 shadow-[0_32px_64px_-32px_rgba(5,6,15,0.9),0_0_40px_-16px_rgba(182,217,252,0.2)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6">
+              <p className="hidden text-caption text-fog/60 sm:block">
+                فیلدهای ستاره‌دار الزامی هستند
+              </p>
+              <div className="flex items-center gap-3 sm:gap-4">
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={submitting}
+                  className="flex-1 gap-2 px-5 sm:flex-none"
+                >
+                  {submitting ? (
+                    <Loader2 className="size-5 animate-spin" />
+                  ) : (
+                    <Check className="size-5" />
+                  )}
+                  ثبت فرآیند
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="lg"
+                  disabled={submitting}
+                  onClick={() => router.push("/orghead/processes")}
+                  className="gap-2 px-5"
+                >
+                  <X className="size-5" />
+                  انصراف
+                </Button>
+              </div>
+            </div>
           </div>
         </form>
       </Form>

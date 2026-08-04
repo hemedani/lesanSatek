@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, use } from "react";
 import { toast } from "sonner";
-import { Loader2, ArrowRight, Share2, Building2 } from "lucide-react";
+import { Loader2, ArrowRight, Share2, Building2, GitBranch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormCard } from "@/components/form/form-card";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
@@ -200,7 +200,7 @@ export default function ProcessRelationsPage({
       </div>
 
       <form onSubmit={onSubmit} className="space-y-6">
-        <FormCard title="سازمان" description="سازمان مرتبط با فرآیند (از نقش فعال شما)">
+        <FormCard title="سازمان" description="سازمان مرتبط با فرآیند (از نقش فعال شما)" icon={Building2} iconClassName="text-electric-iris">
           <div className="flex items-center gap-3 rounded-lg border border-steel-border/20 bg-white/[0.02] px-3 py-2.5">
             <Building2 className="size-4 text-fog/40 shrink-0" />
             <span className="text-sm text-moonlight">
@@ -212,6 +212,8 @@ export default function ProcessRelationsPage({
         <FormCard
           title="حوزه کاربرد"
           description="فرآیند را به واحد یا سلسله‌مراتب کالا محدود کنید. در صورت عدم انتخاب، فرآیند عمومی خواهد بود. هر سطح، گزینه‌های سطح بعد را فیلتر می‌کند."
+          icon={GitBranch}
+          iconClassName="text-electric-iris"
         >
           <div className="space-y-4">
             <div className="space-y-2">

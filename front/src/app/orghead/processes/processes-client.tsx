@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Workflow, Copy, CheckCircle2, XCircle, Trash2, Clock, FileText, Share2, List, BarChart3, Target } from "lucide-react";
+import { Plus, Pencil, Workflow, Copy, CheckCircle2, XCircle, Trash2, Clock, FileText, Share2, List, BarChart3, Target, Archive, User, CalendarDays, GitBranch, Layers } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/ui/page-header";
 import { DataTable } from "@/components/ui/data-table";
 import type { Column } from "@/components/ui/data-table";
 import { Pagination } from "@/components/ui/pagination";
 import { FilterBar } from "@/components/ui/filter-bar";
+import { StatCard } from "@/components/dashboard/stat-card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -43,6 +44,10 @@ interface ProcessesClientProps {
   nextPageUrl: string;
   page: number;
   search?: string;
+  total?: number;
+  activeCount?: number;
+  draftCount?: number;
+  archivedCount?: number;
 }
 
 const statusLabels: Record<string, { label: string; variant: "active" | "inactive" | "pending" | "info" }> = {
@@ -57,6 +62,10 @@ export function ProcessesClient({
   nextPageUrl,
   page,
   search = "",
+  total = 0,
+  activeCount = 0,
+  draftCount = 0,
+  archivedCount = 0,
 }: ProcessesClientProps) {
   const router = useRouter();
   const [cardView, setCardView] = useState(true);
@@ -194,22 +203,22 @@ export function ProcessesClient({
         <div className="flex items-center gap-1">
           <Link href={`/orghead/processes/${item._id}`}>
             <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100" title="ویرایش">
-              <Pencil className="size-3.5" />
+              <Pencil className="size-5" />
             </Button>
           </Link>
           <Link href={`/orghead/processes/${item._id}/graph`}>
             <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 text-fog/60 hover:text-electric-iris" title="نمودار">
-              <BarChart3 className="size-3.5" />
+              <BarChart3 className="size-5" />
             </Button>
           </Link>
           <Link href={`/orghead/processes/${item._id}/steps`}>
             <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 text-fog/60 hover:text-frost-link" title="گام‌ها">
-              <List className="size-3.5" />
+              <List className="size-5" />
             </Button>
           </Link>
           <Link href={`/orghead/processes/${item._id}/relations`}>
             <Button variant="ghost" size="icon-xs" className="opacity-60 group-hover/row:opacity-100 text-fog/60 hover:text-amber-400" title="روابط">
-              <Share2 className="size-3.5" />
+              <Share2 className="size-5" />
             </Button>
           </Link>
           {item.status === "Draft" && (
@@ -220,7 +229,7 @@ export function ProcessesClient({
               onClick={() => handleActivate(item)}
               title="فعال‌سازی"
             >
-              <CheckCircle2 className="size-3.5" />
+              <CheckCircle2 className="size-5" />
             </Button>
           )}
           <Button
@@ -230,7 +239,7 @@ export function ProcessesClient({
             onClick={() => handleDuplicate(item)}
             title="کپی"
           >
-            <Copy className="size-3.5" />
+            <Copy className="size-5" />
           </Button>
           <Button
             variant="ghost"
@@ -239,7 +248,7 @@ export function ProcessesClient({
             onClick={() => setDeleteTarget(item)}
             title="حذف"
           >
-            <Trash2 className="size-3.5" />
+            <Trash2 className="size-5" />
           </Button>
         </div>
       ),
@@ -262,135 +271,218 @@ export function ProcessesClient({
         </PageHeader>
       </div>
 
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 lg:gap-5">
+        <StatCard
+          label="کل فرآیندها"
+          value={total}
+          icon={Workflow}
+          iconColor="text-electric-iris"
+          iconBg="bg-electric-iris/10"
+          subtitle="فرآیندهای تعریف‌شده"
+          onClick={() => router.push("/orghead/processes")}
+        />
+        <StatCard
+          label="فعال"
+          value={activeCount}
+          icon={CheckCircle2}
+          iconColor="text-emerald-400"
+          iconBg="bg-emerald-400/10"
+          subtitle="در گردش کار"
+        />
+        <StatCard
+          label="پیش‌نویس"
+          value={draftCount}
+          icon={FileText}
+          iconColor="text-amber-400"
+          iconBg="bg-amber-400/10"
+          subtitle="در حال طراحی"
+        />
+        <StatCard
+          label="بایگانی"
+          value={archivedCount}
+          icon={Archive}
+          iconColor="text-fog"
+          iconBg="bg-fog/10"
+          subtitle="متوقف شد"
+        />
+      </div>
+
       <FilterBar
         search={search}
         onSearchChange={handleSearch}
         searchPlaceholder="جستجوی فرآیند..."
       />
 
-      <DataTable
-        columns={columns}
-        data={items}
-        keyExtractor={(item) => item._id}
-        cardView={cardView}
-        onViewToggle={() => setCardView((v) => !v)}
-        renderCard={(item) => (
-          <div className="glass-card glass-card-hover-active rounded-xl p-5 transition-all duration-200">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="size-10 rounded-xl bg-electric-iris/10 border border-electric-iris/15 flex items-center justify-center shrink-0">
-                  <Workflow className="size-5 text-electric-iris" />
-                </div>
-                <div className="min-w-0 space-y-1">
-                  <Link
-                    href={`/orghead/processes/${item._id}`}
-                    className="text-base font-semibold text-moonlight hover:text-electric-iris transition-colors leading-6 truncate block"
-                  >
-                    {item.name || "—"}
-                  </Link>
-                  <div className="flex items-center gap-2">
-                    {statusIcon(item.status)}
-                    <span className="text-xs text-fog/60">
-                      {statusLabels[item.status || ""]?.label || item.status || "—"}
-                    </span>
-                    <span className="text-xs text-fog/40">•</span>
-                    <span className="text-xs text-fog/50 font-mono">v{item.version || 1}</span>
+      {cardView ? (
+        items.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:flex lg:flex-col">
+            {items.map((item) => (
+              <div key={item._id} className="glass-card glass-card-hover-active rounded-xl p-5 transition-all duration-200 flex flex-col">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="size-10 rounded-xl bg-electric-iris/10 border border-electric-iris/15 flex items-center justify-center shrink-0">
+                      <Workflow className="size-5 text-electric-iris" />
+                    </div>
+                    <div className="min-w-0 space-y-1">
+                      <Link
+                        href={`/orghead/processes/${item._id}`}
+                        className="text-base font-semibold text-moonlight hover:text-electric-iris transition-colors leading-6 truncate block"
+                      >
+                        {item.name || "—"}
+                      </Link>
+                      <div className="flex items-center gap-2">
+                        {statusIcon(item.status)}
+                        <span className="text-xs text-fog/60">
+                          {statusLabels[item.status || ""]?.label || item.status || "—"}
+                        </span>
+                        <span className="text-xs text-fog/40">•</span>
+                        <span className="text-xs text-fog/50 font-mono">v{item.version || 1}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1.5 shrink-0">
+                    <StatusBadge
+                      status={item.isActive ? "active" : "inactive"}
+                      label={item.isActive ? "فعال" : "غیرفعال"}
+                    />
                   </div>
                 </div>
-              </div>
-              <div className="flex flex-col items-end gap-1.5 shrink-0">
-                <StatusBadge
-                  status={item.isActive ? "active" : "inactive"}
-                  label={item.isActive ? "فعال" : "غیرفعال"}
-                />
-                <span className="text-[10px] text-electric-iris/60">
-                  {hasProcessScope(item) ? getProcessScopeLabel(item) : "عمومی"}
-                </span>
-              </div>
-            </div>
-            {item.description && (
-              <p className="mt-3 text-sm text-fog/60 leading-relaxed line-clamp-2">
-                {item.description}
-              </p>
-            )}
-            <div className="flex items-center justify-between mt-4 pt-3 border-t border-steel-border/10">
-              <div className="flex items-center gap-1">
-                <Link href={`/orghead/processes/${item._id}`}>
-                  <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-moonlight" title="ویرایش">
-                    <Pencil className="size-3.5" />
-                  </Button>
-                </Link>
-                <Link href={`/orghead/processes/${item._id}/graph`}>
-                  <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-electric-iris" title="نمودار">
-                    <BarChart3 className="size-3.5" />
-                  </Button>
-                </Link>
-                <Link href={`/orghead/processes/${item._id}/steps`}>
-                  <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-frost-link" title="گام‌ها">
-                    <List className="size-3.5" />
-                  </Button>
-                </Link>
-                <Link href={`/orghead/processes/${item._id}/relations`}>
-                  <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-amber-400" title="روابط">
-                    <Share2 className="size-3.5" />
-                  </Button>
-                </Link>
-                {item.status === "Draft" && (
+
+                {item.description && (
+                  <p className="mt-3 text-sm text-fog/60 leading-relaxed line-clamp-2">
+                    {item.description}
+                  </p>
+                )}
+
+                <div className="mt-auto pt-3 mt-4">
+                  <div className="flex flex-wrap items-center gap-1.5 border-t border-steel-border/15 pt-3">
+                    <Target className="size-4 text-electric-iris/70" />
+                    <span className="text-xs font-medium text-moonlight">
+                      {hasProcessScope(item) ? getProcessScopeLabel(item) : "عمومی"}
+                    </span>
+                    {item.unit?.name && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.04] px-2 py-0.5 text-[11px] text-pebble ring-1 ring-inset ring-steel-border/25">
+                        <GitBranch className="size-3.5" />
+                        {item.unit.name}
+                      </span>
+                    )}
+                    {item.createdBy && (
+                      <span className="inline-flex items-center gap-1 text-xs text-fog/60">
+                        <User className="size-3.5 text-fog/40" />
+                        {item.createdBy.first_name} {item.createdBy.last_name}
+                      </span>
+                    )}
+                    {item.createdAt && (
+                      <span className="inline-flex items-center gap-1 text-xs text-fog/60 ms-auto">
+                        <CalendarDays className="size-3.5 text-fog/40" />
+                        {new Date(item.createdAt).toLocaleDateString("fa-IR")}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1 flex-wrap border-t border-steel-border/10 pt-2 mt-3">
+                  <Link href={`/orghead/processes/${item._id}`}>
+                    <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-moonlight" title="ویرایش">
+                      <Pencil className="size-5" />
+                    </Button>
+                  </Link>
+                  <Link href={`/orghead/processes/${item._id}/graph`}>
+                    <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-electric-iris" title="نمودار">
+                      <BarChart3 className="size-5" />
+                    </Button>
+                  </Link>
+                  <Link href={`/orghead/processes/${item._id}/steps`}>
+                    <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-frost-link" title="گام‌ها">
+                      <List className="size-5" />
+                    </Button>
+                  </Link>
+                  <Link href={`/orghead/processes/${item._id}/relations`}>
+                    <Button variant="ghost" size="icon-xs" className="text-fog/60 hover:text-amber-400" title="روابط">
+                      <Share2 className="size-5" />
+                    </Button>
+                  </Link>
+                  {item.status === "Draft" && (
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      className="text-fog/60 hover:text-emerald-400"
+                      title="فعال‌سازی"
+                      onClick={() => handleActivate(item)}
+                    >
+                      <CheckCircle2 className="size-5" />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="icon-xs"
-                    className="text-fog/60 hover:text-emerald-400"
-                    title="فعال‌سازی"
-                    onClick={() => handleActivate(item)}
+                    className="text-fog/60 hover:text-frost-link"
+                    title="کپی"
+                    onClick={() => handleDuplicate(item)}
                   >
-                    <CheckCircle2 className="size-3.5" />
+                    <Copy className="size-5" />
                   </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon-xs"
-                  className="text-fog/60 hover:text-frost-link"
-                  title="کپی"
-                  onClick={() => handleDuplicate(item)}
-                >
-                  <Copy className="size-3.5" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon-xs"
-                  className="text-fog/60 hover:text-destructive"
-                  title="حذف"
-                  onClick={() => setDeleteTarget(item)}
-                >
-                  <XCircle className="size-3.5" />
-                </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
+                    className="text-fog/60 hover:text-destructive"
+                    title="حذف"
+                    onClick={() => setDeleteTarget(item)}
+                  >
+                    <XCircle className="size-5" />
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                {item.createdBy && (
-                  <span className="text-[10px] text-fog/40 hidden sm:inline">
-                    {item.createdBy.first_name} {item.createdBy.last_name}
-                  </span>
-                )}
-                {item.createdAt && (
-                  <span className="text-[10px] text-fog/40">
-                    {new Date(item.createdAt).toLocaleDateString("fa-IR")}
-                  </span>
-                )}
-              </div>
-            </div>
+            ))}
           </div>
-        )}
-        emptyTitle="فرآیندی یافت نشد"
-        emptyDescription="هنوز هیچ فرآیندی ایجاد نشده است."
-        emptyAction={
-          <Link href="/orghead/processes/add">
-            <Button size="sm" className="gap-1.5">
-              <Plus className="size-4" />
-              ایجاد فرآیند
-            </Button>
-          </Link>
-        }
-      />
+        ) : null
+      ) : null}
+
+      {(!cardView || items.length === 0) && (
+        <DataTable
+          columns={columns}
+          data={items}
+          keyExtractor={(item) => item._id}
+          cardView={false}
+          emptyTitle="فرآیندی یافت نشد"
+          emptyDescription="هنوز هیچ فرآیندی ایجاد نشده است."
+          emptyAction={
+            <Link href="/orghead/processes/add">
+              <Button size="sm" className="gap-1.5">
+                <Plus className="size-4" />
+                ایجاد فرآیند
+              </Button>
+            </Link>
+          }
+        />
+      )}
+
+      {cardView && items.length > 0 && (
+        <div className="flex items-center justify-end">
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => setCardView(false)}
+            className="gap-2.5 rounded-lg px-5"
+          >
+            <List className="size-5" />
+            نمای جدول
+          </Button>
+        </div>
+      )}
+      {!cardView && (
+        <div className="flex items-center justify-end">
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => setCardView(true)}
+            className="gap-2.5 rounded-lg px-5"
+          >
+            <Layers className="size-5" />
+            نمای کارت
+          </Button>
+        </div>
+      )}
 
       <Pagination
         prevUrl={prevPageUrl}

@@ -6,11 +6,11 @@ import { useForm } from "react-hook-form"
 import { zodV4Resolver } from "@/lib/zod-v4-resolver"
 import { z } from "zod"
 import { toast } from "sonner"
-import { ArrowRight, Loader2, Trash2, Workflow, CheckCircle2, Target, Copy, List, BarChart3, Share2, MapPin } from "lucide-react"
+import { ArrowRight, Loader2, Trash2, Check, X, CheckCircle2, Target, Copy, List, BarChart3, Share2, MapPin, ClipboardList, Workflow } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { FormInput } from "@/components/form/form-input"
 import { FormTextarea } from "@/components/form/form-textarea"
-import { FormCard } from "@/components/form/form-card"
+import { SectionCard } from "@/components/form/section-card"
 import { PageHeader } from "@/components/ui/page-header"
 import { Form } from "@/components/ui/form"
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton"
@@ -99,15 +99,19 @@ export default function EditProcessPage({ params }: { params: Promise<{ id: stri
   }, [form, id])
 
   const onSubmit = async (data: ProcessData) => {
-    const result = await update(
-      { activeRoleId: getActiveRoleIdFromStore(), _id: id, name: data.name, description: data.description || undefined },
-      { _id: 1, name: 1 },
-    )
-    if (result.success) {
-      toast.success("فرآیند با موفقیت به‌روزرسانی شد")
-      router.refresh()
-    } else {
-      toast.error(result.body?.message || "خطا در به‌روزرسانی فرآیند")
+    try {
+      const result = await update(
+        { activeRoleId: getActiveRoleIdFromStore(), _id: id, name: data.name, description: data.description || undefined },
+        { _id: 1, name: 1 },
+      )
+      if (result.success) {
+        toast.success("فرآیند با موفقیت به‌روزرسانی شد")
+        router.refresh()
+      } else {
+        toast.error(result.body?.message || "خطا در به‌روزرسانی فرآیند")
+      }
+    } catch {
+      toast.error("خطا در به‌روزرسانی فرآیند")
     }
   }
 
@@ -164,6 +168,8 @@ export default function EditProcessPage({ params }: { params: Promise<{ id: stri
     )
   }
 
+  const submitting = form.formState.isSubmitting
+
   const steps = (process?.steps || []).sort((a: { order?: number }, b: { order?: number }) => (a.order || 0) - (b.order || 0))
   const scopeChain = hasProcessScope(process) ? getProcessScopeChain(process) : []
 
@@ -174,33 +180,48 @@ export default function EditProcessPage({ params }: { params: Promise<{ id: stri
   ]
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/orghead/processes" className="text-fog hover:text-moonlight transition-colors">
+    <div className="mx-auto w-full max-w-2xl space-y-6">
+      <PageHeader
+        title={process?.name || "ویرایش فرآیند"}
+        description={`نسخه ${process?.version || 1}`}
+      >
+        <Link href="/orghead/processes">
+          <Button variant="ghost" className="gap-2 px-4">
             <ArrowRight className="size-5" />
-          </Link>
-          <PageHeader title={process?.name || "ویرایش فرآیند"} description={`نسخه ${process?.version || 1}`} className="border-none mb-0 pb-0" />
-        </div>
-        <div className="flex items-center gap-2">
-          {process?.status === "Draft" && (
-            <Button variant="ghost" size="sm" className="text-emerald-400 gap-1.5" onClick={handleActivate}>
-              <CheckCircle2 className="size-4" />
-              فعال‌سازی
-            </Button>
-          )}
-          <Button variant="ghost" size="sm" className="text-frost-link gap-1.5" onClick={handleDuplicate}>
-            <Copy className="size-4" />
-            کپی
+            بازگشت به فرآیندها
           </Button>
-          <Button variant="ghost" size="sm" className="text-destructive gap-1.5" onClick={() => setShowDelete(true)}>
-            <Trash2 className="size-4" />
-            حذف
+        </Link>
+        <Link href={`/orghead/processes/${id}/steps`}>
+          <Button variant="ghost" className="gap-2 px-4">
+            <List className="size-5" />
+            مدیریت گام‌ها
           </Button>
-        </div>
-      </div>
+        </Link>
+        {process?.status === "Draft" && (
+          <Button
+            variant="ghost"
+            onClick={handleActivate}
+            className="gap-2 px-4 text-emerald-400 hover:bg-emerald-500/5 hover:text-emerald-400"
+          >
+            <CheckCircle2 className="size-5" />
+            فعال‌سازی
+          </Button>
+        )}
+        <Button variant="ghost" onClick={handleDuplicate} className="gap-2 px-4 text-frost-link hover:text-frost-link">
+          <Copy className="size-5" />
+          کپی
+        </Button>
+        <Button
+          variant="ghost"
+          onClick={() => setShowDelete(true)}
+          className="gap-2 px-4 text-ember hover:bg-ember/5 hover:text-ember"
+        >
+          <Trash2 className="size-5" />
+          حذف
+        </Button>
+      </PageHeader>
 
-      <div className="flex items-center gap-4 px-1 flex-wrap">
+      <div className="flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-2">
           <span className="text-xs text-fog/60">وضعیت:</span>
           {process?.status && (
@@ -245,29 +266,57 @@ export default function EditProcessPage({ params }: { params: Promise<{ id: stri
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormCard title="اطلاعات فرآیند">
-            <FormInput control={form.control} name="name" label="نام فرآیند" required />
-            <FormTextarea control={form.control} name="description" label="توضیحات" rows={3} />
-          </FormCard>
-          <div className="flex items-center gap-2 justify-end">
-            <Button type="submit" disabled={form.formState.isSubmitting} className="gap-1.5">
-              {form.formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
-              ذخیره تغییرات
-            </Button>
+          <SectionCard
+            icon={ClipboardList}
+            iconClassName="bg-electric-iris/10 text-electric-iris ring-electric-iris/15"
+            title="اطلاعات فرآیند"
+          >
+            <FormInput control={form.control} name="name" label="نام فرآیند" placeholder="مثال: فرآیند خرید مستقیم" required disabled={submitting} />
+            <FormTextarea control={form.control} name="description" label="توضیحات" placeholder="توضیحات مختصری درباره فرآیند…" rows={3} disabled={submitting} />
+          </SectionCard>
+
+          <div className="sticky bottom-0 z-10">
+            <div className="glass-card-conic-top flex flex-col-reverse gap-4 rounded-xl border border-white/8 bg-graphite-plate/70 p-5 shadow-[0_32px_64px_-32px_rgba(5,6,15,0.9),0_0_40px_-16px_rgba(182,217,252,0.2)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6">
+              <p className="hidden text-caption text-fog/60 sm:block">
+                فیلدهای ستاره‌دار الزامی هستند
+              </p>
+              <div className="flex items-center gap-3 sm:gap-4">
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={submitting}
+                  className="flex-1 gap-2 px-5 sm:flex-none"
+                >
+                  {submitting ? (
+                    <Loader2 className="size-5 animate-spin" />
+                  ) : (
+                    <Check className="size-5" />
+                  )}
+                  ذخیره تغییرات
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="lg"
+                  disabled={submitting}
+                  onClick={() => router.push("/orghead/processes")}
+                  className="gap-2 px-5"
+                >
+                  <X className="size-5" />
+                  انصراف
+                </Button>
+              </div>
+            </div>
           </div>
         </form>
       </Form>
 
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Workflow className="size-5 text-electric-iris" />
-          <h2 className="text-base font-medium text-glacier">گام‌های فرآیند</h2>
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-electric-iris/8 text-electric-iris/70">{steps.length} گام</span>
-          <Link href={`/orghead/processes/${id}/steps`} className="ms-auto text-xs text-frost-link hover:text-electric-iris transition-colors">
-            مدیریت گام‌ها
-          </Link>
-        </div>
-
+      <SectionCard
+        icon={Workflow}
+        iconClassName="bg-amber-500/10 text-amber-400 ring-amber-500/15"
+        title={`گام‌های فرآیند (${steps.length})`}
+        description="گام‌های گردش کار را به ترتیب مرور یا ویرایش کنید."
+      >
         {steps.length === 0 ? (
           <div className="rounded-xl border border-dashed border-steel-border/20 p-8 text-center">
             <Workflow className="size-8 text-fog/30 mx-auto mb-2" />
@@ -298,7 +347,7 @@ export default function EditProcessPage({ params }: { params: Promise<{ id: stri
             ))}
           </div>
         )}
-      </div>
+      </SectionCard>
 
       <ConfirmDialog
         open={showDelete}

@@ -1,4 +1,5 @@
 import { gets } from "@/app/actions/process/gets"
+import { count } from "@/app/actions/process/count"
 import { ProcessesClient } from "./processes-client"
 
 export default async function OrgHeadProcessesPage({
@@ -31,7 +32,18 @@ export default async function OrgHeadProcessesPage({
     },
   )
 
+  const [totalResult, activeResult, draftResult, archivedResult] = await Promise.all([
+    count({}, { qty: 1 }),
+    count({ status: "Active" }, { qty: 1 }),
+    count({ status: "Draft" }, { qty: 1 }),
+    count({ status: "Archived" }, { qty: 1 }),
+  ])
+
   const items = result.success ? result.body : []
+  const total = totalResult.success ? (totalResult.body?.qty ?? 0) : 0
+  const activeCount = activeResult.success ? (activeResult.body?.qty ?? 0) : 0
+  const draftCount = draftResult.success ? (draftResult.body?.qty ?? 0) : 0
+  const archivedCount = archivedResult.success ? (archivedResult.body?.qty ?? 0) : 0
   const prevPageUrl = page > 1 ? `/orghead/processes?page=${page - 1}${resolvedSearchParams.search ? `&search=${resolvedSearchParams.search}` : ""}` : ""
   const nextPageUrl = items.length >= limit ? `/orghead/processes?page=${page + 1}${resolvedSearchParams.search ? `&search=${resolvedSearchParams.search}` : ""}` : ""
 
@@ -42,6 +54,10 @@ export default async function OrgHeadProcessesPage({
       nextPageUrl={nextPageUrl}
       page={page}
       search={resolvedSearchParams.search || ""}
+      total={total}
+      activeCount={activeCount}
+      draftCount={draftCount}
+      archivedCount={archivedCount}
     />
   )
 }
