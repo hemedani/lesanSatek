@@ -520,7 +520,7 @@ export function OrgHeadPRDetailClient({ pr }: OrgHeadPRDetailClientProps) {
                   onClick={() => setShowPayConfirm(true)}
                   disabled={paying}
                 >
-                  {paying ? <Loader2 className="size-4 animate-spin" /> : <CreditCard className="size-4" />}
+                  {paying ? <Loader2 className="size-5 animate-spin" /> : <CreditCard className="size-5" />}
                   {paying ? "در حال ارسال..." : "ارسال به مالی"}
                 </Button>
               </CardContent>
@@ -531,12 +531,12 @@ export function OrgHeadPRDetailClient({ pr }: OrgHeadPRDetailClientProps) {
           <div className="flex flex-col gap-2">
             {isPendingFinalization && (
               <Button className="w-full gap-2" size="sm" onClick={() => setShowFinalize(true)}>
-                <ShieldCheck className="size-4" />
+                <ShieldCheck className="size-5" />
                 تأیید نهایی
               </Button>
             )}
             <Button variant="ghost" className="w-full gap-2" size="sm" onClick={() => router.push("/orghead/requests")}>
-              <ArrowRight className="size-4" />
+              <ArrowRight className="size-5" />
               بازگشت به لیست
             </Button>
           </div>
