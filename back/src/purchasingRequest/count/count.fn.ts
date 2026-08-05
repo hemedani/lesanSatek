@@ -27,10 +27,22 @@ export const countFn: ActFn = async (body) => {
 
   const filters: Document = {};
 
+  const isWarehouseHead = await (async () => {
+    if (activeRole.name !== "UnitHead") return false;
+    if (activeRole.scopeType !== "unit" || !activeRole.scopeId) return false;
+    const u = await unit.findOne({
+      filters: { _id: new ObjectId(activeRole.scopeId) },
+      projection: { type: 1 },
+    }) as Document | null;
+    return u?.type === "Warehouse";
+  })();
+
   if (activeRole.name === "Employee" || activeRole.name === "Ordinary") {
     filters["requester._id"] = user._id;
   } else if (activeRole.name === "UnitHead" && !unitId) {
-    if (activeRole.scopeType === "unit" && activeRole.scopeId) {
+    if (isWarehouseHead) {
+      filters["stuffStatus"] = "delivered";
+    } else if (activeRole.scopeType === "unit" && activeRole.scopeId) {
       filters["requestingUnit._id"] = new ObjectId(activeRole.scopeId);
     }
   } else if (activeRole.name === "StoreHead") {

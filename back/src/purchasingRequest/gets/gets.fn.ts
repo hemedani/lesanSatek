@@ -44,12 +44,26 @@ export const getsFn: ActFn = async (body) => {
 
   const pipeline: Document[] = [];
 
+  const isWarehouseHead = await (async () => {
+    if (activeRole.name !== "UnitHead") return false;
+    if (activeRole.scopeType !== "unit" || !activeRole.scopeId) return false;
+    const u = await unit.findOne({
+      filters: { _id: new ObjectId(activeRole.scopeId) },
+      projection: { type: 1 },
+    }) as Document | null;
+    return u?.type === "Warehouse";
+  })();
+
   if (activeRole.name === "Employee" || activeRole.name === "Ordinary") {
     pipeline.push({
       $match: { "requester._id": user._id },
     });
   } else if (activeRole.name === "UnitHead") {
-    if (activeRole.scopeType === "unit" && activeRole.scopeId) {
+    if (isWarehouseHead) {
+      pipeline.push({
+        $match: { stuffStatus: "delivered" },
+      });
+    } else if (activeRole.scopeType === "unit" && activeRole.scopeId) {
       pipeline.push({
         $match: { "requestingUnit._id": new ObjectId(activeRole.scopeId) },
       });

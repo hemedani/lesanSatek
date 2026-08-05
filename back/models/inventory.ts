@@ -190,7 +190,7 @@ export const createInventoryIndex = async () => {
       { unique: true },
     );
   } catch (error) {
-    console.log(
+    console.error(
       "Inventory compound index already exists or creation failed:",
       (error as Error).message,
     );

@@ -15,20 +15,6 @@ export const getsFn: ActFn = async (body) => {
     get,
   } = body.details;
 
-  /*
-   * 	@LOG @DEBUG @INFO
-   * 	This log written by ::==> {{ `` }}
-   *
-   * 	Please remove your log after debugging
-   */
-  console.log(" ============= ");
-  console.group("activeRoleId ------ ");
-  console.log();
-  console.info({ set: body.details.set }, " ------ ");
-  console.log();
-  console.groupEnd();
-  console.log(" ============= ");
-
   const pipeline: Document[] = [];
 
   search &&

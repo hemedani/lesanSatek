@@ -13,13 +13,88 @@ export const addFn: ActFn = async (body) => {
     activeRoleId,
     purchasingRequestId,
     receivedById,
-    receivingUnitId,
+    receivingUnitId: _receivingUnitId,
     ...rest
   } = set;
 
   const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
 
   const now = new Date();
+
+  // Fetch PR for authorization check + data extraction
+  let prDoc: Record<string, unknown> | null = null;
+  let prStoreId: string | undefined;
+  let prEstimatedAmount = 0;
+  let prQuantity = 0;
+  let receivingUnitId: string | undefined;
+
+  if (purchasingRequestId) {
+    prDoc = await purchasingRequest.findOne({
+      filters: { _id: new ObjectId(purchasingRequestId as string) },
+      projection: {
+        store: { _id: 1 }, estimatedAmount: 1, quantity: 1, stuffStatus: 1,
+        requester: { _id: 1 }, requestingUnit: { _id: 1 }, ware: { _id: 1 },
+      },
+    }) as Record<string, unknown> | null;
+
+    if (!prDoc) {
+      throwError("Purchasing request not found");
+      return;
+    }
+    const pr = prDoc as Record<string, unknown>;
+
+    // Authorization: the requester, the head of the requesting unit, or a central
+    // warehouse head can confirm goods delivery
+    const isRequester = pr.requester &&
+      (pr.requester as Record<string, unknown>)._id?.toString() === user._id.toString();
+
+    const prRequestingUnitId = (pr.requestingUnit as Record<string, unknown>)?._id?.toString();
+    if (!prRequestingUnitId) {
+      throwError("Purchasing request has no requesting unit to receive goods into");
+      return;
+    }
+
+    const requestingUnitDoc = await unit.findOne({
+      filters: { _id: new ObjectId(prRequestingUnitId) },
+      projection: { head: { _id: 1 } },
+    }) as Document | null;
+    const isRequestingUnitHead = requestingUnitDoc?.head?._id?.toString() === user._id.toString();
+
+    const warehouseUnits = await unit.aggregation({
+      pipeline: [
+        { $match: { type: "Warehouse", "head._id": user._id } },
+      ],
+      projection: { _id: 1 },
+    }).toArray();
+    const isWarehouseHead = warehouseUnits.length > 0;
+
+    if (!isRequester && !isRequestingUnitHead && !isWarehouseHead) {
+      throwError(
+        "Only the requester, the requesting unit head, or the central warehouse head can confirm goods delivery",
+      );
+    }
+
+    // Route received goods based on the active role's scoped unit (ignore any client-supplied unit):
+    // - active role scoped to a Warehouse unit (central warehouse head) → the central warehouse
+    // - otherwise (requesting unit employee/head/requester) → the requesting unit's own warehouse
+    receivingUnitId = prRequestingUnitId;
+    if (activeRole?.scopeType === "unit" && activeRole.scopeId) {
+      const scopedUnit = await unit.findOne({
+        filters: { _id: new ObjectId(activeRole.scopeId) },
+        projection: { type: 1 },
+      }) as Document | null;
+      if (scopedUnit?.type === "Warehouse") {
+        receivingUnitId = activeRole.scopeId as string;
+      }
+    }
+
+    // Extract store/pricing data
+    if (pr.store) {
+      prStoreId = ((pr.store as Record<string, unknown>)._id as ObjectId).toString();
+    }
+    prEstimatedAmount = (pr.estimatedAmount as number) || 0;
+    prQuantity = (pr.quantity as number) || 0;
+  }
 
   const relations: Record<string, unknown> = {};
 
@@ -46,64 +121,6 @@ export const addFn: ActFn = async (body) => {
         goodsReceipts: true,
       },
     };
-  }
-
-  // Fetch PR for authorization check + data extraction
-  let prDoc: Record<string, unknown> | null = null;
-  let prStoreId: string | undefined;
-  let prEstimatedAmount = 0;
-  let prQuantity = 0;
-  if (purchasingRequestId) {
-    prDoc = await purchasingRequest.findOne({
-      filters: { _id: new ObjectId(purchasingRequestId as string) },
-      projection: {
-        store: { _id: 1 }, estimatedAmount: 1, quantity: 1, stuffStatus: 1,
-        requester: { _id: 1 }, requestingUnit: { _id: 1 }, ware: { _id: 1 },
-      },
-    }) as Record<string, unknown> | null;
-
-    if (!prDoc) {
-      throwError("Purchasing request not found");
-      return;
-    }
-    const pr = prDoc as Record<string, unknown>;
-
-    // Authorization: only the requester or a warehouse head can confirm goods delivery
-    const isRequester = pr.requester &&
-      (pr.requester as Record<string, unknown>)._id?.toString() === user._id.toString();
-
-    let isWarehouseHead = false;
-    let warehouseHeadUnitIds: string[] = [];
-    if (!isRequester) {
-      const warehouseUnits = await unit.aggregation({
-        pipeline: [
-          { $match: { type: "Warehouse", "head._id": user._id } },
-        ],
-        projection: { _id: 1 },
-      }).toArray();
-      isWarehouseHead = warehouseUnits.length > 0;
-      warehouseHeadUnitIds = warehouseUnits.map((u: Document) => u._id.toString());
-    }
-
-    if (!isRequester && !isWarehouseHead) {
-      throwError("Only the requester or the central warehouse head can confirm goods delivery");
-    }
-
-    // Validate receivingUnitId matches the appropriate unit
-    const prRequestingUnitId = (pr.requestingUnit as Record<string, unknown>)?._id?.toString();
-    if (isRequester && receivingUnitId !== prRequestingUnitId) {
-      throwError("As the requester, goods must be received into your requesting unit");
-    }
-    if (isWarehouseHead && !warehouseHeadUnitIds.includes(receivingUnitId as string)) {
-      throwError("As the warehouse head, goods must be received into your warehouse unit");
-    }
-
-    // Extract store/pricing data
-    if (pr.store) {
-      prStoreId = ((pr.store as Record<string, unknown>)._id as ObjectId).toString();
-    }
-    prEstimatedAmount = (pr.estimatedAmount as number) || 0;
-    prQuantity = (pr.quantity as number) || 0;
   }
 
   // Get PR's ware as fallback when items don't specify wareId
