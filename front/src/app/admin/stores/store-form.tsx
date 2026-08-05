@@ -296,6 +296,8 @@ export function StoreForm({ item }: StoreFormProps) {
       backLabel="بازگشت به فروشگاه‌ها"
       submitLabel={isEdit ? "ذخیره تغییرات" : "ثبت فروشگاه"}
       relationsHref={isEdit && item ? `/admin/stores/${item._id}/relations` : undefined}
+      helpTopicId="admin-stores"
+      helpTooltip="راهنمای فروشگاه"
       form={form}
       onSubmit={onSubmit}
     >

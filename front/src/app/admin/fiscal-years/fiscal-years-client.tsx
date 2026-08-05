@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Plus, CalendarRange, Pencil, Trash2, ArrowDownUp, RotateCcw, Lock, CalendarDays, Share2 } from "lucide-react"
 import { toast } from "sonner"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Button } from "@/components/ui/button"
 import { Pagination } from "@/components/ui/pagination"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -264,6 +265,7 @@ export function FiscalYearsClient({
             افزودن سال مالی
           </Button>
         </Link>
+        <HelpLauncher topicId="admin-fiscal-years" tooltip="راهنمای سال‌های مالی" />
       </PageHeader>
 
       <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">

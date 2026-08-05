@@ -11,6 +11,7 @@ import { toast } from "sonner"
 import { ArrowRight, Wallet, Loader2, Check, X, Trash2, Share2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Form } from "@/components/ui/form"
 import { FormInput } from "@/components/form/form-input"
 import { SectionCard } from "@/components/form/section-card"
@@ -135,6 +136,7 @@ export function BudgetLineEditClient({ budgetLine }: BudgetLineEditClientProps) 
           <Trash2 className="size-5" />
           حذف
         </Button>
+      <HelpLauncher topicId="admin-budget-lines" tooltip="راهنمای ردیف بودجه" />
       </PageHeader>
 
       <Form {...form}>

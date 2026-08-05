@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Plus, Gavel, Pencil, Trash2, ArrowDownUp, RotateCcw, CalendarDays, Clock, ShoppingCart } from "lucide-react"
 import { toast } from "sonner"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Button } from "@/components/ui/button"
 import { Pagination } from "@/components/ui/pagination"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -227,6 +228,7 @@ export function TendersClient({
             مناقصه جدید
           </Button>
         </Link>
+        <HelpLauncher topicId="admin-tenders" tooltip="راهنمای مناقصات" />
       </PageHeader>
 
       <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">

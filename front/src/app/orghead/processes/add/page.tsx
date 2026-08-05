@@ -12,6 +12,7 @@ import { FormTextarea } from "@/components/form/form-textarea"
 import { SectionCard } from "@/components/form/section-card"
 import { Form } from "@/components/ui/form"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { ProcessBuilder } from "@/components/process/process-builder"
 import { ProcessScopeFields } from "@/components/process/process-scope-fields"
 import { add as addProcess } from "@/app/actions/process/add"
@@ -168,6 +169,7 @@ export default function AddProcessPage() {
             بازگشت به فرآیندها
           </Button>
         </Link>
+        <HelpLauncher topicId="orghead-process-add" tooltip="راهنمای ایجاد فرآیند" />
       </PageHeader>
 
       <Form {...form}>

@@ -25,6 +25,7 @@ import { FilterSelect } from "@/components/ui/filter-select"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { Badge } from "@/components/ui/badge"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import type { FilterOption } from "@/components/ui/filter-select"
 import { removeUser } from "@/app/actions/user/removeUser"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
@@ -273,12 +274,15 @@ export function UsersClient({
         title="کاربران"
         description="مدیریت کاربران سامانه — نقش‌ها، دسترسی‌ها و وضعیت هر کاربر"
       >
-        <Link href="/admin/users/add">
-          <Button className="gap-2 px-5">
-            <Plus className="size-5" />
-            افزودن کاربر
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <HelpLauncher topicId="admin-users-list" tooltip="راهنمای مدیریت کاربران" />
+          <Link href="/admin/users/add">
+            <Button className="gap-2 px-5">
+              <Plus className="size-5" />
+              افزودن کاربر
+            </Button>
+          </Link>
+        </div>
       </PageHeader>
 
       <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">

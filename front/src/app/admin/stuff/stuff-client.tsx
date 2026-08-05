@@ -9,6 +9,7 @@ import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/page-header";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { Pagination } from "@/components/ui/pagination";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SearchField } from "@/components/ui/search-field";
@@ -388,6 +389,7 @@ export function StuffClient({
           <Plus className="size-5" />
           موجودی جدید
         </Button>
+        <HelpLauncher topicId="admin-stuff" tooltip="راهنمای موجودی فروشگاه‌ها" />
       </PageHeader>
 
       <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">

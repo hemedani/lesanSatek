@@ -7,6 +7,7 @@ import Link from "next/link"
 import { Plus, ArrowDownUp, RotateCcw, Inbox } from "lucide-react"
 import { toast } from "sonner"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Button } from "@/components/ui/button"
 import { Pagination } from "@/components/ui/pagination"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -61,6 +62,8 @@ interface EntityListClientProps<T> {
   deleteDescription: (item: T) => string
   deleteSuccess: string
   deleteError: string
+  helpTopicId?: string
+  helpTooltip?: string
 }
 
 function EntityListClient<T extends { _id: string }>({
@@ -94,6 +97,8 @@ function EntityListClient<T extends { _id: string }>({
   deleteDescription,
   deleteSuccess,
   deleteError,
+  helpTopicId,
+  helpTooltip,
 }: EntityListClientProps<T>) {
   const router = useRouter()
   const [deleteTarget, setDeleteTarget] = useState<T | null>(null)
@@ -164,6 +169,9 @@ function EntityListClient<T extends { _id: string }>({
             {addLabel}
           </Button>
         </Link>
+        {helpTopicId && (
+          <HelpLauncher topicId={helpTopicId} tooltip={helpTooltip} />
+        )}
       </PageHeader>
 
       <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RequestStatusBadge } from "@/components/purchasing/request-status-badge";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { WorkflowVisualizer } from "@/components/purchasing/workflow-visualizer";
 import { HistoryTimeline } from "@/components/purchasing/history-timeline";
 import { AddStuffDialog } from "@/components/purchasing/add-stuff-dialog";
@@ -166,6 +167,9 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
                 )}
               </div>
             </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <HelpLauncher topicId="admin-purchasing-requests" tooltip="راهنمای درخواست خرید" />
           </div>
         </div>
       </div>

@@ -21,6 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { NavCard } from "@/components/dashboard/nav-card"
 import { StatCard } from "@/components/dashboard/stat-card"
 import { dashboardStatistic } from "@/app/actions/user/dashboardStatistic"
@@ -93,6 +94,7 @@ export default async function UnitHeadDashboard() {
             مدیریت درخواست‌ها
           </Button>
         </Link>
+        <HelpLauncher topicId="unit-head-dashboard" tooltip="راهنمای داشبورد واحد" />
       </PageHeader>
 
       {/* KPI / Nav Cards */}

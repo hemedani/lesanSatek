@@ -197,6 +197,8 @@ export function WareForm({ item }: WareFormProps) {
       backLabel="بازگشت به کالاها"
       submitLabel={isEdit ? "ذخیره تغییرات" : "ثبت کالا"}
       relationsHref={isEdit && item ? `/admin/wares/${item._id}/relations` : undefined}
+      helpTopicId="admin-ware-add"
+      helpTooltip="راهنمای افزودن کالا"
       form={form}
       onSubmit={onSubmit}
     >

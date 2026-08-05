@@ -82,6 +82,8 @@ export function FiscalYearForm() {
   return (
     <EntityFormShell
       title="افزودن سال مالی"
+      helpTopicId="admin-fiscal-years"
+      helpTooltip="راهنمای سال مالی"
       description="دوره مالی برای مدیریت بودجه سازمان تعریف کنید؛ تنها یک سال مالی معمولاً فعال است."
       backHref="/admin/fiscal-years"
       backLabel="بازگشت به سال‌های مالی"

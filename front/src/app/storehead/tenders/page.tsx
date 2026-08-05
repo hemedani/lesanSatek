@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { gets } from "@/app/actions/tender/gets"
 import { count } from "@/app/actions/tender/count"
 import { TendersListClient } from "./tenders-list-client"
@@ -67,7 +68,9 @@ export default async function StoreTendersPage({
 
   return (
     <div className="space-y-6">
-      <PageHeader title="مناقصات" description="مناقصات قابل شرکت برای فروشگاه شما" />
+      <PageHeader title="مناقصات" description="مناقصات قابل شرکت برای فروشگاه شما">
+        <HelpLauncher topicId="storehead-tenders" tooltip="راهنمای مناقصات" />
+      </PageHeader>
 
       <TendersListClient
         items={items}

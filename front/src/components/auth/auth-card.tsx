@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react"
+import { HelpLauncher } from "@/components/help/help-launcher"
 
 interface AuthCardProps {
   icon: LucideIcon
@@ -16,6 +17,9 @@ function AuthCard({ icon: Icon, title, subtitle, children }: AuthCardProps) {
       />
 
       <div className="relative mb-8 text-center">
+        <div className="absolute end-0 top-0">
+          <HelpLauncher topicId="auth-help" tooltip="راهنما" />
+        </div>
         <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-2xl bg-electric-iris/15 shadow-[inset_0_0_0_1px_rgba(102,58,243,0.25),0_0_28px_-8px_rgba(102,58,243,0.55)]">
           <Icon className="size-7 text-electric-iris" aria-hidden="true" />
         </div>

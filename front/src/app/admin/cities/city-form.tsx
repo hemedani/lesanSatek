@@ -60,6 +60,8 @@ export function CityForm() {
   return (
     <EntityFormShell
       title="افزودن شهر"
+      helpTopicId="admin-cities"
+      helpTooltip="راهنمای شهر"
       description="شهر، دومین سطح سلسله‌مراتب موقعیت جغرافیایی است و زیرمجموعه یک استان قرار می‌گیرد."
       backHref="/admin/cities"
       backLabel="بازگشت به شهرها"

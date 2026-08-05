@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ArrowRight, Warehouse, ScrollText } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Button } from "@/components/ui/button"
 import { NavCard } from "@/components/dashboard/nav-card"
 import { gets as getStockMovements } from "@/app/actions/stockMovement/gets"
@@ -114,6 +115,7 @@ export default async function RequestsStockMovementsPage({
             همه درخواست‌ها
           </Button>
         </Link>
+        <HelpLauncher topicId="requests-stock-movements" tooltip="راهنمای گردش کالا" />
       </PageHeader>
 
       <section className="space-y-4" aria-label="دسترسی سریع">

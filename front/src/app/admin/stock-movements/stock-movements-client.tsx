@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Activity, Factory, FolderTree, Building2, User, MessageSquareText, Box, ArrowDownUp, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/page-header";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { Pagination } from "@/components/ui/pagination";
 import { EmptyState } from "@/components/ui/empty-state";
 import { FilterSelect } from "@/components/ui/filter-select";
@@ -224,6 +225,7 @@ export function StockMovementsClient({
           <span className="size-1.5 rounded-full bg-electric-iris" aria-hidden="true" />
           {total.toLocaleString("fa-IR")} گردش
         </span>
+        <HelpLauncher topicId="admin-stock-movements" tooltip="راهنمای گردش انبار" />
       </PageHeader>
 
       <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">

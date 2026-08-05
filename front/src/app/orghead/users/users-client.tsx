@@ -7,6 +7,7 @@ import { Plus, User, Pencil, Trash2, Mail, Phone, Shield, BadgeCheck, BadgeX, Bu
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { DataTable } from "@/components/ui/data-table"
 import { Pagination } from "@/components/ui/pagination"
 import { FilterBar } from "@/components/ui/filter-bar"
@@ -97,6 +98,7 @@ export function UsersClient({ items, prevPageUrl, nextPageUrl, page, search = ""
             کاربر جدید
           </Button>
         </Link>
+        <HelpLauncher topicId="orghead-users" tooltip="راهنمای کاربران" />
       </PageHeader>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 lg:gap-5">

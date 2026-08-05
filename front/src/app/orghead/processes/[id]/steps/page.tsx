@@ -10,6 +10,7 @@ import { ArrowRight, Loader2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { PageHeader } from "@/components/ui/page-header";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { ErrorState } from "@/components/ui/error-state";
 import { ProcessBuilder } from "@/components/process/process-builder";
@@ -199,7 +200,9 @@ export default function EditProcessStepsPage({
           title={`گام‌های فرآیند: ${processName}`}
           description="افزودن، ویرایش و مرتب‌سازی گام‌های فرآیند"
           className="border-none mb-0 pb-0"
-        />
+        >
+          <HelpLauncher topicId="orghead-process-steps" tooltip="راهنمای گام‌های فرآیند" />
+        </PageHeader>
       </div>
 
       <Form {...form}>

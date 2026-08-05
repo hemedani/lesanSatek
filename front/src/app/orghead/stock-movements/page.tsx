@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { gets as getStockMovements } from "@/app/actions/stockMovement/gets"
 import { count } from "@/app/actions/stockMovement/count"
 import { StockMovementsClient } from "./stock-movements-client"
@@ -61,6 +62,7 @@ export default async function OrgHeadStockMovementsPage({
           <ArrowRight className="size-4" />
           بازگشت به داشبورد
         </Link>
+        <HelpLauncher topicId="orghead-stock-movements" tooltip="راهنمای گردش کالا" />
       </div>
       <PageHeader title="گردش کالا" description="مشاهده تاریخچه جابه‌جایی کالا در سطح سازمان" />
       <StockMovementsClient

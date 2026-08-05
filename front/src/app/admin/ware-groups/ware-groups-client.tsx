@@ -57,6 +57,8 @@ export function WareGroupsClient({
       addHref="/admin/ware-groups/add"
       addLabel="افزودن گروه کالا"
       searchPlaceholder="جستجوی گروه کالا…"
+      helpTopicId="admin-ware-groups"
+      helpTooltip="راهنمای گروه‌های کالا"
       basePath="/admin/ware-groups"
       search={search}
       sort={sort}

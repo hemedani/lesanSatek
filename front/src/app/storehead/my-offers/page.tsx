@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { gets } from "@/app/actions/tenderOffer/gets"
 import { MyOffersClient } from "./my-offers-client"
 
@@ -74,7 +75,9 @@ export default async function MyOffersPage({
 
   return (
     <div className="space-y-6">
-      <PageHeader title="پیشنهادهای من" description="لیست پیشنهادهای ثبت شده برای مناقصات" />
+      <PageHeader title="پیشنهادهای من" description="لیست پیشنهادهای ثبت شده برای مناقصات">
+        <HelpLauncher topicId="storehead-my-offers" tooltip="راهنمای پیشنهادهای من" />
+      </PageHeader>
 
       <MyOffersClient
         items={items}

@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Plus, ClipboardList, Pencil, Trash2, ArrowDownUp, RotateCcw, CalendarDays, ShoppingCart, Package } from "lucide-react"
 import { toast } from "sonner"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Button } from "@/components/ui/button"
 import { Pagination } from "@/components/ui/pagination"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -233,6 +234,7 @@ export function GoodsReceiptsClient({
             رسید جدید
           </Button>
         </Link>
+        <HelpLauncher topicId="admin-goods-receipts" tooltip="راهنمای رسید کالا" />
       </PageHeader>
 
       <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">

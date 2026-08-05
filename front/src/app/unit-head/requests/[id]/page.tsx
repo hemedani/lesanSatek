@@ -4,6 +4,7 @@ import { ArrowRight, ShoppingCart, Building2, Landmark, Store, Package, Clipboar
 import { cn } from "@/lib/utils"
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { get as getPR } from "@/app/actions/purchasingRequest/get"
 import { get as getUnit } from "@/app/actions/unit/get"
@@ -416,7 +417,7 @@ export default async function UnitHeadRequestDetailPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between gap-3">
         <Link
           href="/unit-head/requests"
           className="inline-flex items-center gap-1 text-sm text-fog hover:text-glacier transition-colors"
@@ -424,6 +425,7 @@ export default async function UnitHeadRequestDetailPage({
           <ArrowRight className="size-4" />
           بازگشت به لیست
         </Link>
+        <HelpLauncher topicId="unit-head-request-review" tooltip="راهنمای بررسی درخواست" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">

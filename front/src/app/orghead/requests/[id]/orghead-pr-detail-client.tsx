@@ -8,6 +8,7 @@ import {
   CreditCard, ShieldCheck, CheckCircle, Wallet, Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -185,6 +186,7 @@ export function OrgHeadPRDetailClient({ pr }: OrgHeadPRDetailClientProps) {
               </div>
             </div>
           </div>
+          <HelpLauncher topicId="orghead-request-detail" tooltip="راهنمای جزئیات درخواست" />
         </div>
       </div>
 

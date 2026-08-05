@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { SearchSelect } from "@/components/form/form-search-select"
 import { updateRelations } from "@/app/actions/ware/updateRelations"
 import { gets as getWareTypes } from "@/app/actions/wareType/gets"
@@ -215,6 +216,7 @@ export function WareRelationsClient({ ware }: WareRelationsProps) {
             بازگشت به کالا
           </Button>
         </Link>
+      <HelpLauncher topicId="admin-wares" tooltip="راهنمای روابط کالا" />
       </PageHeader>
 
       <SectionCard

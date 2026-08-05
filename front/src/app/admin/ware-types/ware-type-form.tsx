@@ -67,6 +67,8 @@ export function WareTypeForm({ item }: WareTypeFormProps) {
   return (
     <EntityFormShell
       title={isEdit ? "ویرایش نوع کالا" : "افزودن نوع کالا"}
+      helpTopicId="admin-ware-types"
+      helpTooltip="راهنمای نوع کالا"
       description="نام و نام لاتین نوع کالا را مشخص کنید؛ انواع کالا بالاترین سطح سلسله‌مراتب دسته‌بندی هستند."
       backHref="/admin/ware-types"
       backLabel="بازگشت به انواع کالا"

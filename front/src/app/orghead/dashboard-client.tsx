@@ -21,6 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { NavCard } from "@/components/dashboard/nav-card";
 import { PrStatusDonut } from "@/components/orghead/charts/pr-status-donut";
@@ -177,6 +178,7 @@ export function OrgHeadDashboardClient({ organization, stats }: Props) {
             مدیریت درخواست‌ها
           </Button>
         </Link>
+        <HelpLauncher topicId="orghead-dashboard" tooltip="راهنمای داشبورد سازمان" />
       </PageHeader>
 
       {/* Section 1: Org Banner */}

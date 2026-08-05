@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { NavCard } from "@/components/dashboard/nav-card"
 import { count as countStuff } from "@/app/actions/stuff/count"
 import { gets as getTenders } from "@/app/actions/tender/gets"
@@ -83,6 +84,7 @@ export default async function StoreHeadDashboard({ searchParams }: StoreHeadPage
             مدیریت کالاها
           </Button>
         </Link>
+        <HelpLauncher topicId="storehead-dashboard" tooltip="راهنمای داشبورد فروشگاه" />
       </PageHeader>
 
       {/* Store info banner */}

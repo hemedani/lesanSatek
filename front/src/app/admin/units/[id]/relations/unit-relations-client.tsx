@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { SearchSelect } from "@/components/form/form-search-select"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { updateRelations } from "@/app/actions/unit/updateRelations"
@@ -238,6 +239,7 @@ export function UnitRelationsClient({ unit }: UnitRelationsProps) {
             بازگشت به ویرایش
           </Button>
         </Link>
+      <HelpLauncher topicId="admin-unit-edit" tooltip="راهنمای روابط واحد" />
       </PageHeader>
 
       <SectionCard

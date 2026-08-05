@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { gets as getInventories } from "@/app/actions/inventory/gets"
 import { count as countInventories } from "@/app/actions/inventory/count"
 import { InventoryClient } from "./inventory-client"
@@ -95,7 +96,12 @@ export default async function OrgHeadInventoryPage({
 
   return (
     <div className="space-y-6">
-      <PageHeader title="موجودی انبار" description="مشاهده و مدیریت موجودی کالا در سطح سازمان" />
+      <PageHeader
+        title="موجودی انبار"
+        description="مشاهده و مدیریت موجودی کالا در سطح سازمان"
+      >
+        <HelpLauncher topicId="orghead-inventory" tooltip="راهنمای موجودی انبار" />
+      </PageHeader>
       <InventoryClient
         items={items}
         prevUrl={prevPageUrl}

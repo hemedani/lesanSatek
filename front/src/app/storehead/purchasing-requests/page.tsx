@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { gets } from "@/app/actions/purchasingRequest/gets"
 import { count } from "@/app/actions/purchasingRequest/count"
 import { PRListClient } from "./pr-list-client"
@@ -89,7 +90,9 @@ export default async function StorePurchasingRequestsPage({
       <PageHeader
         title={goodsReceiptStatus === "none" ? "درخواست‌های نیازمند تحویل" : "درخواست‌های خرید"}
         description={goodsReceiptStatus === "none" ? "درخواست‌هایی که هنوز تحویل داده نشده‌اند" : "درخواست‌های خرید تخصیص داده شده به فروشگاه شما"}
-      />
+      >
+        <HelpLauncher topicId="storehead-pr-list" tooltip="راهنمای درخواست‌های خرید" />
+      </PageHeader>
 
       <PRListClient
         items={items}

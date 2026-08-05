@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ArrowRight, Package } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Card, CardContent } from "@/components/ui/card"
 import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
 import { gets as getUnits } from "@/app/actions/unit/gets"
@@ -106,7 +107,9 @@ export default async function GoodsReceiptPage() {
       <PageHeader
         title="تحویل کالا"
         description={`مدیریت دریافت کالا در ${warehouseName || "انبار"}`}
-      />
+      >
+        <HelpLauncher topicId="unit-head-goods-receipt" tooltip="راهنمای تحویل کالا" />
+      </PageHeader>
 
       <GoodsReceiptClient
         items={items}

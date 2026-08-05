@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Plus, MapPin, Pencil, Trash2, ArrowDownUp, RotateCcw, Building2, Share2, CalendarDays } from "lucide-react"
 import { toast } from "sonner"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Button } from "@/components/ui/button"
 import { Pagination } from "@/components/ui/pagination"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -212,6 +213,7 @@ export function CitiesClient({
             افزودن شهر
           </Button>
         </Link>
+        <HelpLauncher topicId="admin-cities" tooltip="راهنمای شهرها" />
       </PageHeader>
 
       <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">

@@ -116,6 +116,8 @@ export function BudgetLineForm() {
   return (
     <EntityFormShell
       title="افزودن ردیف بودجه"
+      helpTopicId="admin-budget-lines"
+      helpTooltip="راهنمای ردیف بودجه"
       description="ردیف بودجه را برای یک سال مالی و سازمان تعریف کنید؛ مانده ردیف به‌صورت خودکار محاسبه می‌شود."
       backHref="/admin/budget-lines"
       backLabel="بازگشت به ردیف‌های بودجه"

@@ -11,6 +11,7 @@ import { ArrowRight, Box, Loader2, Check, X, Trash2, Building2, Warehouse as War
 import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { SectionCard } from "@/components/form/section-card"
 import { FormInput } from "@/components/form/form-input"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
@@ -130,6 +131,7 @@ export function InventoryEditClient({ item }: InventoryEditClientProps) {
           <Trash2 className="size-5" />
           حذف
         </Button>
+      <HelpLauncher topicId="admin-inventory" tooltip="راهنمای ویرایش موجودی انبار" />
       </PageHeader>
 
       <Form {...form}>

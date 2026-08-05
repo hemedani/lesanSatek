@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
 import { PageHeader } from "@/components/ui/page-header";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { DataTable } from "@/components/ui/data-table";
 import type { Column } from "@/components/ui/data-table";
 import { Pagination } from "@/components/ui/pagination";
@@ -239,6 +240,7 @@ export function TagsClient({
             <Plus className="size-4" />
             برچسب جدید
           </Button>
+          <HelpLauncher topicId="admin-tags" tooltip="راهنمای برچسب‌ها" />
         </PageHeader>
       </div>
 

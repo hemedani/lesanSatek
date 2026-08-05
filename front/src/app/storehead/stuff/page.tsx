@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { gets } from "@/app/actions/stuff/gets"
 import { count } from "@/app/actions/stuff/count"
 import { StuffListClient } from "./stuff-list-client"
@@ -72,6 +73,7 @@ export default async function StoreStuffPage({
             کالای جدید
           </Button>
         </Link>
+        <HelpLauncher topicId="storehead-stuff" tooltip="راهنمای کالاهای فروشگاه" />
       </PageHeader>
 
       <StuffListClient

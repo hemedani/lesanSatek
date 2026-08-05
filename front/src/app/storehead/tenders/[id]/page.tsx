@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { Gavel, CalendarDays, GitBranch, FileText, Package, Clock, Banknote, ChevronRight } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Badge } from "@/components/ui/badge"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -118,6 +119,7 @@ export default async function TenderDetailPage({
             </Button>
           </Link>
         )}
+        <HelpLauncher topicId="storehead-tender-detail" tooltip="راهنمای جزئیات مناقصه" />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

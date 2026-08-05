@@ -81,6 +81,8 @@ export function WareClassForm({ item }: WareClassFormProps) {
   return (
     <EntityFormShell
       title={isEdit ? "ویرایش کلاس کالا" : "افزودن کلاس کالا"}
+      helpTopicId="admin-ware-classes"
+      helpTooltip="راهنمای کلاس کالا"
       description="کلاس کالا، سطح دوم سلسله‌مراتب دسته‌بندی است و زیرمجموعه یک نوع کالا قرار می‌گیرد."
       backHref="/admin/ware-classes"
       backLabel="بازگشت به کلاس‌های کالا"

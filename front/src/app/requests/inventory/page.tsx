@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ArrowRight, ScrollText, Activity } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Button } from "@/components/ui/button"
 import { NavCard } from "@/components/dashboard/nav-card"
 import { gets as getInventory } from "@/app/actions/inventory/gets"
@@ -102,6 +103,7 @@ export default async function EmployeeInventoryPage({
             همه درخواست‌ها
           </Button>
         </Link>
+        <HelpLauncher topicId="requests-inventory" tooltip="راهنمای موجودی انبار" />
       </PageHeader>
 
       <section className="space-y-4" aria-label="دسترسی سریع">

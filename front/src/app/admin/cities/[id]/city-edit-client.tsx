@@ -14,6 +14,7 @@ import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { FormInput } from "@/components/form/form-input"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { update } from "@/app/actions/city/update"
@@ -149,6 +150,7 @@ export function CityEditClient({ city }: CityEditFormProps) {
           <Trash2 className="size-5" />
           حذف
         </Button>
+      <HelpLauncher topicId="admin-cities" tooltip="راهنمای ویرایش شهر" />
       </PageHeader>
 
       <Form {...form}>

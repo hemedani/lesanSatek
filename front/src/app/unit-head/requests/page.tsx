@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
 import { count as countPRs } from "@/app/actions/purchasingRequest/count"
 import { gets as getProcesses } from "@/app/actions/process/gets"
@@ -118,7 +119,9 @@ export default async function UnitHeadRequestsPage({
       <PageHeader
         title="همه درخواست‌ها"
         description="لیست کامل درخواست‌های خرید واحد"
-      />
+      >
+        <HelpLauncher topicId="unit-head-requests" tooltip="راهنمای درخواست‌های تایید" />
+      </PageHeader>
       <RequestsClient
         items={items}
         prevUrl={prevPageUrl}

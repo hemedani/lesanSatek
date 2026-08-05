@@ -29,6 +29,7 @@ import { SearchField } from "@/components/ui/search-field"
 import { FilterSelect } from "@/components/ui/filter-select"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { StatusBadge } from "@/components/ui/status-badge"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import type { FilterOption } from "@/components/ui/filter-select"
 import { remove as removeUnit } from "@/app/actions/unit/remove"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
@@ -270,12 +271,16 @@ export function UnitsClient({
         title="واحدها"
         description="مدیریت واحدها و زیرواحدهای سازمان‌ها — رئیس، سازمان و موقعیت هر واحد"
       >
-        <Link href="/admin/units/add">
-          <Button className="gap-2 px-5">
-            <Plus className="size-5" />
-            افزودن واحد
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <HelpLauncher topicId="admin-units-list" tooltip="راهنمای فهرست واحدها" />
+          <HelpLauncher topicId="admin-units-hierarchy" tooltip="راهنمای ساختار درختی واحدها" />
+          <Link href="/admin/units/add">
+            <Button className="gap-2 px-5">
+              <Plus className="size-5" />
+              افزودن واحد
+            </Button>
+          </Link>
+        </div>
       </PageHeader>
 
       <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">

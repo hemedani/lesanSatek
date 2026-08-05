@@ -5,6 +5,7 @@ import { useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Landmark, Building2, FileSpreadsheet, ChartNoAxesColumnIncreasing, Wallet, TrendingDown, TrendingUp, Lock, Calculator, AlertTriangle } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { FilterSelect } from "@/components/ui/filter-select"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { StatusBadge } from "@/components/ui/status-badge"
@@ -144,6 +145,7 @@ export function BudgetReportsClient({
           <span className="size-1.5 rounded-full bg-electric-iris" aria-hidden="true" />
           {fiscalYearName || "انتخاب نشده"}
         </span>
+        <HelpLauncher topicId="admin-budget-reports" tooltip="راهنمای گزارش بودجه" />
       </PageHeader>
 
       <div className="flex flex-wrap items-stretch gap-2.5">

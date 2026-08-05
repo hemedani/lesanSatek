@@ -13,6 +13,7 @@ import { FormTextarea } from "@/components/form/form-textarea"
 import { FormCheckbox } from "@/components/form/form-checkbox"
 import { SectionCard } from "@/components/form/section-card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Form } from "@/components/ui/form"
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton"
 import { SearchSelect } from "@/components/form/form-search-select"
@@ -124,7 +125,9 @@ export default function OrgHeadSettingsPage() {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
-      <PageHeader title="تنظیمات سازمان" description="ویرایش اطلاعات و تنظیمات سازمان" />
+      <PageHeader title="تنظیمات سازمان" description="ویرایش اطلاعات و تنظیمات سازمان">
+        <HelpLauncher topicId="orghead-settings" tooltip="راهنمای تنظیمات سازمان" />
+      </PageHeader>
 
       <div className="flex items-center gap-4 rounded-2xl glass-card p-5">
         <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-electric-iris/10 ring-1 ring-inset ring-electric-iris/20">

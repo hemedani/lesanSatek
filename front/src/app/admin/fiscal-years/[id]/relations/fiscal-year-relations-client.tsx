@@ -9,6 +9,7 @@ import { ArrowRight, Loader2, Check, X, Building2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { SearchSelect } from "@/components/form/form-search-select"
 import { updateRelations } from "@/app/actions/fiscalYear/updateRelations"
 import { gets as getOrganizations } from "@/app/actions/organization/gets"
@@ -115,6 +116,7 @@ export function FiscalYearRelationsClient({ fiscalYear }: FiscalYearRelationsPro
             بازگشت به ویرایش
           </Button>
         </Link>
+      <HelpLauncher topicId="admin-fiscal-years" tooltip="راهنمای روابط سال مالی" />
       </PageHeader>
 
       <SectionCard

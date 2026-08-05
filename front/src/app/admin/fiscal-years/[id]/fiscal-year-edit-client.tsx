@@ -14,6 +14,7 @@ import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { FormInput } from "@/components/form/form-input"
 import { FormSelect } from "@/components/form/form-select"
 import { FormCheckbox } from "@/components/form/form-checkbox"
@@ -203,6 +204,7 @@ export function FiscalYearEditClient({ fiscalYear }: FiscalYearEditFormProps) {
           <Trash2 className="size-5" />
           حذف
         </Button>
+      <HelpLauncher topicId="admin-fiscal-years" tooltip="راهنمای ویرایش سال مالی" />
       </PageHeader>
 
       <Form {...form}>

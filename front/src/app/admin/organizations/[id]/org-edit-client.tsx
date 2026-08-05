@@ -14,6 +14,7 @@ import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { FormInput } from "@/components/form/form-input"
 import { FormTextarea } from "@/components/form/form-textarea"
 import { FormCheckbox } from "@/components/form/form-checkbox"
@@ -144,26 +145,29 @@ export function OrgEditClient({ org }: OrgEditFormProps) {
         title={org.name || "ویرایش سازمان"}
         description="ویرایش اطلاعات سازمان"
       >
-        <Link href="/admin/organizations">
-          <Button variant="ghost" className="gap-2 px-4">
-            <ArrowRight className="size-5" />
-            بازگشت به سازمان‌ها
+        <div className="flex items-center gap-2">
+          <HelpLauncher topicId="admin-org-edit" tooltip="راهنمای ویرایش سازمان" />
+          <Link href="/admin/organizations">
+            <Button variant="ghost" className="gap-2 px-4">
+              <ArrowRight className="size-5" />
+              بازگشت به سازمان‌ها
+            </Button>
+          </Link>
+          <Link href={`/admin/organizations/${org._id}/relations`}>
+            <Button variant="ghost" className="gap-2 px-4">
+              <Share2 className="size-5" />
+              ویرایش روابط
+            </Button>
+          </Link>
+          <Button
+            variant="ghost"
+            onClick={() => setShowDelete(true)}
+            className="gap-2 px-4 text-ember hover:bg-ember/5 hover:text-ember"
+          >
+            <Trash2 className="size-5" />
+            حذف
           </Button>
-        </Link>
-        <Link href={`/admin/organizations/${org._id}/relations`}>
-          <Button variant="ghost" className="gap-2 px-4">
-            <Share2 className="size-5" />
-            ویرایش روابط
-          </Button>
-        </Link>
-        <Button
-          variant="ghost"
-          onClick={() => setShowDelete(true)}
-          className="gap-2 px-4 text-ember hover:bg-ember/5 hover:text-ember"
-        >
-          <Trash2 className="size-5" />
-          حذف
-        </Button>
+        </div>
       </PageHeader>
 
       <Form {...form}>

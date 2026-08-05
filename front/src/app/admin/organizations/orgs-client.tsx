@@ -24,6 +24,9 @@ import { SearchField } from "@/components/ui/search-field"
 import { FilterSelect } from "@/components/ui/filter-select"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { StatusBadge } from "@/components/ui/status-badge"
+import { HelpLauncher } from "@/components/help/help-launcher"
+import { HelpButton } from "@/components/help/help-button"
+import { HelpModal } from "@/components/help/help-modal"
 import type { FilterOption } from "@/components/ui/filter-select"
 import { remove as removeOrganization } from "@/app/actions/organization/remove"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
@@ -65,9 +68,11 @@ function faDate(iso?: string): string {
 function OrganizationCard({
   item,
   onDelete,
+  onHelp,
 }: {
   item: Organization
   onDelete: (item: Organization) => void
+  onHelp: () => void
 }) {
   const headName = item.head
     ? [item.head.first_name, item.head.last_name].filter(Boolean).join(" ")
@@ -92,10 +97,13 @@ function OrganizationCard({
             )}
           </div>
         </div>
-        <StatusBadge
-          status={item.isActive ? "active" : "inactive"}
-          label={item.isActive ? "فعال" : "غیرفعال"}
-        />
+        <div className="flex shrink-0 items-center gap-1.5">
+          <HelpButton tooltip="راهنمای کارت سازمان" onClick={onHelp} />
+          <StatusBadge
+            status={item.isActive ? "active" : "inactive"}
+            label={item.isActive ? "فعال" : "غیرفعال"}
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-px overflow-hidden rounded-xl bg-white/[0.06] ring-1 ring-inset ring-white/[0.06]">
@@ -163,6 +171,7 @@ export function OrganizationsClient({
   const router = useRouter()
   const [deleteTarget, setDeleteTarget] = useState<Organization | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [showCardHelp, setShowCardHelp] = useState(false)
 
   const makeParams = useCallback(
     (next: { search?: string; sort?: string }) => {
@@ -217,12 +226,15 @@ export function OrganizationsClient({
         title="سازمان‌ها"
         description="مدیریت سازمان‌های فعال در سامانه — رئیس، موقعیت و وضعیت هر سازمان"
       >
-        <Link href="/admin/organizations/add">
-          <Button className="gap-2 px-5">
-            <Plus className="size-5" />
-            افزودن سازمان
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <HelpLauncher topicId="admin-orgs-list" tooltip="راهنمای فهرست سازمان‌ها" />
+          <Link href="/admin/organizations/add">
+            <Button className="gap-2 px-5">
+              <Plus className="size-5" />
+              افزودن سازمان
+            </Button>
+          </Link>
+        </div>
       </PageHeader>
 
       <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">
@@ -258,7 +270,12 @@ export function OrganizationsClient({
       {items.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-5">
           {items.map((item) => (
-            <OrganizationCard key={item._id} item={item} onDelete={setDeleteTarget} />
+            <OrganizationCard
+              key={item._id}
+              item={item}
+              onDelete={setDeleteTarget}
+              onHelp={() => setShowCardHelp(true)}
+            />
           ))}
         </div>
       ) : (
@@ -305,6 +322,12 @@ export function OrganizationsClient({
         confirmLabel="حذف"
         onConfirm={handleDelete}
         loading={deleting}
+      />
+
+      <HelpModal
+        isOpen={showCardHelp}
+        onClose={() => setShowCardHelp(false)}
+        topicId="admin-org-cards"
       />
     </div>
   )

@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { SearchSelect } from "@/components/form/form-search-select"
 import { FilterSelect } from "@/components/ui/filter-select"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
@@ -231,12 +232,16 @@ export function UserRolesClient({ user, scopeNameMap }: UserRolesClientProps) {
         title={fullName}
         description="مدیریت نقش‌ها"
       >
-        <Link href={`/admin/users/${user._id}`}>
-          <Button variant="ghost" className="gap-2 px-4">
-            <ArrowRight className="size-5" />
-            بازگشت به ویرایش
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <HelpLauncher topicId="admin-user-roles" tooltip="راهنمای مدیریت نقش‌ها" />
+          <HelpLauncher topicId="admin-user-permissions" tooltip="راهنمای اختصاص دسترسی" />
+          <Link href={`/admin/users/${user._id}`}>
+            <Button variant="ghost" className="gap-2 px-4">
+              <ArrowRight className="size-5" />
+              بازگشت به ویرایش
+            </Button>
+          </Link>
+        </div>
       </PageHeader>
 
       <SectionCard

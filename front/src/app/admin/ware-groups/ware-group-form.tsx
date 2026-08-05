@@ -132,6 +132,8 @@ export function WareGroupForm({ item }: WareGroupFormProps) {
       backLabel="بازگشت به گروه‌های کالا"
       submitLabel={isEdit ? "ذخیره تغییرات" : "ثبت گروه کالا"}
       relationsHref={isEdit && item ? `/admin/ware-groups/${item._id}/relations` : undefined}
+      helpTopicId="admin-ware-groups"
+      helpTooltip="راهنمای گروه کالا"
       form={form}
       onSubmit={onSubmit}
     >

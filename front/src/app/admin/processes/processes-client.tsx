@@ -28,6 +28,7 @@ import { SearchField } from "@/components/ui/search-field"
 import { FilterSelect } from "@/components/ui/filter-select"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { StatusBadge } from "@/components/ui/status-badge"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import type { FilterOption } from "@/components/ui/filter-select"
 import { remove } from "@/app/actions/process/remove"
 import { activateProcess } from "@/app/actions/process/activateProcess"
@@ -326,12 +327,15 @@ export function ProcessesClient({
         title="فرآیندها"
         description="مدیریت فرآیندهای خرید سازمان — وضعیت، نسخه و حوزه کاربرد هر فرآیند"
       >
-        <Link href="/admin/processes/add">
-          <Button className="gap-2 px-5">
-            <Plus className="size-5" />
-            افزودن فرآیند
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <HelpLauncher topicId="admin-processes-list" tooltip="راهنمای مدیریت فرآیندها" />
+          <Link href="/admin/processes/add">
+            <Button className="gap-2 px-5">
+              <Plus className="size-5" />
+              افزودن فرآیند
+            </Button>
+          </Link>
+        </div>
       </PageHeader>
 
       <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">

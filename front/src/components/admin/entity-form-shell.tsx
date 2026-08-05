@@ -7,6 +7,7 @@ import type { UseFormReturn } from "react-hook-form"
 import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 
 interface EntityFormShellProps {
   title: string
@@ -21,6 +22,8 @@ interface EntityFormShellProps {
   children: React.ReactNode
   cancelHref?: string
   relationsHref?: string
+  helpTopicId?: string
+  helpTooltip?: string
 }
 
 function EntityFormShell({
@@ -34,6 +37,8 @@ function EntityFormShell({
   children,
   cancelHref,
   relationsHref,
+  helpTopicId,
+  helpTooltip,
 }: EntityFormShellProps) {
   const submitting = form.formState.isSubmitting
 
@@ -53,6 +58,9 @@ function EntityFormShell({
               ویرایش روابط
             </Button>
           </Link>
+        )}
+        {helpTopicId && (
+          <HelpLauncher topicId={helpTopicId} tooltip={helpTooltip} />
         )}
       </PageHeader>
 

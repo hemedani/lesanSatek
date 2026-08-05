@@ -9,6 +9,7 @@ import {
   Landmark,
 } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatCard } from "@/components/dashboard/stat-card"
 import { NavCard } from "@/components/dashboard/nav-card"
@@ -47,7 +48,9 @@ export default async function UnitHeadFinanceDashboard() {
       <PageHeader
         title="داشبورد مالی"
         description="خلاصه وضعیت بودجه و پرداخت‌ها در واحد شما"
-      />
+      >
+        <HelpLauncher topicId="unit-head-finance" tooltip="راهنمای داشبورد مالی" />
+      </PageHeader>
 
       {/* 1. Summary stats */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5">

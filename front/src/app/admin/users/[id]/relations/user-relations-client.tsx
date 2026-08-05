@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { SearchSelect } from "@/components/form/form-search-select"
 import { SearchMultiSelect } from "@/components/form/form-search-multi-select"
 import { updateUserRelations } from "@/app/actions/user/updateUserRelations"
@@ -194,6 +195,7 @@ export function UserRelationsClient({ user }: UserRelationsClientProps) {
             مدیریت نقش‌ها
           </Button>
         </Link>
+      <HelpLauncher topicId="admin-user-edit" tooltip="راهنمای روابط کاربر" />
       </PageHeader>
 
       <SectionCard

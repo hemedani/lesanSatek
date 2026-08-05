@@ -52,6 +52,8 @@ export function ManufacturersClient({
       addHref="/admin/manufacturers/add"
       addLabel="افزودن تولیدکننده"
       searchPlaceholder="جستجوی تولیدکننده…"
+      helpTopicId="admin-manufacturers"
+      helpTooltip="راهنمای تولیدکنندگان"
       basePath="/admin/manufacturers"
       search={search}
       sort={sort}

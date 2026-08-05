@@ -135,6 +135,8 @@ export function GoodsReceiptForm() {
   return (
     <EntityFormShell
       title="رسید کالا جدید"
+      helpTopicId="admin-goods-receipts"
+      helpTooltip="راهنمای رسید کالا"
       description="ثبت رسید کالای دریافتی از فروشنده و اقلام آن."
       backHref="/admin/goods-receipts"
       backLabel="بازگشت به رسیدها"

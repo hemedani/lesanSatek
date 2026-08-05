@@ -9,6 +9,7 @@ import { ArrowRight, Loader2, Check, X, Landmark, Building2, Tags } from "lucide
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { SearchSelect } from "@/components/form/form-search-select"
 import { updateRelations } from "@/app/actions/budgetLine/updateRelations"
 import { gets as getFiscalYears } from "@/app/actions/fiscalYear/gets"
@@ -182,6 +183,7 @@ export function BudgetLineRelationsClient({ budgetLine }: BudgetLineRelationsPro
             بازگشت به ویرایش
           </Button>
         </Link>
+      <HelpLauncher topicId="admin-budget-lines" tooltip="راهنمای روابط ردیف بودجه" />
       </PageHeader>
 
       <SectionCard

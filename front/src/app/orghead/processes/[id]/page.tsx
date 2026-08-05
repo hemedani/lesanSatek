@@ -12,6 +12,7 @@ import { FormInput } from "@/components/form/form-input"
 import { FormTextarea } from "@/components/form/form-textarea"
 import { SectionCard } from "@/components/form/section-card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Form } from "@/components/ui/form"
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
@@ -219,6 +220,7 @@ export default function EditProcessPage({ params }: { params: Promise<{ id: stri
           <Trash2 className="size-5" />
           حذف
         </Button>
+        <HelpLauncher topicId="orghead-process-edit" tooltip="راهنمای ویرایش فرآیند" />
       </PageHeader>
 
       <div className="flex items-center gap-4 flex-wrap">

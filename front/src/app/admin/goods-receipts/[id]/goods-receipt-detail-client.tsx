@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -122,6 +123,7 @@ export function GoodsReceiptDetailClient({ receipt }: { receipt: GoodsReceipt })
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
+            <HelpLauncher topicId="admin-goods-receipts" tooltip="راهنمای رسید کالا" />
             <Button
               variant="ghost"
               className="gap-2 px-4 text-ember hover:text-ember hover:bg-ember/5"

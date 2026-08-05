@@ -7,6 +7,7 @@ import { Network, User, ZoomIn, ZoomOut, RotateCcw, Building2, ShieldCheck, Corn
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { EmptyState } from "@/components/ui/empty-state"
 import { StatCard } from "@/components/dashboard/stat-card"
 
@@ -368,7 +369,9 @@ export function OrgChartClient({ units, organization }: OrgChartClientProps) {
       <PageHeader
         title={organization?.name ? `نمودار سازمانی ${organization.name}` : "نمودار سازمان"}
         description="نمایش درختی واحدها و زیرواحدهای سازمان"
-      />
+      >
+        <HelpLauncher topicId="orghead-org-chart" tooltip="راهنمای نمودار سازمان" />
+      </PageHeader>
 
       <div className="grid gap-4 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 lg:gap-5">
         <StatCard

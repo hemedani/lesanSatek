@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { SearchSelect } from "@/components/form/form-search-select"
 import { updateRelations } from "@/app/actions/city/updateRelations"
 import { gets as getStates } from "@/app/actions/state/gets"
@@ -115,6 +116,7 @@ export function CityRelationsClient({ city }: CityRelationsProps) {
             بازگشت به ویرایش
           </Button>
         </Link>
+      <HelpLauncher topicId="admin-cities" tooltip="راهنمای روابط شهر" />
       </PageHeader>
 
       <SectionCard

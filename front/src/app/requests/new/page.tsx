@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { SearchFieldSelect, type SearchFieldSelectOption } from "@/components/ui/search-field-select"
 import { add as addPR } from "@/app/actions/purchasingRequest/add"
 import { gets as getWareModels } from "@/app/actions/wareModel/gets"
@@ -172,6 +173,7 @@ export default function NewRequestPage() {
             بازگشت به درخواست‌ها
           </Button>
         </Link>
+        <HelpLauncher topicId="requests-new" tooltip="راهنمای ثبت درخواست خرید" />
       </PageHeader>
 
       <Form {...form}>

@@ -112,6 +112,8 @@ export function PaymentOrderForm() {
   return (
     <EntityFormShell
       title="دستور پرداخت جدید"
+      helpTopicId="admin-payment-orders"
+      helpTooltip="راهنمای دستور پرداخت"
       description="دستور پرداخت برای یک درخواست خرید صادر کنید."
       backHref="/admin/payment-orders"
       backLabel="بازگشت به دستورات پرداخت"

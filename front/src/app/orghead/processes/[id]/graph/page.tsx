@@ -4,6 +4,7 @@ import { useEffect, useState, use } from "react";
 import { Printer, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { ErrorState } from "@/components/ui/error-state";
 import { ProcessGraph } from "@/components/process/process-graph";
@@ -96,6 +97,7 @@ export default function ProcessGraphPage({
             <Printer className="size-4" />
             چاپ
           </Button>
+          <HelpLauncher topicId="orghead-process-graph" tooltip="راهنمای نمودار فرآیند" />
         </div>
       </div>
 

@@ -14,6 +14,7 @@ import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { FormInput } from "@/components/form/form-input"
 import { FormTextarea } from "@/components/form/form-textarea"
 import { FormCheckbox } from "@/components/form/form-checkbox"
@@ -190,26 +191,29 @@ export function UnitEditClient({ unit }: UnitEditFormProps) {
         title={unit.name || "ویرایش واحد"}
         description="ویرایش اطلاعات واحد"
       >
-        <Link href="/admin/units">
-          <Button variant="ghost" className="gap-2 px-4">
-            <ArrowRight className="size-5" />
-            بازگشت به واحدها
+        <div className="flex items-center gap-2">
+          <HelpLauncher topicId="admin-unit-edit" tooltip="راهنمای ویرایش واحد" />
+          <Link href="/admin/units">
+            <Button variant="ghost" className="gap-2 px-4">
+              <ArrowRight className="size-5" />
+              بازگشت به واحدها
+            </Button>
+          </Link>
+          <Link href={`/admin/units/${unit._id}/relations`}>
+            <Button variant="ghost" className="gap-2 px-4">
+              <Share2 className="size-5" />
+              ویرایش روابط
+            </Button>
+          </Link>
+          <Button
+            variant="ghost"
+            onClick={() => setShowDelete(true)}
+            className="gap-2 px-4 text-ember hover:bg-ember/5 hover:text-ember"
+          >
+            <Trash2 className="size-5" />
+            حذف
           </Button>
-        </Link>
-        <Link href={`/admin/units/${unit._id}/relations`}>
-          <Button variant="ghost" className="gap-2 px-4">
-            <Share2 className="size-5" />
-            ویرایش روابط
-          </Button>
-        </Link>
-        <Button
-          variant="ghost"
-          onClick={() => setShowDelete(true)}
-          className="gap-2 px-4 text-ember hover:bg-ember/5 hover:text-ember"
-        >
-          <Trash2 className="size-5" />
-          حذف
-        </Button>
+        </div>
       </PageHeader>
 
       <Form {...form}>

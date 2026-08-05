@@ -69,6 +69,8 @@ export function ManufacturerForm({ item }: ManufacturerFormProps) {
   return (
     <EntityFormShell
       title={isEdit ? "ویرایش تولیدکننده" : "افزودن تولیدکننده"}
+      helpTopicId="admin-manufacturers"
+      helpTooltip="راهنمای تولیدکننده"
       description="مشخصات تولیدکننده کالا را وارد کنید؛ تولیدکننده به مدل‌های کالا متصل می‌شود."
       backHref="/admin/manufacturers"
       backLabel="بازگشت به تولیدکنندگان"

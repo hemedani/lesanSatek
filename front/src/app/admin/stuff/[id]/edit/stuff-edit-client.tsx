@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { FormInput } from "@/components/form/form-input";
@@ -110,6 +111,7 @@ export function StuffEditClient({ item }: { item: StuffDetail }) {
             {item.ware?.name || "موجودی"} — {item.store?.name || ""}
           </p>
         </div>
+        <HelpLauncher topicId="admin-stuff" tooltip="راهنمای ویرایش موجودی" />
       </div>
 
       <Card variant="glass">

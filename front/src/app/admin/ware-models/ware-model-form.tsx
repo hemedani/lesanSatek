@@ -119,6 +119,8 @@ export function WareModelForm({ item }: WareModelFormProps) {
   return (
     <EntityFormShell
       title={isEdit ? "ویرایش مدل کالا" : "افزودن مدل کالا"}
+      helpTopicId="admin-ware-models"
+      helpTooltip="راهنمای مدل کالا"
       description="مدل کالا، سطح چهارم سلسله‌مراتب دسته‌بندی است و به نوع، کلاس و گروه کالا متصل می‌شود."
       backHref="/admin/ware-models"
       backLabel="بازگشت به مدل‌های کالا"

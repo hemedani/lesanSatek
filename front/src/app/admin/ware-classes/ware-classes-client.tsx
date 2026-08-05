@@ -56,6 +56,8 @@ export function WareClassesClient({
       addHref="/admin/ware-classes/add"
       addLabel="افزودن کلاس کالا"
       searchPlaceholder="جستجوی کلاس کالا…"
+      helpTopicId="admin-ware-classes"
+      helpTooltip="راهنمای کلاس‌های کالا"
       basePath="/admin/ware-classes"
       search={search}
       sort={sort}

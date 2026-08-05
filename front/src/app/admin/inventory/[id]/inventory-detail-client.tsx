@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -223,6 +224,7 @@ export function InventoryDetailClient({ item, movements }: { item: Inventory; mo
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
+            <HelpLauncher topicId="admin-inventory" tooltip="راهنمای موجودی انبار" />
             <Button
               variant="ghost"
               className="gap-2 px-4 text-frost-link/80 hover:text-frost-link"

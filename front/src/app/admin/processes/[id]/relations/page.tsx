@@ -6,6 +6,7 @@ import { ArrowRight, Plus, Share2, Workflow } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton"
 import { ErrorState } from "@/components/ui/error-state"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
@@ -256,6 +257,7 @@ export default function ProcessRelationsPage({
           <Share2 className="size-4 text-electric-iris" />
           {(activeRelations.length).toLocaleString("fa-IR")} ارتباط
         </span>
+        <HelpLauncher topicId="admin-process-relations" tooltip="راهنمای ارتباط‌های فرآیند" />
         <Link href={`/admin/processes/${id}`}>
           <Button variant="ghost" className="gap-2 px-4">
             <ArrowRight className="size-5" />

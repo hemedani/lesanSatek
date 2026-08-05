@@ -65,6 +65,8 @@ export function WaresClient({
       addHref="/admin/wares/add"
       addLabel="افزودن کالا"
       searchPlaceholder="جستجوی کالا…"
+      helpTopicId="admin-wares"
+      helpTooltip="راهنمای کالاها"
       basePath="/admin/wares"
       search={search}
       sort={sort}

@@ -12,6 +12,7 @@ import { ArrowRight, Gavel, Loader2, Check, X, Trash2, ShoppingCart } from "luci
 import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { SectionCard } from "@/components/form/section-card"
 import { FormInput } from "@/components/form/form-input"
 import { FormTextarea } from "@/components/form/form-textarea"
@@ -126,6 +127,7 @@ export function TenderEditClient({ tender }: TenderEditClientProps) {
           <Trash2 className="size-5" />
           حذف
         </Button>
+      <HelpLauncher topicId="admin-tenders" tooltip="راهنمای ویرایش مناقصه" />
       </PageHeader>
 
       <Form {...form}>

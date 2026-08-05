@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { gets } from "@/app/actions/consumption/gets"
 import { count } from "@/app/actions/consumption/count"
 import { ConsumptionClient } from "./consumption-client"
@@ -55,6 +56,7 @@ export default async function OrgHeadConsumptionPage({
           <ArrowRight className="size-4" />
           بازگشت به داشبورد
         </Link>
+        <HelpLauncher topicId="orghead-consumption" tooltip="راهنمای مصرف کالا" />
       </div>
       <PageHeader title="مصرف کالا" description="مشاهده مصرف کالا در سطح سازمان" />
       <ConsumptionClient

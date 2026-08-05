@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Plus, Pencil, Workflow, Copy, CheckCircle2, XCircle, Trash2, Clock, FileText, Share2, List, BarChart3, Target, Archive, User, CalendarDays, GitBranch, Layers } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/ui/page-header";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { DataTable } from "@/components/ui/data-table";
 import type { Column } from "@/components/ui/data-table";
 import { Pagination } from "@/components/ui/pagination";
@@ -268,6 +269,7 @@ export function ProcessesClient({
               فرآیند جدید
             </Button>
           </Link>
+          <HelpLauncher topicId="orghead-processes-list" tooltip="راهنمای فرآیندها" />
         </PageHeader>
       </div>
 

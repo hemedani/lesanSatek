@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import { ArrowRight, ShoppingCart, Package, Calendar, Building2, BadgeCheck, Store, BarChart3, FileText, Landmark } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -200,6 +201,7 @@ export default function StorePRDetailPage() {
             </div>
           </div>
         </div>
+        <HelpLauncher topicId="storehead-pr-detail" tooltip="راهنمای جزئیات درخواست" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Pagination } from "@/components/ui/pagination";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -211,7 +212,9 @@ export function RequestsClient({
         <PageHeader
           title="درخواست‌های خرید"
           description="مدیریت و نهایی‌سازی درخواست‌های خرید سازمان"
-        />
+        >
+          <HelpLauncher topicId="orghead-requests" tooltip="راهنمای درخواست‌های خرید" />
+        </PageHeader>
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 lg:gap-5">

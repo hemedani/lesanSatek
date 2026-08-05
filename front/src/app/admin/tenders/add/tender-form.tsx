@@ -74,6 +74,8 @@ export function TenderForm() {
   return (
     <EntityFormShell
       title="مناقصه جدید"
+      helpTopicId="admin-tenders"
+      helpTooltip="راهنمای مناقصه"
       description="برای یک درخواست خرید مناقصه ایجاد کنید و مهلت دریافت پیشنهاد را تعیین کنید."
       backHref="/admin/tenders"
       backLabel="بازگشت به مناقصات"

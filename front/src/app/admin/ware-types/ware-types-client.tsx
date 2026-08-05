@@ -51,6 +51,8 @@ export function WareTypesClient({
       addHref="/admin/ware-types/add"
       addLabel="افزودن نوع کالا"
       searchPlaceholder="جستجوی نوع کالا…"
+      helpTopicId="admin-ware-types"
+      helpTooltip="راهنمای انواع کالا"
       basePath="/admin/ware-types"
       search={search}
       sort={sort}

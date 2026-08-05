@@ -14,6 +14,7 @@ import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { FormInput } from "@/components/form/form-input"
 import { FormTextarea } from "@/components/form/form-textarea"
 import { FormCheckbox } from "@/components/form/form-checkbox"
@@ -160,12 +161,15 @@ export default function AddUnitPage() {
         title="افزودن واحد"
         description="اطلاعات واحد را وارد کنید؛ پس از ایجاد، می‌توانید سرپرست و زیرواحدها را تعریف کنید."
       >
-        <Link href="/admin/units">
-          <Button variant="ghost" className="gap-2 px-4">
-            <ArrowRight className="size-5" />
-            بازگشت به واحدها
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <HelpLauncher topicId="admin-unit-add" tooltip="راهنمای ایجاد واحد" />
+          <Link href="/admin/units">
+            <Button variant="ghost" className="gap-2 px-4">
+              <ArrowRight className="size-5" />
+              بازگشت به واحدها
+            </Button>
+          </Link>
+        </div>
       </PageHeader>
 
       <Form {...form}>

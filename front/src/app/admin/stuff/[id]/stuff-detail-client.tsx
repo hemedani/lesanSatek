@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -126,6 +127,7 @@ export function StuffDetailClient({ item }: { item: StuffDetail }) {
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          <HelpLauncher topicId="admin-stuff" tooltip="راهنمای موجودی فروشگاه" />
           <Button
             variant="ghost"
             className="gap-2 px-4 text-ember hover:text-ember hover:bg-ember/5"

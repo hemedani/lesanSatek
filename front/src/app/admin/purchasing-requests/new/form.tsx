@@ -11,6 +11,7 @@ import { Loader2, Save, Send, ShoppingCart, FileText, ArrowRight } from "lucide-
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { PageHeader } from "@/components/ui/page-header";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { SectionCard } from "@/components/form/section-card";
 import { FormInput } from "@/components/form/form-input";
 import { FormTextarea } from "@/components/form/form-textarea";
@@ -122,6 +123,7 @@ export function NewPurchasingRequestForm() {
             بازگشت به درخواست‌ها
           </Button>
         </Link>
+      <HelpLauncher topicId="admin-purchasing-requests" tooltip="راهنمای درخواست خرید جدید" />
       </PageHeader>
 
       <Form {...form}>

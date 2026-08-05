@@ -9,6 +9,7 @@ import { FormCard } from "@/components/form/form-card";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { ErrorState } from "@/components/ui/error-state";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { SearchSelect } from "@/components/form/form-search-select";
 import { get } from "@/app/actions/process/get";
 import { updateRelations } from "@/app/actions/process/updateRelations";
@@ -195,6 +196,9 @@ export default function ProcessRelationsPage({
             <p className="text-body-sm text-fog/70 leading-relaxed">
               حوزه کاربرد فرآیند را تعیین کنید. فرآیند به سازمان فعال شما تعلق دارد.
             </p>
+          </div>
+          <div className="ms-auto">
+            <HelpLauncher topicId="orghead-process-relations" tooltip="راهنمای ارتباط‌های فرآیند" />
           </div>
         </div>
       </div>

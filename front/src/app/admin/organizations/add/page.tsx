@@ -14,6 +14,7 @@ import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { FormInput } from "@/components/form/form-input"
 import { FormTextarea } from "@/components/form/form-textarea"
 import { FormCheckbox } from "@/components/form/form-checkbox"
@@ -120,12 +121,15 @@ export default function AddOrganizationPage() {
         title="افزودن سازمان"
         description="اطلاعات اولیه سازمان را وارد کنید؛ پس از ایجاد، می‌توانید واحدها و کاربران را تعریف کنید."
       >
-        <Link href="/admin/organizations">
-          <Button variant="ghost" className="gap-2 px-4">
-            <ArrowRight className="size-5" />
-            بازگشت به سازمان‌ها
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <HelpLauncher topicId="admin-org-add" tooltip="راهنمای ایجاد سازمان" />
+          <Link href="/admin/organizations">
+            <Button variant="ghost" className="gap-2 px-4">
+              <ArrowRight className="size-5" />
+              بازگشت به سازمان‌ها
+            </Button>
+          </Link>
+        </div>
       </PageHeader>
 
       <Form {...form}>

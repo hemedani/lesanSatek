@@ -28,6 +28,7 @@ import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { FormInput } from "@/components/form/form-input"
 import { FormTextarea } from "@/components/form/form-textarea"
 import { FormCheckbox } from "@/components/form/form-checkbox"
@@ -249,40 +250,43 @@ export function ProcessEditClient({ process }: { process: Process }) {
         title={process.name || "ویرایش فرآیند"}
         description={`نسخه ${process.version || 1} · ${process.organization?.name || "بدون سازمان"}`}
       >
-        <Link href="/admin/processes">
-          <Button variant="ghost" className="gap-2 px-4">
-            <ArrowRight className="size-5" />
-            بازگشت به فرآیندها
+        <div className="flex items-center gap-2">
+          <HelpLauncher topicId="admin-process-edit" tooltip="راهنمای ویرایش فرآیند" />
+          <Link href="/admin/processes">
+            <Button variant="ghost" className="gap-2 px-4">
+              <ArrowRight className="size-5" />
+              بازگشت به فرآیندها
+            </Button>
+          </Link>
+          <Link href={`/admin/processes/${process._id}/steps`}>
+            <Button variant="ghost" className="gap-2 px-4">
+              <List className="size-5" />
+              مدیریت مراحل
+            </Button>
+          </Link>
+          {process.status === "Draft" && (
+            <Button
+              variant="ghost"
+              onClick={handleActivate}
+              className="gap-2 px-4 text-emerald-400 hover:bg-emerald-500/5 hover:text-emerald-400"
+            >
+              <CheckCircle2 className="size-5" />
+              فعال‌سازی
+            </Button>
+          )}
+          <Button variant="ghost" onClick={handleDuplicate} className="gap-2 px-4 text-frost-link hover:text-frost-link">
+            <Copy className="size-5" />
+            کپی
           </Button>
-        </Link>
-        <Link href={`/admin/processes/${process._id}/steps`}>
-          <Button variant="ghost" className="gap-2 px-4">
-            <List className="size-5" />
-            مدیریت مراحل
-          </Button>
-        </Link>
-        {process.status === "Draft" && (
           <Button
             variant="ghost"
-            onClick={handleActivate}
-            className="gap-2 px-4 text-emerald-400 hover:bg-emerald-500/5 hover:text-emerald-400"
+            onClick={() => setShowDelete(true)}
+            className="gap-2 px-4 text-ember hover:bg-ember/5 hover:text-ember"
           >
-            <CheckCircle2 className="size-5" />
-            فعال‌سازی
+            <Trash2 className="size-5" />
+            حذف
           </Button>
-        )}
-        <Button variant="ghost" onClick={handleDuplicate} className="gap-2 px-4 text-frost-link hover:text-frost-link">
-          <Copy className="size-5" />
-          کپی
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => setShowDelete(true)}
-          className="gap-2 px-4 text-ember hover:bg-ember/5 hover:text-ember"
-        >
-          <Trash2 className="size-5" />
-          حذف
-        </Button>
+        </div>
       </PageHeader>
 
       <div className="flex flex-wrap items-center gap-2">

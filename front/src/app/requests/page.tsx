@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Plus, User, ShoppingCart, Warehouse, ScrollText, Activity } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Button } from "@/components/ui/button"
 import { NavCard } from "@/components/dashboard/nav-card"
 import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
@@ -140,6 +141,7 @@ export default async function RequestsPage({
             </Button>
           </Link>
         </div>
+        <HelpLauncher topicId="requests-dashboard" tooltip="راهنمای مرکز درخواست‌ها" />
       </PageHeader>
 
       <section className="space-y-4" aria-label="دسترسی سریع">

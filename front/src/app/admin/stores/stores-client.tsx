@@ -68,6 +68,8 @@ export function StoresClient({
       description="مدیریت فروشگاه‌ها و مسئول هر فروشگاه — سلسله‌مراتب و وضعیت"
       addHref="/admin/stores/add"
       addLabel="افزودن فروشگاه"
+      helpTopicId="admin-stores"
+      helpTooltip="راهنمای فروشگاه‌ها"
       searchPlaceholder="جستجو بر اساس نام فروشگاه…"
       basePath="/admin/stores"
       search={search}

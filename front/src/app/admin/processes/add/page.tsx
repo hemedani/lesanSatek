@@ -13,6 +13,7 @@ import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { FormInput } from "@/components/form/form-input"
 import { FormTextarea } from "@/components/form/form-textarea"
 import { FormSearchSelect } from "@/components/form/form-search-select"
@@ -213,12 +214,15 @@ export default function AddProcessPage() {
         title="افزودن فرآیند"
         description="اطلاعات اولیه فرآیند را وارد کنید؛ پس از ایجاد، می‌توانید گام‌های گردش کار را تعریف کنید."
       >
-        <Link href="/admin/processes">
-          <Button variant="ghost" className="gap-2 px-4">
-            <ArrowRight className="size-5" />
-            بازگشت به فرآیندها
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <HelpLauncher topicId="admin-process-add" tooltip="راهنمای ایجاد فرآیند" />
+          <Link href="/admin/processes">
+            <Button variant="ghost" className="gap-2 px-4">
+              <ArrowRight className="size-5" />
+              بازگشت به فرآیندها
+            </Button>
+          </Link>
+        </div>
       </PageHeader>
 
       <Form {...form}>

@@ -6,6 +6,7 @@ import { ArrowRight, Plus, Workflow } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton"
 import { ErrorState } from "@/components/ui/error-state"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
@@ -231,6 +232,7 @@ export default function EditProcessStepsPage({
           <Workflow className="size-4 text-electric-iris" />
           {(steps.length).toLocaleString("fa-IR")} مرحله
         </span>
+        <HelpLauncher topicId="admin-process-steps" tooltip="راهنمای گام‌های فرآیند" />
         <Link href={`/admin/processes/${id}`}>
           <Button variant="ghost" className="gap-2 px-4">
             <ArrowRight className="size-5" />

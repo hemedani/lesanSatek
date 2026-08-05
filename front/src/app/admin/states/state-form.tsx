@@ -72,6 +72,8 @@ export function StateForm({ item }: StateFormProps) {
   return (
     <EntityFormShell
       title={isEdit ? "ویرایش استان" : "افزودن استان"}
+      helpTopicId="admin-states"
+      helpTooltip="راهنمای استان"
       description="استان، نخستین سطح سلسله‌مراتب موقعیت جغرافیایی است و شهرها زیرمجموعه آن قرار می‌گیرند."
       backHref="/admin/states"
       backLabel="بازگشت به استان‌ها"

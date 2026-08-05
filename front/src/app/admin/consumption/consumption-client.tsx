@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
 import { PageHeader } from "@/components/ui/page-header";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { Pagination } from "@/components/ui/pagination";
 import { EmptyState } from "@/components/ui/empty-state";
 import { FilterSelect } from "@/components/ui/filter-select";
@@ -325,6 +326,7 @@ export function ConsumptionClient({
           <Plus className="size-5" />
           ثبت مصرف
         </Button>
+        <HelpLauncher topicId="admin-consumption" tooltip="راهنمای مصرف کالا" />
       </PageHeader>
 
       <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">

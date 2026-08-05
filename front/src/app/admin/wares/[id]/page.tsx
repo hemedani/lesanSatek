@@ -4,6 +4,7 @@ import { get } from "@/app/actions/ware/get"
 import { Button } from "@/components/ui/button"
 import { ErrorState } from "@/components/ui/error-state"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { SectionCard } from "@/components/form/section-card"
 
 interface Props {
@@ -96,6 +97,7 @@ export default async function WareDetailPage({ params }: Props) {
             ویرایش کالا
           </Button>
         </Link>
+        <HelpLauncher topicId="admin-wares" tooltip="راهنمای کالا" />
       </PageHeader>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">

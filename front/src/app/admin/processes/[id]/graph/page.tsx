@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ArrowRight, Printer, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
+import { HelpLauncher } from "@/components/help/help-launcher";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { ErrorState } from "@/components/ui/error-state";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -165,6 +166,7 @@ export default function ProcessGraphPage({
         description={`نمایش گرافیکی گام‌های فرآیند · نسخه ${process.version || 1}`}
       >
         <div className="flex flex-wrap items-center gap-2">
+          <HelpLauncher topicId="admin-process-graph" tooltip="راهنمای نمودار فرآیند" />
           <StatusBadge
             status={statusLabels[process.status || ""]?.variant || "inactive"}
             label={statusLabels[process.status || ""]?.label || process.status || "—"}

@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Plus, ShoppingCart, Pencil, Trash2, ArrowDownUp, RotateCcw, CalendarDays, Building2, UserRound, Workflow, Package } from "lucide-react"
 import { toast } from "sonner"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Button } from "@/components/ui/button"
 import { Pagination } from "@/components/ui/pagination"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -262,6 +263,7 @@ export function PurchasingRequestsClient({
             درخواست خرید جدید
           </Button>
         </Link>
+        <HelpLauncher topicId="admin-purchasing-requests" tooltip="راهنمای درخواست‌های خرید" />
       </PageHeader>
 
       <div className="flex flex-col gap-2.5 lg:flex-row lg:items-stretch">

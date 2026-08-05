@@ -58,6 +58,8 @@ export function WareModelsClient({
       addHref="/admin/ware-models/add"
       addLabel="افزودن مدل کالا"
       searchPlaceholder="جستجوی مدل کالا…"
+      helpTopicId="admin-ware-models"
+      helpTooltip="راهنمای مدل‌های کالا"
       basePath="/admin/ware-models"
       search={search}
       sort={sort}

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { SearchSelect } from "@/components/form/form-search-select"
 import { SearchMultiSelect } from "@/components/form/form-search-multi-select"
 import type { SearchSelectOption } from "@/components/form/form-search-select"
@@ -149,6 +150,7 @@ export function WareGroupRelationsClient({ group }: WareGroupRelationsProps) {
             بازگشت به ویرایش
           </Button>
         </Link>
+      <HelpLauncher topicId="admin-ware-groups" tooltip="راهنمای روابط گروه کالا" />
       </PageHeader>
 
       <SectionCard

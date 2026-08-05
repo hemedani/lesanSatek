@@ -7,6 +7,7 @@ import { Plus, GitBranch, Pencil, Trash2, User, Building2, Tag, CheckCircle2, XC
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Pagination } from "@/components/ui/pagination"
 import { FilterBar } from "@/components/ui/filter-bar"
 import { StatCard } from "@/components/dashboard/stat-card"
@@ -92,6 +93,7 @@ export function UnitsClient({ items, prevPageUrl, nextPageUrl, page, search = ""
             واحد جدید
           </Button>
         </Link>
+        <HelpLauncher topicId="orghead-units" tooltip="راهنمای واحدها" />
       </PageHeader>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 lg:gap-5">

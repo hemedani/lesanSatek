@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ArrowRight, Plus } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
+import { HelpLauncher } from "@/components/help/help-launcher"
 import { Button } from "@/components/ui/button"
 import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
 import { count as countPRs } from "@/app/actions/purchasingRequest/count"
@@ -143,6 +144,7 @@ export default async function MyRequestsPage({
               ثبت درخواست جدید
             </Button>
           </Link>
+          <HelpLauncher topicId="requests-my-requests" tooltip="راهنمای درخواست‌های من" />
         </div>
       </PageHeader>
 
