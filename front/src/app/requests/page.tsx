@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Plus, User, ShoppingCart, Warehouse, ScrollText, Activity } from "lucide-react"
+import { Plus, User, ShoppingCart, Warehouse, ScrollText, Activity, Package } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
 import { HelpLauncher } from "@/components/help/help-launcher"
 import { Button } from "@/components/ui/button"
@@ -145,7 +145,7 @@ export default async function RequestsPage({
       </PageHeader>
 
       <section className="space-y-4" aria-label="دسترسی سریع">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5">
           <NavCard
             href="/requests/my-requests"
             title="درخواست‌های من"
@@ -178,6 +178,14 @@ export default async function RequestsPage({
             icon={Activity}
             iconColor="text-sky-400"
             iconBg="bg-sky-400/10"
+          />
+          <NavCard
+            href="/requests/goods-receipt"
+            title="دریافت کالا"
+            description="دریافت کالاهای آماده تحویل"
+            icon={Package}
+            iconColor="text-emerald-400"
+            iconBg="bg-emerald-400/10"
           />
         </div>
       </section>

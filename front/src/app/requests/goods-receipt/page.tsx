@@ -6,7 +6,7 @@ import { gets as getPRs } from "@/app/actions/purchasingRequest/gets"
 import { gets as getUnits } from "@/app/actions/unit/gets"
 import { cookies } from "next/headers"
 import { getMe } from "@/app/actions/user/getMe"
-import { GoodsReceiptClient } from "./goods-receipt-client"
+import { GoodsReceiptClient } from "@/app/unit-head/goods-receipt/goods-receipt-client"
 
 interface PRItem {
   _id: string
@@ -75,7 +75,7 @@ export default async function GoodsReceiptPage() {
   return (
     <div className="space-y-6">
       <Link
-        href="/unit-head"
+        href="/requests"
         className="inline-flex items-center gap-1 text-sm text-fog hover:text-glacier transition-colors"
       >
         <ArrowRight className="size-4" />
@@ -83,10 +83,10 @@ export default async function GoodsReceiptPage() {
       </Link>
 
       <PageHeader
-        title="تحویل کالا"
+        title="دریافت کالا"
         description="مدیریت دریافت کالا"
       >
-        <HelpLauncher topicId="unit-head-goods-receipt" tooltip="راهنمای تحویل کالا" />
+        <HelpLauncher topicId="requests-goods-receipt" tooltip="راهنمای دریافت کالا" />
       </PageHeader>
 
       <GoodsReceiptClient
@@ -94,6 +94,7 @@ export default async function GoodsReceiptPage() {
         warehouseUnitId={warehouseUnitId}
         currentUserId={currentUserId || ""}
         warehouseName={warehouseName}
+        detailHrefPrefix="/requests"
         isWarehouseHead={isWarehouseHead}
       />
     </div>

@@ -240,6 +240,7 @@ const requestsSections: NavSection[] = [
   {
     label: "انبارداری",
     items: [
+      { label: "رسید کالا", href: "/requests/goods-receipt", icon: ClipboardList, allowedRoles: ["UnitHead", "Employee"] },
       { label: "موجودی", href: "/requests/inventory", icon: Warehouse },
       { label: "مصرف", href: "/requests/consumption", icon: ScrollText },
       { label: "گردش کالا", href: "/requests/stock-movements", icon: Activity },

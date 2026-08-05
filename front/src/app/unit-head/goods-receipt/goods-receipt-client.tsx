@@ -38,9 +38,11 @@ interface PRItem {
 
 interface GoodsReceiptClientProps {
   items: PRItem[]
-  warehouseUnitId: string
+  warehouseUnitId?: string
   currentUserId: string
   warehouseName?: string
+  detailHrefPrefix?: string
+  isWarehouseHead?: boolean
 }
 
 const sortOptions: FilterOption[] = [
@@ -70,7 +72,7 @@ function matchesSearch(item: PRItem, q: string): boolean {
   return haystack.includes(q.toLowerCase())
 }
 
-function GoodsReceiptClient({ items, warehouseUnitId, currentUserId, warehouseName }: GoodsReceiptClientProps) {
+function GoodsReceiptClient({ items, warehouseUnitId, currentUserId, warehouseName, detailHrefPrefix = "/unit-head/requests", isWarehouseHead = false }: GoodsReceiptClientProps) {
   const router = useRouter()
   const [search, setSearch] = useState("")
   const [sort, setSort] = useState<SortKey>("created-desc")
@@ -111,7 +113,7 @@ function GoodsReceiptClient({ items, warehouseUnitId, currentUserId, warehouseNa
         purchasingRequestId: item._id,
         wareModelId: item.wareModel._id,
         quantity: item.quantity || 1,
-        receivingUnitId: warehouseUnitId,
+        receivingUnitId: item.requestingUnit?._id || warehouseUnitId || "",
         receivedById: currentUserId,
       })
       if (result.success) {
@@ -219,7 +221,7 @@ function GoodsReceiptClient({ items, warehouseUnitId, currentUserId, warehouseNa
                   </div>
                   <div className="min-w-0 flex-1">
                     <Link
-                      href={`/unit-head/requests/${item._id}`}
+                      href={`${detailHrefPrefix}/${item._id}`}
                       className="inline-block text-base font-semibold text-moonlight leading-6 truncate transition-colors hover:text-glacier"
                     >
                       {item.title || "—"}
@@ -286,7 +288,11 @@ function GoodsReceiptClient({ items, warehouseUnitId, currentUserId, warehouseNa
         title="تأیید دریافت کالا"
         description={
           confirmTarget
-            ? `آیا از دریافت "${confirmTarget.title || "بدون عنوان"}" در ${warehouseName || "انبار"} اطمینان دارید؟`
+            ? `آیا از دریافت "${confirmTarget.title || "بدون عنوان"}" در ${
+                isWarehouseHead
+                  ? warehouseName || "انبار مرکزی"
+                  : confirmTarget.requestingUnit?.name || "واحد درخواست‌کننده"
+              } اطمینان دارید؟`
             : ""
         }
         confirmLabel="تأیید دریافت"
