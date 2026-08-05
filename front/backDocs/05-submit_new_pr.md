@@ -12,9 +12,14 @@ The submit action requires one of these roles as `activeRoleId`:
 - `Admin`
 - `OrgHead`
 - `UnitHead`
-- `Employee`
 
-If the user's `activeRoleId` resolves to `Ordinary`, the backend returns `"You cant do this"`. The employee panel must use the `Employee` role (not `Ordinary`). In the E2E seed data, the admin user is given `Employee` as a third role (alongside `Ordinary` and `Manager`) via the `gen-update-admin-roles` entry. The captured `{employeeRoleId}` should be used as `activeRoleId` when submitting PRs from the employee panel.
+> **Employees cannot submit.** Registering a PR (`add`) always creates a `Draft`; accepting/submitting that Draft is the UnitHead's job (see `08-new_add_submit_pr.md` and `19-pr-stuff-tender-selection-plan.md`).
+
+If the user's `activeRoleId` resolves to `Ordinary` or `Employee`, the backend returns `"You cant do this"`. The employee panel must therefore NOT show the "ارسال درخواست" button on Draft PRs — the frontend gates it to UnitHead (and privileged) roles and requires a `selectionType` (`stuff`/`tender`) to be set before showing it.
+
+## Selection Precondition
+
+Before a Draft PR can be submitted, `selectionType` MUST be `"stuff"` (with a linked `stuff`) or `"tender"` (with a `selectedTenderOfferId`). Submitting with `selectionType: "none"` is blocked with `"Please assign stuff or select a tender offer before submitting this request"`.
 
 ## Required Fields (Validator)
 
@@ -77,7 +82,7 @@ When `submit` succeeds, the backend also:
 
 | Error Message | Cause |
 |---------------|-------|
-| `"You cant do this"` | The `activeRoleId` resolves to a role NOT in [Manager, Admin, OrgHead, UnitHead, Employee] |
+| `"You cant do this"` | The `activeRoleId` resolves to a role NOT in [Manager, Admin, OrgHead, UnitHead] (e.g. `Employee`, `Ordinary`) |
 | `"activeRoleId is required"` | Missing `activeRoleId` in the request body |
 | `"Active role not found"` | The `activeRoleId` UUID doesn't match any role on the user |
 | `"Could not determine organization..."` | User has no org and no requestingUnitId was provided |
@@ -157,4 +162,5 @@ Returns the created PR with the requested `get` projection. The `process` relati
 - **`estimatedAmount` is optional** for the schema but recommended for budget tracking.
 - **`processId` is NEVER sent** — the server resolves it automatically.
 - **Auto-encumbrance** only triggers when both `budgetLineId` and `estimatedAmount` are present AND the BudgetLine has sufficient `remainingBudget`.
-- **Role must be `Employee`, `Manager`, `Admin`, `OrgHead`, or `UnitHead`** — `Ordinary` is NOT allowed for submit (allowed only for read/gets/list actions).
+- **Role must be `Manager`, `Admin`, `OrgHead`, or `UnitHead`** — `Ordinary` and `Employee` are NOT allowed for submit.
+- **`selectionType` must be set** — the Draft must have stuff assigned or a tender offer selected before submit succeeds.

@@ -54,10 +54,12 @@ Roles live on the User model via `roles: Role[]`. Each role:
 | Manager | Global; manages users, units, org-wide everything. |
 | Admin | Global-ish; same high-level access as Manager. |
 | OrgHead | Scoped to one organization (`scopeType: "organization"`). Finalizes PRs, sees org analytics/org-chart. |
-| UnitHead | Scoped to one unit (`scopeType: "unit"`). Approves steps, registers PRs, dashboard statistics. |
+| UnitHead | Scoped to one unit (`scopeType: "unit"`). Approves steps, registers PRs, **accepts (submits) Draft PRs**, dashboard statistics. |
 | StoreHead | Scoped to one store (`scopeType: "store"`). Manages stuff and offers for that store only. |
-| Employee | Can register/submit PRs (not approve). |
+| Employee | Can register PRs as **Drafts only** (cannot submit/accept). |
 | Ordinary | Read-only; cannot submit PRs. |
+
+Submit (`Draft → Pending`) is **UnitHead-only** (plus privileged Manager/Admin/OrgHead). A Draft cannot be submitted until a `selectionType` is set: stuff assigned (`addStuff`) **or** a tender offer selected (`selectTenderOffer`).
 
 The backend also enforces **feature flags** in roles/features, e.g. `canRegisterPurchaseRequest`, `canSubmitPurchaseRequest`, `canManageBudget`, `canIssuePaymentOrder`, `canViewBudgetReports`.
 
@@ -266,7 +268,7 @@ There is **no** `department` and **no** `purchaseOrderItem` model (PurchaseOrder
 
 ## Purchasing Request Lifecycle
 
-`add` (Draft) → `submit` (Pending; auto `processId` resolution + optional auto BudgetEncumbrance) → unit step approvals → Finance unit approval (`budgetLineId` required) → `Approved` → (Stuff assigned / tender awarded) → OrgHead `finalize` (PendingFinalization → Completed) → StoreHead delivery (`updateStuffStatus`: `assigned → ready_to_ship → shipped → delivered`) → `goodsReceipt.add` (adds inventory, auto-creates payment order) → `paymentOrder.markPaid`.
+`add` (Draft) → `submit` (UnitHead-only, requires `selectionType`; auto `processId` resolution + optional auto BudgetEncumbrance) → unit step approvals → Finance unit approval (`budgetLineId` required) → `Approved` → (Stuff assigned / tender awarded) → OrgHead `finalize` (PendingFinalization → Completed) → StoreHead delivery (`updateStuffStatus`: `assigned → ready_to_ship → shipped → delivered`) → `goodsReceipt.add` (adds inventory, auto-creates payment order) → `paymentOrder.markPaid`.
 
 Terminal states: `Completed`, `Rejected`, `Cancelled`.
 

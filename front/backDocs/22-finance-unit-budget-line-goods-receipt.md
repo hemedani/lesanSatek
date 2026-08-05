@@ -196,23 +196,23 @@ Goods delivery confirmation is now restricted to two authorized parties:
 ### Backend authorization flow
 
 1. **Fetches the PR** with `requester._id` and `requestingUnit._id`
-2. **Check A — Is the user the requester?**
-   - If yes: `receivingUnitId` **must equal** PR's `requestingUnit._id`, otherwise throws `"As the requester, goods must be received into your requesting unit"`
-   - Inventory is added to the requesting unit's stock
-3. **Check B — Is the user a warehouse head?**
-   - Queries: `unit.aggregation({ $match: { type: "Warehouse", "head._id": user._id } })`
-   - If yes: `receivingUnitId` must match the warehouse unit
-   - Inventory is added to the warehouse unit's stock
-4. **Neither**: throws `"Only the requester or the central warehouse head can confirm goods delivery"`
+2. **Resolves who is receiving** (identity-based; client-supplied `receivingUnitId` is **ignored** for routing):
+   - `isRequester` — `pr.requester._id === user._id`
+   - `isRequestingUnitHead` — the PR's `requestingUnit.head._id === user._id`
+   - `isWarehouseHead` — the user heads a unit with `type: "Warehouse"` (via `unit.aggregation({ $match: { type: "Warehouse", "head._id": user._id } })`)
+3. **Authorization:** if none of the three → throws `"Only the requester, the requesting unit head, or the central warehouse head can confirm goods delivery"`
+4. **Receiving unit is derived** from identity:
+   - central warehouse head → the warehouse unit they head (central warehouse)
+   - otherwise (requester / requesting unit head / requesting-unit employee) → the PR's `requestingUnit`
+5. **Guard:** if the PR has no `requestingUnit` → throws `"Purchasing request has no requesting unit to receive goods into"`
 
 ### Frontend UX implications
 
-- The goods receipt form should be available to:
-  - The PR creator in their PR detail view (inventory → their unit)
-  - Warehouse staff/heads on a warehouse management page (inventory → warehouse)
-- If the current user doesn't match either condition, the "Confirm Delivery" button should be hidden/disabled
-- When the requester creates the receipt, the `receivingUnitId` should be auto-set to the PR's `requestingUnit._id`
-- When a warehouse head creates it, `receivingUnitId` should default to their warehouse unit
+- The goods receipt pages should be available to:
+  - The PR requester and requesting-unit head/employee in their PR detail view (inventory → their requesting unit)
+  - Central warehouse head on the goods-receipt page (inventory → central warehouse; sees all org-delivered PRs)
+- If the current user matches none of the three identities, the receive button should be hidden
+- The frontend still sends a syntactically valid `receivingUnitId` (e.g. the PR's `requestingUnit._id` or the warehouse id) because `add.val.ts` requires an ObjectId, even though the backend ignores its value for routing
 
 ---
 
@@ -223,7 +223,7 @@ Goods delivery confirmation is now restricted to two authorized parties:
 | `stepApproval.submitDecision` | `budgetLineId` | ObjectId | Required when Finance unit approves |
 | `purchasingRequest.finalize` | `budgetLineId` | ObjectId | Optional — overrides budget line |
 | `paymentOrder.markPaid` | *(no new fields)* | — | Auto-deducts budget line `totalAllocated` |
-| `goodsReceipt.add` | *(no new fields)* | — | Authorization checks requester/warehouse head |
+| `goodsReceipt.add` | *(no new fields)* | — | Authorization checks requester / requesting unit head / warehouse head; receiving unit derived from identity |
 
 ## Response Enrichments
 

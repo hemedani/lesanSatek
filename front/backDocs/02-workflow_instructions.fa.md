@@ -442,10 +442,10 @@ pnpm dev
 - `stuffStatus` پیشرفت می‌کند: assigned ← ready_to_ship ← shipped ← delivered
 - تاریخچه ورودی‌های "stuff_status_updated" را برای هر مرحله نشان می‌دهد
 
-### ۴-خ. رسید کالا (فقط متقاضی یا رئیس واحد انبار)
+### ۴-خ. رسید کالا (متقاضی، مدیر واحد درخواست‌کننده، یا رئیس انبار مرکزی)
 
-> **بررسی مجوز:** فقط متقاضی درخواست خرید یا رئیس واحدی از نوع انبار می‌تواند تحویل را تأیید کند.
-> اگر متقاضی تأیید کند، `receivingUnitId` باید برابر با `requestingUnit._id` درخواست خرید باشد.
+> **بررسی مجوز:** متقاضی درخواست خرید، مدیر واحد درخواست‌کننده، یا رئیس واحدی از نوع انبار می‌تواند تحویل را تأیید کند.
+> `receivingUnitId` بر اساس هویت تعیین می‌شود: رئیس انبار → واحد انبار خود؛ در غیر این صورت → `requestingUnit` درخواست خرید. مقدار ارسالی کلاینت نادیده گرفته می‌شود (اما باید یک ObjectId معتبر باشد).
 
 ۱. ورود به‌عنوان متقاضی درخواست خرید (مثلاً مدیر سیستمی که درخواست را ثبت کرده)
 ۲. رفتن به ایجاد رسید کالا
@@ -801,7 +801,7 @@ pnpm dev
 
 - `estimatedAmount` در لحظه **تخصیص کالا** (قیمت کالا × تعداد) یا **انتخاب پیشنهاد** (قیمت پیشنهاد × تعداد) تنظیم می‌شود.
 - `unitId` هنگام ایجاد درخواست خرید (**ثبت درخواست**) تنظیم می‌شود، نه هنگام ایجاد پیش‌نویس. در ایجاد پیش‌نویس، `unitId` توسط بک‌اند از حوزه نقش فعال استخراج می‌شود (کاربر آن را تنظیم نمی‌کند).
-- برای **رسید کالا**، `receivingUnitId` باید با `requestingUnit._id` درخواست خرید مطابقت داشته باشد (اگر متقاضی تأیید می‌کند) یا واحد انبار باشد.
+- برای **رسید کالا**، `receivingUnitId` بر اساس هویت دریافت‌کننده تعیین می‌شود: رئیس انبار → واحد انبار خود؛ در غیر این صورت → `requestingUnit` درخواست خرید (مقدار ارسالی کلاینت نادیده گرفته می‌شود).
 - یک درخواست خرید **تکمیل شده** قابل حذف نیست.
 - **بایگانی فرآیند:** وضعیت ← `"archived"`، نسخه ← `1`، قابل فعال‌سازی مجدد.
 - **وضعیت فروشگاه** (`storeStatus`): `active` / `inactive`. فروشگاه غیرفعال نمی‌تواند کالا ارائه دهد.
@@ -966,8 +966,8 @@ curl http://localhost:1370/api/main/purchasingRequest/gets   -H "Content-Type: a
 | "Stuff not found"                                                             | `addStuff` با `stuffId` نامعتبر فراخوانی شده است                                                                     | سند کالا برای wareModel و فروشگاه داده شده وجود دارد                                      |
 | "Budget line is required when approving from a finance unit"                  | تأیید مرحله برای واحد نوع Finance بدون ارائه `budgetLineId`                                                          | یک شناسه ردیف بودجه معتبر با `remainingBudget` کافی ارسال کنید                            |
 | "Insufficient budget: remaining is less than required"                        | `remainingBudget` ردیف بودجه کمتر از `estimatedTotal` (قیمت واحد × تعداد) است                                        | ردیف بودجه دیگری انتخاب کنید یا تخصیص را افزایش دهید                                      |
-| "Only the requester or the central warehouse head can confirm goods delivery" | کاربری که نه متقاضی درخواست خرید است و نه رئیس انبار، سعی در ایجاد رسید کالا دارد                                    | کاربر واردشده باید متقاضی درخواست خرید یا نقش رئیس در واحد نوع Warehouse داشته باشد       |
-| "As the requester, goods must be received into your requesting unit"          | متقاضی درخواست خرید در حال ایجاد رسید کالا است اما `receivingUnitId` با `requestingUnit._id` درخواست خرید متفاوت است | `receivingUnitId` را برابر شناسه واحد متقاضی درخواست خرید قرار دهید                       |
+| "Only the requester, the requesting unit head, or the central warehouse head can confirm goods delivery" | کاربری که نه متقاضی درخواست خرید، نه مدیر واحد درخواست‌کننده، و نه رئیس انبار است، سعی در ایجاد رسید کالا دارد                                    | کاربر واردشده باید متقاضی، مدیر واحد درخواست‌کننده، یا رئیس واحدی از نوع Warehouse باشد |
+| "Purchasing request has no requesting unit to receive goods into" | درخواست خرید `requestingUnit` ندارد تا کالا به آن واحد منتقل شود | مطمئن شوید درخواست خرید واحد درخواست‌کننده دارد |
 | درخواست خرید در PendingFinalization گیر کرده                                  | همه مراحل تأیید شده اما هیچ OrgHead/مدیری نهایی‌سازی نکرده است                                                       | `purchasingRequest.finalize` را به‌عنوان Manager/Admin/OrgHead فراخوانی کنید              |
 | "You can only add items to your own store"                                    | StoreHead `stuff.add` را با `storeId` غیر از حوزه خود فراخوانی می‌کند                                                | از `activeRole.scopeId` به‌عنوان `storeId` استفاده کنید                                   |
 | "Invalid stuffStatus"                                                         | `updateStuffStatus` با مقدار enum اشتباه فراخوانی شده است                                                            | از یکی از موارد استفاده کنید: assigned, ready_to_ship, shipped, delivered                 |
@@ -1030,7 +1030,7 @@ curl http://localhost:1370/api/main/purchasingRequest/gets   -H "Content-Type: a
   نهایی‌سازی OrgHead (عملیات `finalize`) → Completed، stuffStatus="assigned"
   تحویل StoreHead: `updateStuffStatus` → assigned→ready_to_ship→shipped→delivered
   رسید کالا (GR-001، تعداد=۱۰ پذیرفته) → stuffStatus="received"، موجودی خودکار، پرداخت خودکار
-    مجوز: فقط متقاضی یا رئیس انبار؛ receivingUnit باید برابر requestingUnit باشد
+    مجوز: متقاضی، مدیر واحد درخواست‌کننده، یا رئیس انبار؛ receivingUnit بر اساس هویت تعیین می‌شود (انبار → انبار، در غیر این صورت → requestingUnit)
   حواله پرداخت: OrgHead به مالی ارسال می‌کند ← رئیس واحد مالی markPaid (بودجه کسر شد)
   ↓
 

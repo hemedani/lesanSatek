@@ -115,6 +115,8 @@ get: selectStruct("purchasingRequest", 2)
 
 ### 3c. `purchasingRequest.submit` — modified
 
+**Role restriction:** `submit` is restricted to `Manager`, `Admin`, `OrgHead`, and `UnitHead`. **`Employee` can only `add` (register a Draft); they cannot submit.** The frontend must gate the "ارسال درخواست" button accordingly (only show it for submit-capable roles AND only when `selectionType !== "none"`).
+
 **What changed:**
 - **Selection validation added**: Before transitioning Draft→Pending, checks `selectionType`:
   - If `"none"`: blocks with error "Please assign stuff or select a tender offer before submitting this request"

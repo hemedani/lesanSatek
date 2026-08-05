@@ -5,7 +5,7 @@
 The purchasing request flow has been split into two distinct phases:
 
 1. **`add`** — Anyone with `canRegisterPurchaseRequest` feature can register a purchase need (Draft). No process, no price, no vendor.
-2. **`submit`** — UnitHead or someone with `canSubmitPurchaseRequest` feature transitions a Draft PR to Pending, linking it to a process, optionally assigning a vendor, and checking for tenders.
+2. **`submit`** — **UnitHead** (or privileged `Manager`/`Admin`/`OrgHead`) transitions a Draft PR to Pending, linking it to a process. A `selectionType` (`stuff` or `tender`) must already be set — see `19-pr-stuff-tender-selection-plan.md`. **Employees cannot submit.**
 
 ---
 
@@ -61,10 +61,12 @@ The PR will have `status: "Draft"` and **no `process` relation** (it's `null`).
 
 ### Who Can Call
 - `Manager`, `Admin` — always
-- `OrgHead`, `UnitHead`, `Employee` — **only if they have the `canSubmitPurchaseRequest` feature**
+- `OrgHead`, `UnitHead` — always
+- **`Employee` is NOT allowed** to call `submit`. Employees only register Drafts via `add`; the UnitHead accepts and submits them.
 
 Additionally, the backend validates:
 - The caller's active role's `scopeId` (unit) must match the Draft PR's `requestingUnit`.
+- The Draft PR must have a `selectionType` set to `"stuff"` (with linked `stuff`) or `"tender"` (with `selectedTenderOfferId`). Otherwise submit is blocked: `"Please assign stuff or select a tender offer before submitting this request"`.
 
 ### Required Fields (send in `set`)
 

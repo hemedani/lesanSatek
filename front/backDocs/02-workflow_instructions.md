@@ -423,10 +423,10 @@ This is the core business flow: **PR Draft → addStuff/submit → UnitHead appr
    - `stuffStatus` progresses: assigned → ready_to_ship → shipped → delivered
    - History shows "stuff_status_updated" entries for each stage
 
-### 4i. Goods Receipt (Requester or Warehouse Head Only)
+### 4i. Goods Receipt (Requester, Requesting Unit Head, or Warehouse Head)
 
-> **Authority check:** Only the PR's requester or a Warehouse-type unit head can confirm delivery.
-> If the requester confirms, `receivingUnitId` must equal the PR's `requestingUnit._id`.
+> **Authority check:** The PR's requester, the requesting unit's head, or a Warehouse-type unit head can confirm delivery.
+> `receivingUnitId` is derived from identity: warehouse heads → their warehouse unit; otherwise → the PR's `requestingUnit`. The client-supplied value is ignored (but must still be a valid ObjectId).
 
 1. Log in as the PR requester (e.g. Admin, who submitted the PR)
 2. Navigate to goods receipt creation
@@ -1179,8 +1179,8 @@ The PanelSelector should show all 3 options for role switching.
 | "Stuff not found" | `addStuff` called with invalid `stuffId` | Verify the stuff document exists for the given wareModel and store |
 | "Budget line is required when approving from a finance unit" | Step approval for a Finance-type unit without providing `budgetLineId` | Pass a valid budget line ID with sufficient `remainingBudget` |
 | "Insufficient budget: remaining is less than required" | The budget line's `remainingBudget` is less than `estimatedTotal` (unitPrice × quantity) | Choose a different budget line or increase allocation |
-| "Only the requester or the central warehouse head can confirm goods delivery" | A user who is neither the PR requester nor a Warehouse head tries to create a goods receipt | Ensure the logged-in user is the PR requester or has a head role at a Warehouse-type unit |
-| "As the requester, goods must be received into your requesting unit" | The PR's requester is creating the goods receipt but `receivingUnitId` differs from the PR's `requestingUnit._id` | Set `receivingUnitId` to the PR's requesting unit ID |
+| "Only the requester, the requesting unit head, or the central warehouse head can confirm goods delivery" | A user who is neither the PR requester, the requesting unit's head, nor a Warehouse head tries to create a goods receipt | Ensure the logged-in user is the PR requester, the requesting unit's head, or heads a Warehouse-type unit |
+| "Purchasing request has no requesting unit to receive goods into" | The PR has no `requestingUnit` to route the received goods into | Ensure the PR has a requesting unit |
 | PR stuck at PendingFinalization | All steps approved but no OrgHead/Manager has finalized | Call `purchasingRequest.finalize` as Manager/Admin/OrgHead |
 | "You can only add items to your own store" | StoreHead calls `stuff.add` with `storeId` not matching their scope | Use `activeRole.scopeId` as `storeId` |
 | "Invalid stuffStatus" | Called `updateStuffStatus` with wrong enum value | Use one of: assigned, ready_to_ship, shipped, delivered |
@@ -1678,9 +1678,9 @@ Draft → (submit) → Pending → (step approvals) → InProgress → (last ste
 | `receivedAt` | 2026-04-01 |
 | `items` | `[{wareModelId, wareModelName, wareId, wareName, quantityReceived: 10, quantityAccepted: 10, quantityRejected: 0, batchNo, expirationDate}]` |
 
-**Relations:** `purchasingRequestId` → PR #1, `receivedById` → user (must be the PR requester or a Warehouse unit head), `receivingUnitId` → requesting unit (not warehouse, due to authority check)  
+**Relations:** `purchasingRequestId` → PR #1, `receivedById` → user (must be the PR requester, the requesting unit head, or a Warehouse unit head), `receivingUnitId` → derived from identity (warehouse head → warehouse; otherwise → requesting unit)  
 **Pricing:** Reads `estimatedAmount` from PR (prorated by accepted qty). No `purchaseOrderItemId` needed — `PurchaseOrderItem` model was deleted. `payTo` resolved from PR's `store` relation.  
-**Authority:** Only the PR's requester (receivingUnit must match requestingUnit) or a Warehouse-type unit head can confirm delivery.
+**Authority:** The PR requester, the requesting unit head, or a Warehouse-type unit head can confirm delivery; `receivingUnitId` is derived from identity.
 
 ---
 
@@ -1843,7 +1843,7 @@ E2E Flow #1 — Direct Store Purchase (New Lifecycle):
   OrgHead finalize (`finalize` action) → Completed, stuffStatus="assigned"
   StoreHead delivery: `updateStuffStatus` → assigned→ready_to_ship→shipped→delivered
   Goods Receipt (GR-001, qty=10 accepted) → stuffStatus="received", auto-inventory, auto-payment
-    Authority: requester or warehouse head only; receivingUnit must match requestingUnit
+    Authority: requester, requesting unit head, or warehouse head; receivingUnit derived from identity (warehouse → warehouse, else → requestingUnit)
   Payment Order: OrgHead sends to finance → Finance UnitHead markPaid (budget deducted)
   ↓
 
