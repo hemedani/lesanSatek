@@ -160,7 +160,7 @@ function SidebarFooter({ nav, collapsed = false, onToggle }: { nav: PanelNav; co
                 </Link>
               )}
               <Link
-                href="/docs"
+                href="/doc"
                 className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[11px] text-fog/60 transition-colors hover:bg-white/[0.03] hover:text-moonlight"
               >
                 <BookOpen className="size-3.5" />

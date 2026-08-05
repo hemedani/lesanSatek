@@ -6,7 +6,7 @@ const linkGroups = [
     links: [
       { label: "ویژگی‌ها", href: "/#ویژگی‌ها" },
       { label: "قیمت‌گذاری", href: "/pricing" },
-      { label: "مستندات", href: "/docs" },
+      { label: "مستندات", href: "/doc" },
       { label: "تغییرات", href: "/changelog" },
     ],
   },
@@ -14,8 +14,8 @@ const linkGroups = [
     title: "منابع",
     links: [
       { label: "وبلاگ", href: "/blog" },
-      { label: "راهنما", href: "/docs" },
-      { label: "مستندات API", href: "/docs" },
+      { label: "راهنما", href: "/doc" },
+      { label: "مستندات API", href: "/doc" },
       { label: "سوالات متداول", href: "/faq" },
     ],
   },
