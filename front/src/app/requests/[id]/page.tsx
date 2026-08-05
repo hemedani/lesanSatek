@@ -237,6 +237,7 @@ export default async function RequestDetailPage({
       updatedAt: 1,
       stuff: { _id: 1, quantity: 1, price: 1 },
       stuffStatus: 1,
+      selectionType: 1,
       completedAt: 1,
       estimatedAmount: 1,
       requester: { _id: 1, first_name: 1, last_name: 1 },
@@ -294,8 +295,10 @@ export default async function RequestDetailPage({
   const activeRoleId = cookieStore.get("activeRoleId")?.value
   let isCurrentUserRequester = false
   let currentUserId: string | undefined
+  let currentUserRoles: string[] = []
   let isWarehouseHead = false
   let warehouseUnitId: string | undefined
+  let activeRole: { roleId?: string; name?: string; scopeType?: string; scopeId?: string } | undefined
 
   if (activeRoleId) {
     const userRes = await getMe({
@@ -304,6 +307,8 @@ export default async function RequestDetailPage({
     }).catch(() => ({ success: false, body: null }))
     const currentUser = userRes.success ? userRes.body : null
     currentUserId = currentUser?._id
+    currentUserRoles = currentUser?.roles?.map((r: { name?: string }) => r.name) ?? []
+    activeRole = currentUser?.roles?.find((r: { roleId?: string }) => r.roleId === activeRoleId)
     isCurrentUserRequester = currentUser?._id === pr.requester?._id
   }
   if (currentUserId) {
@@ -322,9 +327,20 @@ export default async function RequestDetailPage({
     }
   }
 
-  const receiveUnitId = isCurrentUserRequester ? pr.requestingUnit?._id : warehouseUnitId
-  const canReceive = pr.stuffStatus === "delivered" && pr.wareModel?._id && ((isCurrentUserRequester && pr.requestingUnit?._id) || (isWarehouseHead && warehouseUnitId))
+  const isRequestingUnitHead =
+    activeRole?.name === "UnitHead" &&
+    activeRole?.scopeType === "unit" &&
+    Boolean(activeRole.scopeId && activeRole.scopeId === pr.requestingUnit?._id)
+
+  const receiveUnitId = (isCurrentUserRequester || isRequestingUnitHead) ? pr.requestingUnit?._id : warehouseUnitId
+  const canReceive = pr.stuffStatus === "delivered" && pr.wareModel?._id && (((isCurrentUserRequester || isRequestingUnitHead) && pr.requestingUnit?._id) || (isWarehouseHead && warehouseUnitId))
   const isDraft = String(pr.status || "").toLowerCase() === "draft"
+
+  const canSubmitRole = currentUserRoles.some((r) => ["UnitHead", "Manager", "Admin", "OrgHead"].includes(r))
+  const selectionReady = pr.selectionType === "stuff" || pr.selectionType === "tender"
+  const canSubmitNow = isDraft && canSubmitRole && selectionReady
+  const isDraftAwaitingSelection = isDraft && canSubmitRole && !selectionReady
+  const isDraftAwaitingUnitHead = isDraft && !canSubmitRole
 
   const [approvalsRes, grRes, poRes] = await Promise.all([
     getApprovals(
@@ -482,9 +498,9 @@ export default async function RequestDetailPage({
               </div>
             </div>
 
-            {(isDraft || canReceive) && (
+            {(canSubmitNow || canReceive) && (
               <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-                {isDraft && (
+                {canSubmitNow && (
                   <SubmitPRButton
                     purchasingRequestId={pr._id}
                     title={pr.title}
@@ -743,13 +759,23 @@ export default async function RequestDetailPage({
         <div className="space-y-6">
           <SectionCard icon={Zap} title="اقدامات سریع" iconClassName="bg-electric-iris/10 text-electric-iris ring-electric-iris/15">
             <div className="space-y-3">
-              {isDraft && (
+              {canSubmitNow && (
                 <SubmitPRButton
                   purchasingRequestId={pr._id}
                   title={pr.title}
                   quantity={pr.quantity}
                   wareModelName={pr.wareModel?.name}
                 />
+              )}
+              {isDraftAwaitingSelection && (
+                <p className="rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-3 text-body-sm leading-6 text-amber-400/90">
+                  برای پذیرش و ارسال این پیش‌نویس، ابتدا کالا تخصیص دهید یا از طریق مناقصه پیشنهاد انتخاب کنید.
+                </p>
+              )}
+              {isDraftAwaitingUnitHead && (
+                <p className="rounded-xl border border-steel-border/20 bg-white/[0.02] p-3 text-body-sm leading-6 text-fog">
+                  این درخواست در وضعیت پیش‌نویس است و پس از تعیین نحوه تأمین، توسط مدیر واحد پذیرش و ارسال می‌شود.
+                </p>
               )}
               {canReceive && (
                 <ReceiveGoodsButton
@@ -779,6 +805,19 @@ export default async function RequestDetailPage({
                 </div>
               </div>
               <MetaItem icon={User} label="ثبت‌کننده" value={fullName(pr.requester)} />
+              {pr.selectionType && pr.selectionType !== "none" && (
+                <MetaItem
+                  icon={ShoppingCart}
+                  label="نحوه تأمین"
+                  value={
+                    pr.selectionType === "stuff"
+                      ? "تخصیص کالا"
+                      : pr.selectionType === "tender"
+                        ? "مناقصه"
+                        : "—"
+                  }
+                />
+              )}
               <MetaItem icon={Package} label="تعداد" value={pr.quantity?.toLocaleString("fa-IR") || "—"} valueDir="ltr" />
               <MetaItem icon={Building2} label="واحد درخواست‌کننده" value={pr.requestingUnit?.name || "—"} />
               <MetaItem icon={GitBranch} label="فرآیند" value={pr.process?.name || "—"} />

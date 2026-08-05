@@ -121,7 +121,8 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
     );
   }
 
-  const isDraft = pr.status === "draft";
+  const isDraft = String(pr.status || "").toLowerCase() === "draft";
+  const selectionReady = pr.selectionType === "stuff" || pr.selectionType === "tender";
   const currentStep = pr.currentStep || 0;
   const totalSteps = pr.process?.steps?.length || 0;
   const isStuffAssigned = pr.stuffStatus === "assigned" || pr.stuffStatus === "received";
@@ -389,10 +390,26 @@ export function PurchasingRequestDetailClient({ pr, history }: PurchasingRequest
           {/* Actions */}
           <div className="flex flex-col gap-2">
             {isDraft ? (
-              <Button className="w-full gap-2" size="sm" onClick={() => setShowSubmitPR(true)}>
-                <Send className="size-4" />
-                ارسال درخواست
-              </Button>
+              selectionReady ? (
+                <Button className="w-full gap-2" size="sm" onClick={() => setShowSubmitPR(true)}>
+                  <Send className="size-4" />
+                  ارسال درخواست
+                </Button>
+              ) : (
+                <>
+                  <p className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-3 py-2.5 text-xs leading-5 text-amber-400/90">
+                    برای ارسال این پیش‌نویس، ابتدا کالا تخصیص دهید یا از طریق مناقصه پیشنهاد انتخاب کنید.
+                  </p>
+                  <Button className="w-full gap-2" size="sm" onClick={() => setShowAddStuff(true)}>
+                    <Package className="size-4" />
+                    تخصیص کالا
+                  </Button>
+                  <Button className="w-full gap-2" size="sm" variant="secondary" onClick={() => setShowCreateTender(true)}>
+                    <Gavel className="size-4" />
+                    ایجاد مناقصه
+                  </Button>
+                </>
+              )
             ) : (
               <>
                 {!isStuffAssigned && (

@@ -75,13 +75,19 @@ export function UnitHeadActions({
         </Button>
       )}
 
-      {isDraft && (
+      {isDraft && selectionType && selectionType !== "none" && (
         <SubmitPRButton
           purchasingRequestId={purchasingRequestId}
           title={undefined}
           quantity={quantity}
           wareModelName={undefined}
         />
+      )}
+
+      {isDraft && (!selectionType || selectionType === "none") && (
+        <p className="rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-3 text-body-sm leading-6 text-amber-400/90">
+          برای ارسال این پیش‌نویس، ابتدا کالا تخصیص دهید یا از طریق مناقصه پیشنهاد انتخاب کنید.
+        </p>
       )}
 
       <AddStuffDialog

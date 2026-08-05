@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodV4Resolver } from "@/lib/zod-v4-resolver";
 import { z } from "zod";
-import { Loader2, Save, Send, ShoppingCart, FileText, ArrowRight } from "lucide-react";
+import { Loader2, Save, ShoppingCart, FileText, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { PageHeader } from "@/components/ui/page-header";
@@ -18,7 +18,6 @@ import { FormTextarea } from "@/components/form/form-textarea";
 import { FormSearchSelect } from "@/components/form/form-search-select";
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role";
 import { add } from "@/app/actions/purchasingRequest/add";
-import { submit as submitRequest } from "@/app/actions/purchasingRequest/submit";
 import { gets as getWareModels } from "@/app/actions/wareModel/gets";
 
 const newPRSchema = z.object({
@@ -33,7 +32,6 @@ type NewPRData = z.infer<typeof newPRSchema>;
 export function NewPurchasingRequestForm() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
-  const [mode, setMode] = useState<"submit" | "draft">("submit");
 
   const form = useForm<NewPRData>({
     resolver: zodV4Resolver(newPRSchema),
@@ -64,47 +62,10 @@ export function NewPurchasingRequestForm() {
     }
   };
 
-  const handleSaveAndSubmit = async (values: NewPRData) => {
-    try {
-      const result = await add(
-        {
-          activeRoleId: getActiveRoleIdFromStore(),
-          title: values.title,
-          description: values.description || undefined,
-          quantity: Number(values.quantity),
-          wareModelId: values.wareModelId,
-        },
-        { _id: 1, title: 1, status: 1 }
-      );
-      if (!result.success || !result.body?._id) {
-        toast.error(result.body?.message || "خطا در ایجاد درخواست خرید");
-        return;
-      }
-      const draftId = result.body._id;
-      const submitResult = await submitRequest(
-        { activeRoleId: getActiveRoleIdFromStore(), _id: draftId },
-        { _id: 1, title: 1, status: 1 }
-      );
-      if (submitResult.success) {
-        toast.success("درخواست خرید با موفقیت ثبت و ارسال شد.");
-        router.push(`/admin/purchasing-requests/${draftId}`);
-      } else {
-        toast.error(submitResult.body?.message || "پیش‌نویس ذخیره شد اما ارسال ناموفق بود");
-        router.push(`/admin/purchasing-requests/${draftId}`);
-      }
-    } catch {
-      toast.error("خطا در ثبت درخواست خرید");
-    }
-  };
-
   const submit = async (values: NewPRData) => {
     setSaving(true);
     try {
-      if (mode === "draft") {
-        await handleSaveDraft(values);
-      } else {
-        await handleSaveAndSubmit(values);
-      }
+      await handleSaveDraft(values);
     } finally {
       setSaving(false);
     }
@@ -114,7 +75,7 @@ export function NewPurchasingRequestForm() {
     <div className="mx-auto w-full max-w-2xl space-y-6">
       <PageHeader
         title="درخواست خرید جدید"
-        description="ثبت درخواست خرید جدید و ارسال برای فرآیند تأیید"
+        description="ثبت درخواست خرید به عنوان پیش‌نویس؛ پس از تعیین کالا یا مناقصه، توسط مدیر واحد ارسال می‌شود."
       >
 
         <Link href="/admin/purchasing-requests">
@@ -205,30 +166,14 @@ export function NewPurchasingRequestForm() {
                   type="submit"
                   size="lg"
                   disabled={saving}
-                  onClick={() => setMode("submit")}
                   className="flex-1 gap-2 px-5 sm:flex-none"
                 >
-                  {saving && mode === "submit" ? (
-                    <Loader2 className="size-5 animate-spin" />
-                  ) : (
-                    <Send className="size-5" />
-                  )}
-                  {saving && mode === "submit" ? "در حال ثبت…" : "ثبت و ارسال"}
-                </Button>
-                <Button
-                  type="submit"
-                  variant="secondary"
-                  size="lg"
-                  disabled={saving}
-                  onClick={() => setMode("draft")}
-                  className="gap-2 px-5"
-                >
-                  {saving && mode === "draft" ? (
+                  {saving ? (
                     <Loader2 className="size-5 animate-spin" />
                   ) : (
                     <Save className="size-5" />
                   )}
-                  ذخیره به عنوان پیش‌نویس
+                  {saving ? "در حال ذخیره…" : "ثبت پیش‌نویس"}
                 </Button>
                 <Button
                   type="button"
