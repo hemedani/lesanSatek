@@ -249,7 +249,7 @@ export const dashboardStatisticFn: ActFn = async (body) => {
       );
 
       const poMatch: Document = { status: "sent_to_finance" };
-      if (effectiveUnitId) {
+      if (effectiveUnitId && unitType !== "Finance") {
         poMatch["financialUnit._id"] = effectiveUnitId;
       }
 
@@ -314,7 +314,7 @@ export const dashboardStatisticFn: ActFn = async (body) => {
   if (get.paymentOrders === 1) {
     if (!effectiveUnitId || unitType === "Finance") {
       const poMatch: Document = {};
-      if (effectiveUnitId) {
+      if (effectiveUnitId && unitType !== "Finance") {
         poMatch["financialUnit._id"] = effectiveUnitId;
       }
 
