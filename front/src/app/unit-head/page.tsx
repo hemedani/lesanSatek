@@ -233,6 +233,31 @@ export default async function UnitHeadDashboard() {
             <Landmark className="size-5 text-frost-link" />
             <h2 className="text-sm font-medium text-fog tracking-wide">خلاصه بودجه</h2>
           </div>
+
+          {paymentOrders && (
+            <Link href="/unit-head/finance/payment-orders" className="block">
+              <Card variant="glass" className="cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:border-frost-link/35 motion-reduce:hover:translate-y-0">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-10 items-center justify-center rounded-xl bg-sky-500/10 ring-1 ring-inset ring-sky-500/15">
+                      <Receipt className="size-5 text-sky-400" />
+                    </div>
+                    <div className="min-w-0">
+                      <CardTitle className="text-sm font-medium text-frost-link">درخواست‌های نیازمند پرداخت</CardTitle>
+                      <p className="text-xs text-fog/50 mt-0.5">دستورات پرداخت ارجاع شده به واحد مالی</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-semibold text-glacier leading-8" dir="ltr">
+                    {paymentOrders.sent_to_finance.toLocaleString("fa-IR")}
+                  </p>
+                  <p className="text-xs text-fog/50 mt-1">در انتظار پرداخت</p>
+                </CardContent>
+              </Card>
+            </Link>
+          )}
+
           <div className="grid gap-5 sm:grid-cols-3">
             <Link href="/unit-head/finance/budget-lines">
               <Card variant="glass" className="cursor-pointer h-full transition-all duration-200 hover:-translate-y-0.5 hover:border-frost-link/35 motion-reduce:hover:translate-y-0">
