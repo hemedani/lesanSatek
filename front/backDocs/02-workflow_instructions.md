@@ -22,7 +22,7 @@ The app is at `http://localhost:3000`.
 Run the `e2e.json` test suite via the playground at `http://localhost:1370/playground`.  
 Paste each entry from `back/http/e2e.json` sequentially, or use the collection runner.
 
-The suite creates **126 records** spanning the full lifecycle. Below is the complete reference.
+The suite creates **186 records** spanning the full lifecycle. Below is the complete reference.
 
 ---
 
@@ -79,10 +79,10 @@ The `e2e.json` suite creates the following entities in order.
 | `gen-warehouse-head` | حسین کاظمی (hossein@lesansatek.com) | UnitHead (scope: Warehouse) | Warehouse Unit Head |
 | `gen-finance-head` | فاطمه موسوی (fatemeh@lesansatek.com) | UnitHead (scope: Finance) | Finance Unit Head |
 | `gen-finance-user` | مریم حسینی (maryam@lesansatek.com) | Ordinary + canManageBudget | Finance Panel |
-| `gen-vendor-user` | سارا کریمی (sara@lesansatek.com) | Manager + Ordinary + Employee + canRespondToTender + canAssignItemsToOrder | Vendor / Store Head |
+| `gen-vendor-user` | سارا کریمی (sara@lesansatek.com) | StoreHead (scope: store) + canRespondToTender + canAssignItemsToOrder | Vendor / Store Head |
 | `gen-orghead-user` | دکتر احمدی (dr.ahmadi@lesansatek.com) | OrgHead (scope: organization) | OrgHead Panel |
 
-### 1c. Units (17 total)
+### 1c. Units (18 total)
 
 | Entry | Unit Name (fa) | Type | Parent Unit |
 |-------|---------------|------|-------------|
@@ -95,6 +95,7 @@ The `e2e.json` suite creates the following entities in order.
 | `gen-unit-hr` | واحد منابع انسانی (HR) | Administration | — |
 | `gen-unit-legal` | واحد حقوقی (Legal) | General | — |
 | `gen-unit-rd` | واحد تحقیق و توسعه (R&D) | Expert | — |
+| `gen-unit-tedarakat` | واحد تدارکات (Procurement Support) | Logistics | — |
 | `gen-unit-hemato-lab` | آزمایشگاه هماتولوژی (Hematology Lab) | Expert | → Procurement |
 | `gen-unit-micro-lab` | آزمایشگاه میکروبیولوژی (Microbiology Lab) | Expert | → Procurement |
 | `gen-unit-patho-lab` | آزمایشگاه پاتولوژی (Pathology Lab) | Expert | → Procurement |
@@ -104,7 +105,7 @@ The `e2e.json` suite creates the following entities in order.
 | `gen-unit-tech-support` | واحد پشتیبانی فنی (Technical Support) | General | → IT |
 | `gen-unit-internal-audit` | واحد حسابرسی داخلی (Internal Audit) | Administration | → Finance |
 
-**Standard captures**: `{unitId}` (Procurement), `{warehouseUnitId}`, `{financeUnitId}`, `{prodUnitId}`, `{logisticsUnitId}`, `{itUnitId}`, `{hrUnitId}`, `{legalUnitId}`, `{rdUnitId}`, `{hematolabUnitId}`, `{microlabUnitId}`, `{patholabUnitId}`, `{coldstoreUnitId}`, `{internalprocUnitId}`, `{qaUnitId}`, `{techsupportUnitId}`, `{internalauditUnitId}`
+**Standard captures**: `{unitId}` (Procurement), `{warehouseUnitId}`, `{financeUnitId}`, `{prodUnitId}`, `{logisticsUnitId}`, `{itUnitId}`, `{hrUnitId}`, `{legalUnitId}`, `{rdUnitId}`, `{procurementUnitId}` (Procurement Support, head محمد رضایی `{logHeadId}`), `{hematolabUnitId}`, `{microlabUnitId}`, `{patholabUnitId}`, `{coldstoreUnitId}`, `{internalprocUnitId}`, `{qaUnitId}`, `{techsupportUnitId}`, `{internalauditUnitId}`
 
 ### 1d. Product Hierarchy
 
@@ -118,42 +119,46 @@ The `e2e.json` suite creates the following entities in order.
 | `gen-wareModel` | WareModel | کیت TSH | TSH Kit |
 | `gen-ware` | Ware | کیت TSH زیشیمی (2,500,000 IRR) | TSH Kit ZistShimi |
 | `gen-store` | Store | فروشگاه نمونه | Sample Store |
-| `gen-stuff` | Stuff | inventoryNo=1001, price=2,800,000 | Absolute price |
+| `gen-stuff` | Stuff | quantity=50, price=2,800,000 | Absolute price |
 
 **Captures**: `{wareTypeId}`, `{wareClassId}`, `{wareGroupId}`, `{wareModelId}`, `{wareId}`, `{warePrice}`, `{storeId}`, `{stuffId}`, `{stuffPrice}`
 
-### 1e. Processes — 8 Scoped Processes
+### 1e. Processes — 9 Scoped Processes
 
 #### Process #1 — General (Org-Wide) `{processGeneralId}`
-فرآیند خرید عمومی سازمان | Steps: 3 (تأیید درخواست → تأیید انبار → تأیید مالی)
+فرآیند خرید عمومی سازمان | Steps: 4 (تأیید درخواست → تأیید انبار → تأیید مالی → تأیید تدارکات)
 
 #### Process #2 — Unit-Scoped (Procurement) `{processUnitId}`
-فرآیند خرید واحد خرید | Steps: 3 (تأیید درخواست → تأیید انبار → تأیید مالی)  
+فرآیند خرید واحد خرید | Steps: 4 (تأیید انبار → تأیید انبار سرد → تأیید مالی → تأیید تدارکات)  
 **Scope**: `unitId: {unitId}`
 
 #### Process #3 — Unit-Scoped (Warehouse) `{processWarehouseId}`
-فرآیند خرید انبار مرکزی | Steps: 2 (تأیید انبار → تأیید مالی)  
+فرآیند خرید انبار مرکزی | Steps: 3 (تأیید انبار → تأیید مالی → تأیید تدارکات)  
 **Scope**: `unitId: {warehouseUnitId}`
 
 #### Process #4 — Unit-Scoped (Finance) `{processFinanceId}`
-فرآیند خرید واحد مالی | Steps: 1 (تأیید مالی)  
+فرآیند خرید واحد مالی | Steps: 2 (تأیید مالی → تأیید تدارکات)  
 **Scope**: `unitId: {financeUnitId}`
 
 #### Process #5 — WareType-Scoped `{processWaretypeId}`
-فرآیند خرید تجهیزات آزمایشگاهی | Steps: 2 (تأیید درخواست → تأیید مالی)  
+فرآیند خرید تجهیزات آزمایشگاهی | Steps: 3 (تأیید درخواست → تأیید مالی → تأیید تدارکات)  
 **Scope**: `wareTypeId: {wareTypeId}`
 
 #### Process #6 — WareClass-Scoped `{processWareclassId}`
-فرآیند خرید هماتولوژی | Steps: 1 (تأیید درخواست)  
+فرآیند خرید هماتولوژی | Steps: 2 (تأیید درخواست → تأیید تدارکات)  
 **Scope**: `wareClassId: {wareClassId}`
 
 #### Process #7 — WareGroup-Scoped `{processWaregroupId}`
-فرآیند خرید کیت | Steps: 3 (تأیید درخواست → تأیید انبار → تأیید مالی)  
+فرآیند خرید کیت | Steps: 4 (تأیید درخواست → تأیید انبار → تأیید مالی → تأیید تدارکات)  
 **Scope**: `wareGroupId: {wareGroupId}`
 
 #### Process #8 — WareModel-Scoped `{processWaremodelId}`
-فرآیند خرید کیت TSH | Steps: 2 (تأیید درخواست → تأیید مالی)  
+فرآیند خرید کیت TSH | Steps: 3 (تأیید درخواست → تأیید مالی → تأیید تدارکات)  
 **Scope**: `wareModelId: {wareModelId}`
+
+#### Process #9 — WareModel-Scoped (Betadine) `{processBetadineId}`
+فرآیند کوتاه خرید بتادین | Steps: 3 (تأیید انبار → تأیید مالی → تأیید تدارکات)  
+**Scope**: `wareModelId: {wareModel2Id}`
 
 All processes are **activated** via `activateProcess`.
 
@@ -164,11 +169,13 @@ All processes are **activated** via `activateProcess`.
 | `gen-fiscalYear` | FiscalYear | سال مالی 1405 (2026-03-21 → 2027-03-20) |
 | `gen-budgetLine` | BudgetLine | BUD-001 — بودجه خرید تجهیزات |
 | `gen-budgetAllocation` | BudgetAllocation | 100,000,000 IRR allocated |
+| `gen-second-budgetLine` | BudgetLine | BUD-002 — بودجه خرید مواد مصرفی |
+| `gen-second-budgetAllocation` | BudgetAllocation | 50,000,000 IRR allocated |
 
 ### 1g. PR #1 — Direct Store Purchase
 
 - **Auto-resolved process**: Process #2 (unit-scoped, Procurement)
-- **Flow**: Submit → Check Store Availability → Add Stuff (via `addStuff`) → Step 1 (Procurement approve) → Warehouse Check → Step 2 (Warehouse approve) → Step 3 (Finance approve, requires `budgetLineId` + budget sufficiency check) → PendingFinalization → OrgHead finalize (`finalize` action, `["Manager","Admin","OrgHead"]`) → Completed → Goods Receipt → Auto Payment (draft) → Mark Paid (deducts `totalAllocated` from budget line)
+- **Flow**: Submit → Check Store Availability → Add Stuff (via `addStuff`) → Step 1 (Warehouse approve) → Warehouse Check → Step 2 (Cold Storage approve) → Step 3 (Finance approve, requires `budgetLineId` + budget sufficiency check) → Step 4 (Procurement Support approve) → PendingFinalization → OrgHead finalize (`finalize` action, `["Manager","Admin","OrgHead"]`) → Completed → Goods Receipt → Auto Payment (draft) → Mark Paid (deducts `totalAllocated` from budget line)
 - `{prId}`, `{goodsReceiptId}`, `{paymentOrderId}`
 
 ### 1h. PR #2 — Tender Purchase
@@ -181,10 +188,13 @@ All processes are **activated** via `activateProcess`.
 
 | Entry | Action | Value |
 |-------|--------|-------|
-| `gen-inventory-add` | Initial stock | 50 units, Shelf A-12 |
+| `gen-inventory-add` | Initial stock | 50 units, Shelf A-12 (warehouse) |
 | `gen-inventory-adjust` | Adjust to 45 | Manual: 5 damaged |
 | `gen-consumption` | Consume 5 | Routine lab testing |
 | `gen-inventory-transfer` | Transfer 10 | Warehouse → Procurement |
+| `gen-inventory2-add` | Initial stock (betadine) | 100 units, Shelf B-07 |
+| `gen-inventory-lowstock` | Low-stock item | 3 units (below min 10), Shelf C-03, cold store |
+| `gen-consumption2` | Consume 2 | Microbiology lab testing |
 
 ### 1j. Extended Coverage
 
@@ -194,7 +204,7 @@ All processes are **activated** via `activateProcess`.
 | `gen-duplicate-process` | Clone general process (name + "(Copy)") |
 | `gen-budget-report` | Budget line report |
 | `gen-update-admin-roles` | Add Manager role to admin |
-| `gen-pr-pending` | 3rd PR (25M, qty=5) stays Pending for approval flow test |
+| `gen-pr-pending-add` | 3rd PR (25M, qty=5) stays Pending for approval flow test |
 | `gen-get-me` | User profile endpoint |
 | `gen-store-update-score` | Store score update (4.5, 15M sales) |
 | `gen-stepApproval-gets` | Filtered approval records |
@@ -205,7 +215,7 @@ All processes are **activated** via `activateProcess`.
 | `gen-add-removable-tag` | Tag for deletion test (موقت, #00FF00) |
 | `gen-remove-tag` | Delete that tag |
 | `gen-ware-update-relations` | Update ware's manufacturer relation |
-| `gen-sara-login` | Login as Sara (StoreHead), captures `saraToken`, `saraRoleId` |
+| `gen-storehead-login` | Login as Sara (StoreHead), captures `saraToken`, `storeHeadRoleId` |
 | `storehead-stuff-gets` | StoreHead views their store's stuff (auto-filtered by `store._id`) |
 | `storehead-store-gets` | StoreHead views store list |
 | `storehead-tender-gets` | StoreHead browses open tenders |
@@ -220,11 +230,11 @@ All processes are **activated** via `activateProcess`.
 
 | Panel | User | Email | Password | Role | Notes |
 |-------|------|-------|----------|------|-------|
-| **Admin** | Admin System | admin@lesansatek.com | password123 | Manager + Ordinary | Bootstrap ghost, full access |
+| **Admin** | Admin System | admin@lesansatek.com | password123 | Manager + Ordinary + UnitHead×3 | Bootstrap ghost, full access |
 | **UnitHead** | رضا احمدی | reza@lesansatek.com | password123 | UnitHead (Procurement) | Approves PRs for Procurement Unit |
 | **Finance** | مریم حسینی | maryam@lesansatek.com | password123 | Ordinary + canManageBudget | Budget management, payment orders |
-| **Vendor / Store Head** | سارا کریمی | sara@lesansatek.com | password123 | Manager + Ordinary + Employee + canRespondToTender + canAssignItemsToOrder | Store manager, tender offer submission, can add stuff to store |
-| **Employee** | علی محمدی | ali@lesansatek.com | password123 | Manager | Can also act as requester |
+| **Vendor / Store Head** | سارا کریمی | sara@lesansatek.com | password123 | StoreHead (scope: فروشگاه نمونه) + canRespondToTender + canAssignItemsToOrder | Store manager, tender offer submission, can add stuff to store |
+| **Employee** | علی محمدی | ali@lesansatek.com | password123 | Manager + Employee | Can also act as requester |
 | **Warehouse** | حسین کاظمی | hossein@lesansatek.com | password123 | UnitHead (Warehouse) | Warehouse operations |
 | **OrgHead** | دکتر احمدی | dr.ahmadi@lesansatek.com | password123 | OrgHead (Organization) | Organization-level oversight, tender finalization |
 
@@ -250,9 +260,9 @@ All processes are **activated** via `activateProcess`.
 |---|-----------|---------------|
 | 3.2.1 | **سازمان‌ها** — click sidebar | List shows "سازمان نمونه" with city/state |
 | 3.2.2 | Click "سازمان جدید" → create, then edit/delete | CRUD works |
-| 3.2.3 | **Users** — click sidebar | All 11 users visible; search/filter by role |
+| 3.2.3 | **Users** — click sidebar | All 13 users visible; search/filter by role |
 | 3.2.4 | Click any user → detail page with roles, features, units | Edit roles, toggle isActive |
-| 3.2.5 | **Units** — click sidebar | Tree view: 15 units with nesting: Hematology Lab → Procurement, Cold Storage → Warehouse, etc. |
+| 3.2.5 | **Units** — click sidebar | Tree view: 18 units with nesting: Hematology Lab → Procurement, Cold Storage → Warehouse, etc. |
 | 3.2.6 | Click a unit → edit name, type, head, parent | Update works |
 
 ### 3.3 Geographic & Product Hierarchy
@@ -272,7 +282,7 @@ All processes are **activated** via `activateProcess`.
 |---|-----------|----------------|
 | 3.4.1 | **فروشگاه‌ها** — click sidebar | "فروشگاه نمونه" with city/state, score, contact |
 | 3.4.2 | Click store → edit name, address, score | Store update works |
-| 3.4.3 | **موجودی فروشگاه** (Stuff) | inventoryNo=1001, 2,800,000 IRR, absolute price |
+| 3.4.3 | **موجودی فروشگاه** (Stuff) | qty=50, 2,800,000 IRR, absolute price |
 | 3.4.4 | **انبارها** (Inventory) | TSH Kit: qty=45 (after adjust), Shelf A-12 |
 | 3.4.5 | **حرکات انبار** (Stock Movements) | List of all movements: addStock, adjust, consumption, transfer |
 
@@ -280,8 +290,8 @@ All processes are **activated** via `activateProcess`.
 
 | # | Test Case | Expected Result |
 |---|-----------|----------------|
-| 3.5.1 | **فرآیندها** — click sidebar | 8 processes listed |
-| 3.5.2 | Click "فرآیند خرید عمومی سازمان" | 3 steps visible (تأیید درخواست → تأیید انبار → تأیید مالی) |
+| 3.5.1 | **فرآیندها** — click sidebar | 9 processes listed |
+| 3.5.2 | Click "فرآیند خرید عمومی سازمان" | 4 steps visible (تأیید درخواست → تأیید انبار → تأیید مالی → تأیید تدارکات) |
 | 3.5.3 | Click the unit-scoped process | Shows "واحد خرید" as scope |
 | 3.5.4 | Click a hierarchy-scoped process (e.g. waretype) | Shows "تجهیزات آزمایشگاهی" as scope |
 | 3.5.5 | **فرآیند تکراری** | "فرآیند خرید عمومی سازمان (Copy)" — Draft, version 1 |
@@ -361,27 +371,27 @@ This is the core business flow: **PR Draft → addStuff/submit → UnitHead appr
 
 **Note:** Submit requires `selectionType !== "none"`. If no stuff is assigned and no tender offer is selected, the backend rejects with: `"Please assign stuff or select a tender offer before submitting this request"`.
 
-### 4d. Approve Step 1 — Procurement Unit
+### 4d. Approve Step 1 — Central Warehouse
 
-1. **Log in as** `reza@lesansatek.com` / `password123` (UnitHead of Procurement)
+1. **Log in as** `hossein@lesansatek.com` / `password123` (UnitHead of Warehouse)
 2. The UnitHead panel now uses **`getPendingByUnit`** (not `stepApproval.gets`) to find pending PRs
 3. Navigate to the UnitHead panel → pending requests
 4. Click the PR
 5. **Verify:**
-   - Step Approval Panel shows "تأیید درخواست"
+   - Step Approval Panel shows "تأیید انبار"
    - Comment textarea + "تایید" / "رد" buttons
 6. Type comment: `تایید شد.`
 7. Click "تایید" → confirm dialog → "تایید"
 8. **Verify:**
    - Toast: "درخواست با موفقیت تایید شد"
-   - Step 1 marked complete, Step 2 "تأیید انبار" highlighted as current
+   - Step 1 marked complete, Step 2 "تأیید انبار سرد" highlighted as current
    - History shows "step_approved" entry
 
-### 4e. Approve Step 2 — Warehouse Unit
+### 4e. Approve Step 2 — Cold Storage Unit
 
-1. **Log in as** `hossein@lesansatek.com` / `password123` (UnitHead of Warehouse)
+1. **Log in as** `hossein@lesansatek.com` / `password123` (UnitHead of Warehouse & Cold Storage)
 2. Navigate to UnitHead panel → pending requests
-3. Approve Step 2 "تأیید انبار"
+3. Approve Step 2 "تأیید انبار سرد"
 4. **Verify:** Step 3 "تأیید مالی" highlighted as current
 
 ### 4f. Approve Step 3 — Finance Unit (with Budget Line + Auto-Encumbrance)
@@ -390,12 +400,20 @@ This is the core business flow: **PR Draft → addStuff/submit → UnitHead appr
 2. Navigate to UnitHead panel → pending requests
 3. Approve Step 3 "تأیید مالی" — **must provide a budget line** (select BUD-001 from the budget line picker)
 4. **Verify:**
+   - Step 4 "تأیید تدارکات" highlighted as current
+   - **Auto-created BudgetEncumbrance** (reserves the estimated amount on the budget line)
+   - Budget line's `totalEncumbered` increased, `remainingBudget` reduced accordingly
+
+### 4f2. Approve Step 4 — Procurement Support Unit
+
+1. **Log in as** `mohammad@lesansatek.com` / `password123` (UnitHead of Logistics & Procurement Support)
+2. Navigate to UnitHead panel → pending requests
+3. Approve Step 4 "تأیید تدارکات"
+4. **Verify:**
    - PR status → **"در انتظار نهایی‌سازی" (PendingFinalization)**
    - All steps complete in visualizer
    - History shows "all_steps_approved" entry with budget line info
    - Budget line linked to the PR
-   - **Auto-created BudgetEncumbrance** (reserves the estimated amount on the budget line)
-   - Budget line's `totalEncumbered` increased, `remainingBudget` reduced accordingly
 
 ### 4g. OrgHead Finalize (PendingFinalization → Completed)
 
@@ -575,22 +593,22 @@ This is the core business flow: **PR Draft → addStuff/submit → UnitHead appr
 
 **Login:** `sara@lesansatek.com` / `password123`
 
-Sara is the **vendor** (canRespondToTender), the **StoreHead** of فروشگاه نمونه (`scopeType: "store"`, `scopeId: {storeId}`), and has **Manager** role (`/admin` panel access). She also has `canAssignItemsToOrder` feature for inventory management.
+Sara is the **vendor** (canRespondToTender), the **StoreHead** of فروشگاه نمونه (`scopeType: "store"`, `scopeId: {storeId}`). She also has `canAssignItemsToOrder` feature for inventory management. She has **StoreHead as her only role** — no Manager/Ordinary/Employee roles.
 
 | # | Test Case | Expected Result |
 |---|-----------|----------------|
-| 9.1 | Login redirect | Lands on `/vendor` dashboard (default for her role set) |
-| 9.2 | Dashboard KPIs | Open tenders, my offers, awarded count, win rate |
+| 9.1 | Login redirect | Lands on `/store` dashboard (default for her role set) |
+| 9.2 | Dashboard KPIs | Store info, open tenders, PRs assigned to her store |
 | 9.3 | Open tenders (`/vendor/tenders`) | DataTable with title, deadline, status; "ثبت پیشنهاد" for open |
 | 9.4 | Submit offer form | Fields: `wareId` (required — specific ware being offered), price, delivery time, terms, notes. `storeId` auto-derived from `activeRole.scopeId` |
 | 9.5 | My offers (`/vendor/my-offers`) | The submitted offer (2,500,000, 7 days, status=submitted) |
 | 9.6 | Empty states | Persian empty state when no data |
-| 9.7 | **Manager role** | Also has `/admin` panel access (PanelSelector shows مدیریت) |
-| 9.8 | **Store management** | Can add/edit Stuff (store inventory) via admin panel or designated store UI |
+| 9.7 | **No Manager role** | `/admin` panel is **NOT** available (PanelSelector shows only فروشگاه) |
+| 9.8 | **Store management** | Can add/edit Stuff (store inventory) via the `/store` panel |
 
 ### Adding Stuff to Store Manually
 
-Sara (as store head with Manager role) can add inventory items to her store:
+Sara (as store head) can add inventory items to her store via the `/store` panel:
 
 1. Login as `sara@lesansatek.com` / `password123`
 2. Switch to **Admin panel** via PanelSelector (or navigate to store management page)
@@ -643,7 +661,7 @@ Sara has a **StoreHead** role with `scopeType: "store"` and `scopeId: {storeId}`
 | 11.8 | **Update Stuff** – edit price, quantity of own store's stuff | `stuff.update` succeeds (scope check: fetched `store._id` matches `activeRole.scopeId`) |
 | 11.9 | **Remove Stuff** – delete own store's stuff | `stuff.remove` succeeds (scope check: fetched `store._id` matches `activeRole.scopeId`) |
 | 11.10 | **Store settings** – manage delivery settings, working hours, status | Update pure fields works within scope |
-| 11.11 | **Can also access `/admin`** via PanelSelector (has Manager role) | PanelSelector shows مدیریت and فروشگاه options |
+| 11.11 | **Single panel** – StoreHead is her only role | PanelSelector shows only فروشگاه (no مدیریت/درخواست‌ها) |
 | 11.12 | **View open tenders** – browse tenders with status `open` | `tender.gets` returns open tenders; StoreHead can view offers |
 | 11.13 | **Submit tender offer** – submit a bid on an open tender | `tenderOffer.submit` succeeds (scope check: `storeId` matches `activeRole.scopeId`). **Requires `wareId`** (specific ware being offered) |
 | 11.14 | **View PRs assigned to store** – list PRs where `store._id` matches own store | `purchasingRequest.gets` auto-filters by `store._id`; shows ALL PRs (not just Completed) |
@@ -670,14 +688,12 @@ Sara has a **StoreHead** role with `scopeType: "store"` and `scopeId: {storeId}`
 
 ### PanelSelector Behavior for Sara
 
-Sara has **3 roles** with different panels:
+Sara has **1 role** with a single panel:
 | Role | Panel | Access |
 |------|-------|--------|
-| Manager | `/admin` | Full admin panel |
 | StoreHead | `/store` | Store management panel |
-| Employee | `/employee` | PR submission panel |
 
-The PanelSelector should show all 3 options for role switching.
+The PanelSelector shows only فروشگاه for role switching.
 
 ---
 
@@ -726,7 +742,7 @@ The PanelSelector should show all 3 options for role switching.
 |---|-----------|-------|----------|
 | 15.1 | **getMe** | Any user, navigate to profile | Returns user profile with roles, features |
 | 15.2 | **Store score update** | Admin → edit store | score=4.5, totalSoldAmount=15,000,000, totalSoldNum=5 |
-| 15.3 | **Step approval gets** | UnitHead → PR detail → approvals tab | 3 approval records (one per step), with unit and step names |
+| 15.3 | **Step approval gets** | UnitHead → PR detail → approvals tab | 4 approval records (one per step), with unit and step names |
 | 15.4 | **Tender offer gets** | Vendor → my offers | Winning offer: 2,500,000, 7 days, store name |
 | 15.5 | **Tag CRUD** | Admin → tags | Create فوری (#FF0000), create موقت (#00FF00), delete موقت |
 | 15.6 | **Ware update relations** | Admin → ware detail → edit | Link/unlink manufacturer |
@@ -741,7 +757,7 @@ The PanelSelector should show all 3 options for role switching.
 
 1. Login as **admin@lesansatek.com** — has Manager + Ordinary roles, all features
 2. **PanelSelector** — in admin header, click the LayoutDashboard icon
-3. **Verify:** Dropdown shows: مدیریت, پنل واحد, درخواست‌ها, مالی, فروشندگان, فروشگاه, مدیریت سازمان
+3. **Verify:** Dropdown shows: مدیریت, پنل واحد, درخواست‌ها, مالی
 4. Click **"پنل واحد"** → redirects to `/unit-head`
 5. Header changes to simpler PanelLayout (no sidebar)
 6. Click PanelSelector → switch back to **"مدیریت"** → back to `/admin`
@@ -907,25 +923,26 @@ The PanelSelector should show all 3 options for role switching.
 | **حسین کاظمی** (warehouseHead) | hossein@lesansatek.com / password123 | `/unit-head` | ✓ (Employee role) | ✓ (UnitHead role) |
 | **فاطمه موسوی** (finHead) | fatemeh@lesansatek.com / password123 | `/unit-head` | ✓ (Employee role) | ✓ (UnitHead role) |
 | **مریم حسینی** (financeUser) | maryam@lesansatek.com / password123 | `/finance` | ✓ (Employee role) | ✗ (Ordinary) |
-| **سارا کریمی** (vendorUser) | sara@lesansatek.com / password123 | `/vendor`, `/admin`, or `/store` | ✓ (Employee/Manager role) | ✓ (Manager role) |
+| **سارا کریمی** (vendorUser) | sara@lesansatek.com / password123 | `/store` | ✗ (StoreHead only) | ✗ (StoreHead only) |
 | **دکتر احمدی** (orgHeadUser) | dr.ahmadi@lesansatek.com / password123 | `/orghead` | ✓ (Employee role) | ✓ (OrgHead role) |
 
 **All unit heads** (علی محمدی through فاطمه موسوی) work via `/admin` panel — they have Manager role.  
 **UnitHead users** (رضا احمدی, حسین کاظمی, فاطمه موسوی) work via `/unit-head` panel — they see only their unit's data. This is the most common approval panel.  
-**StoreHead user** (سارا کریمی) works via `/store` panel — manages فروشگاه نمونه with StoreHead role.
+**StoreHead user** (سارا کریمی) works via `/store` panel — manages فروشگاه نمونه with StoreHead role (her only role).
 
 ---
 
-### 19b. Simple Workflow (1-Step: Finance Unit)
+### 19b. Simple Workflow (2-Step: Finance + Procurement)
 
-**Objective:** Single-step approval flow with one submitter and one approver.
+**Objective:** Short approval flow with one submitter and two approvers.
 
 | Detail | Value |
 |--------|-------|
 | **Process** | Process #4 — فرآیند خرید واحد مالی (unit-scoped to Finance Unit) |
 | **Submitter** | **فاطمه موسوی** — fatemeh@lesansatek.com — UnitHead of Finance |
 | **Step 1** | تأیید مالی → assigned to Finance Unit |
-| **Approver** | Any user with a role at Finance Unit: **Admin System** works best (Manager role) |
+| **Step 2** | تأیید تدارکات → assigned to Procurement Support Unit |
+| **Approver** | Any user with a role at Finance/Procurement Support: **Admin System** works best (Manager role) |
 | **Comment** | "تأیید شد" or leave blank |
 
 #### Step-by-Step Frontend Walkthrough
@@ -948,7 +965,7 @@ The PanelSelector should show all 3 options for role switching.
 1. From the Draft PR detail, click **"تخصیص کالا"** (Add Stuff) → select TSH Kit stuff
 2. ✅ `selectionType` → `"stuff"`, `stuffStatus` → `"assigned"`
 3. Click **"ارسال درخواست"** (Submit Request)
-4. ✅ The process auto-resolves to **Process #4** (1 step: تأیید مالی)
+4. ✅ The process auto-resolves to **Process #4** (2 steps: تأیید مالی → تأیید تدارکات)
 5. PR status → **"در انتظار تایید"** (Pending)
 6. Note the PR number/ID for approval step
 
@@ -961,29 +978,33 @@ The PanelSelector should show all 3 options for role switching.
 5. You should see **Step 1: تأیید مالی** highlighted as current step
 6. Click **"تأیید"** (Approve)
    - **توضیحات (Comment):** type "تأیید شد. لطفاً به مرحله بعد منتقل شود." or leave blank
-7. ✅ Expected result: PR status changes to **"تکمیل شده"** (Completed)
+7. ✅ PR advances to **Step 2 (تأیید تدارکات)**
+8. Approve Step 2 as **Admin System** (Manager) — the Procurement Support step
+9. ✅ Expected result: PR status changes to **"تکمیل شده"** (Completed)
 
 ---
 
-### 19c. Complex Workflow (3-Step: Procurement → Warehouse → Finance)
+### 19c. Complex Workflow (4-Step: Warehouse → Cold Storage → Finance → Procurement)
 
-**Objective:** Full multi-approver chain. Three different users approve across three units, demonstrating OR/AND step logic and role switching.
+**Objective:** Full multi-approver chain. Four different units approve, demonstrating the cold-store routing and role switching.
 
 | Detail | Value |
 |--------|-------|
 | **Process** | Process #2 — فرآیند خرید واحد خرید (unit-scoped to Procurement Unit) |
 | **Submitter** | **رضا احمدی** — reza@lesansatek.com — UnitHead of Procurement |
-| **Step 1** | **تأیید درخواست** → Procurement Unit (approver: has role at Procurement) |
-| **Step 2** | **تأیید انبار** → Central Warehouse (approver: has role at Warehouse) |
+| **Step 1** | **تأیید انبار** → Central Warehouse (approver: has role at Warehouse) |
+| **Step 2** | **تأیید انبار سرد** → Cold Storage (approver: has role at Cold Storage) |
 | **Step 3** | **تأیید مالی** → Finance Unit (approver: has role at Finance) |
+| **Step 4** | **تأیید تدارکات** → Procurement Support (approver: has role at Procurement Support) |
 
 **Approver Mapping:**
 
 | Step | Approver | Login | Panel | Role Used | Suggested Comment |
 |------|----------|-------|-------|-----------|-------------------|
-| 1 | **Admin System** | admin@lesansatek.com | `/admin` | Manager | "درخواست تأیید شد. به انبار ارسال شود." |
-| 2 | **حسین کاظمی** | hossein@lesansatek.com | `/unit-head` | UnitHead | "موجودی انبار کافی است. تأیید شد." |
+| 1 | **حسین کاظمی** | hossein@lesansatek.com | `/unit-head` | UnitHead | "موجودی انبار کافی است. تأیید شد." |
+| 2 | **حسین کاظمی** | hossein@lesansatek.com | `/unit-head` | UnitHead | "انبار سرد آماده است. تأیید شد." |
 | 3 | **فاطمه موسوی** | fatemeh@lesansatek.com | `/unit-head` | UnitHead | "بودجه کافی است. تأیید نهایی." |
+| 4 | **محمد رضایی** | mohammad@lesansatek.com | `/unit-head` | UnitHead | "تدارکات نهایی شد." |
 
 #### Step-by-Step Frontend Walkthrough
 
@@ -1009,26 +1030,27 @@ The PanelSelector should show all 3 options for role switching.
 **Phase 1c — Submit the PR**
 1. Click **"ارسال درخواست"**
 2. ✅ PR status: **"در انتظار تایید" (Pending)**
-3. The process auto-resolves to **Process #2** (3 steps)
+3. The process auto-resolves to **Process #2** (4 steps)
 
-**Phase 2 — Approve Step 1 (تأیید درخواست)**
-1. **Logout** and **Login** as **Admin System** (admin@lesansatek.com) via `/admin` panel
-2. Go to **"درخواست‌های خرید"** list
-3. Find the PR (still in "در انتظار تایید", Step 1 active)
-4. Click to view details → see **Step 1: تأیید درخواست** is current
-5. Click **"تأیید"**
-   - **توضیحات:** "درخواست تأیید شد. به انبار ارسال شود."
-6. ✅ PR advances to **Step 2 (تأیید انبار)**
-
-**Phase 3 — Approve Step 2 (تأیید انبار)**
+**Phase 2 — Approve Step 1 (تأیید انبار)**
 1. **Logout** and **Login** as **حسین کاظمی** (hossein@lesansatek.com / password123) via `/unit-head` panel
 2. He is the UnitHead of Central Warehouse
 3. Go to **"درخواست‌های خرید"** list
-4. Find the PR — status should still be "در انتظار تایید" but **Step 2** is now active
-   - The unit-head panel filters to show PRs pending for Central Warehouse
-5. Click to view details → **Step 2: تأیید انبار** is current
+4. Find the PR (still in "در انتظار تایید", Step 1 active)
+5. Click to view details → see **Step 1: تأیید انبار** is current
 6. Click **"تأیید"**
    - **توضیحات:** "موجودی انبار بررسی شد. کافی است. تأیید شد."
+7. ✅ PR advances to **Step 2 (تأیید انبار سرد)**
+
+**Phase 3 — Approve Step 2 (تأیید انبار سرد)**
+1. **Logout** and **Login** as **حسین کاظمی** (hossein@lesansatek.com / password123) via `/unit-head` panel
+2. He is the UnitHead of Cold Storage
+3. Go to **"درخواست‌های خرید"** list
+4. Find the PR — status should still be "در انتظار تایید" but **Step 2** is now active
+   - The unit-head panel filters to show PRs pending for Cold Storage
+5. Click to view details → **Step 2: تأیید انبار سرد** is current
+6. Click **"تأیید"**
+   - **توضیحات:** "انبار سرد آماده دریافت است. تأیید شد."
 7. ✅ PR advances to **Step 3 (تأیید مالی)**
 
 **Phase 4 — Approve Step 3 (تأیید مالی) with Budget Line**
@@ -1039,7 +1061,16 @@ The PanelSelector should show all 3 options for role switching.
 5. Select a budget line (e.g. BUD-001) from the budget line picker
 6. Click **"تأیید"**
    - **توضیحات:** "بودجه کافی است. تأیید نهایی."
-7. ✅ PR status: **"در انتظار نهایی‌سازی"** (PendingFinalization)
+7. ✅ PR advances to **Step 4 (تأیید تدارکات)**
+
+**Phase 4a — Approve Step 4 (تأیید تدارکات)**
+1. **Logout** and **Login** as **محمد رضایی** (mohammad@lesansatek.com / password123) via `/unit-head` panel
+2. He is the UnitHead of Procurement Support
+3. Go to **"درخواست‌های خرید"** list
+4. Find the PR — **Step 4** is now active
+5. Click **"تأیید"**
+   - **توضیحات:** "تدارکات نهایی شد."
+6. ✅ PR status: **"در انتظار نهایی‌سازی"** (PendingFinalization)
 
 **Phase 4b — OrgHead Finalizes the PR**
 1. **Logout** and **Login** as **دکتر احمدی** (dr.ahmadi@lesansatek.com / password123) or Admin via `/admin` panel
@@ -1151,14 +1182,13 @@ The PanelSelector should show all 3 options for role switching.
 - `{adminUnitHeadFinRoleId}` → UnitHead at Finance Unit
 
 **سارا کریمی's (Store Head) role set:**
-- She has **Manager** role (added at user creation) → can access `/admin` panel and call `purchasingRequest.addStuff`, etc.
-- She has **StoreHead** role with `scopeType: "store"` and `scopeId: {storeId}` → can access `/store` panel and manage فروشگاه نمونه:
+- She has **StoreHead** role only (`gen-roles-sara-storehead`, `scopeType: "store"`, `scopeId: {storeId}`) → can access `/store` panel and manage فروشگاه نمونه:
   - `stuff.add` / `stuff.update` / `stuff.remove` (scoped to own store)
   - `stuff.gets` (auto-filtered to own store)
   - `tender.gets` / `tenderOffer.submit` / `tenderOffer.gets`
   - `purchasingRequest.gets` (auto-filtered by store)
   - `purchasingRequest.updateStuffStatus`
-- She has **Ordinary** + **Employee** roles → can submit PRs and view the employee panel
+- She does **NOT** have Manager/Ordinary/Employee roles — `/admin` and `/employee` panels are not available to her
 - She has `canRespondToTender` → can submit tender offers via `/vendor` panel
 - She has `canAssignItemsToOrder` → can assign store inventory to purchase requests
 
@@ -1221,30 +1251,31 @@ This appendix provides the full field-level reference for all test data created 
 
 ---
 
-#### Complete Users List (All 12 Users)
+#### Complete Users List (All 13 Users)
 
 | # | Captured ID | Name | Email | Password | Mobile | Gender | Roles | Can Submit PR | Heads These Units | Purpose |
 |---|-------------|------|-------|----------|--------|--------|-------|-------------|-------------------|---------|
 | 1 | `{userId}` | Admin System | admin@lesansatek.com | password123 | 09120000000 | Male | **Ordinary**, **Manager**, **UnitHead**×3, **Employee** | ✓ (Employee) | Procurement, Warehouse, Finance | Bootstrap admin; all panels |
 | 2 | `{prodHeadId}` | علی محمدی | ali@lesansatek.com | password123 | 09120000004 | Male | Manager + Employee | ✓ (Employee) | Production, QA | Head of Production |
-| 3 | `{logHeadId}` | محمد رضایی | mohammad@lesansatek.com | password123 | 09120000005 | Male | Manager + Employee | ✓ (Employee) | Logistics, Internal Procurement | Head of Logistics |
+| 3 | `{logHeadId}` | محمد رضایی | mohammad@lesansatek.com | password123 | 09120000005 | Male | Manager + Employee | ✓ (Employee) | Logistics, Internal Procurement, Procurement Support (واحد تدارکات) | Head of Logistics |
 | 4 | `{itHeadId}` | زهرا احمدی | zahra@lesansatek.com | password123 | 09120000006 | Male | Manager + Employee | ✓ (Employee) | IT, Technical Support | Head of IT |
 | 5 | `{hrHeadId}` | نرگس کریمی | narges@lesansatek.com | password123 | 09120000007 | Male | Manager + Employee | ✓ (Employee) | HR | Head of HR |
 | 6 | `{legalHeadId}` | فرهاد نوروزی | farhad@lesansatek.com | password123 | 09120000008 | Male | Manager + Employee | ✓ (Employee) | Legal | Head of Legal |
 | 7 | `{rdHeadId}` | پریسا صادقی | parisa@lesansatek.com | password123 | 09120000009 | Male | Manager + Employee | ✓ (Employee) | R&D | Head of R&D |
 | 8 | `{unitheadUserId}` | رضا احمدی | reza@lesansatek.com | password123 | 09120000001 | Male | UnitHead (Procurement) + Employee | ✓ (Employee) | Hematology/Micro/Pathology Labs | `/unit-head` panel |
-| 9 | `{warehouseHeadId}` | حسین کاظمی | hossein@lesansatek.com | password123 | 09120000010 | Male | UnitHead (Warehouse) + Employee | ✓ (Employee) | Cold Storage | Head of Warehouse |
-| 10 | `{finHeadId}` | فاطمه موسوی | fatemeh@lesansatek.com | password123 | 09120000011 | Female | UnitHead (Finance) + Employee | ✓ (Employee) | Internal Audit | Head of Finance |
+| 9 | `{warehouseHeadId}` | حسین کاظمی | hossein@lesansatek.com | password123 | 09120000010 | Male | UnitHead (Warehouse) + Employee | ✓ (Employee) | Central Warehouse, Cold Storage | Head of Warehouse |
+| 10 | `{finHeadId}` | فاطمه موسوی | fatemeh@lesansatek.com | password123 | 09120000011 | Female | UnitHead (Finance) + Employee | ✓ (Employee) | Finance, Internal Audit | Head of Finance |
 | 11 | `{financeUserId}` | مریم حسینی | maryam@lesansatek.com | password123 | 09120000002 | Female | Ordinary + Employee + `canManageBudget` | ✓ (Employee) | — | `/finance` panel |
-| 12 | `{vendorUserId}` | سارا کریمی | sara@lesansatek.com | password123 | 09120000003 | Female | **Manager** + **StoreHead** (scope: فروشگاه نمونه) + Ordinary + Employee + `canRespondToTender` + `canAssignItemsToOrder` | ✓ (Employee) or ✓ (Manager) | فروشگاه نمونه (store head via StoreHead role) | `/vendor`, `/admin` (Manager), `/store` (StoreHead) |
+| 12 | `{vendorUserId}` | سارا کریمی | sara@lesansatek.com | password123 | 09120000003 | Female | **StoreHead** (scope: فروشگاه نمونه) + `canRespondToTender` + `canAssignItemsToOrder` | ✗ | فروشگاه نمونه (store head via StoreHead role) | `/store` panel (single role) |
+| 13 | `{orgHeadUserId}` | دکتر احمدی | dr.ahmadi@lesansatek.com | password123 | 09120000012 | Male | OrgHead (scope: organization) | ✗ | — | `/orghead` panel; `{orgHeadToken}`, `{orgHeadRoleId}` |
 
 **Notes:**
-- Every user now has the **`Employee` role** as their secondary role, which is allowed by `grantAccess` for `purchasingRequest.submit`. Use `activeRoleId: {employeeRoleId}` (or each user's own Employee roleId) when submitting PRs.
+- Every user except سارا کریمی and دکتر احمدی has the **`Employee` role** as their secondary role, which is allowed by `grantAccess` for `purchasingRequest.submit`. Use `activeRoleId: {employeeRoleId}` (or each user's own Employee roleId) when submitting PRs.
 - Users 2–7 (unit heads) have `isActive: true`, `is_verified: true`, `organization: {orgId}`.
-- User 1 starts with a single role added at tempUser creation (`roles: [{name: "Ordinary"}]`). The `gen-update-admin-roles` entry appends `{name: "Manager"}` and `{name: "Employee"}` so the admin can use `/admin` and submit PRs via the employee panel.
+- User 1 starts with a single role added at tempUser creation (`roles: [{name: "Ordinary"}]`). The `gen-update-admin-roles` entry appends `Manager`, scoped `Employee`, and scoped `UnitHead`×3 so the admin can use `/admin`, `/employee`, and `/unit-head` panels. `gen-roles-ghost-microlab` adds a scoped `Employee` role at Microbiology Lab (`{microEmployeeRoleId}`).
 - Users 8–10 are scoped UnitHeads — they manage a specific unit and see only that unit's data in their panels. They can also submit PRs using their Employee role.
-- Users 11–12 are feature-gated Ordinary users — they can now also submit PRs because `Employee` is in their roles.
-- User 12 (سارا کریمی) also has **StoreHead** role with `scopeType: "store"` and `scopeId: {storeId}` — this gives her the `/store` panel for managing فروشگاه نمونه.
+- User 11 is a feature-gated Ordinary user — can also submit PRs because `Employee` is in their roles.
+- User 12 (سارا کریمی) has **StoreHead as her only role** (`scopeType: "store"`, `scopeId: {storeId}`) — this gives her the `/store` panel for managing فروشگاه نمونه. She cannot submit PRs or approve steps.
 - **Role switching pattern:** `submit` → `Employee` role, `approve` → `Manager`/`UnitHead` role, `store management` → `StoreHead` role.
 
 ---
@@ -1292,6 +1323,7 @@ This appendix provides the full field-level reference for all test data created 
 | **HR Unit** | واحد منابع انسانی | HR Unit | Human resources | Administration | — |
 | **Legal Unit** | واحد حقوقی | Legal Unit | Legal affairs | General | — |
 | **R&D Unit** | واحد تحقیق و توسعه | R&D Unit | Research and development | Expert | — |
+| **Procurement Support** | واحد تدارکات | Procurement Support | Procurement & purchase support | Logistics | — |
 | **Hematology Lab** | آزمایشگاه هماتولوژی | Hematology Lab | Hematology testing | Expert | `parentUnitId`: Procurement |
 | **Microbiology Lab** | آزمایشگاه میکروبیولوژی | Microbiology Lab | Microbiology testing | Expert | `parentUnitId`: Procurement |
 | **Pathology Lab** | آزمایشگاه پاتولوژی | Pathology Lab | Pathology testing | Expert | `parentUnitId`: Procurement |
@@ -1316,6 +1348,7 @@ This appendix provides the full field-level reference for all test data created 
 | HR Unit | واحد منابع انسانی | نرگس کریمی | `{hrHeadId}` |
 | Legal Unit | واحد حقوقی | فرهاد نوروزی | `{legalHeadId}` |
 | R&D Unit | واحد تحقیق و توسعه | پریسا صادقی | `{rdHeadId}` |
+| Procurement Support | واحد تدارکات | محمد رضایی | `{logHeadId}` |
 | Hematology Lab | آزمایشگاه هماتولوژی | رضا احمدی | `{unitheadUserId}` |
 | Microbiology Lab | آزمایشگاه میکروبیولوژی | رضا احمدی | `{unitheadUserId}` |
 | Pathology Lab | آزمایشگاه پاتولوژی | رضا احمدی | `{unitheadUserId}` |
@@ -1393,6 +1426,19 @@ WareType (تجهیزات آزمایشگاهی)
 
 **WareGroup relation update:** links `wareClassIds: ["{wareClassId}"]` to establish M:N.
 
+#### Second Hierarchy (Betadine — `gen-second-*`)
+
+| Level | `name` | `enName` | Captured ID |
+|-------|--------|----------|-------------|
+| WareType | محلول‌ها و مواد شیمیایی | محلول‌ها و مواد شیمیایی | `{wareType2Id}` |
+| WareClass | مواد شوینده | مواد شوینده | `{wareClass2Id}` |
+| WareGroup | ضدعفونی‌کننده | ضدعفونی‌کننده | `{wareGroup2Id}` |
+| WareModel | بتادین ۱۰٪ | بتادین ۱۰٪ | `{wareModel2Id}` |
+| Ware | بتادین ۱۰٪ ۵۰۰ml | بتادین ۱۰٪ ۵۰۰ml | `{ware2Id}` |
+| Stuff | qty=200, price=520,000 (absolute) | — | `{stuff2Id}` |
+
+**Relations:** WareType → WareClass → WareGroup (M:N via `wareClassIds`) → WareModel (بتادین) → Ware (manufacturer `{mfrId}`). Store `{store2Id}` (داروخانه مرکزی) carries the Stuff. Used by the betadine short-process PR (`{prWashId}`).
+
 ---
 
 ### 20e. Store & Stuff
@@ -1424,15 +1470,17 @@ If `hasAbsolutePrice = false`, price would be computed as `Ware.price * (1 + pri
 
 ---
 
-### 20f. Process & Steps — 8 Scoped Processes
+### 20f. Process & Steps — 9 Processes
 
-The E2E suite creates **8 processes** covering every scope form. PR creation auto-resolves the correct process via `resolveProcessForPR()`.
+The E2E suite creates **9 processes** covering every scope form. PR creation auto-resolves the correct process via `resolveProcessForPR()`.
 
 **Resolution priority** (first match wins):
 1. Unit-scoped (`process.unit._id === requestingUnitId`)
 2. Ware-scoped (`process.ware._id === wareId`)
 3. WareModel-scoped → WareGroup → WareClass → WareType
 4. Org-wide general (unscoped) — fallback
+
+Every process ends with **تأیید تدارکات** (Procurement Support unit, `{procurementUnitId}`) as the final step.
 
 #### Process #1: General (Org-Wide) — `{processGeneralId}`
 
@@ -1444,9 +1492,10 @@ The E2E suite creates **8 processes** covering every scope form. PR creation aut
 
 | Step | `name` | `order` | Assignee Unit |
 |------|--------|---------|---------------|
-| 1 | تأیید درخواست | 1 | Procurement Unit (`{unitId}`) |
-| 2 | تأیید انبار | 2 | Central Warehouse (`{warehouseUnitId}`) |
-| 3 | تأیید مالی | 3 | Finance Unit (`{financeUnitId}`) |
+| `{stepGeneral1Id}` | تأیید درخواست | 1 | Procurement Unit (`{unitId}`) |
+| `{stepGeneral2Id}` | تأیید انبار | 2 | Central Warehouse (`{warehouseUnitId}`) |
+| `{stepGeneral3Id}` | تأیید مالی | 3 | Finance Unit (`{financeUnitId}`) |
+| `{stepGeneral4Id}` | تأیید تدارکات | 4 | Procurement Support (`{procurementUnitId}`) |
 
 #### Process #2: Unit-Scoped (Procurement) — `{processUnitId}`
 
@@ -1457,9 +1506,10 @@ The E2E suite creates **8 processes** covering every scope form. PR creation aut
 
 | Step | `name` | `order` | Assignee Unit |
 |------|--------|---------|---------------|
-| 1 | تأیید درخواست | 1 | Procurement Unit |
-| 2 | تأیید انبار | 2 | Central Warehouse |
-| 3 | تأیید مالی | 3 | Finance Unit |
+| `{stepUnit1Id}` | تأیید انبار | 1 | Central Warehouse (`{warehouseUnitId}`) |
+| `{stepUnit2Id}` | تأیید انبار سرد | 2 | Cold Storage (`{coldstoreUnitId}`) |
+| `{stepUnit3Id}` | تأیید مالی | 3 | Finance Unit (`{financeUnitId}`) |
+| `{stepUnit4Id}` | تأیید تدارکات | 4 | Procurement Support (`{procurementUnitId}`) |
 
 #### Process #3: Unit-Scoped (Warehouse) — `{processWarehouseId}`
 
@@ -1470,8 +1520,9 @@ The E2E suite creates **8 processes** covering every scope form. PR creation aut
 
 | Step | `name` | `order` | Assignee Unit |
 |------|--------|---------|---------------|
-| 1 | تأیید انبار | 1 | Central Warehouse |
-| 2 | تأیید مالی | 2 | Finance Unit |
+| `{stepWarehouse1Id}` | تأیید انبار | 1 | Central Warehouse |
+| `{stepWarehouse2Id}` | تأیید مالی | 2 | Finance Unit |
+| `{stepWarehouse3Id}` | تأیید تدارکات | 3 | Procurement Support |
 
 #### Process #4: Unit-Scoped (Finance) — `{processFinanceId}`
 
@@ -1482,7 +1533,8 @@ The E2E suite creates **8 processes** covering every scope form. PR creation aut
 
 | Step | `name` | `order` | Assignee Unit |
 |------|--------|---------|---------------|
-| 1 | تأیید مالی | 1 | Finance Unit |
+| (no capture) | تأیید مالی | 1 | Finance Unit |
+| (no capture) | تأیید تدارکات | 2 | Procurement Support |
 
 #### Process #5: WareType-Scoped — `{processWaretypeId}`
 
@@ -1493,8 +1545,9 @@ The E2E suite creates **8 processes** covering every scope form. PR creation aut
 
 | Step | `name` | `order` | Assignee Unit |
 |------|--------|---------|---------------|
-| 1 | تأیید درخواست | 1 | Procurement Unit |
-| 2 | تأیید مالی | 2 | Finance Unit |
+| `{stepWaretype1Id}` | تأیید درخواست | 1 | Procurement Unit |
+| `{stepWaretype2Id}` | تأیید مالی | 2 | Finance Unit |
+| `{stepWaretype3Id}` | تأیید تدارکات | 3 | Procurement Support |
 
 #### Process #6: WareClass-Scoped — `{processWareclassId}`
 
@@ -1505,7 +1558,8 @@ The E2E suite creates **8 processes** covering every scope form. PR creation aut
 
 | Step | `name` | `order` | Assignee Unit |
 |------|--------|---------|---------------|
-| 1 | تأیید درخواست | 1 | Procurement Unit |
+| `{stepWareclass1Id}` | تأیید درخواست | 1 | Procurement Unit |
+| `{stepWareclass2Id}` | تأیید تدارکات | 2 | Procurement Support |
 
 #### Process #7: WareGroup-Scoped — `{processWaregroupId}`
 
@@ -1516,11 +1570,12 @@ The E2E suite creates **8 processes** covering every scope form. PR creation aut
 
 | Step | `name` | `order` | Assignee Unit |
 |------|--------|---------|---------------|
-| 1 | تأیید درخواست | 1 | Procurement Unit |
-| 2 | تأیید انبار | 2 | Central Warehouse |
-| 3 | تأیید مالی | 3 | Finance Unit |
+| `{stepWaregroup1Id}` | تأیید درخواست | 1 | Procurement Unit |
+| `{stepWaregroup2Id}` | تأیید انبار | 2 | Central Warehouse |
+| `{stepWaregroup3Id}` | تأیید مالی | 3 | Finance Unit |
+| `{stepWaregroup4Id}` | تأیید تدارکات | 4 | Procurement Support |
 
-#### Process #8: WareModel-Scoped — `{processWaremodelId}`
+#### Process #8: WareModel-Scoped (TSH) — `{processWaremodelId}`
 
 | Field | Value |
 |-------|-------|
@@ -1529,8 +1584,26 @@ The E2E suite creates **8 processes** covering every scope form. PR creation aut
 
 | Step | `name` | `order` | Assignee Unit |
 |------|--------|---------|---------------|
-| 1 | تأیید درخواست | 1 | Procurement Unit |
-| 2 | تأیید مالی | 2 | Finance Unit |
+| `{stepWaremodel1Id}` | تأیید درخواست | 1 | Procurement Unit |
+| `{stepWaremodel2Id}` | تأیید مالی | 2 | Finance Unit |
+| `{stepWaremodel3Id}` | تأیید تدارکات | 3 | Procurement Support |
+
+#### Process #9: WareModel-Scoped (بتادین) — `{processBetadineId}`
+
+| Field | Value |
+|-------|-------|
+| `name` | فرآیند کوتاه خرید بتادین |
+| **Scope** | `wareModelId: {wareModel2Id}` (بتادین) |
+
+| Step | `name` | `order` | Assignee Unit |
+|------|--------|---------|---------------|
+| `{stepBetadine1Id}` | تأیید انبار | 1 | Central Warehouse |
+| `{stepBetadine2Id}` | تأیید مالی | 2 | Finance Unit |
+| `{stepBetadine3Id}` | تأیید تدارکات | 3 | Procurement Support |
+
+**Resolution in practice:**
+- **خرید کیت TSH** — requested from Procurement Unit → matches the **unit-scoped** long process (`{processUnitId}`): انبار → انبار سرد → مالی → تدارکات. The procurement unit never approves its own request; kit purchases route through the cold store as a mid-step.
+- **خرید بتادین** — requested from Microbiology Lab (`{microEmployeeRoleId}`), which has no unit process → falls through to the **wareModel-scoped** betadine process (`{processBetadineId}`): انبار → مالی → تدارکات.
 
 #### Assignee Logic (All Processes)
 
@@ -1621,7 +1694,7 @@ Draft → (submit) → Pending → (step approvals) → InProgress → (last ste
 
 **Relations (no processId — auto-resolved):** `wareModelId`, `requestingUnitId` → Procurement Unit
 
-**Flow:** Draft → `addStuff` (selectionType="stuff") → Submit → Step 1 → Step 2 → Step 3 (Finance approves with budgetLineId, auto-encumbrance) → PendingFinalization → OrgHead finalizes → Completed → StoreHead delivers (assigned→ready_to_ship→shipped→delivered) → Goods Receipt → Auto Payment
+**Flow:** Draft → `addStuff` (selectionType="stuff") → Submit → Step 1 تأیید انبار → Step 2 تأیید انبار سرد → Step 3 تأیید مالی (Finance approves with budgetLineId, auto-encumbrance) → Step 4 تأیید تدارکات → PendingFinalization → OrgHead finalizes → Completed → StoreHead delivers (assigned→ready_to_ship→shipped→delivered) → Goods Receipt → Auto Payment
 
 #### PR #2 — Tender-Based Purchase (New Flow)
 
@@ -1631,7 +1704,7 @@ Draft → (submit) → Pending → (step approvals) → InProgress → (last ste
 | `description` | Tender-based procurement |
 | `quantity` | 20 |
 
-**Flow:** Draft → `tender.add` → `tender.close` → `selectTenderOffer` (selectionType="tender") → Submit → Step approvals → Last step approved → Auto-awards tender → PendingFinalization → OrgHead finalize → Completed
+**Flow:** Draft → `tender.add` → `tender.close` → `selectTenderOffer` (selectionType="tender") → Submit → Step approvals (same 4-step unit process) → Last step approved → Auto-awards tender → PendingFinalization → OrgHead finalize → Completed
 
 #### PR #3 — Pending (for approval flow test)
 
@@ -1642,7 +1715,17 @@ Draft → (submit) → Pending → (step approvals) → InProgress → (last ste
 | `estimatedAmount` | 25,000,000 |
 | `quantity` | 5 |
 
-**Stays in `Pending` status** — no decisions submitted.
+**Stays in `Pending` status** — no decisions submitted. (`gen-pr-pending-add` + `gen-pr-pending-submit`, capture `{prPendingId}`)
+
+#### PR #4 — Betadine (Short Process — `gen-pr-wash`)
+
+| Field | Value |
+|-------|-------|
+| `title` | خرید بتادین |
+| `description` | تأمین مواد ضدعفونی |
+| `quantity` | 30 |
+
+**Requested by** Microbiology Lab (`activeRoleId: {microEmployeeRoleId}`) → resolves to the betadine WareModel-scoped process (انبار → مالی → تدارکات). Flow: `addStuff` (stuff2) → submit → 3 step approvals → Goods Receipt (رسید-۰۰۲) → inventory +100 at قفسه B-07.
 
 ---
 
@@ -1697,6 +1780,28 @@ Draft → (submit) → Pending → (step approvals) → InProgress → (last ste
 
 **Relations:** `wareModelId` → TSH Kit, `unitId` → Central Warehouse
 
+#### Inventory (Betadine — `gen-inventory2-add`)
+
+| Field | Value |
+|-------|-------|
+| `quantity` | 100 |
+| `minQuantity` | 20 |
+| `maxQuantity` | 500 |
+| `location` | قفسه B-07 |
+
+**Relations:** `wareId` → بتادین, `unitId` → Central Warehouse
+
+#### Inventory (Low Stock — `gen-inventory-lowstock`)
+
+| Field | Value |
+|-------|-------|
+| `quantity` | 3 |
+| `minQuantity` | 10 |
+| `maxQuantity` | 50 |
+| `location` | قفسه C-03 |
+
+**Relations:** `wareId` → TSH Kit, `unitId` → Cold Storage (`{coldstoreUnitId}`). Below `minQuantity` — surfaces in the low-stock report.
+
 #### Inventory Adjust
 
 | Field | Value |
@@ -1723,6 +1828,16 @@ Draft → (submit) → Pending → (step approvals) → InProgress → (last ste
 | `reason` | Quality control testing |
 
 **Relations:** `wareModelId`, `unitId` → Procurement Unit, `consumedById` → user, `inventoryId`, `purchasingRequestId` → PR #1
+
+#### Consumption Record (Micro Lab — `gen-consumption2`)
+
+| Field | Value |
+|-------|-------|
+| `quantity` | 2 |
+| `consumedAt` | 2026-05-10 |
+| `reason` | مصرف آزمایشگاه میکروبیولوژی |
+
+**Relations:** `wareId` → TSH Kit, `unitId` → Microbiology Lab (`{microlabUnitId}`), `consumedById` → user, `inventoryId`
 
 #### Inventory Transfer
 
@@ -1751,20 +1866,21 @@ Draft → (submit) → Pending → (step approvals) → InProgress → (last ste
 | 51 | `gen-update-admin-roles` | Adds `Manager`, scoped `Employee`, and scoped `UnitHead`×3 roles to admin for `/admin` panel | — |
 | 52 | `gen-unithead-user` | Creates **رضا احمدی** (`reza@lesansatek.com` / `password123`) | `{unitheadUserId}` |
 | 53 | `gen-finance-user` | Creates **مریم حسینی** (`maryam@lesansatek.com` / `password123`) with `canManageBudget` + `canIssuePaymentOrder` + `canViewBudgetReports` features | `{financeUserId}` |
-| 54 | `gen-vendor-user` | Creates **سارا کریمی** (`sara@lesansatek.com` / `password123`) with `canRespondToTender` + `canAssignItemsToOrder` features. Also serves as **store head** of فروشگاه نمونه. | `{vendorUserId}` |
-| 55 | `gen-roles-sara` | Adds `Manager` + scoped `Employee` (Procurement unit) to سارا کریمی | — |
-| 56 | `gen-roles-sara-storehead` | Adds **StoreHead** role (`scopeType: "store"`, `scopeId: {storeId}`) to سارا کریمی for managing فروشگاه نمونه | `{storeHeadRoleId}` |
-| 57 | `gen-roles-ali` | Adds `Manager` + scoped `Employee` (Production) + `UnitHead` (Production, QA) to علی محمدی | — |
-| 58 | `gen-roles-mohammad` | Adds `Manager` + scoped `Employee` (Logistics) + `UnitHead` (Logistics, Internal Procurement) to محمد رضایی | — |
-| 59 | `gen-roles-zahra` | Adds `Manager` + scoped `Employee` (IT) + `UnitHead` (IT, Technical Support) to زهرا احمدی | — |
-| 60 | `gen-roles-narges` | Adds `Manager` + scoped `Employee` (HR) + `UnitHead` (HR) to نرگس کریمی | — |
-| 61 | `gen-roles-farhad` | Adds `Manager` + scoped `Employee` (Legal) + `UnitHead` (Legal) to فرهاد نوروزی | — |
-| 62 | `gen-roles-parisa` | Adds `Manager` + scoped `Employee` (R&D) + `UnitHead` (R&D) to پریسا صادقی | — |
-| 63 | `gen-roles-reza` | Adds `UnitHead` (Procurement) + scoped `Employee` (Procurement) + `UnitHead` (Hematology/Micro/Pathology labs) to رضا احمدی | — |
-| 64 | `gen-roles-hossein` | Adds `UnitHead` (Warehouse) + scoped `Employee` (Warehouse) + `UnitHead` (Cold Storage) to حسین کاظمی | — |
-| 65 | `gen-roles-fatemeh` | Adds `UnitHead` (Finance) + scoped `Employee` (Finance) + `UnitHead` (Internal Audit) + `canManageBudget` + `canIssuePaymentOrder` + `canViewBudgetReports` features to فاطمه موسوی | — |
-| 66 | `gen-roles-maryam` | Adds scoped `Employee` (Finance unit) to مریم حسینی | — |
-| 67 | `gen-pr-pending` | Submits a 3rd PR (25,000,000, qty=5, TSH Kit) that stays in `Pending` status | `{prPendingId}` |
+| 54 | `gen-vendor-user` | Creates **سارا کریمی** (`sara@lesansatek.com` / `password123`) with `canRespondToTender` + `canAssignItemsToOrder` features. StoreHead role added separately (row 56). | `{vendorUserId}` |
+| 55 | `gen-roles-sara-storehead` | Adds **StoreHead** role (`scopeType: "store"`, `scopeId: {storeId}`) to سارا کریمی — her **only** role. `storeHeadRoleId` captured at login (row 54 login captures roles[1]). | — |
+| 56 | `gen-roles-ali` | Adds `Manager` + scoped `Employee` (Production) + `UnitHead` (Production, QA) to علی محمدی | — |
+| 57 | `gen-roles-mohammad` | Adds `Manager` + scoped `Employee` (Logistics) + `UnitHead` (Logistics, Internal Procurement) to محمد رضایی | — |
+| 58 | `gen-roles-zahra` | Adds `Manager` + scoped `Employee` (IT) + `UnitHead` (IT, Technical Support) to زهرا احمدی | — |
+| 59 | `gen-roles-narges` | Adds `Manager` + scoped `Employee` (HR) + `UnitHead` (HR) to نرگس کریمی | — |
+| 60 | `gen-roles-farhad` | Adds `Manager` + scoped `Employee` (Legal) + `UnitHead` (Legal) to فرهاد نوروزی | — |
+| 61 | `gen-roles-parisa` | Adds `Manager` + scoped `Employee` (R&D) + `UnitHead` (R&D) to پریسا صادقی | — |
+| 62 | `gen-roles-reza` | Adds `UnitHead` (Procurement) + scoped `Employee` (Procurement) + `UnitHead` (Hematology/Micro/Pathology labs) to رضا احمدی | — |
+| 63 | `gen-roles-hossein` | Adds `UnitHead` (Warehouse) + scoped `Employee` (Warehouse) + `UnitHead` (Cold Storage) to حسین کاظمی | — |
+| 64 | `gen-roles-fatemeh` | Adds `UnitHead` (Finance) + scoped `Employee` (Finance) + `UnitHead` (Internal Audit) + `canManageBudget` + `canIssuePaymentOrder` + `canViewBudgetReports` features to فاطمه موسوی | — |
+| 65 | `gen-roles-maryam` | Adds scoped `Employee` (Finance unit) to مریم حسینی | — |
+| 66 | `gen-roles-orghead` | Adds **OrgHead** role (`scopeType: "organization"`, `scopeId: {orgId}`) to دکتر احمدی | — |
+| 67 | `gen-roles-ghost-microlab` | Adds scoped `Employee` role at Microbiology Lab to admin (`{microEmployeeRoleId}`) — used to submit the betadine PR | `{microEmployeeRoleId}` |
+| 68 | `gen-pr-pending-add` + `gen-pr-pending-submit` | Creates 3rd PR (25,000,000, qty=5, TSH Kit) and submits it — stays in `Pending` status | `{prPendingId}` |
 
 **Note:** All users are created with only `[{name: "Ordinary"}]` by `addUser`. Their full role set (Manager, UnitHead, OrgHead, StoreHead, scoped Employee, etc.) is applied immediately after via `addOrRemoveRoles`. This enforces a single source of truth for role management.
 
@@ -1775,9 +1891,7 @@ Draft → (submit) → Pending → (step approvals) → InProgress → (last ste
 | `/admin` | Admin System (existing) | `Manager` + `Ordinary` | admin@lesansatek.com / password123 |
 | `/unit-head` | رضا احمدی | `UnitHead` (scope: Procurement Unit) | reza@lesansatek.com / password123 |
 | `/finance` | مریم حسینی | `Ordinary` + `canManageBudget` | maryam@lesansatek.com / password123 |
-| `/vendor` | سارا کریمی | `Manager` + `Ordinary` + `Employee` + `canRespondToTender` + `canAssignItemsToOrder` | sara@lesansatek.com / password123 |
-| `/store` | سارا کریمی | `StoreHead` (scope: فروشگاه نمونه) | sara@lesansatek.com / password123 |
-| `/admin` | سارا کریمی | `Manager` (via role switching) | sara@lesansatek.com / password123 |
+| `/store` | سارا کریمی | `StoreHead` (scope: فروشگاه نمونه) — her only role | sara@lesansatek.com / password123 |
 | `/employee` | Admin System (existing) | `Ordinary` | admin@lesansatek.com / password123 |
 
 #### Complete Captured Variables
@@ -1787,7 +1901,7 @@ Draft → (submit) → Pending → (step approvals) → InProgress → (last ste
 | `{unitheadUserId}` | gen-unithead-user | _id of رضا احمدی (UnitHead) |
 | `{financeUserId}` | gen-finance-user | _id of مریم حسینی (Finance) |
 | `{vendorUserId}` | gen-vendor-user | _id of سارا کریمی (Vendor) |
-| `{prPendingId}` | gen-pr-pending | _id of the pending PR (25M, qty=5) |
+| `{prPendingId}` | gen-pr-pending-add | _id of the pending PR (25M, qty=5) |
 | `{subUnitId}` | gen-unit-child | _id of Hematology Lab sub-unit |
 | `{tempTagId}` | gen-add-removable-tag | _id of the temporary tag |
 | `{managerRoleId}` | gen-update-admin-roles | roleId of the `Manager` role (for submitDecision etc.) |
@@ -1820,12 +1934,13 @@ Setup Phase:
   tempUser (Admin/System) → login → capture token
   state (Tehran) → city (Tehran) → org (Sample Organization)
   ↓
-   17 units (4 General, 2 Warehouse, 1 Finance, 2 Administration, 2 Logistics, 1 Production, 5 Expert)
-  8 unit heads + 3 panel users
+   18 units (4 General, 2 Warehouse, 1 Finance, 2 Administration, 3 Logistics, 1 Production, 5 Expert)
+   9 unit heads + 3 panel users (unithead, finance, vendor, orghead)
   Manufacturer → WareType → WareClass → WareGroup → WareModel → Ware → Stuff
+  Second hierarchy (محلول‌ها و مواد شیمیایی → مواد شوینده → ضدعفونی‌کننده → بتادین) + Store2 + Stuff2
   Store → link to city/state → StoreHead role assigned to سارا کریمی
   ↓
-  8 Processes (1 general + 3 unit-scoped + 4 hierarchy-scoped)
+   9 Processes (1 general + 3 unit-scoped + 5 hierarchy-scoped)
   All activated with consecutive steps
   ↓
   Budget:
@@ -1836,10 +1951,11 @@ E2E Flow #1 — Direct Store Purchase (New Lifecycle):
   PR Draft via `add` (TSH Kit, qty=10, requestingUnit=Procurement) → Draft
     No process, no pricing, selectionType="none"
   Add Stuff via `addStuff({stuffId})` → selectionType="stuff", stuffStatus="assigned", estimatedAmount set
-  Submit PR via `submit` → Pending (process auto-resolved to Process #2)
-  Step 1 (Procurement Unit): approve → advances to step 2
-  Step 2 (Warehouse Unit): approve → advances to step 3
-  Step 3 (Finance Unit): approve with `budgetLineId` → budget check → auto-encumbrance → PendingFinalization
+  Submit PR via `submit` → Pending (process auto-resolved to Process #2, unit-scoped)
+  Step 1 (Central Warehouse): approve → advances to step 2
+  Step 2 (Cold Storage): approve → advances to step 3
+  Step 3 (Finance Unit): approve with `budgetLineId` → budget check → auto-encumbrance → step 4
+  Step 4 (Procurement Support / تدارکات): approve → PendingFinalization
   OrgHead finalize (`finalize` action) → Completed, stuffStatus="assigned"
   StoreHead delivery: `updateStuffStatus` → assigned→ready_to_ship→shipped→delivered
   Goods Receipt (GR-001, qty=10 accepted) → stuffStatus="received", auto-inventory, auto-payment
@@ -1848,9 +1964,12 @@ E2E Flow #1 — Direct Store Purchase (New Lifecycle):
   ↓
 
 E2E Flow #2 — Inventory Management:
-  Inventory add (Shelf A-12, qty=50)
+  Inventory add (Shelf A-12, qty=50, TSH Kit / Central Warehouse)
+  Inventory add 2 (قفسه B-07, qty=100, بتادین / Central Warehouse)
+  Inventory low stock (قفسه C-03, qty=3, TSH Kit / Cold Storage)
   Adjust (qty=45, 5 damaged)
   Consumption (qty=5, routine lab testing)
+  Consumption 2 (qty=2, مصرف آزمایشگاه میکروبیولوژی)
   Stock Movements (gets all)
   Inventory Transfer (10 units, Warehouse → Procurement)
   ↓
@@ -1863,26 +1982,35 @@ E2E Flow #3 — Tender Purchase (auto-resolved → Process #2, unit-scoped):
   Close tender → Award to winning offer → `stuffStatus=assigned` on PR
   ↓
 
+E2E Flow #4 — Betadine Short Process:
+  PR add (خرید بتادین, qty=30, requestingUnit=Microlab) via `{microEmployeeRoleId}`
+  addStuff (stuff2) → submit → resolves to betadine WareModel-scoped process
+  3 step approvals (انبار → مالی → تدارکات) → PendingFinalization
+  Goods Receipt (رسید-۰۰۲, qty=30) → inventory +100 at قفسه B-07
+  ↓
+
 Utility:
   Tag (فوری, red)
   Duplicate general process
   Budget report (gets budget line report)
   ↓
 
-E2E Flow #4 — Role Management (all via `addOrRemoveRoles`):
+E2E Flow #5 — Role Management (all via `addOrRemoveRoles`):
   Admin role update (add Manager + UnitHead scopes via `addOrRemoveRoles`)
   All users created with only `[{name: "Ordinary"}]` — roles applied after via `addOrRemoveRoles`
   UnitHead user (رضا احمدی)
   Finance user (مریم حسینی, canManageBudget)
-  Vendor user / Store head (سارا کریمی, canRespondToTender + canAssignItemsToOrder + store head of فروشگاه نمونه)
-  12x `addOrRemoveRoles` calls — Manager + scoped Employee + UnitHead for all unit-head users + finance user + sara (+ StoreHead for sara)
+  Vendor user / Store head (سارا کریمی, canRespondToTender + canAssignItemsToOrder; StoreHead = only role)
+  OrgHead user (دکتر احمدی) + OrgHead role (organization scope)
+  Admin + Micro Lab Employee role ({microEmployeeRoleId})
+  14x `addOrRemoveRoles` calls — admin + Manager/scoped Employee/UnitHead for all unit-head users + finance user + orghead + sara StoreHead
   Pending PR (25M, qty=5, for approval flow test)
   ↓
 
-E2E Flow #5 — Extended Coverage:
+E2E Flow #6 — Extended Coverage:
   getMe (profile check)
   Store score update (4.5, 15M sales)
-  StepApproval gets (3 records for PR #1)
+  StepApproval gets (4 records for PR #1, one per step)
   BudgetLine gets (filtered by fiscal year)
   TenderOffer gets (winning offer details)
   Consumption with PR link (qty=3, history push)
