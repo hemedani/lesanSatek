@@ -271,6 +271,17 @@
     ]
   },
   {
+    "id": "gen-unit-tedarakat",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"واحد تدارکات\", \"enName\": \"واحد تدارکات\", \"description\": \"مدیریت تدارکات و پشتیبانی خرید\", \"type\": \"Logistics\", \"organizationId\": \"{orgId}\", \"headId\": \"{logHeadId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "procurementUnitId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
     "id": "gen-unit-hemato-lab",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"آزمایشگاه هماتولوژی\", \"enName\": \"آزمایشگاه هماتولوژی\", \"description\": \"تست هماتولوژی\", \"type\": \"Expert\", \"organizationId\": \"{orgId}\", \"headId\": \"{unitheadUserId}\", \"parentUnitId\": \"{unitId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,
@@ -379,12 +390,6 @@
         "value": "[body][_id]"
       }
     ]
-  },
-  {
-    "id": "gen-roles-sara",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addOrRemoveRoles\", \"details\": {\"set\": {\"_id\": \"{vendorUserId}\", \"activeRoleId\": \"{roleId}\", \"addRoles\": [{\"name\": \"Manager\"}, {\"name\": \"Employee\", \"scopeType\": \"unit\", \"scopeId\": \"{unitId}\"}]}, \"get\": {\"_id\": 1, \"roles\": 1}}}}",
-    "repeat": 1,
-    "captures": []
   },
   {
     "id": "gen-roles-ali",
@@ -631,6 +636,17 @@
     ]
   },
   {
+    "id": "gen-step-general-4",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید تدارکات\", \"description\": \"تأیید نهایی تدارکات\", \"stepType\": \"Approval\", \"order\": 4, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{procurementUnitId}\"]}], \"processId\": \"{processGeneralId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "stepGeneral4Id",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
     "id": "gen-activate-general",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"activateProcess\", \"details\": {\"set\": {\"_id\": \"{processGeneralId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1, \"version\": 1, \"isActive\": 1}}}}",
     "repeat": 1,
@@ -649,7 +665,7 @@
   },
   {
     "id": "gen-step-unit-1",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید درخواست\", \"description\": \"بررسی درخواست خرید\", \"stepType\": \"Approval\", \"order\": 1, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{unitId}\"]}], \"processId\": \"{processUnitId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید انبار\", \"description\": \"بررسی انبار مرکزی\", \"stepType\": \"Approval\", \"order\": 1, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{warehouseUnitId}\"]}], \"processId\": \"{processUnitId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,
     "captures": [
       {
@@ -660,7 +676,7 @@
   },
   {
     "id": "gen-step-unit-2",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید انبار\", \"description\": \"تأیید انبار\", \"stepType\": \"Approval\", \"order\": 2, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{warehouseUnitId}\"]}], \"processId\": \"{processUnitId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید انبار سرد\", \"description\": \"تأیید انبار سرد\", \"stepType\": \"Approval\", \"order\": 2, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{coldstoreUnitId}\"]}], \"processId\": \"{processUnitId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,
     "captures": [
       {
@@ -676,6 +692,17 @@
     "captures": [
       {
         "key": "stepUnit3Id",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-step-unit-4",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید تدارکات\", \"description\": \"تأیید نهایی تدارکات\", \"stepType\": \"Approval\", \"order\": 4, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{procurementUnitId}\"]}], \"processId\": \"{processUnitId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "stepUnit4Id",
         "value": "[body][_id]"
       }
     ]
@@ -720,6 +747,17 @@
     ]
   },
   {
+    "id": "gen-step-warehouse-3",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید تدارکات\", \"description\": \"تأیید نهایی تدارکات\", \"stepType\": \"Approval\", \"order\": 3, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{procurementUnitId}\"]}], \"processId\": \"{processWarehouseId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "stepWarehouse3Id",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
     "id": "gen-activate-warehouse",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"activateProcess\", \"details\": {\"set\": {\"_id\": \"{processWarehouseId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1, \"version\": 1, \"isActive\": 1}}}}",
     "repeat": 1,
@@ -743,6 +781,17 @@
     "captures": [
       {
         "key": "stepFinance1Id",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-step-finance-2",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید تدارکات\", \"description\": \"تأیید نهایی تدارکات\", \"stepType\": \"Approval\", \"order\": 2, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{procurementUnitId}\"]}], \"processId\": \"{processFinanceId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "stepFinance2Id",
         "value": "[body][_id]"
       }
     ]
@@ -787,6 +836,17 @@
     ]
   },
   {
+    "id": "gen-step-waretype-3",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید تدارکات\", \"description\": \"تأیید نهایی تدارکات\", \"stepType\": \"Approval\", \"order\": 3, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{procurementUnitId}\"]}], \"processId\": \"{processWaretypeId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "stepWaretype3Id",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
     "id": "gen-activate-waretype",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"activateProcess\", \"details\": {\"set\": {\"_id\": \"{processWaretypeId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1, \"version\": 1, \"isActive\": 1}}}}",
     "repeat": 1,
@@ -810,6 +870,17 @@
     "captures": [
       {
         "key": "stepWareclass1Id",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-step-wareclass-2",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید تدارکات\", \"description\": \"تأیید نهایی تدارکات\", \"stepType\": \"Approval\", \"order\": 2, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{procurementUnitId}\"]}], \"processId\": \"{processWareclassId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "stepWareclass2Id",
         "value": "[body][_id]"
       }
     ]
@@ -865,6 +936,17 @@
     ]
   },
   {
+    "id": "gen-step-waregroup-4",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید تدارکات\", \"description\": \"تأیید نهایی تدارکات\", \"stepType\": \"Approval\", \"order\": 4, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{procurementUnitId}\"]}], \"processId\": \"{processWaregroupId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "stepWaregroup4Id",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
     "id": "gen-activate-waregroup",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"activateProcess\", \"details\": {\"set\": {\"_id\": \"{processWaregroupId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1, \"version\": 1, \"isActive\": 1}}}}",
     "repeat": 1,
@@ -899,6 +981,17 @@
     "captures": [
       {
         "key": "stepWaremodel2Id",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-step-waremodel-3",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید تدارکات\", \"description\": \"تأیید نهایی تدارکات\", \"stepType\": \"Approval\", \"order\": 3, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{procurementUnitId}\"]}], \"processId\": \"{processWaremodelId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "stepWaremodel3Id",
         "value": "[body][_id]"
       }
     ]
@@ -943,6 +1036,18 @@
     ]
   },
   {
+    "id": "gen-second-budgetLine",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"add\", \"details\": {\"set\": {\"code\": \"BUD-002\", \"title\": \"بودجه خرید مواد مصرفی\", \"description\": \"بودجه مواد مصرفی و شوینده\", \"fiscalYearId\": \"{fiscalYearId}\", \"organizationId\": \"{orgId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"code\": 1, \"totalAllocated\": 1, \"remainingBudget\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "budgetLine2Id", "value": "[body][_id]"}]
+  },
+  {
+    "id": "gen-second-budgetAllocation",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetAllocation\", \"act\": \"add\", \"details\": {\"set\": {\"amount\": 50000000, \"description\": \"تخصیص بودجه مواد مصرفی\", \"allocatedAt\": \"2026-04-01\", \"budgetLineId\": \"{budgetLine2Id}\", \"allocatedById\": \"{userId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"amount\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
     "id": "gen-update-admin-roles",
     "bodyHeaders": "{\"headers\":{\"Content-Type\":\"application/json\",\"token\":\"{token}\"},\"body\":{\"service\":\"main\",\"model\":\"user\",\"act\":\"addOrRemoveRoles\",\"details\":{\"set\":{\"_id\":\"{ghostId}\",\"activeRoleId\":\"{roleId}\",\"addRoles\":[{\"name\":\"Manager\"},{\"name\":\"Employee\",\"scopeType\":\"unit\",\"scopeId\":\"{unitId}\"},{\"name\":\"UnitHead\",\"scopeType\":\"unit\",\"scopeId\":\"{unitId}\"},{\"name\":\"UnitHead\",\"scopeType\":\"unit\",\"scopeId\":\"{warehouseUnitId}\"},{\"name\":\"UnitHead\",\"scopeType\":\"unit\",\"scopeId\":\"{financeUnitId}\"}]},\"get\":{\"_id\":1,\"roles\":1}}}}",
     "repeat": 1,
@@ -966,6 +1071,17 @@
       {
         "key": "adminUnitHeadFinRoleId",
         "value": "[body][roles][5][roleId]"
+      }
+    ]
+  },
+  {
+    "id": "gen-roles-ghost-microlab",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addOrRemoveRoles\", \"details\": {\"set\": {\"_id\": \"{ghostId}\", \"activeRoleId\": \"{roleId}\", \"addRoles\": [{\"name\": \"Employee\", \"scopeType\": \"unit\", \"scopeId\": \"{microlabUnitId}\"}]}, \"get\": {\"_id\": 1, \"roles\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "microEmployeeRoleId",
+        "value": "[body][roles][6][roleId]"
       }
     ]
   },
@@ -1000,7 +1116,7 @@
   },
   {
     "id": "gen-decision-step1",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prId}\", \"processStepId\": \"{stepUnit1Id}\", \"unitId\": \"{unitId}\", \"status\": \"approved\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prId}\", \"processStepId\": \"{stepUnit1Id}\", \"unitId\": \"{warehouseUnitId}\", \"status\": \"approved\", \"activeRoleId\": \"{managerRoleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
@@ -1012,13 +1128,19 @@
   },
   {
     "id": "gen-decision-step2",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prId}\", \"processStepId\": \"{stepUnit2Id}\", \"unitId\": \"{warehouseUnitId}\", \"status\": \"approved\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prId}\", \"processStepId\": \"{stepUnit2Id}\", \"unitId\": \"{coldstoreUnitId}\", \"status\": \"approved\", \"activeRoleId\": \"{managerRoleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
   {
     "id": "gen-decision-step3",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prId}\", \"processStepId\": \"{stepUnit3Id}\", \"unitId\": \"{financeUnitId}\", \"status\": \"approved\", \"budgetLineId\": \"{budgetLineId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prId}\", \"processStepId\": \"{stepUnit3Id}\", \"unitId\": \"{financeUnitId}\", \"status\": \"approved\", \"budgetLineId\": \"{budgetLineId}\", \"activeRoleId\": \"{managerRoleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-decision-step4",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prId}\", \"processStepId\": \"{stepUnit4Id}\", \"unitId\": \"{procurementUnitId}\", \"status\": \"approved\", \"activeRoleId\": \"{managerRoleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
@@ -1039,7 +1161,7 @@
       },
       {
         "key": "storeHeadRoleId",
-        "value": "[body][user][roles][3][roleId]"
+        "value": "[body][user][roles][1][roleId]"
       }
     ]
   },
@@ -1340,7 +1462,7 @@
       },
       {
         "key": "saraRoleId",
-        "value": "[body][user][roles][2][roleId]"
+        "value": "[body][user][roles][1][roleId]"
       },
       {
         "key": "saraUserId",
@@ -1445,8 +1567,38 @@
     "captures": [{"key": "stuff2Id", "value": "[body][_id]"}, {"key": "stuff2Price", "value": "[body][price]"}]
   },
   {
+    "id": "gen-process-betadine",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"فرآیند کوتاه خرید بتادین\", \"description\": \"گردش کار کوتاه خرید بتادین\", \"organizationId\": \"{orgId}\", \"wareModelId\": \"{wareModel2Id}\"}, \"get\": {\"_id\": 1, \"name\": 1, \"status\": 1, \"version\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "processBetadineId", "value": "[body][_id]"}]
+  },
+  {
+    "id": "gen-step-betadine-1",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید انبار\", \"description\": \"بررسی انبار مرکزی\", \"stepType\": \"Approval\", \"order\": 1, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{warehouseUnitId}\"]}], \"processId\": \"{processBetadineId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "stepBetadine1Id", "value": "[body][_id]"}]
+  },
+  {
+    "id": "gen-step-betadine-2",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید مالی\", \"description\": \"تأیید مالی\", \"stepType\": \"Approval\", \"order\": 2, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{financeUnitId}\"]}], \"processId\": \"{processBetadineId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "stepBetadine2Id", "value": "[body][_id]"}]
+  },
+  {
+    "id": "gen-step-betadine-3",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید تدارکات\", \"description\": \"تأیید نهایی تدارکات\", \"stepType\": \"Approval\", \"order\": 3, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{procurementUnitId}\"]}], \"processId\": \"{processBetadineId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [{"key": "stepBetadine3Id", "value": "[body][_id]"}]
+  },
+  {
+    "id": "gen-activate-betadine",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"activateProcess\", \"details\": {\"set\": {\"_id\": \"{processBetadineId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1, \"version\": 1, \"isActive\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
     "id": "gen-pr-wash",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"add\", \"details\": {\"set\": {\"title\": \"خرید بتادین\", \"description\": \"تأمین مواد ضدعفونی\", \"quantity\": 30, \"wareModelId\": \"{wareModel2Id}\", \"activeRoleId\": \"{employeeRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"add\", \"details\": {\"set\": {\"title\": \"خرید بتادین\", \"description\": \"تأمین مواد ضدعفونی\", \"quantity\": 30, \"wareModelId\": \"{wareModel2Id}\", \"activeRoleId\": \"{microEmployeeRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": [{"key": "prWashId", "value": "[body][_id]"}]
   },
@@ -1458,47 +1610,35 @@
   },
   {
     "id": "gen-pr-wash-submit",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"submit\", \"details\": {\"set\": {\"_id\": \"{prWashId}\", \"activeRoleId\": \"{employeeRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1, \"selectionType\": 1, \"currentStep\": 1, \"process\": {\"_id\": 1, \"name\": 1}, \"stepApprovals\": {\"_id\": 1, \"status\": 1, \"processStep\": {\"_id\": 1}, \"unit\": {\"_id\": 1}}}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"submit\", \"details\": {\"set\": {\"_id\": \"{prWashId}\", \"activeRoleId\": \"{microEmployeeRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1, \"selectionType\": 1, \"currentStep\": 1, \"process\": {\"_id\": 1, \"name\": 1}, \"stepApprovals\": {\"_id\": 1, \"status\": 1, \"processStep\": {\"_id\": 1}, \"unit\": {\"_id\": 1}}}}}}",
     "repeat": 1,
     "captures": []
   },
   {
     "id": "gen-decision-wash-step1",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prWashId}\", \"processStepId\": \"{stepUnit1Id}\", \"unitId\": \"{unitId}\", \"status\": \"approved\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prWashId}\", \"processStepId\": \"{stepBetadine1Id}\", \"unitId\": \"{warehouseUnitId}\", \"status\": \"approved\", \"activeRoleId\": \"{managerRoleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
   {
     "id": "gen-decision-wash-step2",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prWashId}\", \"processStepId\": \"{stepUnit2Id}\", \"unitId\": \"{warehouseUnitId}\", \"status\": \"approved\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prWashId}\", \"processStepId\": \"{stepBetadine2Id}\", \"unitId\": \"{financeUnitId}\", \"status\": \"approved\", \"budgetLineId\": \"{budgetLine2Id}\", \"activeRoleId\": \"{managerRoleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
   {
     "id": "gen-decision-wash-step3",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prWashId}\", \"processStepId\": \"{stepUnit3Id}\", \"unitId\": \"{financeUnitId}\", \"status\": \"approved\", \"budgetLineId\": \"{budgetLineId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"submitDecision\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prWashId}\", \"processStepId\": \"{stepBetadine3Id}\", \"unitId\": \"{procurementUnitId}\", \"status\": \"approved\", \"activeRoleId\": \"{managerRoleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
   {
     "id": "gen-wash-goods-receipt",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"goodsReceipt\", \"act\": \"add\", \"details\": {\"set\": {\"receiptNumber\": \"رسید-۰۰۲\", \"description\": \"رسید مواد ضدعفونی\", \"receivedAt\": \"2026-05-15\", \"items\": [{\"wareModelId\": \"{wareModel2Id}\", \"wareId\": \"{ware2Id}\", \"quantityReceived\": 30, \"quantityAccepted\": 30, \"quantityRejected\": 0}], \"purchasingRequestId\": \"{prWashId}\", \"receivedById\": \"{userId}\", \"receivingUnitId\": \"{unitId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"receiptNumber\": 1, \"status\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"goodsReceipt\", \"act\": \"add\", \"details\": {\"set\": {\"receiptNumber\": \"رسید-۰۰۲\", \"description\": \"رسید مواد ضدعفونی\", \"receivedAt\": \"2026-05-15\", \"items\": [{\"wareModelId\": \"{wareModel2Id}\", \"wareId\": \"{ware2Id}\", \"quantityReceived\": 30, \"quantityAccepted\": 30, \"quantityRejected\": 0}], \"purchasingRequestId\": \"{prWashId}\", \"receivedById\": \"{userId}\", \"receivingUnitId\": \"{microlabUnitId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"receiptNumber\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": [
       {"key": "washReceiptId", "value": "[body][_id]"}
     ]
-  },
-  {
-    "id": "gen-second-budgetLine",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"add\", \"details\": {\"set\": {\"code\": \"BUD-002\", \"title\": \"بودجه خرید مواد مصرفی\", \"description\": \"بودجه مواد مصرفی و شوینده\", \"fiscalYearId\": \"{fiscalYearId}\", \"organizationId\": \"{orgId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"code\": 1, \"totalAllocated\": 1, \"remainingBudget\": 1}}}}",
-    "repeat": 1,
-    "captures": [{"key": "budgetLine2Id", "value": "[body][_id]"}]
-  },
-  {
-    "id": "gen-second-budgetAllocation",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetAllocation\", \"act\": \"add\", \"details\": {\"set\": {\"amount\": 50000000, \"description\": \"تخصیص بودجه مواد مصرفی\", \"allocatedAt\": \"2026-04-01\", \"budgetLineId\": \"{budgetLine2Id}\", \"allocatedById\": \"{userId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"amount\": 1}}}}",
-    "repeat": 1,
-    "captures": []
   },
   {
     "id": "gen-inventory2-add",
