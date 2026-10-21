@@ -34,6 +34,13 @@ const idOf = (value: unknown): string | null => {
 
 const dedupe = (ids: string[]): string[] => [...new Set(ids)];
 
+const sameId = (left: unknown, right: unknown): boolean => {
+  const leftId = idOf(left);
+  const rightId = idOf(right);
+
+  return leftId !== null && rightId !== null && leftId === rightId;
+};
+
 const toObjectId = (id: string): ObjectId | null => {
   try {
     return new ObjectId(id);
@@ -165,7 +172,7 @@ export const unitReadScope = async (
     }
     case "UnitHead": {
       const unitId = idOf(activeRole.scopeId);
-      if (!unitId) return { unitIds: [] };
+      if (!unitId || !toObjectId(unitId)) return { unitIds: [] };
 
       const loader = options.loadDescendantUnitIds ??
         loadDescendantUnitIdsFromDb;
@@ -186,10 +193,11 @@ export const unitReadScope = async (
   }
 };
 
-export const organizationReadScope = (
+export const organizationReadScope = async (
   activeRole: ActiveRole,
   user: ScopeUser | undefined,
-): ReadScope => {
+  options: ScopeLoaderOptions = {},
+): Promise<ReadScope> => {
   if (isBypass(activeRole, user)) return "all";
 
   if (activeRole.name === "OrgHead") {
@@ -197,6 +205,33 @@ export const organizationReadScope = (
     return organizationId
       ? { organizationIds: [organizationId] }
       : { organizationIds: [] };
+  }
+
+  if (activeRole.name === "UnitHead") {
+    const unitId = idOf(activeRole.scopeId);
+
+    if (!unitId || !toObjectId(unitId)) return { organizationIds: [] };
+
+    const membership = (user?.units ?? []).find((unit) =>
+      sameId(unit?._id, unitId)
+    );
+    const membershipOrganizationId = idOf(membership?.organization?._id);
+
+    if (membershipOrganizationId) {
+      return { organizationIds: [membershipOrganizationId] };
+    }
+
+    const loader = options.loadUnitOrganizationId ??
+      loadUnitOrganizationIdFromDb;
+
+    try {
+      const organizationId = await loader(unitId);
+      return organizationId
+        ? { organizationIds: [organizationId] }
+        : { organizationIds: [] };
+    } catch {
+      return { organizationIds: [] };
+    }
   }
 
   return { organizationIds: organizationIdsOf(user) };
@@ -228,12 +263,14 @@ export const applyOrganizationReadScope = (
 ): void => {
   if (scope === "all") return;
 
-  const ids = "organizationIds" in scope
-    ? scope.organizationIds
-    : scope.unitIds;
-
   pipeline.push({
-    $match: { _id: { $in: validObjectIds(ids) } },
+    $match: {
+      _id: {
+        $in: "organizationIds" in scope
+          ? validObjectIds(scope.organizationIds)
+          : [],
+      },
+    },
   });
 };
 
@@ -250,7 +287,7 @@ export const assertCanReadUnit = async (
   if (scope === "all") return;
 
   if ("unitIds" in scope) {
-    if (scope.unitIds.includes(unitId)) return;
+    if (scope.unitIds.some((candidate) => sameId(candidate, unitId))) return;
     throwError("You cant do this");
     return;
   }
@@ -266,31 +303,63 @@ export const assertCanReadUnit = async (
     throwError("You cant do this");
   }
 
-  if (organizationId && scope.organizationIds.includes(organizationId)) {
+  if (
+    organizationId &&
+    scope.organizationIds.some((candidate) => sameId(candidate, organizationId))
+  ) {
     return;
   }
 
   throwError("You cant do this");
 };
 
-export const assertCanReadOrganization = (
+export const assertCanReadOrganization = async (
   activeRole: ActiveRole,
   user: ScopeUser | undefined,
   organizationId: string,
-): void => {
+  options: ScopeLoaderOptions = {},
+): Promise<void> => {
   if (isBypass(activeRole, user)) return;
 
-  const scope = organizationReadScope(activeRole, user);
+  const scope = await organizationReadScope(activeRole, user, options);
 
   if (scope === "all") return;
 
   if (
-    "organizationIds" in scope && scope.organizationIds.includes(organizationId)
+    "organizationIds" in scope &&
+    scope.organizationIds.some((candidate) => sameId(candidate, organizationId))
   ) {
     return;
   }
 
   throwError("You cant do this");
+};
+
+export const unitScope = unitReadScope;
+
+export const organizationScope = organizationReadScope;
+
+export const applyOrgUnitScope = (
+  pipeline: Pipeline,
+  scope: ReadScope,
+  field?: string,
+): void => {
+  if (scope === "all") return;
+
+  if ("organizationIds" in scope) {
+    pipeline.push({
+      $match: {
+        [field ?? "organization._id"]: {
+          $in: validObjectIds(scope.organizationIds),
+        },
+      },
+    });
+    return;
+  }
+
+  pipeline.push({
+    $match: { _id: { $in: validObjectIds(scope.unitIds) } },
+  });
 };
 
 export const isSelfOnlyRole = (activeRole: ActiveRole): boolean =>

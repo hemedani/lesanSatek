@@ -1,6 +1,7 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
 import { user } from "../../../mod.ts";
 import { throwError } from "@lib";
+import { isManagerLike } from "../../../utils/authzPolicy.ts";
 import { getAuth } from "../../../utils/grantAccess.ts";
 import { isSelfOnlyRole, userReadFilter } from "../../../utils/readScope.ts";
 
@@ -13,6 +14,8 @@ export const getUserFn: ActFn = async (body) => {
   const { user: rawUser, activeRole } = await getAuth();
   const authUser = rawUser as unknown as { _id?: unknown; isGhost?: boolean };
   const requestedId = String(_id);
+  const isUnrestricted = Boolean(authUser.isGhost) ||
+    isManagerLike(activeRole);
 
   if (
     !authUser.isGhost &&
@@ -36,6 +39,9 @@ export const getUserFn: ActFn = async (body) => {
       projection: get,
     })
     .toArray();
-  foundedUser.length < 1 && throwError("user not exist");
+  if (foundedUser.length < 1) {
+    throwError(isUnrestricted ? "user not exist" : "You cant do this");
+  }
+
   return foundedUser[0];
 };

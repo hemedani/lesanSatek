@@ -20,7 +20,7 @@ export const getsFn: ActFn = async (body) => {
   } = body.details;
 
   const { user, activeRole } = await getAuth();
-  const scope = organizationReadScope(activeRole, user);
+  const scope = await organizationReadScope(activeRole, user);
 
   const pipeline: Document[] = [];
 

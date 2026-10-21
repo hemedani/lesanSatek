@@ -53,26 +53,16 @@ const expectRejectsWith = async (
   throw new Error(`Expected rejection with "${message}"`);
 };
 
-const expectThrowsWith = (fn: () => unknown, message: string) => {
-  try {
-    fn();
-  } catch (error) {
-    assertEquals((error as Error).message, message);
-    return;
-  }
-  throw new Error(`Expected throw with "${message}"`);
-};
-
 Deno.test("Manager and Admin read everything", async () => {
   const user = userWithUnits([]);
 
   for (const name of ["Manager", "Admin"] as const) {
     const activeRole = role({ name });
     assertEquals(await unitReadScope(activeRole, user), "all");
-    assertEquals(organizationReadScope(activeRole, user), "all");
+    assertEquals(await organizationReadScope(activeRole, user), "all");
     assertEquals(userReadFilter(activeRole, user), null);
     await assertCanReadUnit(activeRole, user, "any-unit");
-    assertCanReadOrganization(activeRole, user, "any-org");
+    await assertCanReadOrganization(activeRole, user, "any-org");
   }
 });
 
@@ -81,10 +71,10 @@ Deno.test("Ghost reads everything", async () => {
   const activeRole = role({ name: "Ordinary" });
 
   assertEquals(await unitReadScope(activeRole, ghost), "all");
-  assertEquals(organizationReadScope(activeRole, ghost), "all");
+  assertEquals(await organizationReadScope(activeRole, ghost), "all");
   assertEquals(userReadFilter(activeRole, ghost), null);
   await assertCanReadUnit(activeRole, ghost, "any-unit");
-  assertCanReadOrganization(activeRole, ghost, "any-org");
+  await assertCanReadOrganization(activeRole, ghost, "any-org");
 });
 
 Deno.test("OrgHead is scoped to its organization", async () => {
@@ -98,7 +88,7 @@ Deno.test("OrgHead is scoped to its organization", async () => {
   assertEquals(await unitReadScope(activeRole, user), {
     organizationIds: [ORG_OWN],
   });
-  assertEquals(organizationReadScope(activeRole, user), {
+  assertEquals(await organizationReadScope(activeRole, user), {
     organizationIds: [ORG_OWN],
   });
   assertEquals(userReadFilter(activeRole, user), {
@@ -113,7 +103,7 @@ Deno.test("OrgHead without a scope fails closed", async () => {
   assertEquals(await unitReadScope(activeRole, user), {
     organizationIds: [],
   });
-  assertEquals(organizationReadScope(activeRole, user), {
+  assertEquals(await organizationReadScope(activeRole, user), {
     organizationIds: [],
   });
 });
@@ -137,7 +127,7 @@ Deno.test("UnitHead includes own unit and injected descendants", async () => {
   assertEquals(scope, {
     unitIds: [UNIT_OWN, UNIT_CHILD, UNIT_GRANDCHILD],
   });
-  assertEquals(organizationReadScope(activeRole, user), {
+  assertEquals(await organizationReadScope(activeRole, user), {
     organizationIds: [ORG_OWN],
   });
 });
@@ -169,7 +159,7 @@ Deno.test("Employee is scoped to the units they belong to", async () => {
   assertEquals(await unitReadScope(activeRole, user), {
     unitIds: [UNIT_A, UNIT_B],
   });
-  assertEquals(organizationReadScope(activeRole, user), {
+  assertEquals(await organizationReadScope(activeRole, user), {
     organizationIds: [ORG_OWN],
   });
   assertEquals(userReadFilter(activeRole, user), {
@@ -187,7 +177,7 @@ Deno.test("Ordinary is scoped to the units they belong to", async () => {
   assertEquals(await unitReadScope(activeRole, user), {
     unitIds: [UNIT_A, UNIT_B],
   });
-  assertEquals(organizationReadScope(activeRole, user), {
+  assertEquals(await organizationReadScope(activeRole, user), {
     organizationIds: [ORG_A, ORG_B],
   });
 });
@@ -197,14 +187,100 @@ Deno.test("missing units and organizations fail closed", async () => {
   const user = userWithUnits(undefined);
 
   assertEquals(await unitReadScope(employee, user), { unitIds: [] });
-  assertEquals(organizationReadScope(employee, user), {
+  assertEquals(await organizationReadScope(employee, user), {
     organizationIds: [],
   });
 
   const unscopedUnitHead = role({ name: "UnitHead", scopeId: UNIT_A });
-  assertEquals(organizationReadScope(unscopedUnitHead, userWithUnits([])), {
-    organizationIds: [],
+  assertEquals(
+    await organizationReadScope(unscopedUnitHead, userWithUnits([]), {
+      loadUnitOrganizationId: () => Promise.resolve(null),
+    }),
+    { organizationIds: [] },
+  );
+});
+
+Deno.test("UnitHead organization scope ignores memberships when the scope is missing or invalid", async () => {
+  const user = userWithUnits([
+    { _id: UNIT_OWN, organization: { _id: ORG_OWN } },
+    { _id: UNIT_A, organization: { _id: ORG_A } },
+  ]);
+
+  assertEquals(
+    await organizationReadScope(role({ name: "UnitHead" }), user, {
+      loadUnitOrganizationId: () => {
+        throw new Error("should not load an organization");
+      },
+    }),
+    { organizationIds: [] },
+  );
+
+  assertEquals(
+    await organizationReadScope(
+      role({ name: "UnitHead", scopeId: "not-an-object-id" }),
+      user,
+    ),
+    { organizationIds: [] },
+  );
+});
+
+Deno.test("UnitHead organization scope uses the scoped unit membership", async () => {
+  const activeRole = role({
+    name: "UnitHead",
+    scopeType: "unit",
+    scopeId: UNIT_OWN,
   });
+  const user = userWithUnits([
+    { _id: UNIT_OWN, organization: { _id: ORG_OWN } },
+    { _id: UNIT_A, organization: { _id: ORG_A } },
+  ]);
+
+  assertEquals(
+    await organizationReadScope(activeRole, user, {
+      loadUnitOrganizationId: () => {
+        throw new Error("should not load an organization");
+      },
+    }),
+    { organizationIds: [ORG_OWN] },
+  );
+});
+
+Deno.test("invalid UnitHead unit scope fails closed", async () => {
+  const activeRole = role({
+    name: "UnitHead",
+    scopeType: "unit",
+    scopeId: "not-an-object-id",
+  });
+
+  assertEquals(
+    await unitReadScope(activeRole, userWithUnits([]), {
+      loadDescendantUnitIds: () => Promise.resolve([UNIT_CHILD]),
+    }),
+    { unitIds: [] },
+  );
+});
+
+Deno.test("ObjectId-like IDs are compared as strings", async () => {
+  const objectIdLike = { toString: () => UNIT_OWN };
+  const activeRole = role({
+    name: "UnitHead",
+    scopeType: "unit",
+    scopeId: objectIdLike as unknown as string,
+  });
+  const user = userWithUnits([
+    { _id: UNIT_OWN, organization: { _id: ORG_OWN } },
+  ]);
+
+  assertEquals(
+    await unitReadScope(activeRole, user, {
+      loadDescendantUnitIds: () => Promise.resolve([]),
+    }),
+    { unitIds: [UNIT_OWN] },
+  );
+  assertEquals(await organizationReadScope(activeRole, user), {
+    organizationIds: [ORG_OWN],
+  });
+  await assertCanReadOrganization(activeRole, user, ORG_OWN);
 });
 
 Deno.test("assertCanReadUnit allows scoped units and denies foreign units", async () => {
@@ -254,7 +330,7 @@ Deno.test("assertCanReadUnit checks organization scope for OrgHead", async () =>
   );
 });
 
-Deno.test("assertCanReadOrganization denies foreign organizations", () => {
+Deno.test("assertCanReadOrganization denies foreign organizations", async () => {
   const orgHead = role({
     name: "OrgHead",
     scopeType: "organization",
@@ -262,9 +338,9 @@ Deno.test("assertCanReadOrganization denies foreign organizations", () => {
   });
   const user = userWithUnits([]);
 
-  assertCanReadOrganization(orgHead, user, ORG_OWN);
-  expectThrowsWith(
-    () => assertCanReadOrganization(orgHead, user, ORG_FOREIGN),
+  await assertCanReadOrganization(orgHead, user, ORG_OWN);
+  await expectRejectsWith(
+    assertCanReadOrganization(orgHead, user, ORG_FOREIGN),
     "You cant do this",
   );
 
@@ -273,9 +349,9 @@ Deno.test("assertCanReadOrganization denies foreign organizations", () => {
     { _id: UNIT_A, organization: { _id: ORG_A } },
   ]);
 
-  assertCanReadOrganization(employee, employeeUser, ORG_A);
-  expectThrowsWith(
-    () => assertCanReadOrganization(employee, employeeUser, ORG_B),
+  await assertCanReadOrganization(employee, employeeUser, ORG_A);
+  await expectRejectsWith(
+    assertCanReadOrganization(employee, employeeUser, ORG_B),
     "You cant do this",
   );
 });
@@ -325,6 +401,14 @@ Deno.test("apply helpers push fail-closed matches", () => {
   const orgPipeline: Record<string, unknown>[] = [];
   applyOrganizationReadScope(orgPipeline, { organizationIds: [] });
   assertEquals(orgPipeline, [{
+    $match: { _id: { $in: [] } },
+  }]);
+
+  const unitScopedOrganizationPipeline: Record<string, unknown>[] = [];
+  applyOrganizationReadScope(unitScopedOrganizationPipeline, {
+    unitIds: [UNIT_A],
+  });
+  assertEquals(unitScopedOrganizationPipeline, [{
     $match: { _id: { $in: [] } },
   }]);
 

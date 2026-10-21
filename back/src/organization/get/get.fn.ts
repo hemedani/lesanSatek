@@ -11,7 +11,7 @@ export const getFn: ActFn = async (body) => {
 
   const { user, activeRole } = await getAuth();
 
-  assertCanReadOrganization(activeRole, user, _id as string);
+  await assertCanReadOrganization(activeRole, user, _id as string);
 
   return await organization
     .aggregation({
