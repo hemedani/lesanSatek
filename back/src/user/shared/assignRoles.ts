@@ -221,7 +221,7 @@ const assertScopeResourceExists = async (
 };
 
 const assertHeadAvailable = async (
-  userId: ObjectId,
+  userId: string | null,
   role: RoleInput,
   actor: ActiveRole,
   isGhost: boolean,
@@ -238,7 +238,7 @@ const assertHeadAvailable = async (
 
   const currentHeadId = relationId(scopeDoc, "head");
 
-  if (currentHeadId && currentHeadId !== userId.toString()) {
+  if (currentHeadId && currentHeadId !== userId) {
     throwError("You cant do this");
   }
 };
@@ -248,6 +248,7 @@ const assertRoleAssignable = async (
   role: RoleInput,
   targetScope: ScopeRef | null,
   isGhost: boolean,
+  headCheck?: { targetUserId: string | null },
 ) => {
   assertScopeConsistency(role);
   assertRoleScopePairing(role);
@@ -257,6 +258,10 @@ const assertRoleAssignable = async (
   }
 
   await assertScopeResourceExists(role, actor, isGhost);
+
+  if (headCheck) {
+    await assertHeadAvailable(headCheck.targetUserId, role, actor, isGhost);
+  }
 };
 
 export const assertRolesAssignable = async (input: {
@@ -264,6 +269,8 @@ export const assertRolesAssignable = async (input: {
   roles: RoleInput[];
   targetScope: ScopeRef | null;
   isGhost?: boolean;
+  checkHead?: boolean;
+  targetUserId?: string | null;
 }): Promise<void> => {
   for (const role of input.roles) {
     await assertRoleAssignable(
@@ -271,6 +278,9 @@ export const assertRolesAssignable = async (input: {
       role,
       input.targetScope,
       input.isGhost ?? false,
+      input.checkHead
+        ? { targetUserId: input.targetUserId ?? null }
+        : undefined,
     );
   }
 };
@@ -395,15 +405,20 @@ const addRole = async (userId: ObjectId, role: RoleInput) => {
 };
 
 const removeRole = async (userId: ObjectId, role: RoleInput) => {
+  const roleMatch: Record<string, unknown> = { name: role.name };
+
+  roleMatch.scopeType = role.scopeType === undefined
+    ? { $exists: false }
+    : role.scopeType;
+  roleMatch.scopeId = role.scopeId === undefined
+    ? { $exists: false }
+    : role.scopeId;
+
   await user.findOneAndUpdate({
     filter: { _id: userId },
     update: {
       $pull: {
-        roles: {
-          name: role.name,
-          ...(role.scopeType !== undefined && { scopeType: role.scopeType }),
-          ...(role.scopeId !== undefined && { scopeId: role.scopeId }),
-        },
+        roles: roleMatch,
       },
     },
     projection: { _id: 1 },
@@ -510,14 +525,21 @@ export const assignRolesToUser = async (
 
   assertActorCanAccessTarget(input.actor, target, isGhost);
 
-  for (const role of addRoles) {
-    await assertRoleAssignable(input.actor, role, target.scope, isGhost);
-    await assertHeadAvailable(userId, role, input.actor, isGhost);
-  }
+  await assertRolesAssignable({
+    actor: input.actor,
+    roles: addRoles,
+    targetScope: target.scope,
+    isGhost,
+    checkHead: true,
+    targetUserId: userId.toString(),
+  });
 
-  for (const role of removeRoles) {
-    await assertRoleAssignable(input.actor, role, target.scope, isGhost);
-  }
+  await assertRolesAssignable({
+    actor: input.actor,
+    roles: removeRoles,
+    targetScope: target.scope,
+    isGhost,
+  });
 
   for (const role of addRoles) {
     await addRole(userId, role);

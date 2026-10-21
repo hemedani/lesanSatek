@@ -95,6 +95,7 @@ export const addUserFn: ActFn = async (body) => {
       roles: requestedRoles,
       targetScope,
       isGhost,
+      checkHead: true,
     });
   }
 
