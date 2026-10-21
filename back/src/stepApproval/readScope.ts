@@ -35,6 +35,12 @@ export const stepApprovalAllowedUnitIds = async (
 ): Promise<ObjectId[] | null> => {
   if (user?.isGhost || isManagerLike(activeRole)) return null;
 
+  if (activeRole.name === "UnitHead") {
+    if (activeRole.scopeType !== "unit" || !activeRole.scopeId) return [];
+
+    return validObjectIds([String(activeRole.scopeId)]);
+  }
+
   const scope = await unitReadScope(activeRole, user);
 
   if (scope !== "all" && "unitIds" in scope) {

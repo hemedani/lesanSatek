@@ -69,18 +69,6 @@ const ALLOW_FIELDS = [
 const hasAllowLists = (holder: AllowWareHolder): boolean =>
   ALLOW_FIELDS.some((field) => idsOf(holder[field]).length > 0);
 
-const mergeHolders = (holders: AllowWareHolder[]): AllowWareHolder => {
-  const merged: AllowWareHolder = {};
-
-  for (const field of ALLOW_FIELDS) {
-    merged[field] = [
-      ...new Set(holders.flatMap((holder) => idsOf(holder[field]))),
-    ];
-  }
-
-  return merged;
-};
-
 const isAllowed = (
   allowIds: unknown[] | undefined,
   targetId: unknown,
@@ -166,6 +154,12 @@ const loadOrganizationUnitsFromDb = async (
   }).toArray();
 };
 
+const holderAllows = (
+  holder: AllowWareHolder,
+  wareModel: WareModelRef,
+): boolean =>
+  !hasAllowLists(holder) || unitCanAccessWareModel(holder, wareModel);
+
 export const assertWareModelAccess = async (
   user: WareModelAccessUser | undefined,
   activeRole: ActiveRole,
@@ -174,52 +168,65 @@ export const assertWareModelAccess = async (
 ): Promise<void> => {
   if (user?.isGhost || isManagerLike(activeRole)) return;
 
-  const holders: AllowWareHolder[] = [];
+  const userHolder = user ?? {};
+
+  if (!holderAllows(userHolder, wareModel)) throwError("You cant do this");
 
   if (activeRole.name === "OrgHead") {
-    holders.push(user ?? {});
+    if (activeRole.scopeType !== "organization" || !activeRole.scopeId) return;
 
-    if (activeRole.scopeType === "organization" && activeRole.scopeId) {
-      const loader = options.loadOrganizationUnits ??
-        loadOrganizationUnitsFromDb;
+    const loader = options.loadOrganizationUnits ?? loadOrganizationUnitsFromDb;
+    let organizationUnits: AllowWareHolder[];
 
-      try {
-        holders.push(...await loader(String(activeRole.scopeId)));
-      } catch {
-        throwError("You cant do this");
-      }
+    try {
+      organizationUnits = await loader(String(activeRole.scopeId));
+    } catch {
+      throwError("You cant do this");
+      return;
     }
-  } else if (
-    activeRole.name === "UnitHead" || activeRole.name === "Employee"
-  ) {
-    const scopedUnitId = normalizeId(activeRole.scopeId);
-    const contextUnit = activeRole.scopeType === "unit" && scopedUnitId
-      ? user?.units?.find((unit) => normalizeId(unit._id) === scopedUnitId)
-      : undefined;
+
+    if (
+      organizationUnits.length > 0 &&
+      !organizationUnits.some((holder) => holderAllows(holder, wareModel))
+    ) {
+      throwError("You cant do this");
+    }
+
+    return;
+  }
+
+  if (activeRole.name === "UnitHead" || activeRole.name === "Employee") {
+    const scopedUnitId = activeRole.scopeType === "unit" && activeRole.scopeId
+      ? String(activeRole.scopeId)
+      : null;
+
+    if (!scopedUnitId) return;
+
+    const contextUnit = user?.units?.find((unit) =>
+      normalizeId(unit._id) === scopedUnitId
+    );
 
     let scopedUnit = contextUnit;
 
-    if (scopedUnitId && !(contextUnit && hasAllowLists(contextUnit))) {
+    if (!(contextUnit && hasAllowLists(contextUnit))) {
+      const loader = options.loadUnit ?? loadUnitFromDb;
+      let loadedUnit: AllowWareHolder | null;
+
       try {
-        const loader = options.loadUnit ?? loadUnitFromDb;
-        scopedUnit = (await loader(scopedUnitId)) ?? contextUnit;
+        loadedUnit = await loader(scopedUnitId);
       } catch {
-        scopedUnit = contextUnit;
+        throwError("You cant do this");
+        return;
       }
+
+      scopedUnit = loadedUnit ?? contextUnit;
     }
 
-    if (scopedUnit && hasAllowLists(scopedUnit)) {
-      holders.push(scopedUnit);
-    } else {
-      holders.push(user ?? {});
+    if (
+      scopedUnit && hasAllowLists(scopedUnit) &&
+      !unitCanAccessWareModel(scopedUnit, wareModel)
+    ) {
+      throwError("You cant do this");
     }
-  } else {
-    holders.push(user ?? {});
   }
-
-  if (holders.every((holder) => !hasAllowLists(holder))) return;
-
-  if (unitCanAccessWareModel(mergeHolders(holders), wareModel)) return;
-
-  throwError("You cant do this");
 };

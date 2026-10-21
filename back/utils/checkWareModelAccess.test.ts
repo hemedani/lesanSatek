@@ -188,3 +188,136 @@ Deno.test("unitCanAccessWareModel treats unset lists as unrestricted", async () 
     true,
   );
 });
+
+Deno.test("unit loader failure denies UnitHead access", async () => {
+  await assertRejects(
+    () =>
+      assertWareModelAccess(
+        { units: [] },
+        unitHeadRole,
+        wareModel,
+        {
+          loadUnit: () => Promise.reject(new Error("db unavailable")),
+        },
+      ),
+    Error,
+    "You cant do this",
+  );
+});
+
+Deno.test("unit and user restrictions must both pass for UnitHead", async () => {
+  const unitWithModelAllowList = {
+    _id: "unit-1",
+    allowWareModelIds: ["model-1"],
+  };
+
+  await assertWareModelAccess(
+    {
+      allowWareModelIds: ["model-1"],
+      units: [unitWithModelAllowList],
+    },
+    unitHeadRole,
+    wareModel,
+  );
+
+  await assertRejects(
+    () =>
+      assertWareModelAccess(
+        {
+          allowWareModelIds: ["model-1"],
+          units: [],
+        },
+        unitHeadRole,
+        wareModel,
+        {
+          loadUnit: () =>
+            Promise.resolve({
+              _id: "unit-1",
+              allowWareModelIds: ["other-model"],
+            }),
+        },
+      ),
+    Error,
+    "You cant do this",
+  );
+
+  await assertRejects(
+    () =>
+      assertWareModelAccess(
+        {
+          allowWareModelIds: ["other-model"],
+          units: [unitWithModelAllowList],
+        },
+        unitHeadRole,
+        wareModel,
+      ),
+    Error,
+    "You cant do this",
+  );
+});
+
+Deno.test("organization loader failure denies OrgHead access", async () => {
+  await assertRejects(
+    () =>
+      assertWareModelAccess(
+        { units: [] },
+        {
+          roleId: "role-org",
+          name: "OrgHead",
+          scopeType: "organization",
+          scopeId: "org-1",
+        },
+        wareModel,
+        {
+          loadOrganizationUnits: () =>
+            Promise.reject(new Error("db unavailable")),
+        },
+      ),
+    Error,
+    "You cant do this",
+  );
+});
+
+Deno.test("user restrictions cannot be bypassed by organization units", async () => {
+  const orgHeadRole: ActiveRole = {
+    roleId: "role-org",
+    name: "OrgHead",
+    scopeType: "organization",
+    scopeId: "org-1",
+  };
+
+  await assertRejects(
+    () =>
+      assertWareModelAccess(
+        {
+          allowWareModelIds: ["other-model"],
+          units: [],
+        },
+        orgHeadRole,
+        wareModel,
+        {
+          loadOrganizationUnits: () =>
+            Promise.resolve([
+              { _id: "unit-1", allowWareModelIds: ["model-1"] },
+            ]),
+        },
+      ),
+    Error,
+    "You cant do this",
+  );
+
+  await assertWareModelAccess(
+    {
+      allowWareModelIds: ["model-1"],
+      units: [],
+    },
+    orgHeadRole,
+    wareModel,
+    {
+      loadOrganizationUnits: () =>
+        Promise.resolve([
+          { _id: "unit-1", allowWareModelIds: ["model-1"] },
+        ]),
+    },
+  );
+});

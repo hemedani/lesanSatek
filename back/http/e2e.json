@@ -2315,7 +2315,7 @@
   },
   {
     "id": "gen-authz-read-restricted-user",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"first_name\": \"محدود\", \"last_name\": \"مدل کالا\", \"email\": \"authz.read.restricted@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000040\", \"gender\": \"Male\", \"isActive\": true, \"is_verified\": true, \"organizations\": [\"{orgId}\"], \"units\": [\"{unitId}\"], \"allowWareModelIds\": [\"{wareModelId}\"], \"roles\": [{\"name\": \"Employee\", \"scopeType\": \"unit\", \"scopeId\": \"{unitId}\"}]}, \"get\": {\"_id\": 1, \"roles\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"first_name\": \"محدود\", \"last_name\": \"مدل کالا\", \"email\": \"authz.read.restricted@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000040\", \"gender\": \"Male\", \"isActive\": true, \"is_verified\": true, \"organizations\": [\"{orgId}\"], \"units\": [\"{unitId}\"], \"allowWareModelIds\": [\"{wareModelId}\"], \"roles\": [{\"name\": \"Employee\", \"scopeType\": \"unit\", \"scopeId\": \"{unitId}\"}], \"features\": [{\"feature\": \"canRegisterPurchaseRequest\"}]}, \"get\": {\"_id\": 1, \"roles\": 1}}}}",
     "repeat": 1,
     "captures": [
       {

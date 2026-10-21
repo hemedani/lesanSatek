@@ -61,9 +61,27 @@ export const purchasingRequestReadMatch = (
     case "Employee":
     case "Ordinary": {
       const requesterId = objectIdOf(user?._id);
-      return requesterId
-        ? { "requester._id": { $in: [requesterId] } }
-        : emptyMatch();
+      const unitIds = [
+        ...new Set(
+          (user?.units ?? [])
+            .map((unit) => objectIdOf(unit?._id))
+            .filter((id): id is ObjectId => id !== null)
+            .map((id) => String(id)),
+        ),
+      ].map((id) => new ObjectId(id));
+      const clauses: Document[] = [];
+
+      if (unitIds.length > 0) {
+        clauses.push({ "requestingUnit._id": { $in: unitIds } });
+      }
+
+      if (requesterId) {
+        clauses.push({ "requester._id": { $in: [requesterId] } });
+      }
+
+      if (clauses.length === 0) return emptyMatch();
+
+      return clauses.length === 1 ? clauses[0] : { $or: clauses };
     }
     default:
       return emptyMatch();
@@ -105,9 +123,17 @@ export const assertCanReadPurchasingRequest = (
     case "Employee":
     case "Ordinary": {
       const userId = normalizeId(user?._id);
+      const requestingUnitId = normalizeId(requestDoc.requestingUnit?._id);
+      const userUnitIds = new Set(
+        (user?.units ?? [])
+          .map((unit) => normalizeId(unit?._id))
+          .filter((id): id is string => id !== null),
+      );
 
       if (
-        userId !== null && normalizeId(requestDoc.requester?._id) === userId
+        (userId !== null &&
+          normalizeId(requestDoc.requester?._id) === userId) ||
+        (requestingUnitId !== null && userUnitIds.has(requestingUnitId))
       ) {
         return;
       }

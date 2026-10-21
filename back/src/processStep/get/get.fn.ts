@@ -18,7 +18,7 @@ export const getFn: ActFn = async (body) => {
     projection: { process: { _id: 1 } },
   }) as Document | null;
 
-  if (!founded) throwError("processStep not exist");
+  if (!founded) throwError("You cant do this");
 
   await assertCanReadProcessStep(activeRole, user, founded);
 
@@ -28,6 +28,6 @@ export const getFn: ActFn = async (body) => {
       projection: get,
     })
     .toArray();
-  foundedItem.length < 1 && throwError("processStep not exist");
+  foundedItem.length < 1 && throwError("You cant do this");
   return foundedItem[0];
 };

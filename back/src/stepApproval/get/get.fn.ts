@@ -1,6 +1,7 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
 import { stepApproval } from "../../../mod.ts";
 import { getAuth } from "../../../utils/grantAccess.ts";
+import { throwError } from "../../../utils/throwError.ts";
 import { assertCanReadStepApproval } from "../readScope.ts";
 
 export const getFn: ActFn = async (body) => {
@@ -17,9 +18,9 @@ export const getFn: ActFn = async (body) => {
     projection: { unit: { _id: 1 } },
   }) as Document | null;
 
-  if (founded) {
-    await assertCanReadStepApproval(activeRole, user, founded);
-  }
+  if (!founded) throwError("You cant do this");
+
+  await assertCanReadStepApproval(activeRole, user, founded);
 
   return await stepApproval
     .aggregation({

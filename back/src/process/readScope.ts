@@ -39,24 +39,19 @@ export const processReadMatch = async (
 ): Promise<Document | null> => {
   if (user?.isGhost || isManagerLike(activeRole)) return null;
 
-  const scope = await unitReadScope(activeRole, user);
-
-  if (scope !== "all" && "organizationIds" in scope) {
-    return {
-      "organization._id": { $in: validObjectIds(scope.organizationIds) },
-    };
-  }
-
-  const unitIds = scope === "all" ? [] : scope.unitIds;
-
   if (activeRole.name === "UnitHead") {
+    const unitObjectIds = validObjectIds(
+      activeRole.scopeType === "unit" && activeRole.scopeId
+        ? [String(activeRole.scopeId)]
+        : [],
+    );
     const orgScope = await organizationReadScope(activeRole, user);
     const orgIds = orgScope !== "all" && "organizationIds" in orgScope
       ? orgScope.organizationIds
       : [];
 
     const clauses: Document[] = [
-      { "unit._id": { $in: validObjectIds(unitIds) } },
+      { "unit._id": { $in: unitObjectIds } },
     ];
 
     if (orgIds.length > 0) {
@@ -68,6 +63,16 @@ export const processReadMatch = async (
 
     return { $or: clauses };
   }
+
+  const scope = await unitReadScope(activeRole, user);
+
+  if (scope !== "all" && "organizationIds" in scope) {
+    return {
+      "organization._id": { $in: validObjectIds(scope.organizationIds) },
+    };
+  }
+
+  const unitIds = scope === "all" ? [] : scope.unitIds;
 
   return { "unit._id": { $in: validObjectIds(unitIds) } };
 };
