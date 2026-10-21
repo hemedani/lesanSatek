@@ -139,10 +139,23 @@ export const financeTargetOfPurchasingRequestBudget = async (
 
   const request = await purchasingRequest.findOne({
     filters: { _id: requestId },
-    projection: { budgetLine: { _id: 1 } },
+    projection: { budgetLine: { _id: 1 }, requestingUnit: { _id: 1 } },
   }) as Document;
 
-  return financeTargetOfBudgetLine(relationId(request, "budgetLine"));
+  if (!request) return null;
+
+  const budgetLineId = relationId(request, "budgetLine");
+  if (budgetLineId) return await financeTargetOfBudgetLine(budgetLineId);
+
+  const requestingUnitId = relationId(request, "requestingUnit");
+  if (!requestingUnitId) return null;
+
+  const requestingUnit = await loadUnit(requestingUnitId);
+
+  return {
+    organizationId: relationId(requestingUnit, "organization"),
+    unitId: requestingUnitId,
+  };
 };
 
 const assertFinanceUnitType = async (
@@ -212,16 +225,36 @@ const checkUnitHeadTarget = async (
   throwError("You cant do this");
 };
 
+export const assertFinanceTargetConsistency = async (
+  target: FinanceTarget | null,
+) => {
+  if (!target) {
+    throwError("You cant do this");
+    return;
+  }
+
+  const organizationId = normalizeTargetValue(target.organizationId);
+  const unitId = normalizeTargetValue(target.unitId);
+
+  if (!organizationId || !unitId) return;
+
+  const unitDoc = await loadUnit(unitId);
+  const unitOrganizationId = relationId(unitDoc, "organization");
+
+  if (!unitOrganizationId || unitOrganizationId !== organizationId) {
+    throwError("You cant do this");
+  }
+};
+
 export const checkFinanceUnitAccess = async (
-  target?: FinanceTarget,
+  target: FinanceTarget | null,
 ) => {
   const { user, activeRole } = await getAuth();
 
   if (user?.isGhost || isManagerLike(activeRole)) return;
 
-  if (target === undefined) {
-    if (activeRole.name !== "UnitHead") return;
-    await assertFinanceUnitType(activeRole);
+  if (!target) {
+    throwError("You cant do this");
     return;
   }
 

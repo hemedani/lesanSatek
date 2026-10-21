@@ -11,7 +11,7 @@ export const addFn: ActFn = async (body) => {
   const { activeRoleId, budgetLineId, createdById, ...rest } = set;
 
   await checkFinanceUnitAccess(
-    (await financeTargetOfBudgetLine(budgetLineId)) ?? undefined,
+    await financeTargetOfBudgetLine(budgetLineId),
   );
 
   const relations: Record<string, unknown> = {};

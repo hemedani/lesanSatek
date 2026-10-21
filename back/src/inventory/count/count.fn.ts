@@ -1,5 +1,5 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { inventory, unit, coreApp } from "../../../mod.ts";
+import { coreApp, inventory, unit } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
 
@@ -22,41 +22,36 @@ export const countFn: ActFn = async (body) => {
 
   const match: Document = {};
 
-  const isWarehouseHead = await (async () => {
-    if (activeRole.name !== "UnitHead") return false;
-    if (activeRole.scopeType !== "unit" || !activeRole.scopeId) return false;
-    const u = await unit.findOne({
-      filters: { _id: new ObjectId(activeRole.scopeId) },
-      projection: { type: 1 },
-    }) as Document | null;
-    return u?.type === "Warehouse";
-  })();
+  const userUnits =
+    (user as unknown as { units?: { _id?: unknown }[] }).units ??
+      [];
 
-  const userUnits = (user as unknown as { units?: { _id?: unknown }[] }).units ??
-    [];
+  const isUnrestricted = user.isGhost ||
+    activeRole.name === "Manager" || activeRole.name === "Admin";
 
-  let allowedUnitIds: ObjectId[] | null = null;
+  let allowedUnitIds: ObjectId[] | null = isUnrestricted ? null : [];
 
-  if (activeRole.name === "Employee") {
-    allowedUnitIds = userUnits.map((u) => new ObjectId(String(u._id)));
-  } else if (activeRole.name === "UnitHead") {
-    if (
-      !isWarehouseHead && activeRole.scopeType === "unit" &&
-      activeRole.scopeId
-    ) {
-      allowedUnitIds = [new ObjectId(activeRole.scopeId)];
-    }
-  } else if (activeRole.name === "OrgHead") {
-    if (activeRole.scopeType === "organization" && activeRole.scopeId) {
-      const orgUnits = await unit.aggregation({
-        pipeline: [
-          { $match: { "organization._id": new ObjectId(activeRole.scopeId) } },
-          { $project: { _id: 1 } },
-        ],
-      }).toArray();
-      allowedUnitIds = orgUnits.map((u: Document) => u._id as ObjectId);
-    } else {
-      allowedUnitIds = [];
+  if (!isUnrestricted) {
+    if (activeRole.name === "Employee") {
+      allowedUnitIds = userUnits.map((u) => new ObjectId(String(u._id)));
+    } else if (activeRole.name === "UnitHead") {
+      allowedUnitIds = activeRole.scopeType === "unit" && activeRole.scopeId
+        ? [new ObjectId(activeRole.scopeId)]
+        : [];
+    } else if (activeRole.name === "OrgHead") {
+      if (activeRole.scopeType === "organization" && activeRole.scopeId) {
+        const orgUnits = await unit.aggregation({
+          pipeline: [
+            {
+              $match: { "organization._id": new ObjectId(activeRole.scopeId) },
+            },
+            { $project: { _id: 1 } },
+          ],
+        }).toArray();
+        allowedUnitIds = orgUnits.map((u: Document) => u._id as ObjectId);
+      } else {
+        allowedUnitIds = [];
+      }
     }
   }
 

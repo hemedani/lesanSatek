@@ -7,7 +7,7 @@ import {
 
 export const convertToSpendFn: ActFn = async (body) => {
   await checkFinanceUnitAccess(
-    (await financeTargetOfBudgetEncumbrance(body.details.set._id)) ?? undefined,
+    await financeTargetOfBudgetEncumbrance(body.details.set._id),
   );
   const { set, get } = body.details;
   const { _id } = set;

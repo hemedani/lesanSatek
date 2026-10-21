@@ -2058,14 +2058,14 @@
     "captures": []
   },
   {
-    "id": "authz-storehead-move-stuff-to-other-store",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{stuffId}\", \"activeRoleId\": \"{storeHeadRoleId}\", \"storeId\": \"{store2Id}\", \"location\": \"قفسه غیرمجاز\"}, \"get\": {\"_id\": 1, \"location\": 1}}}}",
+    "id": "authz-storehead-add-other-store-stuff",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"add\", \"details\": {\"set\": {\"quantity\": 1, \"price\": 1000, \"hasAbsolutePrice\": true, \"wareId\": \"{ware2Id}\", \"storeId\": \"{store2Id}\", \"wareTypeId\": \"{wareType2Id}\", \"wareClassId\": \"{wareClass2Id}\", \"wareGroupId\": \"{wareGroup2Id}\", \"wareModelId\": \"{wareModel2Id}\", \"activeRoleId\": \"{storeHeadRoleId}\"}, \"get\": {\"_id\": 1, \"price\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
   {
     "id": "authz-orghead-add-own-budget-line",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"add\", \"details\": {\"set\": {\"code\": \"AUTHZ-OWN\", \"title\": \"بودجه محدوده سازمانی\", \"description\": \"بودجه تست محدوده سازمانی\", \"fiscalYearId\": \"{fiscalYearId}\", \"organizationId\": \"{orgId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"code\": 1, \"organization\": {\"_id\": 1}}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"add\", \"details\": {\"set\": {\"code\": \"AUTHZ-OWN\", \"title\": \"بودجه محدوده سازمانی\", \"description\": \"بودجه تست محدوده سازمانی\", \"fiscalYearId\": \"{fiscalYearId}\", \"organizationId\": \"{orgId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"code\": 1, \"organization\": {\"_id\": 1}}}}}",
     "repeat": 1,
     "captures": [
       {
@@ -2076,7 +2076,7 @@
   },
   {
     "id": "authz-orghead-add-foreign-budget-line",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"add\", \"details\": {\"set\": {\"code\": \"AUTHZ-FOREIGN\", \"title\": \"تلاش بودجه سازمان دیگر\", \"description\": \"بودجه تست سازمان دیگر\", \"fiscalYearId\": \"{authzOtherOrgFiscalYearId}\", \"organizationId\": \"{orgId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"code\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"add\", \"details\": {\"set\": {\"code\": \"AUTHZ-FOREIGN\", \"title\": \"تلاش بودجه سازمان دیگر\", \"description\": \"بودجه تست سازمان دیگر\", \"fiscalYearId\": \"{authzOtherOrgFiscalYearId}\", \"organizationId\": \"{orgId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"code\": 1}}}}",
     "repeat": 1,
     "captures": []
   },

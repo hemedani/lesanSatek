@@ -1,6 +1,6 @@
 import type { ActFn, Document } from "lesan";
 import { ObjectId } from "lesan";
-import { inventory, unit, coreApp } from "../../../mod.ts";
+import { coreApp, inventory, unit } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
 
@@ -37,16 +37,6 @@ export const getsFn: ActFn = async (body) => {
   const pipeline: Document[] = [];
   const match: Document = {};
 
-  const isWarehouseHead = await (async () => {
-    if (activeRole.name !== "UnitHead") return false;
-    if (activeRole.scopeType !== "unit" || !activeRole.scopeId) return false;
-    const u = await unit.findOne({
-      filters: { _id: new ObjectId(activeRole.scopeId) },
-      projection: { type: 1 },
-    }) as Document | null;
-    return u?.type === "Warehouse";
-  })();
-
   const unitsOfOrganization = async (
     organizationId: string,
   ): Promise<ObjectId[]> => {
@@ -64,25 +54,28 @@ export const getsFn: ActFn = async (body) => {
     return orgUnits.map((u: Document) => u._id as ObjectId);
   };
 
-  const userUnits = (user as unknown as { units?: { _id?: unknown }[] }).units ??
-    [];
+  const userUnits =
+    (user as unknown as { units?: { _id?: unknown }[] }).units ??
+      [];
 
-  let allowedUnitIds: ObjectId[] | null = null;
+  const isUnrestricted = user.isGhost ||
+    activeRole.name === "Manager" || activeRole.name === "Admin";
 
-  if (activeRole.name === "Employee") {
-    allowedUnitIds = userUnits.map((u) => new ObjectId(String(u._id)));
-  } else if (activeRole.name === "UnitHead") {
-    if (
-      !isWarehouseHead && activeRole.scopeType === "unit" &&
-      activeRole.scopeId
-    ) {
-      allowedUnitIds = [new ObjectId(activeRole.scopeId)];
+  let allowedUnitIds: ObjectId[] | null = isUnrestricted ? null : [];
+
+  if (!isUnrestricted) {
+    if (activeRole.name === "Employee") {
+      allowedUnitIds = userUnits.map((u) => new ObjectId(String(u._id)));
+    } else if (activeRole.name === "UnitHead") {
+      allowedUnitIds = activeRole.scopeType === "unit" && activeRole.scopeId
+        ? [new ObjectId(activeRole.scopeId)]
+        : [];
+    } else if (activeRole.name === "OrgHead") {
+      allowedUnitIds = activeRole.scopeType === "organization" &&
+          activeRole.scopeId
+        ? await unitsOfOrganization(String(activeRole.scopeId))
+        : [];
     }
-  } else if (activeRole.name === "OrgHead") {
-    allowedUnitIds = activeRole.scopeType === "organization" &&
-        activeRole.scopeId
-      ? await unitsOfOrganization(String(activeRole.scopeId))
-      : [];
   }
 
   const restrictToUnits = (ids: ObjectId[]) => {

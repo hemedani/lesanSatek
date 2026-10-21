@@ -10,7 +10,7 @@ export const markPaidFn: ActFn = async (body) => {
   const { _id } = set;
 
   await checkFinanceUnitAccess(
-    (await financeTargetOfPaymentOrder(_id)) ?? undefined,
+    await financeTargetOfPaymentOrder(_id),
   );
 
   const order = await paymentOrder.findOne({

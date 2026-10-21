@@ -1,5 +1,5 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { inventory, coreApp } from "../../../mod.ts";
+import { coreApp, inventory, unit } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
 
@@ -15,10 +15,20 @@ export const adjustFn: ActFn = async (body) => {
     (r: { roleId: string }) => r.roleId === activeRoleId,
   ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
 
-  if (!user.isGhost && activeRole && !["Manager", "Admin"].includes(activeRole.name)) {
+  const isUnrestricted = user.isGhost ||
+    (activeRole && ["Manager", "Admin"].includes(activeRole.name));
+
+  if (!isUnrestricted) {
+    if (!activeRole) {
+      throwError("Active role not found");
+      return;
+    }
+
+    const inventoryId = new ObjectId(_id as string);
+
     const inv = await inventory.findOne({
-      filters: { _id: new ObjectId(_id as string) },
-      projection: { unit: { _id: 1 } },
+      filters: { _id: inventoryId },
+      projection: { unit: { _id: 1, organization: { _id: 1 } } },
     }) as Document | null;
 
     if (!inv) {
@@ -26,13 +36,69 @@ export const adjustFn: ActFn = async (body) => {
       return;
     }
 
-    if (activeRole.scopeType === "unit" && activeRole.scopeId) {
-      if (activeRole.scopeId.toString() !== inv.unit._id.toString()) {
+    const unitRelation = inv.unit as
+      | {
+        _id?: unknown;
+        organization?: { _id?: unknown } | null;
+      }
+      | null
+      | undefined;
+
+    const unitId = unitRelation?._id === null ||
+        unitRelation?._id === undefined
+      ? ""
+      : String(unitRelation._id);
+
+    if (!unitId) {
+      throwError("You cant do this");
+      return;
+    }
+
+    let organizationId = unitRelation?.organization?._id === null ||
+        unitRelation?.organization?._id === undefined
+      ? ""
+      : String(unitRelation.organization._id);
+
+    if (!organizationId) {
+      const unitDoc = await unit.findOne({
+        filters: { _id: new ObjectId(unitId) },
+        projection: { organization: { _id: 1 } },
+      }) as Document;
+      const organizationRef =
+        (unitDoc?.organization as { _id?: unknown } | null | undefined)?._id;
+      organizationId = organizationRef === null || organizationRef === undefined
+        ? ""
+        : String(organizationRef);
+    }
+
+    if (activeRole.name === "OrgHead") {
+      if (
+        activeRole.scopeType !== "organization" ||
+        !activeRole.scopeId ||
+        String(activeRole.scopeId) !== organizationId
+      ) {
+        throwError("You cant do this");
+        return;
+      }
+    } else if (activeRole.name === "UnitHead") {
+      if (
+        activeRole.scopeType !== "unit" ||
+        !activeRole.scopeId ||
+        String(activeRole.scopeId) !== unitId
+      ) {
         throwError("You can only adjust inventory in your own unit");
         return;
       }
+    } else if (activeRole.name === "Employee") {
+      const userUnits =
+        (user as unknown as { units?: { _id?: unknown }[] }).units ?? [];
+
+      if (!userUnits.some((candidate) => String(candidate._id) === unitId)) {
+        throwError("You cant do this");
+        return;
+      }
     } else {
-      throwError("Your active role does not have an associated unit");
+      throwError("You cant do this");
       return;
     }
   }

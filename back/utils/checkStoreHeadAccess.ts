@@ -39,7 +39,7 @@ export const checkStoreHeadAccess = (mode: CheckMode) => {
         return;
       }
       if (String(targetStoreId) !== managedStoreId) {
-        throwError("You can only add items to your own store");
+        throwError("You cant do this");
         return;
       }
       return;
@@ -63,13 +63,13 @@ export const checkStoreHeadAccess = (mode: CheckMode) => {
 
     const docStoreId = (doc.store as Record<string, unknown>)?._id?.toString();
     if (docStoreId !== managedStoreId) {
-      throwError("You can only manage stuff belonging to your own store");
+      throwError("You cant do this");
       return;
     }
 
     if (mode === "update" && set.storeId !== undefined) {
       if (String(set.storeId) !== managedStoreId) {
-        throwError("You can only change stuff within your own store");
+        throwError("You cant do this");
         return;
       }
     }

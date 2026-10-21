@@ -11,7 +11,7 @@ export const deductDirectFn: ActFn = async (body) => {
   const { _id, amount, description } = set;
 
   await checkFinanceUnitAccess(
-    (await financeTargetOfBudgetLine(body.details.set._id)) ?? undefined,
+    await financeTargetOfBudgetLine(body.details.set._id),
   );
 
   if ((amount as number) <= 0) {

@@ -13,8 +13,7 @@ export const addFn: ActFn = async (body) => {
   const { activeRoleId, purchasingRequestId, issuedById, approvedById, payToId, financialUnitId, ...rest } = set;
 
   await checkFinanceUnitAccess(
-    (await financeTargetOfPurchasingRequestBudget(purchasingRequestId)) ??
-      undefined,
+    await financeTargetOfPurchasingRequestBudget(purchasingRequestId),
   );
 
   const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);

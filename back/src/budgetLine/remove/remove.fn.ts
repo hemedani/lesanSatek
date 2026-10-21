@@ -7,7 +7,7 @@ import {
 
 export const removeFn: ActFn = async (body) => {
   await checkFinanceUnitAccess(
-    (await financeTargetOfBudgetLine(body.details.set._id)) ?? undefined,
+    await financeTargetOfBudgetLine(body.details.set._id),
   );
   const {
     set: { _id, hardCascade },

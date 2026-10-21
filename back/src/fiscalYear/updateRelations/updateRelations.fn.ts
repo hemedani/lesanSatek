@@ -7,12 +7,18 @@ import {
 
 export const updateRelationsFn: ActFn = async (body) => {
   await checkFinanceUnitAccess(
-    (await financeTargetOfFiscalYear(body.details.set._id)) ?? undefined,
+    await financeTargetOfFiscalYear(body.details.set._id),
   );
   const {
     set: { _id, ...relations },
     get,
   } = body.details;
+
+  if (relations.organizationId) {
+    await checkFinanceUnitAccess({
+      organizationId: String(relations.organizationId),
+    });
+  }
 
   const modelId = new ObjectId(_id as string);
 

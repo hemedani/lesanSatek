@@ -1,6 +1,9 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
 import { budgetLine, fiscalYear } from "../../../mod.ts";
-import { checkFinanceUnitAccess } from "../../../utils/checkFinanceUnitAccess.ts";
+import {
+  assertFinanceTargetConsistency,
+  checkFinanceUnitAccess,
+} from "../../../utils/checkFinanceUnitAccess.ts";
 import { throwError } from "../../../utils/throwError.ts";
 
 export const addFn: ActFn = async (body) => {
@@ -24,10 +27,14 @@ export const addFn: ActFn = async (body) => {
     throwError("You cant do this");
   }
 
-  await checkFinanceUnitAccess({
-    organizationId: String(organizationId ?? fiscalYearOrganizationId ?? "") || undefined,
+  const financeTarget = {
+    organizationId:
+      String(organizationId ?? fiscalYearOrganizationId ?? "") || undefined,
     unitId: unitId ? String(unitId) : undefined,
-  });
+  };
+
+  await assertFinanceTargetConsistency(financeTarget);
+  await checkFinanceUnitAccess(financeTarget);
 
   const totalAlloc = (rest.totalAllocated as number) || 0;
   const totalEnc = (rest.totalEncumbered as number) || 0;

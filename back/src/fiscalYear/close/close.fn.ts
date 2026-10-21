@@ -7,7 +7,7 @@ import {
 
 export const closeFn: ActFn = async (body) => {
   await checkFinanceUnitAccess(
-    (await financeTargetOfFiscalYear(body.details.set._id)) ?? undefined,
+    await financeTargetOfFiscalYear(body.details.set._id),
   );
   const {
     set: { _id },
