@@ -1663,5 +1663,67 @@
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"dashboardStatistic\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"type\": \"orgHead\"}, \"get\": {\"unit\": 1, \"purchasingRequestCounts\": 1, \"pendingApprovalCount\": 1, \"recentApprovals\": 1, \"finance\": 1, \"receiptCount\": 1, \"fiscalYear\": 1, \"paymentOrders\": 1, \"prStatusDistribution\": 1, \"prMonthlyTrend\": 1, \"prCycleTime\": 1, \"budgetLineBreakdown\": 1, \"budgetBurnDown\": 1, \"inventorySummary\": 1, \"inventoryLowStock\": 1, \"consumptionTrend\": 1, \"consumptionByUnit\": 1, \"consumptionByCategory\": 1, \"procurementByStore\": 1, \"selectionBreakdown\": 1, \"stockMovementSummary\": 1, \"stepBottleneck\": 1}}}}",
     "repeat": 1,
     "captures": []
+  },
+  {
+    "id": "gen-authz-orghead-add-user",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"first_name\": \"کاربر\", \"last_name\": \"سازمانی\", \"email\": \"authz.orghead.created@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000020\", \"gender\": \"Male\", \"isActive\": true, \"is_verified\": true, \"units\": [\"{unitId}\"], \"roles\": [{\"name\": \"OrgHead\", \"scopeType\": \"organization\", \"scopeId\": \"{orgId}\"}]}, \"get\": {\"_id\": 1, \"roles\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzOrgHeadUserId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-manager-add-manager",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{managerRoleId}\", \"first_name\": \"مدیر\", \"last_name\": \"تازه\", \"email\": \"authz.manager.created@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000022\", \"gender\": \"Male\", \"isActive\": true, \"is_verified\": true, \"organizations\": [\"{orgId}\"], \"roles\": [{\"name\": \"Manager\"}]}, \"get\": {\"_id\": 1, \"roles\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzManagerUserId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-created-user-login",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"login\", \"details\": {\"set\": {\"email\": \"authz.orghead.created@lesansatek.com\", \"password\": \"password123\"}, \"get\": {\"token\": 1, \"user\": {\"_id\": 1, \"email\": 1, \"roles\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzCreatedToken",
+        "value": "[body][token]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-created-user-getme",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzCreatedToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"getMe\", \"details\": {\"set\": {}, \"get\": {\"_id\": 1, \"features\": 1, \"units\": {\"_id\": 1, \"name\": 1}, \"organizations\": {\"_id\": 1}, \"roles\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-authz-other-org",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"organization\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"سازمان دیگر\", \"enName\": \"Other Organization\", \"description\": \"سازمان دوم برای تست دسترسی\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "otherOrgId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-orghead-add-user-other-org",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"first_name\": \"رد\", \"last_name\": \"سازمان\", \"email\": \"authz.reject.otherorg@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000021\", \"gender\": \"Male\", \"isActive\": true, \"is_verified\": true, \"organizations\": [\"{otherOrgId}\"]}, \"get\": {\"_id\": 1, \"roles\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-authz-orghead-add-manager",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"first_name\": \"رد\", \"last_name\": \"مدیر\", \"email\": \"authz.reject.manager@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000023\", \"gender\": \"Male\", \"isActive\": true, \"is_verified\": true, \"roles\": [{\"name\": \"Manager\"}]}, \"get\": {\"_id\": 1, \"roles\": 1}}}}",
+    "repeat": 1,
+    "captures": []
   }
 ]

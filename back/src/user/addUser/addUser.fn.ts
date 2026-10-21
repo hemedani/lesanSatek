@@ -2,18 +2,21 @@ import { type ActFn, ObjectId, type TInsertRelations } from "lesan";
 import { user } from "../../../mod.ts";
 import type { user_relations } from "@model";
 import { hash } from "@da/bcrypt";
+import { getAuth } from "@lib";
+import { assignRolesToUser, type RoleInput } from "../shared/assignRoles.ts";
 
 export const addUserFn: ActFn = async (body) => {
   const { set, get } = body.details;
 
   const {
-    activeRoleId,
+    activeRoleId: _activeRoleId,
     avatar,
     organizations,
     units,
     state,
     city,
     password,
+    roles,
     ...rest
   } = set;
 
@@ -65,11 +68,18 @@ export const addUserFn: ActFn = async (body) => {
       birth_date: rest.birth_date
         ? new Date(rest.birth_date as string)
         : undefined,
-      roles: [{ roleId: crypto.randomUUID(), name: "Ordinary" }],
     },
     relations,
-    projection: get,
+    projection: { _id: 1 },
   });
 
-  return addedUser;
+  const { activeRole } = await getAuth();
+  const addedUserId = String((addedUser as { _id: unknown })._id);
+
+  return await assignRolesToUser({
+    userId: addedUserId,
+    actor: activeRole,
+    addRoles: roles as RoleInput[] | undefined,
+    get: get as Record<string, unknown>,
+  });
 };

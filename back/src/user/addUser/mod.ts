@@ -1,4 +1,5 @@
 import {
+  getAuth,
   grantAccess,
   type MyContext,
   setTokens,
@@ -6,28 +7,43 @@ import {
   throwError,
 } from "@lib";
 import { coreApp } from "../../../mod.ts";
+import { isManagerLike } from "../../../utils/authzPolicy.ts";
 import { addUserFn } from "./addUser.fn.ts";
 import { addUserValidator } from "./addUser.val.ts";
 
-export const checkGhostUser = () => {
-  const { user, body }: MyContext = coreApp.contextFns
-    .getContextModel() as MyContext;
+export const authorizeNewUserScope = async () => {
+  const context = coreApp.contextFns.getContextModel() as MyContext;
 
-  if (user.isGhost) {
-    return;
+  if (context.user?.isGhost) return;
+
+  const { activeRole } = await getAuth();
+
+  if (isManagerLike(activeRole)) return;
+
+  if (activeRole.scopeType !== "organization" || !activeRole.scopeId) {
+    return throwError("You cant do this");
   }
 
-  const insertedRoles = body?.details.set?.roles as
-    | { name: string }[]
+  const set = context.body?.details?.set as
+    | Record<string, unknown>
     | undefined;
 
-  if (!insertedRoles || insertedRoles.length === 0) {
+  if (!set) return throwError("You cant do this");
+
+  const organizations = set.organizations as string[] | undefined;
+  const scopeId = String(activeRole.scopeId);
+
+  if (organizations && organizations.length > 0) {
+    const containsOutsideScope = organizations.some(
+      (organizationId) => String(organizationId) !== scopeId,
+    );
+
+    if (containsOutsideScope) throwError("You cant do this");
+
     return;
   }
 
-  if (insertedRoles.some((r) => r.name === "Ghost")) {
-    throwError("Sorry can not add this role");
-  }
+  set.organizations = [scopeId];
 };
 
 export const addUserSetup = () =>
@@ -40,14 +56,9 @@ export const addUserSetup = () =>
       setUser,
       grantAccess([
         { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead"], getScope: (b) => {
-          const orgs = b?.details?.set?.organizations as string[] | undefined;
-          return orgs?.[0]
-            ? { scopeType: "organization", scopeId: orgs[0] }
-            : null;
-        }},
+        { roles: ["OrgHead"] },
       ]),
-      checkGhostUser,
+      authorizeNewUserScope,
     ],
     validator: addUserValidator(),
     fn: addUserFn,

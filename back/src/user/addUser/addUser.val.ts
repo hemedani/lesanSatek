@@ -9,7 +9,12 @@ import {
 } from "lesan";
 import { selectStruct } from "../../../mod.ts";
 import { activeRoleMixin } from "@lib";
-import { feature_enums, user_genders } from "@model";
+import {
+  feature_enums,
+  role_emums,
+  role_scope_type_emums,
+  user_genders,
+} from "@model";
 
 export const addUserValidator = () => {
   return object({
@@ -26,6 +31,12 @@ export const addUserValidator = () => {
       password: string(),
       is_verified: defaulted(boolean(), false),
       features: optional(array(object({ feature: feature_enums }))),
+      roles: optional(array(object({
+        roleId: optional(string()),
+        name: role_emums,
+        scopeType: optional(role_scope_type_emums),
+        scopeId: optional(string()),
+      }))),
       allowWareTypeIds: optional(array(string())),
       allowWareClassIds: optional(array(string())),
       allowWareGroupIds: optional(array(string())),
