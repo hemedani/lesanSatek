@@ -2035,7 +2035,7 @@
   },
   {
     "id": "authz-storehead-update-own-stuff",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{stuffId}\", \"activeRoleId\": \"{storeHeadRoleId}\", \"location\": \"قفسه AUTHZ\"}, \"get\": {\"_id\": 1, \"location\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{stuffId}\", \"activeRoleId\": \"{storeHeadRoleId}\", \"price\": 1234}, \"get\": {\"_id\": 1, \"price\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
@@ -2047,7 +2047,7 @@
   },
   {
     "id": "authz-storehead-update-other-stuff",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{authzOtherTempStuffId}\", \"activeRoleId\": \"{storeHeadRoleId}\", \"location\": \"قفسه غیرمجاز\"}, \"get\": {\"_id\": 1, \"location\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{authzOtherTempStuffId}\", \"activeRoleId\": \"{storeHeadRoleId}\", \"price\": 5678}, \"get\": {\"_id\": 1, \"price\": 1}}}}",
     "repeat": 1,
     "captures": []
   },
