@@ -2,6 +2,7 @@ import { coreApp } from "../../../mod.ts";
 import { updateFn } from "./update.fn.ts";
 import { updateValidator } from "./update.val.ts";
 import { grantAccess, setTokens, setUser } from "@lib";
+import { storeOfSelf } from "../../../utils/scopeResolvers.ts";
 
 export const updateSetup = () =>
 	coreApp.acts.setAct({
@@ -13,10 +14,7 @@ export const updateSetup = () =>
 		setUser,
 		grantAccess([
 			{ roles: ["Manager", "Admin"] },
-			{ roles: ["StoreHead"], getScope: (b) => ({
-				scopeType: "store",
-				scopeId: b?.details?.set?._id,
-			})},
+			{ roles: ["StoreHead"], scope: storeOfSelf() },
 		]),
 	],
 		validator: updateValidator(),

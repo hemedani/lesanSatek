@@ -1,4 +1,5 @@
 import { grantAccess, setTokens, setUser } from "@lib";
+import { orgOfNewUnit, unitFromSet } from "../../../utils/scopeResolvers.ts";
 import { coreApp } from "../../../mod.ts";
 import { addFn } from "./add.fn.ts";
 import { addValidator } from "./add.val.ts";
@@ -13,14 +14,8 @@ export const addSetup = () =>
       setUser,
       grantAccess([
         { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead"], getScope: (b) => ({
-          scopeType: "organization",
-          scopeId: b?.details?.set?.organizationId,
-        })},
-        { roles: ["UnitHead"], getScope: (b) => ({
-          scopeType: "unit",
-          scopeId: b?.details?.set?.parentUnitId,
-        })},
+        { roles: ["OrgHead"], scope: orgOfNewUnit() },
+        { roles: ["UnitHead"], scope: unitFromSet("parentUnitId") },
       ]),
     ],
     validator: addValidator(),

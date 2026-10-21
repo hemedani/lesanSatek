@@ -1853,5 +1853,103 @@
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzManagerToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addOrRemoveRoles\", \"details\": {\"set\": {\"_id\": \"{authzSameUnitUserId}\", \"activeRoleId\": \"{authzManagerRoleId}\", \"removeRoles\": [{\"name\": \"Employee\", \"scopeType\": \"unit\", \"scopeId\": \"{authzRoleUnitId}\"}]}, \"get\": {\"_id\": 1, \"roles\": 1}}}}",
     "repeat": 1,
     "captures": []
+  },
+  {
+    "id": "gen-authz-scope-own-unit",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"واحد محدوده سازمانی\", \"enName\": \"Authz Scope Own Unit\", \"description\": \"واحد تست محدوده سازمانی\", \"type\": \"General\", \"organizationId\": \"{orgId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzScopeOwnUnitId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-scope-other-org-unit",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"واحد سازمان دیگر\", \"enName\": \"Authz Scope Other Org Unit\", \"description\": \"واحد تست سازمان دیگر\", \"type\": \"General\", \"organizationId\": \"{otherOrgId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzScopeOtherOrgUnitId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-scope-other-org-process",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"فرآیند سازمان دیگر\", \"description\": \"فرآیند تست محدوده سازمان دیگر\", \"organizationId\": \"{otherOrgId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzScopeOtherOrgProcessId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "authz-orghead-update-own-process",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{processGeneralId}\", \"activeRoleId\": \"{orgHeadRoleId}\", \"name\": \"فرآیند خرید عمومی سازمان (به‌روزشده)\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-orghead-update-foreign-process-with-own-org",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{authzScopeOtherOrgProcessId}\", \"activeRoleId\": \"{orgHeadRoleId}\", \"name\": \"تلاش غیرمجاز\", \"organizationId\": \"{orgId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-orghead-add-step-own-process",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"name\": \"تأیید محدوده سازمانی\", \"description\": \"گام تست محدوده سازمانی\", \"stepType\": \"Approval\", \"order\": 5, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{unitId}\"]}], \"processId\": \"{processGeneralId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzScopeOwnStepId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "authz-orghead-update-own-process-step",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{authzScopeOwnStepId}\", \"activeRoleId\": \"{orgHeadRoleId}\", \"name\": \"تأیید محدوده سازمانی (به‌روزشده)\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-orghead-remove-own-process-step",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{authzScopeOwnStepId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-orghead-update-own-unit-no-org",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{authzScopeOwnUnitId}\", \"activeRoleId\": \"{orgHeadRoleId}\", \"name\": \"واحد محدوده سازمانی (به‌روزشده)\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-orghead-remove-own-unit-no-org",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{authzScopeOwnUnitId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-orghead-update-foreign-unit-with-own-org",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{authzScopeOtherOrgUnitId}\", \"activeRoleId\": \"{orgHeadRoleId}\", \"name\": \"تلاش غیرمجاز\", \"organizationId\": \"{orgId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-unithead-update-own-unit",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzUnitHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{authzRoleUnitId}\", \"activeRoleId\": \"{authzUnitHeadRoleId}\", \"name\": \"واحد تست نقش‌ها (به‌روزشده)\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-unithead-update-other-unit",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzUnitHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{warehouseUnitId}\", \"activeRoleId\": \"{authzUnitHeadRoleId}\", \"name\": \"تلاش غیرمجاز\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": []
   }
 ]

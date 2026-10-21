@@ -6,6 +6,7 @@ import {
   organization,
   process,
   processStep,
+  store,
   stuff,
   unit,
   user,
@@ -46,6 +47,16 @@ const organizationScope = (id: unknown): ScopeRef | null =>
     ? null
     : { scopeType: "organization", scopeId: String(id) };
 
+const unitScope = (id: unknown): ScopeRef | null =>
+  id === null || id === undefined || id === ""
+    ? null
+    : { scopeType: "unit", scopeId: String(id) };
+
+const storeScope = (id: unknown): ScopeRef | null =>
+  id === null || id === undefined || id === ""
+    ? null
+    : { scopeType: "store", scopeId: String(id) };
+
 export const orgFromSet = (field: string): ScopeResolver => async (body) => {
   const organizationId = toObjectId(setOf(body)[field]);
   if (!organizationId) return null;
@@ -56,6 +67,36 @@ export const orgFromSet = (field: string): ScopeResolver => async (body) => {
   }) as Document;
 
   return org ? organizationScope(documentId(org)) : null;
+};
+
+export const orgOfSelf = (): ScopeResolver => orgFromSet("_id");
+
+export const orgOfNewUnit = (): ScopeResolver => async (body) => {
+  const set = setOf(body);
+  const parentUnitId = toObjectId(set.parentUnitId);
+
+  if (parentUnitId) {
+    const parentUnit = await unit.findOne({
+      filters: { _id: parentUnitId },
+      projection: { organization: { _id: 1 } },
+    }) as Document;
+
+    return organizationScope(relationId(parentUnit, "organization"));
+  }
+
+  return orgFromSet("organizationId")(body, null);
+};
+
+export const unitFromSet = (field: string): ScopeResolver => async (body) => {
+  const unitId = toObjectId(setOf(body)[field]);
+  if (!unitId) return null;
+
+  const unitDoc = await unit.findOne({
+    filters: { _id: unitId },
+    projection: { _id: 1 },
+  }) as Document;
+
+  return unitDoc ? unitScope(documentId(unitDoc)) : null;
 };
 
 export const orgOfUnit = (): ScopeResolver => async (body) => {
@@ -81,6 +122,19 @@ export const orgOfProcess = (): ScopeResolver => async (body) => {
 
   return organizationScope(relationId(processDoc, "organization"));
 };
+
+export const orgOfProcessInSet =
+  (field: string): ScopeResolver => async (body) => {
+    const processId = toObjectId(setOf(body)[field]);
+    if (!processId) return null;
+
+    const processDoc = await process.findOne({
+      filters: { _id: processId },
+      projection: { organization: { _id: 1 } },
+    }) as Document;
+
+    return organizationScope(relationId(processDoc, "organization"));
+  };
 
 export const orgOfProcessStep = (): ScopeResolver => async (body) => {
   const stepId = toObjectId(setOf(body)._id);
@@ -122,6 +176,18 @@ export const orgOfInventory = (): ScopeResolver => async (body) => {
   return organizationScope(relationId(unitDoc, "organization"));
 };
 
+export const unitOfInventory = (): ScopeResolver => async (body) => {
+  const inventoryId = toObjectId(setOf(body)._id);
+  if (!inventoryId) return null;
+
+  const inventoryDoc = await inventory.findOne({
+    filters: { _id: inventoryId },
+    projection: { unit: { _id: 1 } },
+  }) as Document;
+
+  return unitScope(relationId(inventoryDoc, "unit"));
+};
+
 export const storeOfStuff = (): ScopeResolver => async (body) => {
   const stuffId = toObjectId(setOf(body)._id);
   if (!stuffId) return null;
@@ -134,6 +200,18 @@ export const storeOfStuff = (): ScopeResolver => async (body) => {
   const storeId = relationId(stuffDoc, "store");
 
   return storeId ? { scopeType: "store", scopeId: storeId } : null;
+};
+
+export const storeOfSelf = (): ScopeResolver => async (body) => {
+  const storeId = toObjectId(setOf(body)._id);
+  if (!storeId) return null;
+
+  const storeDoc = await store.findOne({
+    filters: { _id: storeId },
+    projection: { _id: 1 },
+  }) as Document;
+
+  return storeDoc ? storeScope(documentId(storeDoc)) : null;
 };
 
 export const orgOfBudgetLine = (): ScopeResolver => async (body) => {

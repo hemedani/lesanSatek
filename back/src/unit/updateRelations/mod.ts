@@ -1,4 +1,5 @@
 import { grantAccess, setTokens, setUser } from "@lib";
+import { orgOfUnit, unitFromSet } from "../../../utils/scopeResolvers.ts";
 import { coreApp } from "../../../mod.ts";
 import { updateRelationsFn } from "./updateRelations.fn.ts";
 import { updateRelationsValidator } from "./updateRelations.val.ts";
@@ -13,14 +14,8 @@ export const updateRelationsSetup = () =>
       setUser,
       grantAccess([
         { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead"], getScope: (b) => ({
-          scopeType: "organization",
-          scopeId: b?.details?.set?.organizationId,
-        })},
-        { roles: ["UnitHead"], getScope: (b) => ({
-          scopeType: "unit",
-          scopeId: b?.details?.set?._id,
-        })},
+        { roles: ["OrgHead"], scope: orgOfUnit() },
+        { roles: ["UnitHead"], scope: unitFromSet("_id") },
       ]),
     ],
     validator: updateRelationsValidator(),
