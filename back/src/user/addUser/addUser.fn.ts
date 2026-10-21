@@ -3,6 +3,7 @@ import { user } from "../../../mod.ts";
 import type { user_relations } from "@model";
 import { hash } from "@da/bcrypt";
 import { getAuth } from "@lib";
+import { isManagerLike } from "../../../utils/authzPolicy.ts";
 import {
   assertRolesAssignable,
   assignRolesToUser,
@@ -24,6 +25,29 @@ export const addUserFn: ActFn = async (body) => {
     ...rest
   } = set;
 
+  const { activeRole, user: actorUser } = await getAuth();
+  const isGhost = Boolean(actorUser?.isGhost);
+
+  const requestedRoles = (roles as RoleInput[] | undefined) ?? [];
+  const suppliedOrganizations = (organizations as string[] | undefined) ?? [];
+  const actorOrganizationId = !isManagerLike(activeRole) &&
+      activeRole.scopeType === "organization" &&
+      activeRole.scopeId
+    ? String(activeRole.scopeId)
+    : undefined;
+  const organizationIds = suppliedOrganizations.length > 0
+    ? suppliedOrganizations
+    : actorOrganizationId
+    ? [actorOrganizationId]
+    : [];
+
+  const targetScope = organizationIds.length > 0
+    ? {
+      scopeType: "organization" as const,
+      scopeId: String(organizationIds[0]),
+    }
+    : null;
+
   const relations: TInsertRelations<typeof user_relations> = {};
 
   avatar &&
@@ -31,9 +55,9 @@ export const addUserFn: ActFn = async (body) => {
       _ids: new ObjectId(avatar as string),
     });
 
-  if (organizations && (organizations as string[]).length > 0) {
+  if (organizationIds.length > 0) {
     relations.organizations = {
-      _ids: (organizations as string[]).map((id: string) => new ObjectId(id)),
+      _ids: organizationIds.map((id: string) => new ObjectId(id)),
       relatedRelations: {
         users: true,
       },
@@ -65,18 +89,6 @@ export const addUserFn: ActFn = async (body) => {
       },
     });
 
-  const { activeRole, user: actorUser } = await getAuth();
-  const isGhost = Boolean(actorUser?.isGhost);
-
-  const requestedRoles = (roles as RoleInput[] | undefined) ?? [];
-  const organizationIds = (organizations as string[] | undefined) ?? [];
-  const targetScope = organizationIds.length > 0
-    ? {
-      scopeType: "organization" as const,
-      scopeId: String(organizationIds[0]),
-    }
-    : null;
-
   if (requestedRoles.length > 0) {
     await assertRolesAssignable({
       actor: activeRole,
@@ -86,10 +98,16 @@ export const addUserFn: ActFn = async (body) => {
     });
   }
 
+  const insertedRoles = requestedRoles.length > 0 ? [] : [{
+    roleId: crypto.randomUUID(),
+    name: "Ordinary" as const,
+  }];
+
   const addedUser = await user.insertOne({
     doc: {
       ...rest,
-      ...(requestedRoles.length > 0 ? { roles: [] } : {}),
+      roles: insertedRoles,
+      features: rest.features ?? [],
       password: password ? await hash(password as string) : undefined,
       birth_date: rest.birth_date
         ? new Date(rest.birth_date as string)

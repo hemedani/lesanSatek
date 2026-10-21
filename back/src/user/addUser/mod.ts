@@ -50,8 +50,6 @@ export const authorizeNewUserScope = async () => {
     );
 
     if (containsOutsideScope) throwError("You cant do this");
-  } else {
-    set.organizations = [scopeId];
   }
 
   const units = set.units as string[] | undefined;
