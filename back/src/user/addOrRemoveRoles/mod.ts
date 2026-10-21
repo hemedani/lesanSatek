@@ -13,10 +13,8 @@ export const addOrRemoveRolesSetup = () =>
       setUser,
       grantAccess([
         { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead"], getScope: (b) => ({
-          scopeType: "organization",
-          scopeId: b?.details?.set?._id,
-        })},
+        { roles: ["OrgHead"] },
+        { roles: ["UnitHead"] },
       ]),
     ],
     validator: addOrRemoveRolesValidator(),

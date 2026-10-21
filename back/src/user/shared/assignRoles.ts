@@ -47,24 +47,88 @@ const relationId = (doc: RelationDocument, field: string): string | null => {
   return id === null || id === undefined ? null : String(id);
 };
 
-const targetScopeOfUser = async (
+type TargetContext = {
+  organizationIds: Set<string>;
+  unitIds: Set<string>;
+  scope: ScopeRef | null;
+};
+
+const idsOf = (docs: unknown): Set<string> => {
+  const ids = new Set<string>();
+
+  if (!Array.isArray(docs)) return ids;
+
+  for (const doc of docs) {
+    const id = (doc as { _id?: unknown } | null)?._id;
+    if (id === null || id === undefined) continue;
+    ids.add(String(id));
+  }
+
+  return ids;
+};
+
+const targetContextOfUser = async (
   userId: ObjectId,
-): Promise<ScopeRef | null> => {
+  actor: ActiveRole,
+): Promise<TargetContext> => {
   const target = await user.findOne({
     filters: { _id: userId },
-    projection: { organizations: { _id: 1 } },
+    projection: { organizations: { _id: 1 }, units: { _id: 1 } },
   }) as RelationDocument;
 
-  const organizations = target?.organizations;
-  const firstOrganization = Array.isArray(organizations)
-    ? organizations[0]
-    : undefined;
-  const organizationId = (firstOrganization as { _id?: unknown } | undefined)
-    ?._id;
+  if (!target) throwError("You cant do this");
 
-  return organizationId === null || organizationId === undefined
-    ? null
-    : { scopeType: "organization", scopeId: String(organizationId) };
+  const organizationIds = idsOf(target?.organizations);
+  const unitIds = idsOf(target?.units);
+
+  const actorOrganizationId = actor.scopeType === "organization" &&
+      actor.scopeId
+    ? String(actor.scopeId)
+    : null;
+  const preferredOrganizationId =
+    actorOrganizationId && organizationIds.has(actorOrganizationId)
+      ? actorOrganizationId
+      : [...organizationIds][0] ?? null;
+
+  return {
+    organizationIds,
+    unitIds,
+    scope: preferredOrganizationId
+      ? { scopeType: "organization", scopeId: preferredOrganizationId }
+      : null,
+  };
+};
+
+const assertActorCanAccessTarget = (
+  actor: ActiveRole,
+  target: TargetContext,
+  isGhost: boolean,
+) => {
+  if (isGhost || isManagerLike(actor)) return;
+
+  if (actor.name === "OrgHead") {
+    if (
+      actor.scopeType !== "organization" ||
+      !actor.scopeId ||
+      !target.organizationIds.has(String(actor.scopeId))
+    ) {
+      throwError("You cant do this");
+    }
+    return;
+  }
+
+  if (actor.name === "UnitHead") {
+    if (
+      actor.scopeType !== "unit" ||
+      !actor.scopeId ||
+      !target.unitIds.has(String(actor.scopeId))
+    ) {
+      throwError("You cant do this");
+    }
+    return;
+  }
+
+  throwError("You cant do this");
 };
 
 const assertScopeConsistency = (role: RoleInput) => {
@@ -76,43 +140,106 @@ const assertScopeConsistency = (role: RoleInput) => {
   }
 };
 
+const requiredScopeForRole: Partial<Record<RoleName, ScopeType>> = {
+  OrgHead: "organization",
+  UnitHead: "unit",
+  StoreHead: "store",
+};
+
+const assertRoleScopePairing = (role: RoleInput) => {
+  const requiredScope = requiredScopeForRole[role.name];
+
+  if (requiredScope && role.scopeType !== requiredScope) {
+    throwError("You cant do this");
+  }
+};
+
 const assertScopeResourceExists = async (
   role: RoleInput,
   actor: ActiveRole,
-  targetScope: ScopeRef | null,
   isGhost: boolean,
 ) => {
-  if (role.scopeType === "unit") {
-    const unitId = objectIdOf(role.scopeId);
+  if (!role.scopeType || !role.scopeId) return;
 
+  if (role.scopeType === "organization") {
+    const organizationDoc = await organization.findOne({
+      filters: { _id: objectIdOf(role.scopeId) },
+      projection: { _id: 1 },
+    });
+
+    if (!organizationDoc) throwError("You cant do this");
+    return;
+  }
+
+  if (role.scopeType === "unit") {
     const unitDoc = await unit.findOne({
-      filters: { _id: unitId },
-      projection: { organization: { _id: 1 } },
+      filters: { _id: objectIdOf(role.scopeId) },
+      projection: { _id: 1, organization: { _id: 1 } },
     }) as RelationDocument;
 
     if (!unitDoc) throwError("You cant do this");
 
     if (isGhost || isManagerLike(actor)) return;
 
-    if (!targetScope || targetScope.scopeType !== "organization") {
-      throwError("You cant do this");
+    if (actor.name === "UnitHead") {
+      if (
+        actor.scopeType !== "unit" ||
+        !actor.scopeId ||
+        String(actor.scopeId) !== String(role.scopeId)
+      ) {
+        throwError("You cant do this");
+      }
       return;
     }
 
-    if (relationId(unitDoc, "organization") !== String(targetScope.scopeId)) {
-      throwError("You cant do this");
+    if (actor.name === "OrgHead") {
+      const actorOrganizationId = actor.scopeType === "organization" &&
+          actor.scopeId
+        ? String(actor.scopeId)
+        : null;
+
+      if (
+        !actorOrganizationId ||
+        relationId(unitDoc, "organization") !== actorOrganizationId
+      ) {
+        throwError("You cant do this");
+      }
+      return;
     }
+
+    throwError("You cant do this");
   }
 
-  if (role.scopeType === "organization") {
-    const organizationId = objectIdOf(role.scopeId);
-
-    const organizationDoc = await organization.findOne({
-      filters: { _id: organizationId },
+  if (role.scopeType === "store") {
+    const storeDoc = await store.findOne({
+      filters: { _id: objectIdOf(role.scopeId) },
       projection: { _id: 1 },
     });
 
-    if (!organizationDoc) throwError("You cant do this");
+    if (!storeDoc) throwError("You cant do this");
+  }
+};
+
+const assertHeadAvailable = async (
+  userId: ObjectId,
+  role: RoleInput,
+  actor: ActiveRole,
+  isGhost: boolean,
+) => {
+  if (isGhost || isManagerLike(actor)) return;
+  if (role.name !== "OrgHead" && role.name !== "UnitHead") return;
+
+  const targetModel = role.name === "OrgHead" ? organization : unit;
+
+  const scopeDoc = await targetModel.findOne({
+    filters: { _id: objectIdOf(role.scopeId) },
+    projection: { head: { _id: 1 } },
+  }) as RelationDocument;
+
+  const currentHeadId = relationId(scopeDoc, "head");
+
+  if (currentHeadId && currentHeadId !== userId.toString()) {
+    throwError("You cant do this");
   }
 };
 
@@ -123,12 +250,13 @@ const assertRoleAssignable = async (
   isGhost: boolean,
 ) => {
   assertScopeConsistency(role);
+  assertRoleScopePairing(role);
 
   if (!isGhost && !canAssignRole(actor, role, targetScope)) {
     throwError("You cant do this");
   }
 
-  await assertScopeResourceExists(role, actor, targetScope, isGhost);
+  await assertScopeResourceExists(role, actor, isGhost);
 };
 
 export const assertRolesAssignable = async (input: {
@@ -377,22 +505,19 @@ export const assignRolesToUser = async (
   const addRoles = input.addRoles ?? [];
   const removeRoles = input.removeRoles ?? [];
 
-  const targetScope = await targetScopeOfUser(userId);
+  const target = await targetContextOfUser(userId, input.actor);
   const isGhost = input.isGhost ?? false;
 
-  await assertRolesAssignable({
-    actor: input.actor,
-    roles: addRoles,
-    targetScope,
-    isGhost,
-  });
+  assertActorCanAccessTarget(input.actor, target, isGhost);
 
-  await assertRolesAssignable({
-    actor: input.actor,
-    roles: removeRoles,
-    targetScope,
-    isGhost,
-  });
+  for (const role of addRoles) {
+    await assertRoleAssignable(input.actor, role, target.scope, isGhost);
+    await assertHeadAvailable(userId, role, input.actor, isGhost);
+  }
+
+  for (const role of removeRoles) {
+    await assertRoleAssignable(input.actor, role, target.scope, isGhost);
+  }
 
   for (const role of addRoles) {
     await addRole(userId, role);
