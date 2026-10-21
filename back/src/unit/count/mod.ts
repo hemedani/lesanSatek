@@ -16,6 +16,7 @@ export const countSetup = () =>
         { roles: ["Manager", "Admin"] },
         { roles: ["OrgHead"], scope: roleScope() },
         { roles: ["UnitHead"], scope: roleScope() },
+        { roles: ["Employee", "Ordinary"] },
       ]),
     ],
     validator: countValidator(),

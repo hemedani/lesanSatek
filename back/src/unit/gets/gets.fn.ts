@@ -1,5 +1,7 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
 import { unit } from "../../../mod.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
+import { applyUnitReadScope, unitReadScope } from "../../../utils/readScope.ts";
 
 export const getsFn: ActFn = async (body) => {
   const {
@@ -16,12 +18,17 @@ export const getsFn: ActFn = async (body) => {
     get,
   } = body.details;
 
+  const { user, activeRole } = await getAuth();
+  const scope = await unitReadScope(activeRole, user);
+
   const pipeline: Document[] = [];
 
   search &&
     pipeline.push({
       $match: { $text: { $search: search } },
     });
+
+  applyUnitReadScope(pipeline, scope);
 
   if (search && (!sortBy || sortBy === "relevance")) {
     pipeline.push({

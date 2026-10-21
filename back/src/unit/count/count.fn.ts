@@ -1,7 +1,7 @@
 import type { ActFn, Document } from "lesan";
 import { ObjectId } from "lesan";
 import { getAuth } from "@lib";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { applyUnitReadScope, unitReadScope } from "../../../utils/readScope.ts";
 import { unit } from "../../../mod.ts";
 
 export const countFn: ActFn = async (body) => {
@@ -27,15 +27,12 @@ export const countFn: ActFn = async (body) => {
   type &&
     (filters["type"] = type);
 
-  if (!user?.isGhost && !isManagerLike(activeRole)) {
-    if (!activeRole.scopeId) return { qty: 0 };
+  const scope = await unitReadScope(activeRole, user);
+  const scopePipeline: Document[] = [];
+  applyUnitReadScope(scopePipeline, scope);
 
-    if (activeRole.name === "OrgHead") {
-      filters["organization._id"] = new ObjectId(String(activeRole.scopeId));
-    } else if (activeRole.name === "UnitHead") {
-      delete filters["organization._id"];
-      filters["_id"] = new ObjectId(String(activeRole.scopeId));
-    }
+  if (scopePipeline.length > 0) {
+    filters["$and"] = scopePipeline.map((stage) => stage.$match);
   }
 
   const foundedItemsLength = await unit.countDocument({

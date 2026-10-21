@@ -2091,5 +2091,147 @@
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzCreatedToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{wareId}\", \"unitId\": \"{warehouseUnitId}\", \"quantity\": 1, \"activeRoleId\": \"{authzCreatedRoleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1}}}}",
     "repeat": 1,
     "captures": []
+  },
+  {
+    "id": "gen-authz-read-ordinary-user",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"first_name\": \"کاربر\", \"last_name\": \"عادی\", \"email\": \"authz.read.ordinary@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000030\", \"gender\": \"Male\", \"isActive\": true, \"is_verified\": true, \"organizations\": [\"{orgId}\"]}, \"get\": {\"_id\": 1, \"roles\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzOrdinaryUserId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-read-ordinary-login",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"login\", \"details\": {\"set\": {\"email\": \"authz.read.ordinary@lesansatek.com\", \"password\": \"password123\"}, \"get\": {\"token\": 1, \"user\": {\"_id\": 1, \"email\": 1, \"roles\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzOrdinaryToken",
+        "value": "[body][token]"
+      },
+      {
+        "key": "authzOrdinaryRoleId",
+        "value": "[body][user][roles][0][roleId]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-read-other-org-user",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"first_name\": \"کاربر\", \"last_name\": \"سازمان دیگر\", \"email\": \"authz.read.otherorg@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000031\", \"gender\": \"Male\", \"isActive\": true, \"is_verified\": true, \"organizations\": [\"{otherOrgId}\"]}, \"get\": {\"_id\": 1, \"roles\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzOtherOrgUserId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-read-unithead-login",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"login\", \"details\": {\"set\": {\"email\": \"reza@lesansatek.com\", \"password\": \"password123\"}, \"get\": {\"token\": 1, \"user\": {\"_id\": 1, \"email\": 1, \"roles\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzReadUnitHeadToken",
+        "value": "[body][token]"
+      },
+      {
+        "key": "authzReadUnitHeadRoleId",
+        "value": "[body][user][roles][1][roleId]"
+      }
+    ]
+  },
+  {
+    "id": "authz-read-orghead-unit-gets",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"name\": 1, \"organization\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-read-orghead-unit-gets-foreign-org",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"limit\": 100, \"organizationId\": \"{otherOrgId}\"}, \"get\": {\"_id\": 1, \"name\": 1, \"organization\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-read-orghead-organization-gets",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"organization\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-read-orghead-organization-get-foreign",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"organization\", \"act\": \"get\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"_id\": \"{otherOrgId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-read-unithead-unit-gets",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzReadUnitHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{authzReadUnitHeadRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"name\": 1, \"parentUnit\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-read-unithead-unit-get-foreign",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzUnitHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"get\", \"details\": {\"set\": {\"activeRoleId\": \"{authzUnitHeadRoleId}\", \"_id\": \"{warehouseUnitId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-read-employee-unit-gets",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzCreatedToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{authzCreatedRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-read-employee-get-user-foreign",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzCreatedToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"getUser\", \"details\": {\"set\": {\"activeRoleId\": \"{authzCreatedRoleId}\", \"_id\": \"{orgHeadUserId}\"}, \"get\": {\"_id\": 1, \"email\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-read-ordinary-get-users",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzOrdinaryToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"getUsers\", \"details\": {\"set\": {\"activeRoleId\": \"{authzOrdinaryRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"email\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-read-orghead-get-users",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"getUsers\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"email\": 1, \"organizations\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-read-unithead-get-users",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzUnitHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"getUsers\", \"details\": {\"set\": {\"activeRoleId\": \"{authzUnitHeadRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"email\": 1, \"units\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-read-orghead-get-user-foreign",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"getUser\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"_id\": \"{authzOtherOrgUserId}\"}, \"get\": {\"_id\": 1, \"email\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-read-orghead-unit-count",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"count\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"qty\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-read-orghead-organization-count",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"organization\", \"act\": \"count\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"qty\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-read-ordinary-count-users",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzOrdinaryToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"countUsers\", \"details\": {\"set\": {\"activeRoleId\": \"{authzOrdinaryRoleId}\"}, \"get\": {\"qty\": 1}}}}",
+    "repeat": 1,
+    "captures": []
   }
 ]
