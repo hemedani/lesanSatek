@@ -1,9 +1,14 @@
 import { type ActFn, ObjectId } from "lesan";
 import { budgetLine } from "../../../mod.ts";
-import { checkFinanceUnitAccess } from "../../../utils/checkFinanceUnitAccess.ts";
+import {
+  checkFinanceUnitAccess,
+  financeTargetOfBudgetLine,
+} from "../../../utils/checkFinanceUnitAccess.ts";
 
 export const updateFn: ActFn = async (body) => {
-  await checkFinanceUnitAccess();
+  await checkFinanceUnitAccess(
+    (await financeTargetOfBudgetLine(body.details.set._id)) ?? undefined,
+  );
   const {
     set: { _id, ...fields },
     get,

@@ -47,30 +47,53 @@ export const getsFn: ActFn = async (body) => {
     return u?.type === "Warehouse";
   })();
 
-  if (activeRole.name === "Employee" || activeRole.name === "Ordinary") {
-    if (activeRole.scopeType === "unit" && activeRole.scopeId) {
-      match["unit._id"] = new ObjectId(activeRole.scopeId);
-    }
+  const unitsOfOrganization = async (
+    organizationId: string,
+  ): Promise<ObjectId[]> => {
+    const orgUnits = await unit.aggregation({
+      pipeline: [
+        {
+          $match: {
+            "organization._id": new ObjectId(organizationId),
+          },
+        },
+        { $project: { _id: 1 } },
+      ],
+    }).toArray();
+
+    return orgUnits.map((u: Document) => u._id as ObjectId);
+  };
+
+  const userUnits = (user as unknown as { units?: { _id?: unknown }[] }).units ??
+    [];
+
+  let allowedUnitIds: ObjectId[] | null = null;
+
+  if (activeRole.name === "Employee") {
+    allowedUnitIds = userUnits.map((u) => new ObjectId(String(u._id)));
   } else if (activeRole.name === "UnitHead") {
-    if (isWarehouseHead) {
-    } else if (activeRole.scopeType === "unit" && activeRole.scopeId) {
-      match["unit._id"] = new ObjectId(activeRole.scopeId);
+    if (
+      !isWarehouseHead && activeRole.scopeType === "unit" &&
+      activeRole.scopeId
+    ) {
+      allowedUnitIds = [new ObjectId(activeRole.scopeId)];
     }
   } else if (activeRole.name === "OrgHead") {
-    if (activeRole.scopeType === "organization" && activeRole.scopeId) {
-      const orgUnits = await unit.aggregation({
-        pipeline: [
-          { $match: { "organization._id": new ObjectId(activeRole.scopeId) } },
-          { $project: { _id: 1 } },
-        ],
-      }).toArray();
-      if (orgUnits.length > 0) {
-        match["unit._id"] = {
-          $in: orgUnits.map((u: Document) => u._id),
-        };
-      }
-    }
+    allowedUnitIds = activeRole.scopeType === "organization" &&
+        activeRole.scopeId
+      ? await unitsOfOrganization(String(activeRole.scopeId))
+      : [];
   }
+
+  const restrictToUnits = (ids: ObjectId[]) => {
+    if (allowedUnitIds === null) {
+      allowedUnitIds = ids;
+      return;
+    }
+
+    const allowed = new Set(allowedUnitIds.map((id) => String(id)));
+    allowedUnitIds = ids.filter((id) => allowed.has(String(id)));
+  };
 
   if (search) {
     match.$or = [
@@ -80,21 +103,29 @@ export const getsFn: ActFn = async (body) => {
   }
   wareId && (match["ware._id"] = new ObjectId(wareId));
   wareModelId && (match["wareModel._id"] = new ObjectId(wareModelId));
-  unitId && (match["unit._id"] = new ObjectId(unitId as string));
-  warehouseUnitId && (match["warehouseUnit._id"] = new ObjectId(warehouseUnitId as string));
-  if (organizationId) {
-    const orgUnits = await unit.aggregation({
-      pipeline: [
-        { $match: { "organization._id": new ObjectId(organizationId as string) } },
-        { $project: { _id: 1 } },
-      ],
-    }).toArray();
-    if (orgUnits.length > 0) {
-      match["unit._id"] = {
-        $in: orgUnits.map((u: Document) => u._id),
-      };
+
+  if (unitId) {
+    const requestedUnitId = new ObjectId(unitId as string);
+    restrictToUnits([requestedUnitId]);
+
+    if (
+      !allowedUnitIds ||
+      !allowedUnitIds.some((id) => String(id) === String(requestedUnitId))
+    ) {
+      throwError("You cant do this");
     }
   }
+
+  if (organizationId) {
+    restrictToUnits(await unitsOfOrganization(String(organizationId)));
+  }
+
+  if (allowedUnitIds !== null) {
+    match["unit._id"] = { $in: allowedUnitIds };
+  }
+
+  warehouseUnitId &&
+    (match["warehouseUnit._id"] = new ObjectId(warehouseUnitId as string));
 
   if (Object.keys(match).length > 0) {
     pipeline.push({ $match: match });

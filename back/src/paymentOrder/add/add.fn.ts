@@ -1,14 +1,21 @@
 import { type ActFn, ObjectId } from "lesan";
 import { paymentOrder, purchasingRequest, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
-import { checkFinanceUnitAccess } from "../../../utils/checkFinanceUnitAccess.ts";
+import {
+  checkFinanceUnitAccess,
+  financeTargetOfPurchasingRequestBudget,
+} from "../../../utils/checkFinanceUnitAccess.ts";
 
 export const addFn: ActFn = async (body) => {
-  await checkFinanceUnitAccess();
   const { set, get } = body.details;
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
 
   const { activeRoleId, purchasingRequestId, issuedById, approvedById, payToId, financialUnitId, ...rest } = set;
+
+  await checkFinanceUnitAccess(
+    (await financeTargetOfPurchasingRequestBudget(purchasingRequestId)) ??
+      undefined,
+  );
 
   const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
 

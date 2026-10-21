@@ -1,13 +1,18 @@
 import { type ActFn, ObjectId } from "lesan";
 import { budgetLine } from "../../../mod.ts";
-import { checkFinanceUnitAccess } from "../../../utils/checkFinanceUnitAccess.ts";
+import {
+  checkFinanceUnitAccess,
+  financeTargetOfBudgetLine,
+} from "../../../utils/checkFinanceUnitAccess.ts";
 import { throwError } from "../../../utils/throwError.ts";
 
 export const deductDirectFn: ActFn = async (body) => {
   const { set, get } = body.details;
   const { _id, amount, description } = set;
 
-  await checkFinanceUnitAccess();
+  await checkFinanceUnitAccess(
+    (await financeTargetOfBudgetLine(body.details.set._id)) ?? undefined,
+  );
 
   if ((amount as number) <= 0) {
     throwError("Amount must be positive");

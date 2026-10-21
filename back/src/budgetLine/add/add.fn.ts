@@ -1,12 +1,33 @@
-import { type ActFn, ObjectId } from "lesan";
-import { budgetLine } from "../../../mod.ts";
+import { type ActFn, type Document, ObjectId } from "lesan";
+import { budgetLine, fiscalYear } from "../../../mod.ts";
 import { checkFinanceUnitAccess } from "../../../utils/checkFinanceUnitAccess.ts";
+import { throwError } from "../../../utils/throwError.ts";
 
 export const addFn: ActFn = async (body) => {
-  await checkFinanceUnitAccess();
   const { set, get } = body.details;
 
   const { activeRoleId, fiscalYearId, organizationId, unitId, wareTypeId, ...rest } = set;
+
+  const fiscalYearDoc = await fiscalYear.findOne({
+    filters: { _id: new ObjectId(fiscalYearId as string) },
+    projection: { organization: { _id: 1 } },
+  }) as Document;
+
+  const fiscalYearOrganizationId =
+    (fiscalYearDoc?.organization as Record<string, unknown> | undefined)?._id;
+
+  if (
+    organizationId &&
+    fiscalYearOrganizationId &&
+    String(organizationId) !== String(fiscalYearOrganizationId)
+  ) {
+    throwError("You cant do this");
+  }
+
+  await checkFinanceUnitAccess({
+    organizationId: String(organizationId ?? fiscalYearOrganizationId ?? "") || undefined,
+    unitId: unitId ? String(unitId) : undefined,
+  });
 
   const totalAlloc = (rest.totalAllocated as number) || 0;
   const totalEnc = (rest.totalEncumbered as number) || 0;

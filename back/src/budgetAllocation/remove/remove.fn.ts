@@ -1,9 +1,14 @@
 import { type ActFn, ObjectId } from "lesan";
 import { budgetAllocation } from "../../../mod.ts";
-import { checkFinanceUnitAccess } from "../../../utils/checkFinanceUnitAccess.ts";
+import {
+  checkFinanceUnitAccess,
+  financeTargetOfBudgetAllocation,
+} from "../../../utils/checkFinanceUnitAccess.ts";
 
 export const removeFn: ActFn = async (body) => {
-  await checkFinanceUnitAccess();
+  await checkFinanceUnitAccess(
+    (await financeTargetOfBudgetAllocation(body.details.set._id)) ?? undefined,
+  );
   const {
     set: { _id, hardCascade },
     get,

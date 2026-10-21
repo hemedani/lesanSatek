@@ -188,6 +188,16 @@ export const assertUnitFieldInScope = (field = "unitId") => async () => {
     throwError("You cant do this");
   }
 
+  if (activeRole.name === "Employee") {
+    const belongsToUser = (scopeUser?.units ?? []).some((candidate) =>
+      String(candidate._id) === String(unitId)
+    );
+
+    if (belongsToUser) return;
+
+    throwError("You cant do this");
+  }
+
   throwError("You cant do this");
 };
 

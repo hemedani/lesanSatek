@@ -32,13 +32,19 @@ export const countFn: ActFn = async (body) => {
     return u?.type === "Warehouse";
   })();
 
-  if (activeRole.name === "Employee" || activeRole.name === "Ordinary") {
-    if (activeRole.scopeType === "unit" && activeRole.scopeId) {
-      match["unit._id"] = new ObjectId(activeRole.scopeId);
-    }
+  const userUnits = (user as unknown as { units?: { _id?: unknown }[] }).units ??
+    [];
+
+  let allowedUnitIds: ObjectId[] | null = null;
+
+  if (activeRole.name === "Employee") {
+    allowedUnitIds = userUnits.map((u) => new ObjectId(String(u._id)));
   } else if (activeRole.name === "UnitHead") {
-    if (!isWarehouseHead && activeRole.scopeType === "unit" && activeRole.scopeId) {
-      match["unit._id"] = new ObjectId(activeRole.scopeId);
+    if (
+      !isWarehouseHead && activeRole.scopeType === "unit" &&
+      activeRole.scopeId
+    ) {
+      allowedUnitIds = [new ObjectId(activeRole.scopeId)];
     }
   } else if (activeRole.name === "OrgHead") {
     if (activeRole.scopeType === "organization" && activeRole.scopeId) {
@@ -48,18 +54,32 @@ export const countFn: ActFn = async (body) => {
           { $project: { _id: 1 } },
         ],
       }).toArray();
-      if (orgUnits.length > 0) {
-        match["unit._id"] = {
-          $in: orgUnits.map((u: Document) => u._id),
-        };
-      }
+      allowedUnitIds = orgUnits.map((u: Document) => u._id as ObjectId);
+    } else {
+      allowedUnitIds = [];
     }
   }
 
   wareId && (match["ware._id"] = new ObjectId(wareId));
   wareModelId && (match["wareModel._id"] = new ObjectId(wareModelId));
-  unitId && (match["unit._id"] = new ObjectId(unitId as string));
-  warehouseUnitId && (match["warehouseUnit._id"] = new ObjectId(warehouseUnitId as string));
+
+  if (unitId) {
+    const requestedUnitId = new ObjectId(unitId as string);
+
+    if (
+      allowedUnitIds !== null &&
+      !allowedUnitIds.some((id) => String(id) === String(requestedUnitId))
+    ) {
+      throwError("You cant do this");
+    }
+
+    match["unit._id"] = requestedUnitId;
+  } else if (allowedUnitIds !== null) {
+    match["unit._id"] = { $in: allowedUnitIds };
+  }
+
+  warehouseUnitId &&
+    (match["warehouseUnit._id"] = new ObjectId(warehouseUnitId as string));
 
   const qty = await inventory.countDocument({ filter: match });
 

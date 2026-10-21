@@ -11,10 +11,7 @@ export const addSetup = () =>
 	preAct: [
 		setTokens,
 		setUser,
-		grantAccess([
-			{ roles: ["Manager", "Admin"] },
-			{ roles: ["StoreHead"] },
-		]),
+		grantAccess([{ roles: ["Manager", "Admin"] }]),
 	],
 		validator: addValidator(),
 		validationRunType: "create",

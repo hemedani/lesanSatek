@@ -1700,6 +1700,10 @@
       {
         "key": "authzCreatedToken",
         "value": "[body][token]"
+      },
+      {
+        "key": "authzCreatedRoleId",
+        "value": "[body][user][roles][0][roleId]"
       }
     ]
   },
@@ -1961,6 +1965,130 @@
   {
     "id": "authz-unithead-update-other-unit",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzUnitHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{warehouseUnitId}\", \"activeRoleId\": \"{authzUnitHeadRoleId}\", \"name\": \"تلاش غیرمجاز\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-authz-own-temp-stuff",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"add\", \"details\": {\"set\": {\"quantity\": 5, \"price\": 1000, \"hasAbsolutePrice\": true, \"wareId\": \"{wareId}\", \"storeId\": \"{storeId}\", \"wareTypeId\": \"{wareTypeId}\", \"wareClassId\": \"{wareClassId}\", \"wareGroupId\": \"{wareGroupId}\", \"wareModelId\": \"{wareModelId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"price\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzOwnTempStuffId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-other-temp-stuff",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"add\", \"details\": {\"set\": {\"quantity\": 5, \"price\": 1000, \"hasAbsolutePrice\": true, \"wareId\": \"{ware2Id}\", \"storeId\": \"{store2Id}\", \"wareTypeId\": \"{wareType2Id}\", \"wareClassId\": \"{wareClass2Id}\", \"wareGroupId\": \"{wareGroup2Id}\", \"wareModelId\": \"{wareModel2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"price\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzOtherTempStuffId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-other-org-fiscalYear",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"fiscalYear\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"سال مالی سازمان دیگر\", \"startDate\": \"2026-03-21\", \"endDate\": \"2027-03-20\", \"isActive\": false, \"organizationId\": \"{otherOrgId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzOtherOrgFiscalYearId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-nonfinance-unithead",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"first_name\": \"سر\", \"last_name\": \"واحد غیرمالی\", \"email\": \"authz.nonfinance.head@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000028\", \"gender\": \"Male\", \"isActive\": true, \"is_verified\": true, \"features\": [{\"feature\": \"canIssuePaymentOrder\"}], \"organizations\": [\"{orgId}\"], \"units\": [\"{authzRoleUnitId}\"], \"roles\": [{\"name\": \"UnitHead\", \"scopeType\": \"unit\", \"scopeId\": \"{authzRoleUnitId}\"}]}, \"get\": {\"_id\": 1, \"roles\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzNonFinanceUserId",
+        "value": "[body][_id]"
+      },
+      {
+        "key": "authzNonFinanceRoleId",
+        "value": "[body][roles][0][roleId]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-nonfinance-unithead-login",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"login\", \"details\": {\"set\": {\"email\": \"authz.nonfinance.head@lesansatek.com\", \"password\": \"password123\"}, \"get\": {\"token\": 1, \"user\": {\"_id\": 1, \"email\": 1, \"roles\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzNonFinanceToken",
+        "value": "[body][token]"
+      }
+    ]
+  },
+  {
+    "id": "authz-storehead-store-add",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"store\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"تلاش ایجاد فروشگاه\", \"activeRoleId\": \"{storeHeadRoleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-storehead-update-own-stuff",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{stuffId}\", \"activeRoleId\": \"{storeHeadRoleId}\", \"location\": \"قفسه AUTHZ\"}, \"get\": {\"_id\": 1, \"location\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-storehead-remove-own-stuff",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{authzOwnTempStuffId}\", \"activeRoleId\": \"{storeHeadRoleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-storehead-update-other-stuff",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{authzOtherTempStuffId}\", \"activeRoleId\": \"{storeHeadRoleId}\", \"location\": \"قفسه غیرمجاز\"}, \"get\": {\"_id\": 1, \"location\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-storehead-remove-other-stuff",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"remove\", \"details\": {\"set\": {\"_id\": \"{authzOtherTempStuffId}\", \"activeRoleId\": \"{storeHeadRoleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-storehead-move-stuff-to-other-store",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"update\", \"details\": {\"set\": {\"_id\": \"{stuffId}\", \"activeRoleId\": \"{storeHeadRoleId}\", \"storeId\": \"{store2Id}\", \"location\": \"قفسه غیرمجاز\"}, \"get\": {\"_id\": 1, \"location\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-orghead-add-own-budget-line",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"add\", \"details\": {\"set\": {\"code\": \"AUTHZ-OWN\", \"title\": \"بودجه محدوده سازمانی\", \"description\": \"بودجه تست محدوده سازمانی\", \"fiscalYearId\": \"{fiscalYearId}\", \"organizationId\": \"{orgId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"code\": 1, \"organization\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzOwnBudgetLineId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "authz-orghead-add-foreign-budget-line",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"add\", \"details\": {\"set\": {\"code\": \"AUTHZ-FOREIGN\", \"title\": \"تلاش بودجه سازمان دیگر\", \"description\": \"بودجه تست سازمان دیگر\", \"fiscalYearId\": \"{authzOtherOrgFiscalYearId}\", \"organizationId\": \"{orgId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"code\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-nonfinance-unithead-mark-paid",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzNonFinanceToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"paymentOrder\", \"act\": \"markPaid\", \"details\": {\"set\": {\"_id\": \"{paymentOrderId}\", \"activeRoleId\": \"{authzNonFinanceRoleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-employee-inventory-add-other-unit",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzCreatedToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{wareId}\", \"unitId\": \"{warehouseUnitId}\", \"quantity\": 1, \"activeRoleId\": \"{authzCreatedRoleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1}}}}",
     "repeat": 1,
     "captures": []
   }
