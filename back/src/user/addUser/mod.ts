@@ -1,3 +1,4 @@
+import { ObjectId } from "lesan";
 import {
   getAuth,
   grantAccess,
@@ -6,10 +7,20 @@ import {
   setUser,
   throwError,
 } from "@lib";
-import { coreApp } from "../../../mod.ts";
+import { coreApp, unit } from "../../../mod.ts";
 import { isManagerLike } from "../../../utils/authzPolicy.ts";
 import { addUserFn } from "./addUser.fn.ts";
 import { addUserValidator } from "./addUser.val.ts";
+
+const toObjectId = (value: unknown): ObjectId | null => {
+  if (value === null || value === undefined || value === "") return null;
+
+  try {
+    return new ObjectId(String(value));
+  } catch {
+    return null;
+  }
+};
 
 export const authorizeNewUserScope = async () => {
   const context = coreApp.contextFns.getContextModel() as MyContext;
@@ -39,11 +50,33 @@ export const authorizeNewUserScope = async () => {
     );
 
     if (containsOutsideScope) throwError("You cant do this");
-
-    return;
+  } else {
+    set.organizations = [scopeId];
   }
 
-  set.organizations = [scopeId];
+  const units = set.units as string[] | undefined;
+
+  if (units && units.length > 0) {
+    for (const unitId of units) {
+      const unitObjectId = toObjectId(unitId);
+
+      if (!unitObjectId) return throwError("You cant do this");
+
+      const unitDoc = await unit.findOne({
+        filters: { _id: unitObjectId },
+        projection: { organization: { _id: 1 } },
+      }) as { organization?: { _id?: unknown } } | null;
+
+      const organizationId = unitDoc?.organization?._id;
+
+      if (
+        organizationId === null || organizationId === undefined ||
+        String(organizationId) !== scopeId
+      ) {
+        return throwError("You cant do this");
+      }
+    }
+  }
 };
 
 export const addUserSetup = () =>

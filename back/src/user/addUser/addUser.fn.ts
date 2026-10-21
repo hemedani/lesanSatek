@@ -3,7 +3,11 @@ import { user } from "../../../mod.ts";
 import type { user_relations } from "@model";
 import { hash } from "@da/bcrypt";
 import { getAuth } from "@lib";
-import { assignRolesToUser, type RoleInput } from "../shared/assignRoles.ts";
+import {
+  assertRolesAssignable,
+  assignRolesToUser,
+  type RoleInput,
+} from "../shared/assignRoles.ts";
 
 export const addUserFn: ActFn = async (body) => {
   const { set, get } = body.details;
@@ -61,9 +65,31 @@ export const addUserFn: ActFn = async (body) => {
       },
     });
 
+  const { activeRole, user: actorUser } = await getAuth();
+  const isGhost = Boolean(actorUser?.isGhost);
+
+  const requestedRoles = (roles as RoleInput[] | undefined) ?? [];
+  const organizationIds = (organizations as string[] | undefined) ?? [];
+  const targetScope = organizationIds.length > 0
+    ? {
+      scopeType: "organization" as const,
+      scopeId: String(organizationIds[0]),
+    }
+    : null;
+
+  if (requestedRoles.length > 0) {
+    await assertRolesAssignable({
+      actor: activeRole,
+      roles: requestedRoles,
+      targetScope,
+      isGhost,
+    });
+  }
+
   const addedUser = await user.insertOne({
     doc: {
       ...rest,
+      ...(requestedRoles.length > 0 ? { roles: [] } : {}),
       password: password ? await hash(password as string) : undefined,
       birth_date: rest.birth_date
         ? new Date(rest.birth_date as string)
@@ -73,13 +99,13 @@ export const addUserFn: ActFn = async (body) => {
     projection: { _id: 1 },
   });
 
-  const { activeRole } = await getAuth();
   const addedUserId = String((addedUser as { _id: unknown })._id);
 
   return await assignRolesToUser({
     userId: addedUserId,
     actor: activeRole,
-    addRoles: roles as RoleInput[] | undefined,
+    addRoles: requestedRoles.length > 0 ? requestedRoles : undefined,
     get: get as Record<string, unknown>,
+    isGhost,
   });
 };

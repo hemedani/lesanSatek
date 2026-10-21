@@ -23,6 +23,7 @@ export type AssignRolesInput = {
   addRoles?: RoleInput[];
   removeRoles?: RoleInput[];
   get: Record<string, unknown>;
+  isGhost?: boolean;
 };
 
 type RelationDocument = Record<string, unknown> | null | undefined;
@@ -75,69 +76,74 @@ const assertScopeConsistency = (role: RoleInput) => {
   }
 };
 
-const assertUnitScope = async (
+const assertScopeResourceExists = async (
   role: RoleInput,
-  targetScope: ScopeRef | null,
-) => {
-  const unitId = objectIdOf(role.scopeId);
-
-  const unitDoc = await unit.findOne({
-    filters: { _id: unitId },
-    projection: { organization: { _id: 1 } },
-  }) as RelationDocument;
-
-  if (!unitDoc) throwError("You cant do this");
-
-  if (!targetScope || targetScope.scopeType !== "organization") {
-    throwError("You cant do this");
-    return;
-  }
-
-  if (relationId(unitDoc, "organization") !== String(targetScope.scopeId)) {
-    throwError("You cant do this");
-  }
-};
-
-const assertOrganizationScope = async (role: RoleInput) => {
-  const organizationId = objectIdOf(role.scopeId);
-
-  const organizationDoc = await organization.findOne({
-    filters: { _id: organizationId },
-    projection: { _id: 1 },
-  });
-
-  if (!organizationDoc) throwError("You cant do this");
-};
-
-const assertRoleCanBeAssigned = async (
   actor: ActiveRole,
-  role: RoleInput,
   targetScope: ScopeRef | null,
+  isGhost: boolean,
 ) => {
-  assertScopeConsistency(role);
-
-  if (!canAssignRole(actor, role, targetScope)) {
-    throwError("You cant do this");
-  }
-
   if (role.scopeType === "unit") {
-    if (isManagerLike(actor)) {
-      const unitId = objectIdOf(role.scopeId);
+    const unitId = objectIdOf(role.scopeId);
 
-      const unitDoc = await unit.findOne({
-        filters: { _id: unitId },
-        projection: { _id: 1 },
-      });
+    const unitDoc = await unit.findOne({
+      filters: { _id: unitId },
+      projection: { organization: { _id: 1 } },
+    }) as RelationDocument;
 
-      if (!unitDoc) throwError("You cant do this");
+    if (!unitDoc) throwError("You cant do this");
+
+    if (isGhost || isManagerLike(actor)) return;
+
+    if (!targetScope || targetScope.scopeType !== "organization") {
+      throwError("You cant do this");
       return;
     }
 
-    await assertUnitScope(role, targetScope);
+    if (relationId(unitDoc, "organization") !== String(targetScope.scopeId)) {
+      throwError("You cant do this");
+    }
   }
 
   if (role.scopeType === "organization") {
-    await assertOrganizationScope(role);
+    const organizationId = objectIdOf(role.scopeId);
+
+    const organizationDoc = await organization.findOne({
+      filters: { _id: organizationId },
+      projection: { _id: 1 },
+    });
+
+    if (!organizationDoc) throwError("You cant do this");
+  }
+};
+
+const assertRoleAssignable = async (
+  actor: ActiveRole,
+  role: RoleInput,
+  targetScope: ScopeRef | null,
+  isGhost: boolean,
+) => {
+  assertScopeConsistency(role);
+
+  if (!isGhost && !canAssignRole(actor, role, targetScope)) {
+    throwError("You cant do this");
+  }
+
+  await assertScopeResourceExists(role, actor, targetScope, isGhost);
+};
+
+export const assertRolesAssignable = async (input: {
+  actor: ActiveRole;
+  roles: RoleInput[];
+  targetScope: ScopeRef | null;
+  isGhost?: boolean;
+}): Promise<void> => {
+  for (const role of input.roles) {
+    await assertRoleAssignable(
+      input.actor,
+      role,
+      input.targetScope,
+      input.isGhost ?? false,
+    );
   }
 };
 
@@ -372,14 +378,21 @@ export const assignRolesToUser = async (
   const removeRoles = input.removeRoles ?? [];
 
   const targetScope = await targetScopeOfUser(userId);
+  const isGhost = input.isGhost ?? false;
 
-  for (const role of addRoles) {
-    await assertRoleCanBeAssigned(input.actor, role, targetScope);
-  }
+  await assertRolesAssignable({
+    actor: input.actor,
+    roles: addRoles,
+    targetScope,
+    isGhost,
+  });
 
-  for (const role of removeRoles) {
-    await assertRoleCanBeAssigned(input.actor, role, targetScope);
-  }
+  await assertRolesAssignable({
+    actor: input.actor,
+    roles: removeRoles,
+    targetScope,
+    isGhost,
+  });
 
   for (const role of addRoles) {
     await addRole(userId, role);
