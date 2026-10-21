@@ -1,7 +1,9 @@
 import { type ActFn, ObjectId } from "lesan";
-import { purchasingRequest, coreApp } from "../../../mod.ts";
+import { coreApp, purchasingRequest, wareModel } from "../../../mod.ts";
 import type { MyContext } from "@lib";
+import { assertWareModelAccess } from "../../../utils/checkWareModelAccess.ts";
 import { throwError } from "../../../utils/throwError.ts";
+import type { ActiveRole } from "../../../utils/authzPolicy.ts";
 
 export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
@@ -20,19 +22,50 @@ export const addFn: ActFn = async (body) => {
     (r: { roleId: string }) => r.roleId === activeRoleId,
   );
 
-  const requestingUnitId = activeRole?.scopeType === "unit" && activeRole?.scopeId
-    ? activeRole.scopeId
-    : undefined;
+  const requestingUnitId =
+    activeRole?.scopeType === "unit" && activeRole?.scopeId
+      ? activeRole.scopeId
+      : undefined;
 
   if (!requestingUnitId) {
     throwError("Your active role does not have an associated unit.");
     return;
   }
 
+  if (!activeRole) {
+    throwError("Active role not found");
+    return;
+  }
+
+  const wareModelDoc = await wareModel.findOne({
+    filters: { _id: new ObjectId(wareModelId as string) },
+    projection: {
+      _id: 1,
+      wareType: { _id: 1 },
+      wareClass: { _id: 1 },
+      wareGroup: { _id: 1 },
+    },
+  }) as Record<string, unknown> | null;
+
+  if (!wareModelDoc) {
+    throwError("Ware model not found");
+    return;
+  }
+
+  await assertWareModelAccess(
+    user,
+    activeRole as ActiveRole,
+    wareModelDoc,
+  );
+
   const userAny = user as Record<string, unknown>;
-  const userOrgs = userAny.organizations as Array<Record<string, unknown>> | undefined;
+  const userOrgs = userAny.organizations as
+    | Array<Record<string, unknown>>
+    | undefined;
   if (!userOrgs || userOrgs.length === 0) {
-    throwError("Could not determine organization. Please ensure you belong to an organization.");
+    throwError(
+      "Could not determine organization. Please ensure you belong to an organization.",
+    );
     return;
   }
   const orgId = userOrgs[0]._id as ObjectId;

@@ -1,7 +1,8 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { inventory, unit } from "../../../mod.ts";
+import { inventory } from "../../../mod.ts";
 import { isManagerLike } from "../../../utils/authzPolicy.ts";
 import { getAuth } from "../../../utils/grantAccess.ts";
+import { assertCanReadUnit } from "../../../utils/readScope.ts";
 import { throwError } from "../../../utils/throwError.ts";
 
 export const getFn: ActFn = async (body) => {
@@ -34,51 +35,9 @@ export const getFn: ActFn = async (body) => {
       ? ""
       : String(unitRelation._id);
 
-    let organizationId = unitRelation?.organization?._id === null ||
-        unitRelation?.organization?._id === undefined
-      ? ""
-      : String(unitRelation.organization._id);
-
     if (!unitId) throwError("You cant do this");
 
-    if (!organizationId) {
-      const unitDoc = await unit.findOne({
-        filters: { _id: new ObjectId(unitId) },
-        projection: { organization: { _id: 1 } },
-      }) as Document;
-      const organizationRef =
-        (unitDoc?.organization as { _id?: unknown } | null | undefined)?._id;
-      organizationId = organizationRef === null || organizationRef === undefined
-        ? ""
-        : String(organizationRef);
-    }
-
-    if (activeRole.name === "OrgHead") {
-      if (
-        activeRole.scopeType !== "organization" ||
-        !activeRole.scopeId ||
-        String(activeRole.scopeId) !== organizationId
-      ) {
-        throwError("You cant do this");
-      }
-    } else if (activeRole.name === "UnitHead") {
-      if (
-        activeRole.scopeType !== "unit" ||
-        !activeRole.scopeId ||
-        String(activeRole.scopeId) !== unitId
-      ) {
-        throwError("You cant do this");
-      }
-    } else if (activeRole.name === "Employee") {
-      const userUnits =
-        (user as unknown as { units?: { _id?: unknown }[] }).units ?? [];
-
-      if (!userUnits.some((candidate) => String(candidate._id) === unitId)) {
-        throwError("You cant do this");
-      }
-    } else {
-      throwError("You cant do this");
-    }
+    await assertCanReadUnit(activeRole, user, unitId);
   }
 
   return await inventory

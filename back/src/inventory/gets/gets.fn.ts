@@ -1,8 +1,13 @@
 import type { ActFn, Document } from "lesan";
 import { ObjectId } from "lesan";
-import { coreApp, inventory, unit } from "../../../mod.ts";
-import type { MyContext } from "@lib";
-import { throwError } from "../../../utils/throwError.ts";
+import { inventory } from "../../../mod.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
+import {
+  idMatch,
+  intersectObjectIds,
+  inventoryAllowedUnitIds,
+  unitsOfOrganization,
+} from "../readScope.ts";
 
 export const getsFn: ActFn = async (body) => {
   const {
@@ -18,75 +23,33 @@ export const getsFn: ActFn = async (body) => {
       unitId,
       warehouseUnitId,
       organizationId,
-      activeRoleId,
     },
     get,
   } = body.details;
 
-  const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
-
-  const activeRole = (user.roles || []).find(
-    (r: { roleId: string }) => r.roleId === activeRoleId,
-  ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
-
-  if (!activeRole) {
-    throwError("Active role not found");
-    return;
-  }
+  const { user, activeRole } = await getAuth();
+  const allowedUnitIds = await inventoryAllowedUnitIds(activeRole, user);
 
   const pipeline: Document[] = [];
   const match: Document = {};
 
-  const unitsOfOrganization = async (
-    organizationId: string,
-  ): Promise<ObjectId[]> => {
-    const orgUnits = await unit.aggregation({
-      pipeline: [
-        {
-          $match: {
-            "organization._id": new ObjectId(organizationId),
-          },
-        },
-        { $project: { _id: 1 } },
-      ],
-    }).toArray();
+  let effectiveUnitIds = allowedUnitIds;
 
-    return orgUnits.map((u: Document) => u._id as ObjectId);
-  };
-
-  const userUnits =
-    (user as unknown as { units?: { _id?: unknown }[] }).units ??
-      [];
-
-  const isUnrestricted = user.isGhost ||
-    activeRole.name === "Manager" || activeRole.name === "Admin";
-
-  let allowedUnitIds: ObjectId[] | null = isUnrestricted ? null : [];
-
-  if (!isUnrestricted) {
-    if (activeRole.name === "Employee") {
-      allowedUnitIds = userUnits.map((u) => new ObjectId(String(u._id)));
-    } else if (activeRole.name === "UnitHead") {
-      allowedUnitIds = activeRole.scopeType === "unit" && activeRole.scopeId
-        ? [new ObjectId(activeRole.scopeId)]
-        : [];
-    } else if (activeRole.name === "OrgHead") {
-      allowedUnitIds = activeRole.scopeType === "organization" &&
-          activeRole.scopeId
-        ? await unitsOfOrganization(String(activeRole.scopeId))
-        : [];
-    }
+  if (unitId) {
+    effectiveUnitIds = intersectObjectIds(allowedUnitIds, [
+      new ObjectId(unitId as string),
+    ]);
   }
 
-  const restrictToUnits = (ids: ObjectId[]) => {
-    if (allowedUnitIds === null) {
-      allowedUnitIds = ids;
-      return;
-    }
-
-    const allowed = new Set(allowedUnitIds.map((id) => String(id)));
-    allowedUnitIds = ids.filter((id) => allowed.has(String(id)));
-  };
+  if (organizationId) {
+    const organizationUnitIds = await unitsOfOrganization(
+      String(organizationId),
+    );
+    effectiveUnitIds = intersectObjectIds(
+      effectiveUnitIds,
+      organizationUnitIds,
+    );
+  }
 
   if (search) {
     match.$or = [
@@ -97,24 +60,8 @@ export const getsFn: ActFn = async (body) => {
   wareId && (match["ware._id"] = new ObjectId(wareId));
   wareModelId && (match["wareModel._id"] = new ObjectId(wareModelId));
 
-  if (unitId) {
-    const requestedUnitId = new ObjectId(unitId as string);
-    restrictToUnits([requestedUnitId]);
-
-    if (
-      !allowedUnitIds ||
-      !allowedUnitIds.some((id) => String(id) === String(requestedUnitId))
-    ) {
-      throwError("You cant do this");
-    }
-  }
-
-  if (organizationId) {
-    restrictToUnits(await unitsOfOrganization(String(organizationId)));
-  }
-
-  if (allowedUnitIds !== null) {
-    match["unit._id"] = { $in: allowedUnitIds };
+  if (effectiveUnitIds !== null) {
+    match["unit._id"] = idMatch(effectiveUnitIds);
   }
 
   warehouseUnitId &&

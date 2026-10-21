@@ -1,11 +1,13 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { inventory, coreApp } from "../../../mod.ts";
+import { coreApp, inventory } from "../../../mod.ts";
 import type { MyContext } from "@lib";
+import { assertWareModelAccess } from "../../../utils/checkWareModelAccess.ts";
+import type { ActiveRole } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
 
 export const transferFn: ActFn = async (body) => {
   const {
-    set: { fromUnitId, toUnitId, wareId, quantity, description, activeRoleId },
+    set: { fromUnitId, toUnitId, wareId, quantity, activeRoleId },
     get,
   } = body.details;
 
@@ -15,7 +17,10 @@ export const transferFn: ActFn = async (body) => {
     (r: { roleId: string }) => r.roleId === activeRoleId,
   ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
 
-  if (!user.isGhost && activeRole && !["Manager", "Admin"].includes(activeRole.name)) {
+  if (
+    !user.isGhost && activeRole &&
+    !["Manager", "Admin"].includes(activeRole.name)
+  ) {
     if (activeRole.scopeType === "unit" && activeRole.scopeId) {
       if (activeRole.scopeId.toString() !== fromUnitId.toString()) {
         throwError("You can only transfer inventory from your own unit");
@@ -32,7 +37,15 @@ export const transferFn: ActFn = async (body) => {
       "unit._id": new ObjectId(fromUnitId as string),
       "ware._id": new ObjectId(wareId as string),
     },
-    projection: { _id: 1, unit: 1, quantity: 1 } as Document,
+    projection: {
+      _id: 1,
+      unit: 1,
+      quantity: 1,
+      wareModel: { _id: 1 },
+      wareType: { _id: 1 },
+      wareClass: { _id: 1 },
+      wareGroup: { _id: 1 },
+    } as Document,
   }) as Document;
 
   if (!fromInv) {
@@ -41,6 +54,18 @@ export const transferFn: ActFn = async (body) => {
 
   if ((fromInv.quantity as number) < (quantity as number)) {
     throw new Error("Insufficient quantity in source inventory");
+  }
+
+  if (
+    !user.isGhost && activeRole &&
+    !["Manager", "Admin"].includes(activeRole.name)
+  ) {
+    await assertWareModelAccess(user, activeRole as ActiveRole, {
+      _id: (fromInv.wareModel as Record<string, unknown>)?._id,
+      wareType: fromInv.wareType as { _id?: unknown },
+      wareClass: fromInv.wareClass as { _id?: unknown },
+      wareGroup: fromInv.wareGroup as { _id?: unknown },
+    });
   }
 
   await inventory.findOneAndUpdate({
@@ -76,10 +101,12 @@ export const transferFn: ActFn = async (body) => {
       filters: { _id: fromInv._id as ObjectId },
       projection: get?.fromUnit || { _id: 1 },
     }),
-    toUnit: toInv ? await inventory.findOne({
-      filters: { _id: toInv._id as ObjectId },
-      projection: get?.toUnit || { _id: 1 },
-    }) : null,
+    toUnit: toInv
+      ? await inventory.findOne({
+        filters: { _id: toInv._id as ObjectId },
+        projection: get?.toUnit || { _id: 1 },
+      })
+      : null,
     quantity,
   };
 };

@@ -1,11 +1,13 @@
 import { type ActFn, ObjectId } from "lesan";
 import {
-  purchasingRequest,
-  processStep,
-  stepApproval,
   coreApp,
+  processStep,
+  purchasingRequest,
+  stepApproval,
 } from "../../../mod.ts";
 import type { MyContext } from "@lib";
+import { assertWareModelAccess } from "../../../utils/checkWareModelAccess.ts";
+import type { ActiveRole } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
 import { resolveProcessForPR } from "../../../utils/resolveProcess.ts";
 
@@ -35,6 +37,9 @@ export const submitFn: ActFn = async (body) => {
       selectedTenderOfferId: 1,
       stuff: { _id: 1 },
       wareModel: { _id: 1, name: 1, enName: 1 },
+      wareType: { _id: 1 },
+      wareClass: { _id: 1 },
+      wareGroup: { _id: 1 },
       requestingUnit: { _id: 1, name: 1 },
     },
   }) as Record<string, unknown>;
@@ -55,7 +60,9 @@ export const submitFn: ActFn = async (body) => {
   const hasTenderOffer = !!pr.selectedTenderOfferId;
 
   if (!hasStuff && !hasTenderOffer) {
-    throwError("Please assign stuff or select a tender offer before submitting this request");
+    throwError(
+      "Please assign stuff or select a tender offer before submitting this request",
+    );
     return;
   }
 
@@ -67,11 +74,27 @@ export const submitFn: ActFn = async (body) => {
     return;
   }
 
+  if (!activeRole) {
+    throwError("Active role not found");
+    return;
+  }
+
+  await assertWareModelAccess(user, activeRole as ActiveRole, {
+    _id: wareModelId,
+    wareType: pr.wareType as { _id?: unknown },
+    wareClass: pr.wareClass as { _id?: unknown },
+    wareGroup: pr.wareGroup as { _id?: unknown },
+  });
+
   // 2. Derive organization
   const userAny = user as Record<string, unknown>;
-  const userOrgs = userAny.organizations as Array<Record<string, unknown>> | undefined;
+  const userOrgs = userAny.organizations as
+    | Array<Record<string, unknown>>
+    | undefined;
   if (!userOrgs || userOrgs.length === 0) {
-    throwError("Could not determine organization. Please ensure you belong to an organization.");
+    throwError(
+      "Could not determine organization. Please ensure you belong to an organization.",
+    );
     return;
   }
   const orgId = (userOrgs[0]._id as ObjectId).toString();
@@ -80,8 +103,8 @@ export const submitFn: ActFn = async (body) => {
   const requestingUnitId = overrideUnitId
     ? (overrideUnitId as string)
     : (activeRole?.scopeType === "unit" && activeRole?.scopeId
-        ? activeRole.scopeId
-        : undefined);
+      ? activeRole.scopeId
+      : undefined);
 
   if (!requestingUnitId) {
     throwError("Your active role does not have an associated unit.");
@@ -89,7 +112,8 @@ export const submitFn: ActFn = async (body) => {
   }
 
   // 4. Validate submitter's unit matches PR's requesting unit
-  const prRequestingUnitId = (pr.requestingUnit as Record<string, unknown>)?._id?.toString();
+  const prRequestingUnitId = (pr.requestingUnit as Record<string, unknown>)?._id
+    ?.toString();
   if (prRequestingUnitId && requestingUnitId !== prRequestingUnitId) {
     throwError("You can only submit purchase requests for your own unit");
     return;
@@ -127,11 +151,13 @@ export const submitFn: ActFn = async (body) => {
 
   if (steps.length > 0) {
     const firstStep = steps[0];
-    const unitIds = [...new Set<string>(
-      firstStep.assigneeGroups.flatMap(
-        (g: { unitIds: string[] }) => g.unitIds,
+    const unitIds = [
+      ...new Set<string>(
+        firstStep.assigneeGroups.flatMap(
+          (g: { unitIds: string[] }) => g.unitIds,
+        ),
       ),
-    )];
+    ];
     for (const unitId of unitIds) {
       await stepApproval.insertOne({
         doc: { status: "pending" },

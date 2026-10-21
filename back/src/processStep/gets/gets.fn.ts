@@ -1,5 +1,8 @@
-import type { ActFn, Document, ObjectId } from "lesan";
+import type { ActFn, Document } from "lesan";
+import { ObjectId } from "lesan";
 import { processStep } from "../../../mod.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
+import { processStepProcessIds } from "../readScope.ts";
 
 export const getsFn: ActFn = async (body) => {
   const {
@@ -15,12 +18,21 @@ export const getsFn: ActFn = async (body) => {
     get,
   } = body.details;
 
+  const { user, activeRole } = await getAuth();
+  const allowedProcessIds = await processStepProcessIds(activeRole, user);
+
   const pipeline: Document[] = [];
 
   search &&
     pipeline.push({
       $match: { $text: { $search: search } },
     });
+
+  if (allowedProcessIds !== null) {
+    pipeline.push({
+      $match: { "process._id": { $in: allowedProcessIds } },
+    });
+  }
 
   processId &&
     pipeline.push({

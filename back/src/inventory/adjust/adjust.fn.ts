@@ -1,11 +1,13 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
 import { coreApp, inventory, unit } from "../../../mod.ts";
 import type { MyContext } from "@lib";
+import { assertWareModelAccess } from "../../../utils/checkWareModelAccess.ts";
+import type { ActiveRole } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
 
 export const adjustFn: ActFn = async (body) => {
   const {
-    set: { _id, quantity, description, activeRoleId },
+    set: { _id, quantity, activeRoleId },
     get,
   } = body.details;
 
@@ -28,7 +30,13 @@ export const adjustFn: ActFn = async (body) => {
 
     const inv = await inventory.findOne({
       filters: { _id: inventoryId },
-      projection: { unit: { _id: 1, organization: { _id: 1 } } },
+      projection: {
+        unit: { _id: 1, organization: { _id: 1 } },
+        wareModel: { _id: 1 },
+        wareType: { _id: 1 },
+        wareClass: { _id: 1 },
+        wareGroup: { _id: 1 },
+      },
     }) as Document | null;
 
     if (!inv) {
@@ -53,6 +61,13 @@ export const adjustFn: ActFn = async (body) => {
       throwError("You cant do this");
       return;
     }
+
+    await assertWareModelAccess(user, activeRole as ActiveRole, {
+      _id: (inv.wareModel as Record<string, unknown>)?._id,
+      wareType: inv.wareType as { _id?: unknown },
+      wareClass: inv.wareClass as { _id?: unknown },
+      wareGroup: inv.wareGroup as { _id?: unknown },
+    });
 
     let organizationId = unitRelation?.organization?._id === null ||
         unitRelation?.organization?._id === undefined

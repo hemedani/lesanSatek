@@ -1,63 +1,40 @@
-import type { ActFn, Document } from "lesan";
-import { ObjectId } from "lesan";
-import { consumption, unit, coreApp } from "../../../mod.ts";
-import type { MyContext } from "@lib";
-import { throwError } from "../../../utils/throwError.ts";
+import { type ActFn, type Document, ObjectId } from "lesan";
+import { consumption } from "../../../mod.ts";
+import { consumptionScopeMatch } from "../../../utils/consumptionScope.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
 
 export const countFn: ActFn = async (body) => {
-  const { set: { unitId, wareModelId, reason, consumedFor, activeRoleId } } = body.details;
+  const {
+    set: { unitId, wareModelId, reason, consumedFor },
+  } = body.details;
 
-  const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
+  const { user, activeRole } = await getAuth();
+  const roleMatch = await consumptionScopeMatch(activeRole, user);
 
-  const activeRole = (user.roles || []).find(
-    (r: { roleId: string }) => r.roleId === activeRoleId,
-  ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
+  const requestedMatch: Document = {};
 
-  if (!activeRole) {
-    throwError("Active role not found");
-    return;
+  unitId && (requestedMatch["unit._id"] = new ObjectId(unitId as string));
+  wareModelId &&
+    (requestedMatch["wareModel._id"] = new ObjectId(wareModelId as string));
+  reason &&
+    (requestedMatch.reason = { $regex: new RegExp(reason as string, "i") });
+  consumedFor &&
+    (requestedMatch.consumedFor = {
+      $regex: new RegExp(consumedFor as string, "i"),
+    });
+
+  const hasRoleMatch = Object.keys(roleMatch).length > 0;
+  const hasRequestedMatch = Object.keys(requestedMatch).length > 0;
+
+  let match: Document = {};
+
+  if (hasRoleMatch && hasRequestedMatch) {
+    match = { $and: [roleMatch, requestedMatch] };
+  } else if (hasRoleMatch) {
+    match = roleMatch;
+  } else if (hasRequestedMatch) {
+    match = requestedMatch;
   }
-
-  const match: Document = {};
-
-  const isWarehouseHead = await (async () => {
-    if (activeRole.name !== "UnitHead") return false;
-    if (activeRole.scopeType !== "unit" || !activeRole.scopeId) return false;
-    const u = await unit.findOne({
-      filters: { _id: new ObjectId(activeRole.scopeId) },
-      projection: { type: 1 },
-    }) as Document | null;
-    return u?.type === "Warehouse";
-  })();
-
-  if (activeRole.name === "Employee" || activeRole.name === "Ordinary") {
-    if (activeRole.scopeType === "unit" && activeRole.scopeId) {
-      match["unit._id"] = new ObjectId(activeRole.scopeId);
-    }
-  } else if (activeRole.name === "UnitHead") {
-    if (!isWarehouseHead && activeRole.scopeType === "unit" && activeRole.scopeId) {
-      match["unit._id"] = new ObjectId(activeRole.scopeId);
-    }
-  } else if (activeRole.name === "OrgHead") {
-    if (activeRole.scopeType === "organization" && activeRole.scopeId) {
-      const orgUnits = await unit.aggregation({
-        pipeline: [
-          { $match: { "organization._id": new ObjectId(activeRole.scopeId) } },
-          { $project: { _id: 1 } },
-        ],
-      }).toArray();
-      if (orgUnits.length > 0) {
-        match["unit._id"] = {
-          $in: orgUnits.map((u: Document) => u._id),
-        };
-      }
-    }
-  }
-
-  unitId && (match["unit._id"] = new ObjectId(unitId as string));
-  wareModelId && (match["wareModel._id"] = new ObjectId(wareModelId));
-  reason && (match.reason = { $regex: new RegExp(reason as string, "i") });
-  consumedFor && (match.consumedFor = { $regex: new RegExp(consumedFor as string, "i") });
 
   const qty = await consumption.countDocument({ filter: match });
 

@@ -1039,7 +1039,12 @@
     "id": "gen-second-budgetLine",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"add\", \"details\": {\"set\": {\"code\": \"BUD-002\", \"title\": \"بودجه خرید مواد مصرفی\", \"description\": \"بودجه مواد مصرفی و شوینده\", \"fiscalYearId\": \"{fiscalYearId}\", \"organizationId\": \"{orgId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"code\": 1, \"totalAllocated\": 1, \"remainingBudget\": 1}}}}",
     "repeat": 1,
-    "captures": [{ "key": "budgetLine2Id", "value": "[body][_id]" }]
+    "captures": [
+      {
+        "key": "budgetLine2Id",
+        "value": "[body][_id]"
+      }
+    ]
   },
   {
     "id": "gen-second-budgetAllocation",
@@ -1517,24 +1522,38 @@
     "repeat": 1,
     "captures": []
   },
-
   {
     "id": "gen-second-wareType",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareType\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"محلول‌ها و مواد شیمیایی\", \"enName\": \"محلول‌ها و مواد شیمیایی\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,
-    "captures": [{ "key": "wareType2Id", "value": "[body][_id]" }]
+    "captures": [
+      {
+        "key": "wareType2Id",
+        "value": "[body][_id]"
+      }
+    ]
   },
   {
     "id": "gen-second-wareClass",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareClass\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"مواد شوینده\", \"enName\": \"مواد شوینده\", \"wareTypeId\": \"{wareType2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,
-    "captures": [{ "key": "wareClass2Id", "value": "[body][_id]" }]
+    "captures": [
+      {
+        "key": "wareClass2Id",
+        "value": "[body][_id]"
+      }
+    ]
   },
   {
     "id": "gen-second-wareGroup",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareGroup\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"ضدعفونی‌کننده\", \"enName\": \"ضدعفونی‌کننده\", \"wareTypeId\": \"{wareType2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,
-    "captures": [{ "key": "wareGroup2Id", "value": "[body][_id]" }]
+    "captures": [
+      {
+        "key": "wareGroup2Id",
+        "value": "[body][_id]"
+      }
+    ]
   },
   {
     "id": "gen-second-wareGroup-relations",
@@ -1546,55 +1565,97 @@
     "id": "gen-second-wareModel",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareModel\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"بتادین ۱۰٪\", \"enName\": \"بتادین ۱۰٪\", \"wareTypeId\": \"{wareType2Id}\", \"wareClassId\": \"{wareClass2Id}\", \"wareGroupId\": \"{wareGroup2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,
-    "captures": [{ "key": "wareModel2Id", "value": "[body][_id]" }]
+    "captures": [
+      {
+        "key": "wareModel2Id",
+        "value": "[body][_id]"
+      }
+    ]
   },
   {
     "id": "gen-second-ware",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"ware\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"بتادین ۱۰٪ ۵۰۰ml\", \"enName\": \"بتادین ۱۰٪ ۵۰۰ml\", \"brand\": \"تولیددارو\", \"price\": 450000, \"manufacturerId\": \"{mfrId}\", \"wareTypeId\": \"{wareType2Id}\", \"wareClassId\": \"{wareClass2Id}\", \"wareGroupId\": \"{wareGroup2Id}\", \"wareModelId\": \"{wareModel2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1, \"price\": 1}}}}",
     "repeat": 1,
     "captures": [
-      { "key": "ware2Id", "value": "[body][_id]" },
-      { "key": "ware2Price", "value": "[body][price]" }
+      {
+        "key": "ware2Id",
+        "value": "[body][_id]"
+      },
+      {
+        "key": "ware2Price",
+        "value": "[body][price]"
+      }
     ]
   },
   {
     "id": "gen-second-store",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"store\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"داروخانه مرکزی\", \"address\": \"تهران، خیابان انقلاب\", \"cityId\": \"{cityId}\", \"stateId\": \"{stateId}\", \"storeHeadId\": \"{vendorUserId}\", \"economicCode\": \"987654321\", \"postalCode\": \"1234567899\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,
-    "captures": [{ "key": "store2Id", "value": "[body][_id]" }]
+    "captures": [
+      {
+        "key": "store2Id",
+        "value": "[body][_id]"
+      }
+    ]
   },
   {
     "id": "gen-second-stuff",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"add\", \"details\": {\"set\": {\"quantity\": 200, \"price\": 520000, \"hasAbsolutePrice\": true, \"wareId\": \"{ware2Id}\", \"storeId\": \"{store2Id}\", \"wareTypeId\": \"{wareType2Id}\", \"wareClassId\": \"{wareClass2Id}\", \"wareGroupId\": \"{wareGroup2Id}\", \"wareModelId\": \"{wareModel2Id}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"price\": 1}}}}",
     "repeat": 1,
     "captures": [
-      { "key": "stuff2Id", "value": "[body][_id]" },
-      { "key": "stuff2Price", "value": "[body][price]" }
+      {
+        "key": "stuff2Id",
+        "value": "[body][_id]"
+      },
+      {
+        "key": "stuff2Price",
+        "value": "[body][price]"
+      }
     ]
   },
   {
     "id": "gen-process-betadine",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"فرآیند کوتاه خرید بتادین\", \"description\": \"گردش کار کوتاه خرید بتادین\", \"organizationId\": \"{orgId}\", \"wareModelId\": \"{wareModel2Id}\"}, \"get\": {\"_id\": 1, \"name\": 1, \"status\": 1, \"version\": 1}}}}",
     "repeat": 1,
-    "captures": [{ "key": "processBetadineId", "value": "[body][_id]" }]
+    "captures": [
+      {
+        "key": "processBetadineId",
+        "value": "[body][_id]"
+      }
+    ]
   },
   {
     "id": "gen-step-betadine-1",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید انبار\", \"description\": \"بررسی انبار مرکزی\", \"stepType\": \"Approval\", \"order\": 1, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{warehouseUnitId}\"]}], \"processId\": \"{processBetadineId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,
-    "captures": [{ "key": "stepBetadine1Id", "value": "[body][_id]" }]
+    "captures": [
+      {
+        "key": "stepBetadine1Id",
+        "value": "[body][_id]"
+      }
+    ]
   },
   {
     "id": "gen-step-betadine-2",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید مالی\", \"description\": \"تأیید مالی\", \"stepType\": \"Approval\", \"order\": 2, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{financeUnitId}\"]}], \"processId\": \"{processBetadineId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,
-    "captures": [{ "key": "stepBetadine2Id", "value": "[body][_id]" }]
+    "captures": [
+      {
+        "key": "stepBetadine2Id",
+        "value": "[body][_id]"
+      }
+    ]
   },
   {
     "id": "gen-step-betadine-3",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"تأیید تدارکات\", \"description\": \"تأیید نهایی تدارکات\", \"stepType\": \"Approval\", \"order\": 3, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{procurementUnitId}\"]}], \"processId\": \"{processBetadineId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
     "repeat": 1,
-    "captures": [{ "key": "stepBetadine3Id", "value": "[body][_id]" }]
+    "captures": [
+      {
+        "key": "stepBetadine3Id",
+        "value": "[body][_id]"
+      }
+    ]
   },
   {
     "id": "gen-activate-betadine",
@@ -1606,7 +1667,12 @@
     "id": "gen-pr-wash",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"add\", \"details\": {\"set\": {\"title\": \"خرید بتادین\", \"description\": \"تأمین مواد ضدعفونی\", \"quantity\": 30, \"wareModelId\": \"{wareModel2Id}\", \"activeRoleId\": \"{microEmployeeRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1}}}}",
     "repeat": 1,
-    "captures": [{ "key": "prWashId", "value": "[body][_id]" }]
+    "captures": [
+      {
+        "key": "prWashId",
+        "value": "[body][_id]"
+      }
+    ]
   },
   {
     "id": "gen-assign-store2-wash",
@@ -1643,20 +1709,33 @@
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"goodsReceipt\", \"act\": \"add\", \"details\": {\"set\": {\"receiptNumber\": \"رسید-۰۰۲\", \"description\": \"رسید مواد ضدعفونی\", \"receivedAt\": \"2026-05-15\", \"items\": [{\"wareModelId\": \"{wareModel2Id}\", \"wareId\": \"{ware2Id}\", \"quantityReceived\": 30, \"quantityAccepted\": 30, \"quantityRejected\": 0}], \"purchasingRequestId\": \"{prWashId}\", \"receivedById\": \"{userId}\", \"receivingUnitId\": \"{microlabUnitId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"receiptNumber\": 1, \"status\": 1}}}}",
     "repeat": 1,
     "captures": [
-      { "key": "washReceiptId", "value": "[body][_id]" }
+      {
+        "key": "washReceiptId",
+        "value": "[body][_id]"
+      }
     ]
   },
   {
     "id": "gen-inventory2-add",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{ware2Id}\", \"unitId\": \"{warehouseUnitId}\", \"quantity\": 100, \"minQuantity\": 20, \"maxQuantity\": 500, \"location\": \"قفسه B-07\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"minQuantity\": 1}}}}",
     "repeat": 1,
-    "captures": [{ "key": "inventory2Id", "value": "[body][_id]" }]
+    "captures": [
+      {
+        "key": "inventory2Id",
+        "value": "[body][_id]"
+      }
+    ]
   },
   {
     "id": "gen-inventory-lowstock",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{wareId}\", \"unitId\": \"{coldstoreUnitId}\", \"quantity\": 3, \"minQuantity\": 10, \"maxQuantity\": 50, \"location\": \"قفسه C-03\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"minQuantity\": 1}}}}",
     "repeat": 1,
-    "captures": [{ "key": "inventoryLowId", "value": "[body][_id]" }]
+    "captures": [
+      {
+        "key": "inventoryLowId",
+        "value": "[body][_id]"
+      }
+    ]
   },
   {
     "id": "gen-consumption2",
@@ -2231,6 +2310,114 @@
   {
     "id": "authz-read-ordinary-count-users",
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzOrdinaryToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"countUsers\", \"details\": {\"set\": {\"activeRoleId\": \"{authzOrdinaryRoleId}\"}, \"get\": {\"qty\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-authz-read-restricted-user",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"first_name\": \"محدود\", \"last_name\": \"مدل کالا\", \"email\": \"authz.read.restricted@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000040\", \"gender\": \"Male\", \"isActive\": true, \"is_verified\": true, \"organizations\": [\"{orgId}\"], \"units\": [\"{unitId}\"], \"allowWareModelIds\": [\"{wareModelId}\"], \"roles\": [{\"name\": \"Employee\", \"scopeType\": \"unit\", \"scopeId\": \"{unitId}\"}]}, \"get\": {\"_id\": 1, \"roles\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzRestrictedUserId",
+        "value": "[body][_id]"
+      },
+      {
+        "key": "authzRestrictedRoleId",
+        "value": "[body][roles][0][roleId]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-read-restricted-login",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"login\", \"details\": {\"set\": {\"email\": \"authz.read.restricted@lesansatek.com\", \"password\": \"password123\"}, \"get\": {\"token\": 1, \"user\": {\"_id\": 1, \"email\": 1, \"roles\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzRestrictedToken",
+        "value": "[body][token]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-read-foreign-process-step",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"name\": \"گام سازمان دیگر\", \"description\": \"گام تست خواندن فرآیند سازمان دیگر\", \"stepType\": \"Approval\", \"order\": 1, \"required\": true, \"groupsOperator\": \"AND\", \"assigneeGroups\": [{\"operator\": \"AND\", \"unitIds\": [\"{authzScopeOtherOrgUnitId}\"]}], \"processId\": \"{authzScopeOtherOrgProcessId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzForeignProcessStepId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-authz-read-warehouse-inventory",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{wareId}\", \"unitId\": \"{warehouseUnitId}\", \"warehouseUnitId\": \"{warehouseUnitId}\", \"quantity\": 3, \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "authzWarehouseInventoryId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "authz-task9-orghead-process-gets",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"name\": 1, \"organization\": {\"_id\": 1}, \"unit\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task9-unithead-process-gets",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzReadUnitHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{authzReadUnitHeadRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"name\": 1, \"organization\": {\"_id\": 1}, \"unit\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task9-orghead-foreign-process-steps",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"processStep\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"processId\": \"{authzScopeOtherOrgProcessId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"name\": 1, \"process\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task9-orghead-purchasing-gets",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"title\": 1, \"organization\": {\"_id\": 1}, \"requestingUnit\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task9-unithead-purchasing-gets",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzReadUnitHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{authzReadUnitHeadRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"title\": 1, \"organization\": {\"_id\": 1}, \"requestingUnit\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task9-storehead-pending-by-unit",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"getPendingByUnit\", \"details\": {\"set\": {\"activeRoleId\": \"{storeHeadRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1, \"store\": {\"_id\": 1, \"name\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task9-orghead-step-approvals",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"status\": 1, \"unit\": {\"_id\": 1, \"organization\": {\"_id\": 1}}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task9-restricted-disallowed-model",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzRestrictedToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{authzRestrictedRoleId}\", \"title\": \"مدل غیرمجاز\", \"quantity\": 1, \"wareModelId\": \"{wareModel2Id}\"}, \"get\": {\"_id\": 1, \"title\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task9-restricted-allowed-model",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzRestrictedToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{authzRestrictedRoleId}\", \"title\": \"مدل مجاز\", \"quantity\": 1, \"wareModelId\": \"{wareModelId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task9-employee-inventory-outside-scope",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzCreatedToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{authzCreatedRoleId}\", \"unitId\": \"{warehouseUnitId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"unit\": {\"_id\": 1}, \"ware\": {\"_id\": 1, \"name\": 1}}}}}",
     "repeat": 1,
     "captures": []
   }

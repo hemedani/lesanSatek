@@ -1,8 +1,8 @@
 import type { ActFn, Document } from "lesan";
 import { ObjectId } from "lesan";
-import { purchasingRequest, unit, coreApp } from "../../../mod.ts";
-import type { MyContext } from "@lib";
-import { throwError } from "../../../utils/throwError.ts";
+import { purchasingRequest } from "../../../mod.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
+import { purchasingRequestReadMatch } from "../readScope.ts";
 
 export const getsFn: ActFn = async (body) => {
   const {
@@ -26,69 +26,25 @@ export const getsFn: ActFn = async (body) => {
       stuffStatus,
       paymentOrderStatus,
       goodsReceiptStatus,
-      activeRoleId,
     },
     get,
   } = body.details;
 
-  const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
-
-  const activeRole = (user.roles || []).find(
-    (r: { roleId: string }) => r.roleId === activeRoleId,
-  ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
-
-  if (!activeRole) {
-    throwError("Active role not found");
-    return;
-  }
+  const { user, activeRole } = await getAuth();
+  const readMatch = purchasingRequestReadMatch(activeRole, user);
 
   const pipeline: Document[] = [];
-
-  const isWarehouseHead = await (async () => {
-    if (activeRole.name !== "UnitHead") return false;
-    if (activeRole.scopeType !== "unit" || !activeRole.scopeId) return false;
-    const u = await unit.findOne({
-      filters: { _id: new ObjectId(activeRole.scopeId) },
-      projection: { type: 1 },
-    }) as Document | null;
-    return u?.type === "Warehouse";
-  })();
-
-  if (activeRole.name === "Employee" || activeRole.name === "Ordinary") {
-    pipeline.push({
-      $match: { "requester._id": user._id },
-    });
-  } else if (activeRole.name === "UnitHead") {
-    if (isWarehouseHead) {
-      pipeline.push({
-        $match: { stuffStatus: "delivered" },
-      });
-    } else if (activeRole.scopeType === "unit" && activeRole.scopeId) {
-      pipeline.push({
-        $match: { "requestingUnit._id": new ObjectId(activeRole.scopeId) },
-      });
-    }
-  } else if (activeRole.name === "OrgHead") {
-    if (activeRole.scopeType === "organization" && activeRole.scopeId) {
-      pipeline.push({
-        $match: { "organization._id": new ObjectId(activeRole.scopeId) },
-      });
-    }
-  } else if (activeRole.name === "StoreHead") {
-    if (activeRole.scopeType === "store" && activeRole.scopeId) {
-      pipeline.push({
-        $match: {
-          "store._id": new ObjectId(activeRole.scopeId),
-          finalizedAt: { $exists: true },
-        },
-      });
-    }
-  }
 
   search &&
     pipeline.push({
       $match: { $text: { $search: search } },
     });
+
+  readMatch && pipeline.push({ $match: readMatch });
+
+  if (activeRole.name === "StoreHead") {
+    pipeline.push({ $match: { finalizedAt: { $exists: true } } });
+  }
 
   status &&
     pipeline.push({
@@ -173,20 +129,6 @@ export const getsFn: ActFn = async (body) => {
   }
 
   if (unitId) {
-    if (!["Manager", "Admin", "OrgHead"].includes(activeRole.name)) {
-      const unitDoc = await unit.aggregation({
-        pipeline: [{ $match: { _id: new ObjectId(unitId as string) } }],
-        projection: { head: { _id: 1 } },
-      }).toArray();
-
-      if (
-        unitDoc.length === 0 || !unitDoc[0].head ||
-        unitDoc[0].head._id.toString() !== user._id.toString()
-      ) {
-        throwError("You can only view requests for your own unit");
-      }
-    }
-
     pipeline.push({
       $match: { "requestingUnit._id": new ObjectId(unitId as string) },
     });

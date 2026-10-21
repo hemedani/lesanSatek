@@ -1,6 +1,8 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { consumption, purchasingRequest, ware, coreApp } from "../../../mod.ts";
+import { consumption, coreApp, purchasingRequest, ware } from "../../../mod.ts";
 import type { MyContext } from "@lib";
+import { assertWareModelAccess } from "../../../utils/checkWareModelAccess.ts";
+import type { ActiveRole } from "../../../utils/authzPolicy.ts";
 import { removeStock } from "../../../utils/inventoryManager.ts";
 import { throwError } from "../../../utils/throwError.ts";
 
@@ -8,11 +10,22 @@ export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
 
-  const { activeRoleId, unitId: rawUnitId, consumedById: rawConsumedById, inventoryId, purchasingRequestId, wareId, ...rest } = set;
+  const {
+    activeRoleId,
+    unitId: rawUnitId,
+    consumedById: rawConsumedById,
+    inventoryId,
+    purchasingRequestId,
+    wareId,
+    ...rest
+  } = set;
 
-  const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
+  const activeRole = (user.roles || []).find((r: { roleId: string }) =>
+    r.roleId === activeRoleId
+  );
 
-  const unitId = rawUnitId || (activeRole?.scopeType === "unit" ? activeRole.scopeId : undefined);
+  const unitId = rawUnitId ||
+    (activeRole?.scopeType === "unit" ? activeRole.scopeId : undefined);
   const consumedById = rawConsumedById || user._id;
 
   if (!unitId) {
@@ -36,6 +49,18 @@ export const addFn: ActFn = async (body) => {
     throwError("Ware not found");
     return;
   }
+
+  if (!activeRole) {
+    throwError("Active role not found");
+    return;
+  }
+
+  await assertWareModelAccess(user, activeRole as ActiveRole, {
+    _id: (wareDoc.wareModel as Record<string, unknown>)?._id,
+    wareType: wareDoc.wareType as { _id?: unknown },
+    wareClass: wareDoc.wareClass as { _id?: unknown },
+    wareGroup: wareDoc.wareGroup as { _id?: unknown },
+  });
 
   const relations: Record<string, unknown> = {};
 
@@ -108,7 +133,8 @@ export const addFn: ActFn = async (body) => {
   // Push "goods_consumed" history on the purchasing request if linked
   if (purchasingRequestId) {
     const wareDoc2 = wareDoc as Record<string, unknown>;
-    const wareModelName = ((wareDoc2.wareModel as Record<string, unknown>)?.name as string) || "";
+    const wareModelName =
+      ((wareDoc2.wareModel as Record<string, unknown>)?.name as string) || "";
 
     await purchasingRequest.findOneAndUpdate({
       filter: { _id: new ObjectId(purchasingRequestId as string) },
@@ -120,12 +146,14 @@ export const addFn: ActFn = async (body) => {
               by: consumedById as string,
               name: `${user.first_name} ${user.last_name}`,
               at: new Date(),
-              role: activeRole ? {
-                id: activeRole.roleId,
-                name: activeRole.name,
-                scopeType: activeRole.scopeType,
-                scopeId: activeRole.scopeId,
-              } : { id: "", name: "" },
+              role: activeRole
+                ? {
+                  id: activeRole.roleId,
+                  name: activeRole.name,
+                  scopeType: activeRole.scopeType,
+                  scopeId: activeRole.scopeId,
+                }
+                : { id: "", name: "" },
             },
             details: {
               consumptionId: result._id?.toString(),
