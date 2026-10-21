@@ -12,6 +12,7 @@ import {
   user,
 } from "../mod.ts";
 import type { ActiveRole, ScopeRef } from "./authzPolicy.ts";
+import { getAuth } from "./grantAccess.ts";
 import type { GrantBody, ScopeResolver } from "./grantAccess.ts";
 
 type Document = Record<string, unknown> | null | undefined;
@@ -56,6 +57,17 @@ const storeScope = (id: unknown): ScopeRef | null =>
   id === null || id === undefined || id === ""
     ? null
     : { scopeType: "store", scopeId: String(id) };
+
+export const roleScope = (): ScopeResolver => async () => {
+  const { activeRole } = await getAuth();
+
+  if (!activeRole.scopeType || !activeRole.scopeId) return null;
+
+  return {
+    scopeType: activeRole.scopeType,
+    scopeId: String(activeRole.scopeId),
+  };
+};
 
 export const orgFromSet = (field: string): ScopeResolver => async (body) => {
   const organizationId = toObjectId(setOf(body)[field]);

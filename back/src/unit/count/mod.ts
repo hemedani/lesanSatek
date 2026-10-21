@@ -1,5 +1,5 @@
 import { grantAccess, setTokens, setUser } from "@lib";
-import { orgFromSet, unitFromSet } from "../../../utils/scopeResolvers.ts";
+import { roleScope } from "../../../utils/scopeResolvers.ts";
 import { countFn } from "./count.fn.ts";
 import { countValidator } from "./count.val.ts";
 import { coreApp } from "../../../mod.ts";
@@ -14,8 +14,8 @@ export const countSetup = () =>
       setUser,
       grantAccess([
         { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead"], scope: orgFromSet("organizationId") },
-        { roles: ["UnitHead"], scope: unitFromSet("_id") },
+        { roles: ["OrgHead"], scope: roleScope() },
+        { roles: ["UnitHead"], scope: roleScope() },
       ]),
     ],
     validator: countValidator(),
