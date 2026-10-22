@@ -1,4 +1,10 @@
-import { object, objectIdValidation, optional } from "lesan";
+import {
+  literal,
+  object,
+  objectIdValidation,
+  optional,
+  union,
+} from "lesan";
 import { activeRoleMixin } from "@lib";
 import { selectStruct } from "../../../mod.ts";
 import { paymentOrder_pure } from "@model";
@@ -14,6 +20,7 @@ export const updateValidator = () => {
       _id: objectIdValidation,
       ...optionalPure,
       purchasingRequestId: optional(objectIdValidation),
+      payToId: optional(union([objectIdValidation, literal("")])),
       financialUnitId: optional(objectIdValidation),
     }),
     get: selectStruct("paymentOrder", 2),

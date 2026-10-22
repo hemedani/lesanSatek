@@ -104,10 +104,17 @@ export const addFn: ActFn = async (body) => {
         const scopedUnitOrganizationId =
           (scopedUnit.organization as Record<string, unknown> | undefined)
             ?._id?.toString();
+        const scopedUnitIsHeaded = warehouseUnits.some(
+          (warehouseUnit) =>
+            String(warehouseUnit._id) === String(activeRole.scopeId),
+        );
 
-        if (scopedUnitOrganizationId === prOrganizationId) {
+        if (
+          scopedUnitOrganizationId === prOrganizationId &&
+          scopedUnitIsHeaded
+        ) {
           authorizedWarehouseUnitId = activeRole.scopeId as string;
-        } else {
+        } else if (scopedUnitOrganizationId !== prOrganizationId) {
           scopedWarehouseUnitOutsidePrOrg = true;
         }
       }
@@ -139,7 +146,12 @@ export const addFn: ActFn = async (body) => {
       if (!isWarehouseHeadInPrOrg) throw error;
     }
 
-    if (!isRequester && !isRequestingUnitHead && !isWarehouseHeadInPrOrg) {
+    if (
+      !bypass &&
+      !isRequester &&
+      !isRequestingUnitHead &&
+      !isWarehouseHeadInPrOrg
+    ) {
       throwError(
         "Only the requester, the requesting unit head, or the central warehouse head can confirm goods delivery",
       );

@@ -14,8 +14,8 @@ export const updateFn: ActFn = async (body) => {
       _id,
       activeRoleId: _activeRoleId,
       purchasingRequestId,
+      payToId,
       financialUnitId,
-      payToId: _payToId,
       ...fields
     },
     get,
@@ -62,9 +62,34 @@ export const updateFn: ActFn = async (body) => {
     }
   }
 
-  return await paymentOrder.findOneAndUpdate({
-    filter: { _id: new ObjectId(_id as string) },
+  const orderId = new ObjectId(_id as string);
+
+  const updated = await paymentOrder.findOneAndUpdate({
+    filter: { _id: orderId },
     update: { $set: updateObj },
     projection: get,
   });
+
+  if (
+    payToId !== undefined &&
+    payToId !== null &&
+    String(payToId).trim() !== "" &&
+    ObjectId.isValid(String(payToId))
+  ) {
+    return await paymentOrder.addRelation({
+      filters: { _id: orderId },
+      relations: {
+        payTo: {
+          _ids: new ObjectId(String(payToId)),
+          relatedRelations: {
+            paymentOrders: true,
+          },
+        },
+      },
+      projection: get,
+      replace: true,
+    });
+  }
+
+  return updated;
 };
