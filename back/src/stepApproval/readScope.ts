@@ -1,7 +1,7 @@
 import { ObjectId } from "lesan";
 import { unit } from "../../mod.ts";
 import type { ActiveRole } from "../../utils/authzPolicy.ts";
-import { isManagerLike } from "../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../utils/authzPolicy.ts";
 import { type ScopeUser, unitReadScope } from "../../utils/readScope.ts";
 import { throwError } from "../../utils/throwError.ts";
 
@@ -33,7 +33,7 @@ export const stepApprovalAllowedUnitIds = async (
   activeRole: ActiveRole,
   user: ScopeUser | undefined,
 ): Promise<ObjectId[] | null> => {
-  if (user?.isGhost || isManagerLike(activeRole)) return null;
+  if (isScopeBypass(activeRole, user)) return null;
 
   if (activeRole.name === "UnitHead") {
     if (activeRole.scopeType !== "unit" || !activeRole.scopeId) return [];

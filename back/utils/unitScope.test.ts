@@ -126,3 +126,24 @@ Deno.test("unknown units fail closed", async () => {
     "You cant do this",
   );
 });
+
+Deno.test("ghost users with a scoped role are still scope checked", async () => {
+  const ghost = userWithUnits([], { isGhost: true });
+
+  await assertUnitInActorScope(
+    ghost,
+    role({ name: "Ordinary" }),
+    UNIT_FOREIGN,
+    options,
+  );
+
+  await expectRejectsWith(
+    assertUnitInActorScope(
+      ghost,
+      role({ name: "OrgHead", scopeType: "organization", scopeId: ORG_OWN }),
+      UNIT_FOREIGN,
+      options,
+    ),
+    "You cant do this",
+  );
+});

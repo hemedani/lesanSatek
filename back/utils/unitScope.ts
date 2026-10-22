@@ -1,5 +1,5 @@
 import { ObjectId } from "lesan";
-import { type ActiveRole, isManagerLike } from "./authzPolicy.ts";
+import { type ActiveRole, isScopeBypass } from "./authzPolicy.ts";
 import type { ScopeUser } from "./readScope.ts";
 import { throwError } from "./throwError.ts";
 
@@ -53,7 +53,7 @@ const loadUnitFromDb = async (
 const isBypass = (
   user: ScopeUser | undefined,
   activeRole: ActiveRole,
-): boolean => Boolean(user?.isGhost) || isManagerLike(activeRole);
+): boolean => isScopeBypass(activeRole, user);
 
 const unitOrganizationId = (unitDoc: UnitScopeDocument | null): string | null =>
   normalizeId(unitDoc?.organization?._id);

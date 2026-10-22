@@ -1,6 +1,6 @@
 import { type Document, ObjectId } from "lesan";
 import type { ActiveRole } from "../../utils/authzPolicy.ts";
-import { isManagerLike } from "../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../utils/authzPolicy.ts";
 import type { ScopeUser } from "../../utils/readScope.ts";
 import { throwError } from "../../utils/throwError.ts";
 
@@ -110,7 +110,7 @@ export const purchasingRequestReadMatch = (
   activeRole: ActiveRole,
   user: UserWithId | undefined,
 ): Document | null => {
-  if (user?.isGhost || isManagerLike(activeRole)) return null;
+  if (isScopeBypass(activeRole, user)) return null;
 
   switch (activeRole.name) {
     case "OrgHead": {
@@ -166,7 +166,7 @@ export const assertCanReadPurchasingRequest = (
   user: UserWithId | undefined,
   requestDoc: PurchasingRequestRef | null | undefined,
 ): void => {
-  if (user?.isGhost || isManagerLike(activeRole)) return;
+  if (isScopeBypass(activeRole, user)) return;
   if (!requestDoc) {
     throwError("You cant do this");
     return;

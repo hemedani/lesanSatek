@@ -34,6 +34,27 @@ const normalizeId = (value: unknown): string =>
 export const isManagerLike = (role: ActiveRole): boolean =>
   role.name === "Manager" || role.name === "Admin";
 
+export const hasRoleScope = (role: ActiveRole): boolean =>
+  Boolean(role.scopeType || role.scopeId);
+
+const roleRequiresScope = (role: ActiveRole): boolean =>
+  role.name === "OrgHead" ||
+  role.name === "UnitHead" ||
+  role.name === "StoreHead";
+
+export const isGhostScopeBypass = (
+  activeRole: ActiveRole,
+  user: { isGhost?: boolean } | undefined,
+): boolean =>
+  Boolean(user?.isGhost) &&
+  !hasRoleScope(activeRole) &&
+  !roleRequiresScope(activeRole);
+
+export const isScopeBypass = (
+  activeRole: ActiveRole,
+  user: { isGhost?: boolean } | undefined,
+): boolean => isManagerLike(activeRole) || isGhostScopeBypass(activeRole, user);
+
 export const scopeMatches = (
   role: ActiveRole,
   scope: ScopeRef | null,

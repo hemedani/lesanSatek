@@ -1,5 +1,5 @@
 import { ObjectId } from "lesan";
-import { type ActiveRole, isManagerLike } from "./authzPolicy.ts";
+import { type ActiveRole, isScopeBypass } from "./authzPolicy.ts";
 import { getAuth } from "./grantAccess.ts";
 import { throwError } from "./throwError.ts";
 import { unit } from "../mod.ts";
@@ -34,7 +34,7 @@ const setOf = (body: { details?: { set?: ScopeSet } } | undefined): ScopeSet =>
   body?.details?.set ?? {};
 
 const isBypass = (user: ScopeUser | undefined, role: ActiveRole) =>
-  Boolean(user?.isGhost) || isManagerLike(role);
+  isScopeBypass(role, user);
 
 const loadUnit = async (id: ObjectId): Promise<Document> =>
   await unit.findOne({

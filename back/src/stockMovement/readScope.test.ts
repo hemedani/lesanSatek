@@ -242,3 +242,20 @@ Deno.test("stockMovementReadMatch ignores foreign organization loaders for own-u
 
   assertEquals(idsIn(match, "unit._id"), [UNIT_OWN]);
 });
+
+Deno.test("scoped Ghost roles do not bypass stock movement scopes", async () => {
+  const activeRole = role({
+    name: "OrgHead",
+    scopeType: "organization",
+    scopeId: ORG_OWN,
+  });
+  const match = await stockMovementReadMatch(
+    activeRole,
+    user({ isGhost: true }),
+    options({
+      loadOrganizationUnitIds: () => Promise.resolve([UNIT_OWN]),
+    }),
+  );
+
+  assertEquals(idsIn(match, "unit._id"), [UNIT_OWN]);
+});

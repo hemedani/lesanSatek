@@ -44,15 +44,33 @@ Deno.test("manager and admin bypass ware model restrictions", async () => {
   );
 });
 
-Deno.test("ghost users bypass ware model restrictions", async () => {
+Deno.test("ghost users only bypass ware model restrictions without a scoped role", async () => {
   await assertWareModelAccess(
     {
       isGhost: true,
       allowWareModelIds: ["other-model"],
       units: [],
     },
-    unitHeadRole,
+    {
+      roleId: "role-ordinary",
+      name: "Ordinary",
+    },
     wareModel,
+  );
+
+  await assertRejects(
+    () =>
+      assertWareModelAccess(
+        {
+          isGhost: true,
+          allowWareModelIds: ["other-model"],
+          units: [],
+        },
+        unitHeadRole,
+        wareModel,
+      ),
+    Error,
+    "You cant do this",
   );
 });
 

@@ -1,7 +1,7 @@
 import { type Document, ObjectId } from "lesan";
 import { unit } from "../../mod.ts";
 import type { ActiveRole } from "../../utils/authzPolicy.ts";
-import { isManagerLike } from "../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../utils/authzPolicy.ts";
 import { type ScopeUser, unitReadScope } from "../../utils/readScope.ts";
 
 const validObjectIds = (ids: string[]): ObjectId[] => {
@@ -22,7 +22,7 @@ export const inventoryAllowedUnitIds = async (
   activeRole: ActiveRole,
   user: ScopeUser | undefined,
 ): Promise<ObjectId[] | null> => {
-  if (user?.isGhost || isManagerLike(activeRole)) return null;
+  if (isScopeBypass(activeRole, user)) return null;
 
   const scope = await unitReadScope(activeRole, user);
 

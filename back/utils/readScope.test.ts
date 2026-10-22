@@ -66,15 +66,108 @@ Deno.test("Manager and Admin read everything", async () => {
   }
 });
 
-Deno.test("Ghost reads everything", async () => {
+Deno.test("Ghost keeps the bootstrap bypass only for unscoped roles", async () => {
   const ghost = userWithUnits([], { isGhost: true });
-  const activeRole = role({ name: "Ordinary" });
 
-  assertEquals(await unitReadScope(activeRole, ghost), "all");
-  assertEquals(await organizationReadScope(activeRole, ghost), "all");
-  assertEquals(userReadFilter(activeRole, ghost), null);
-  await assertCanReadUnit(activeRole, ghost, "any-unit");
-  await assertCanReadOrganization(activeRole, ghost, "any-org");
+  for (const name of ["Manager", "Admin"] as const) {
+    const activeRole = role({ name });
+
+    assertEquals(await unitReadScope(activeRole, ghost), "all");
+    assertEquals(await organizationReadScope(activeRole, ghost), "all");
+    assertEquals(userReadFilter(activeRole, ghost), null);
+    await assertCanReadUnit(activeRole, ghost, "any-unit");
+    await assertCanReadOrganization(activeRole, ghost, "any-org");
+  }
+
+  const ordinary = role({ name: "Ordinary" });
+
+  assertEquals(await unitReadScope(ordinary, ghost), "all");
+  assertEquals(await organizationReadScope(ordinary, ghost), "all");
+  assertEquals(userReadFilter(ordinary, ghost), null);
+  await assertCanReadUnit(ordinary, ghost, "any-unit");
+  await assertCanReadOrganization(ordinary, ghost, "any-org");
+});
+
+Deno.test("Ghost OrgHead is scoped to its organization", async () => {
+  const ghost = userWithUnits([], { isGhost: true });
+  const activeRole = role({
+    name: "OrgHead",
+    scopeType: "organization",
+    scopeId: ORG_OWN,
+  });
+
+  assertEquals(await unitReadScope(activeRole, ghost), {
+    organizationIds: [ORG_OWN],
+  });
+  assertEquals(await organizationReadScope(activeRole, ghost), {
+    organizationIds: [ORG_OWN],
+  });
+  assertEquals(userReadFilter(activeRole, ghost), {
+    "organizations._id": new ObjectId(ORG_OWN),
+  });
+
+  await assertCanReadUnit(activeRole, ghost, UNIT_OWN, {
+    loadUnitOrganizationId: () => Promise.resolve(ORG_OWN),
+  });
+  await expectRejectsWith(
+    assertCanReadUnit(activeRole, ghost, UNIT_FOREIGN, {
+      loadUnitOrganizationId: () => Promise.resolve(ORG_FOREIGN),
+    }),
+    "You cant do this",
+  );
+  await assertCanReadOrganization(activeRole, ghost, ORG_OWN);
+  await expectRejectsWith(
+    assertCanReadOrganization(activeRole, ghost, ORG_FOREIGN),
+    "You cant do this",
+  );
+});
+
+Deno.test("Ghost UnitHead gets its own unit and descendants", async () => {
+  const ghost = userWithUnits([], { isGhost: true });
+  const activeRole = role({
+    name: "UnitHead",
+    scopeType: "unit",
+    scopeId: UNIT_OWN,
+  });
+  const options = {
+    loadDescendantUnitIds: () =>
+      Promise.resolve([UNIT_CHILD, UNIT_OWN, UNIT_GRANDCHILD]),
+  };
+
+  assertEquals(await unitReadScope(activeRole, ghost, options), {
+    unitIds: [UNIT_OWN, UNIT_CHILD, UNIT_GRANDCHILD],
+  });
+
+  await assertCanReadUnit(activeRole, ghost, UNIT_GRANDCHILD, options);
+  await expectRejectsWith(
+    assertCanReadUnit(activeRole, ghost, UNIT_FOREIGN, options),
+    "You cant do this",
+  );
+});
+
+Deno.test("Ghost scoped roles without a scope fail closed", async () => {
+  const ghost = userWithUnits([], { isGhost: true });
+  const orgHead = role({ name: "OrgHead" });
+  const unitHead = role({ name: "UnitHead" });
+
+  assertEquals(await unitReadScope(orgHead, ghost), {
+    organizationIds: [],
+  });
+  assertEquals(await organizationReadScope(orgHead, ghost), {
+    organizationIds: [],
+  });
+  assertEquals(userReadFilter(orgHead, ghost), { _id: { $in: [] } });
+
+  assertEquals(
+    await unitReadScope(unitHead, ghost, {
+      loadDescendantUnitIds: () => Promise.resolve([UNIT_CHILD]),
+    }),
+    { unitIds: [] },
+  );
+  await expectRejectsWith(
+    assertCanReadOrganization(orgHead, ghost, ORG_OWN),
+    "You cant do this",
+  );
 });
 
 Deno.test("OrgHead is scoped to its organization", async () => {

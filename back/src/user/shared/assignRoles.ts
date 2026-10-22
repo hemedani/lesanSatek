@@ -4,6 +4,7 @@ import {
   type ActiveRole,
   canAssignRole,
   isManagerLike,
+  isScopeBypass,
   type RoleName,
   type ScopeRef,
   type ScopeType,
@@ -212,7 +213,7 @@ export const userTargetScope = (): ScopeResolver => async (body, user) => {
     await loadUserTargetContextForActor(
       String(userId),
       activeRole,
-      Boolean(authUser?.isGhost),
+      isScopeBypass(activeRole, authUser),
     );
   } catch {
     return null;

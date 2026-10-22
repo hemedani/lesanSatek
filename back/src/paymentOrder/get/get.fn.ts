@@ -1,6 +1,6 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
 import { paymentOrder } from "../../../mod.ts";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import {
   activeFinanceOrganizationId,
   assertCanReadPaymentOrder,
@@ -30,7 +30,7 @@ export const getFn: ActFn = async (body) => {
   }) as Document | null;
 
   if (!founded) {
-    if (!(user.isGhost || isManagerLike(activeRole))) {
+    if (!isScopeBypass(activeRole, user)) {
       throwError("You cant do this");
     }
   } else {

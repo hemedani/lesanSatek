@@ -1,7 +1,8 @@
 import {
   type ActiveRole,
-  isManagerLike,
+  isGhostScopeBypass,
   isRoleAllowed,
+  isScopeBypass,
   type RoleName,
   scopeMatches,
   type ScopeRef,
@@ -96,9 +97,9 @@ export const grantAccess = (
     const context = await getContext();
     const user = context?.user;
 
-    if (user?.isGhost) return;
-
     const { activeRole, body } = readAuth(user, context?.body);
+
+    if (isGhostScopeBypass(activeRole, user)) return;
 
     const matchingChecks = checks.filter((check) =>
       isRoleAllowed(activeRole, check.roles)
@@ -109,7 +110,7 @@ export const grantAccess = (
     }
 
     for (const check of matchingChecks) {
-      if (isManagerLike(activeRole)) return;
+      if (isScopeBypass(activeRole, user)) return;
 
       if (
         check.features?.length &&
@@ -131,4 +132,3 @@ export const grantAccess = (
 
   return checkAccess;
 };
-

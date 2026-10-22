@@ -1,6 +1,6 @@
 import { type Document, ObjectId } from "lesan";
 import type { ActiveRole } from "../../utils/authzPolicy.ts";
-import { isManagerLike } from "../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../utils/authzPolicy.ts";
 import type { ScopeUser } from "../../utils/readScope.ts";
 import { throwError } from "../../utils/throwError.ts";
 
@@ -80,7 +80,7 @@ export const tenderOfferReadMatch = (
   activeRole: ActiveRole,
   user: UserWithId | undefined,
 ): Document | null => {
-  if (user?.isGhost || isManagerLike(activeRole)) return null;
+  if (isScopeBypass(activeRole, user)) return null;
 
   switch (activeRole.name) {
     case "OrgHead": {
@@ -118,7 +118,7 @@ export const tenderOfferMatchesReadScope = (
   user: UserWithId | undefined,
   offerDoc: TenderOfferRef | null | undefined,
 ): boolean => {
-  if (user?.isGhost || isManagerLike(activeRole)) return true;
+  if (isScopeBypass(activeRole, user)) return true;
   if (!offerDoc) return false;
 
   const storeId = normalizeId(offerDoc.store?._id);

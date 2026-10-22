@@ -3,7 +3,7 @@ import { coreApp, inventory } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { assertWareModelAccess } from "../../../utils/checkWareModelAccess.ts";
 import type { ActiveRole } from "../../../utils/authzPolicy.ts";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
 import { assertUnitInActorScope } from "../../../utils/unitScope.ts";
 
@@ -19,8 +19,8 @@ export const adjustFn: ActFn = async (body) => {
     (r: { roleId: string }) => r.roleId === activeRoleId,
   ) as ActiveRole | undefined;
 
-  const isUnrestricted = Boolean(user.isGhost) ||
-    (activeRole !== undefined && isManagerLike(activeRole));
+  const isUnrestricted = activeRole !== undefined &&
+    isScopeBypass(activeRole, user);
 
   if (!isUnrestricted) {
     if (!activeRole) {

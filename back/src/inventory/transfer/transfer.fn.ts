@@ -3,7 +3,7 @@ import { coreApp, inventory, unit } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { assertWareModelAccess } from "../../../utils/checkWareModelAccess.ts";
 import type { ActiveRole } from "../../../utils/authzPolicy.ts";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
 
 const normalizeId = (value: unknown): string | null => {
@@ -29,8 +29,8 @@ export const transferFn: ActFn = async (body) => {
     (r: { roleId: string }) => r.roleId === activeRoleId,
   ) as ActiveRole | undefined;
 
-  const bypass = Boolean(user.isGhost) ||
-    (activeRole !== undefined && isManagerLike(activeRole));
+  const bypass = activeRole !== undefined &&
+    isScopeBypass(activeRole, user);
 
   if (!bypass) {
     if (!activeRole) {

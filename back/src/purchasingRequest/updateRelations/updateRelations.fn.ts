@@ -8,7 +8,7 @@ import {
 } from "../../../mod.ts";
 import { throwError } from "../../../utils/throwError.ts";
 import { getAuth } from "../../../utils/grantAccess.ts";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { assertUnitInActorScope } from "../../../utils/unitScope.ts";
 import {
   checkFinanceUnitAccess,
@@ -36,7 +36,7 @@ export const updateRelationsFn: ActFn = async (body) => {
   const pr = await loadPurchasingRequestForActor(activeRole, user, _id);
   assertCanWritePurchasingRequest(activeRole, user, pr);
 
-  const bypass = Boolean(user?.isGhost) || isManagerLike(activeRole);
+  const bypass = isScopeBypass(activeRole, user);
   const currentOrganizationId = normalizeId(pr.organization?._id);
 
   if (organizationId !== undefined && !bypass) {

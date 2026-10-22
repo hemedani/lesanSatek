@@ -1,7 +1,7 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
 import { purchasingRequest, unit } from "../../../mod.ts";
 import { getAuth } from "../../../utils/grantAccess.ts";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
 import { getWarehouseDashboard } from "../../../utils/inventoryManager.ts";
 import { loadPurchasingRequestForActor } from "../readScope.ts";
@@ -43,7 +43,7 @@ export const warehouseCheckFn: ActFn = async (body) => {
     return;
   }
 
-  if (!user?.isGhost && !isManagerLike(activeRole)) {
+  if (!isScopeBypass(activeRole, user)) {
     const prOrganizationId = normalizeId(pr.organization?._id);
     const warehouseOrganizationId = normalizeId(
       warehouseUnit.organization?._id,

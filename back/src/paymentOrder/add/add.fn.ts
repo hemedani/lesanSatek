@@ -1,7 +1,7 @@
 import { type ActFn, ObjectId } from "lesan";
 import { paymentOrder, purchasingRequest, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { getAuth } from "../../../utils/grantAccess.ts";
 import {
   checkFinanceUnitAccess,
@@ -19,8 +19,8 @@ export const addFn: ActFn = async (body) => {
   );
 
   const { activeRole } = await getAuth();
-  const bypass = Boolean(user.isGhost) ||
-    (activeRole !== undefined && isManagerLike(activeRole));
+  const bypass = activeRole !== undefined &&
+    isScopeBypass(activeRole, user);
   const effectiveIssuedById = bypass
     ? (issuedById ? String(issuedById) : String(user._id))
     : String(user._id);

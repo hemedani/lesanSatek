@@ -5,6 +5,7 @@ import {
   canAssignRole,
   isManagerLike,
   isRoleAllowed,
+  isScopeBypass,
   type RoleName,
   scopeMatches,
 } from "./authzPolicy.ts";
@@ -322,4 +323,53 @@ Deno.test("StoreHead, Employee and Ordinary cannot assign roles", () => {
       assertEquals(canAssignRole(actor, { name: target }, null), false);
     }
   }
+});
+
+Deno.test("isScopeBypass keeps Manager and Admin unrestricted", () => {
+  const user = { isGhost: false };
+
+  assertEquals(isScopeBypass({ roleId: "m", name: "Manager" }, user), true);
+  assertEquals(isScopeBypass({ roleId: "a", name: "Admin" }, user), true);
+});
+
+Deno.test("isScopeBypass only lets unscoped ghost roles through", () => {
+  const ghost = { isGhost: true };
+
+  assertEquals(isScopeBypass({ roleId: "o", name: "Ordinary" }, ghost), true);
+  assertEquals(
+    isScopeBypass(
+      {
+        roleId: "oh",
+        name: "OrgHead",
+        scopeType: "organization",
+        scopeId: "org1",
+      },
+      ghost,
+    ),
+    false,
+  );
+  assertEquals(
+    isScopeBypass(
+      { roleId: "uh", name: "UnitHead", scopeType: "unit", scopeId: "u1" },
+      ghost,
+    ),
+    false,
+  );
+  assertEquals(
+    isScopeBypass(
+      { roleId: "broken", name: "OrgHead", scopeType: "organization" },
+      ghost,
+    ),
+    false,
+  );
+});
+
+Deno.test("isScopeBypass never opens scopes for non-ghost users", () => {
+  assertEquals(
+    isScopeBypass(
+      { roleId: "o", name: "Ordinary" },
+      { isGhost: false },
+    ),
+    false,
+  );
 });

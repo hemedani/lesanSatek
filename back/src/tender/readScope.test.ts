@@ -3,9 +3,9 @@ import type { ActiveRole } from "../../utils/authzPolicy.ts";
 import type { ScopeUser } from "../../utils/readScope.ts";
 import {
   assertCanReadTender,
-  type TenderRef,
   tenderMatchesReadScope,
   tenderReadMatch,
+  type TenderRef,
 } from "./readScope.ts";
 
 const ORG_OWN = "507f1f77bcf86cd799439001";
@@ -248,4 +248,29 @@ Deno.test("assertCanReadTender denies missing and foreign tenders", () => {
   );
 
   assertCanReadTender(role({ name: "Manager" }), user(), null);
+});
+
+Deno.test("scoped Ghost roles do not bypass tender read scopes", () => {
+  const activeRole = role({
+    name: "OrgHead",
+    scopeType: "organization",
+    scopeId: ORG_OWN,
+  });
+  const match = tenderReadMatch(activeRole, user({ isGhost: true }));
+
+  assertEquals(idsIn(match, "purchasingRequest.organization._id"), [ORG_OWN]);
+  assertEquals(
+    tenderMatchesReadScope(
+      activeRole,
+      user({ isGhost: true }),
+      tender({
+        purchasingRequest: {
+          organization: { _id: ORG_FOREIGN },
+          requestingUnit: { _id: UNIT_OWN },
+          requester: { _id: USER_OTHER },
+        },
+      }),
+    ),
+    false,
+  );
 });

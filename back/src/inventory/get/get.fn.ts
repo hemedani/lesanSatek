@@ -1,6 +1,6 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
 import { inventory } from "../../../mod.ts";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { getAuth } from "../../../utils/grantAccess.ts";
 import { assertCanReadUnit } from "../../../utils/readScope.ts";
 import { throwError } from "../../../utils/throwError.ts";
@@ -19,7 +19,7 @@ export const getFn: ActFn = async (body) => {
     projection: { unit: { _id: 1, organization: { _id: 1 } } },
   }) as Document;
 
-  if (!(user.isGhost || isManagerLike(activeRole))) {
+  if (!isScopeBypass(activeRole, user)) {
     if (!record) throwError("You cant do this");
 
     const unitRelation = record.unit as

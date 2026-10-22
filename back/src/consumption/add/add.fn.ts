@@ -10,7 +10,7 @@ import {
 import type { MyContext } from "@lib";
 import { assertWareModelAccess } from "../../../utils/checkWareModelAccess.ts";
 import type { ActiveRole } from "../../../utils/authzPolicy.ts";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { removeStock } from "../../../utils/inventoryManager.ts";
 import { throwError } from "../../../utils/throwError.ts";
 import { assertUnitInActorScope } from "../../../utils/unitScope.ts";
@@ -65,9 +65,9 @@ export const addFn: ActFn = async (body) => {
 
   await assertUnitInActorScope(user, activeRole, unitId);
 
-  const consumedById = !user.isGhost && !isManagerLike(activeRole)
-    ? user._id
-    : (rawConsumedById || user._id);
+  const consumedById = isScopeBypass(activeRole, user)
+    ? (rawConsumedById || user._id)
+    : user._id;
 
   // Fetch ware to derive hierarchy
   const wareDoc = await ware.findOne({

@@ -1,6 +1,7 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
 import { purchasingRequest } from "../../../mod.ts";
 import { getAuth } from "../../../utils/grantAccess.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
 import { assertCanReadPurchasingRequest } from "../readScope.ts";
 
@@ -21,10 +22,7 @@ export const getHistoryFn: ActFn = async (body) => {
   }) as Document | null;
 
   if (!founded) {
-    if (
-      !(user.isGhost || activeRole.name === "Manager" ||
-        activeRole.name === "Admin")
-    ) {
+    if (!isScopeBypass(activeRole, user)) {
       throwError("You cant do this");
     }
   } else {

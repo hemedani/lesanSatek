@@ -1,5 +1,6 @@
 import type { ActFn } from "lesan";
 import { getAuth } from "@lib";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { assignRolesToUser, type RoleInput } from "../shared/assignRoles.ts";
 
 export const addOrRemoveRolesFn: ActFn = async (body) => {
@@ -14,6 +15,6 @@ export const addOrRemoveRolesFn: ActFn = async (body) => {
     addRoles: addRoles as RoleInput[] | undefined,
     removeRoles: removeRoles as RoleInput[] | undefined,
     get: get as Record<string, unknown>,
-    isGhost: Boolean(actorUser?.isGhost),
+    isGhost: isScopeBypass(activeRole, actorUser),
   });
 };

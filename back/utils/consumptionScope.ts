@@ -1,7 +1,7 @@
 import { type Document, ObjectId } from "lesan";
 import { unit } from "../mod.ts";
 import type { ActiveRole } from "./authzPolicy.ts";
-import { isManagerLike } from "./authzPolicy.ts";
+import { isScopeBypass } from "./authzPolicy.ts";
 import type { ScopeUser } from "./readScope.ts";
 
 const emptyScope = (): Document => ({ "unit._id": { $in: [] } });
@@ -84,7 +84,7 @@ export const consumptionScopeMatch = async (
   activeRole: ActiveRole,
   user: ScopeUser | undefined,
 ): Promise<Document> => {
-  if (user?.isGhost || isManagerLike(activeRole)) return {};
+  if (isScopeBypass(activeRole, user)) return {};
 
   if (activeRole.name === "Employee" || activeRole.name === "Ordinary") {
     if (activeRole.scopeType === "unit" && activeRole.scopeId) {

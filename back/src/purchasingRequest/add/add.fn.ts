@@ -4,7 +4,7 @@ import type { MyContext } from "@lib";
 import { assertWareModelAccess } from "../../../utils/checkWareModelAccess.ts";
 import { throwError } from "../../../utils/throwError.ts";
 import type { ActiveRole } from "../../../utils/authzPolicy.ts";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 
 type UnitDoc = {
   _id?: unknown;
@@ -45,7 +45,7 @@ export const addFn: ActFn = async (body) => {
     ? normalizeId(activeRole.scopeId)
     : null;
 
-  const bypass = Boolean(user.isGhost) || isManagerLike(activeRole);
+  const bypass = isScopeBypass(activeRole, user);
   let requestingUnitId: string | null;
 
   if (bypass) {
@@ -120,7 +120,7 @@ export const addFn: ActFn = async (body) => {
     return;
   }
 
-  if (!isManagerLike(activeRole) && !user.isGhost) {
+  if (!isScopeBypass(activeRole, user)) {
     if (
       activeRole.name === "UnitHead" || activeRole.name === "Employee" ||
       activeRole.name === "Ordinary"

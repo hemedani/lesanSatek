@@ -210,8 +210,14 @@ Deno.test("a present unit feature grants access within the role scope", async ()
   )();
 });
 
-Deno.test("Ghost bypasses role, feature and scope checks", async () => {
-  const ctx = contextFor(null, { isGhost: true });
+Deno.test("unscoped Ghost bypasses role, feature and scope checks", async () => {
+  const ordinary: ActiveRole = {
+    roleId: "role-ghost",
+    name: "Ordinary",
+  };
+  const ctx = contextFor(ordinary, { isGhost: true }, {
+    activeRoleId: ordinary.roleId,
+  });
 
   await grantAccess(
     [{
@@ -221,4 +227,28 @@ Deno.test("Ghost bypasses role, feature and scope checks", async () => {
     }],
     authContext(ctx),
   )();
+});
+
+Deno.test("scoped Ghost must still pass the role gate", async () => {
+  const orgHead: ActiveRole = {
+    roleId: "role-ghost-orghead",
+    name: "OrgHead",
+    scopeType: "organization",
+    scopeId: "org1",
+  };
+  const ctx = contextFor(orgHead, { isGhost: true }, {
+    activeRoleId: orgHead.roleId,
+  });
+
+  await expectRejectsWith(
+    grantAccess(
+      [{
+        roles: ["Manager"],
+        features: ["canManageBudget"],
+        scope: () => ({} as ScopeRef),
+      }],
+      authContext(ctx),
+    )(),
+    "You cant do this",
+  );
 });

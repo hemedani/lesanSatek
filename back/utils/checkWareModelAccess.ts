@@ -1,6 +1,6 @@
 import { ObjectId } from "lesan";
 import type { ActiveRole } from "./authzPolicy.ts";
-import { isManagerLike } from "./authzPolicy.ts";
+import { isScopeBypass } from "./authzPolicy.ts";
 import { throwError } from "./throwError.ts";
 
 export type AllowWareHolder = {
@@ -155,7 +155,7 @@ export const assertWareModelAccess = async (
   wareModel: WareModelRef,
   options: WareModelAccessOptions = {},
 ): Promise<void> => {
-  if (user?.isGhost || isManagerLike(activeRole)) return;
+  if (isScopeBypass(activeRole, user)) return;
 
   const userHolder = user ?? {};
 

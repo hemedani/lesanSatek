@@ -8,7 +8,7 @@ import {
 import type { MyContext } from "@lib";
 import { assertWareModelAccess } from "../../../utils/checkWareModelAccess.ts";
 import type { ActiveRole } from "../../../utils/authzPolicy.ts";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
 import { assertUnitInActorScope } from "../../../utils/unitScope.ts";
 import { resolveProcessForPR } from "../../../utils/resolveProcess.ts";
@@ -51,7 +51,7 @@ export const submitFn: ActFn = async (body) => {
     return;
   }
 
-  if (!isManagerLike(activeRole) && !user.isGhost) {
+  if (!isScopeBypass(activeRole, user)) {
     const prRequestingUnitId = normalizeId(pr.requestingUnit?._id);
     const override = normalizeId(overrideUnitId);
 

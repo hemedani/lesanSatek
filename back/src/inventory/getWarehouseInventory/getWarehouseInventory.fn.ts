@@ -4,7 +4,7 @@ import { inventory, unit, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
 import type { ActiveRole } from "../../../utils/authzPolicy.ts";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 
 export const getWarehouseInventoryFn: ActFn = async (body) => {
   const {
@@ -33,7 +33,7 @@ export const getWarehouseInventoryFn: ActFn = async (body) => {
     return;
   }
 
-  const isUnrestricted = Boolean(user.isGhost) || isManagerLike(activeRole);
+  const isUnrestricted = isScopeBypass(activeRole, user);
   const unitCollection = coreApp.odm.getCollection("unit");
 
   let organizationObjectId: ObjectId | null = null;

@@ -3,7 +3,7 @@ import { user } from "../../../mod.ts";
 import type { user_relations } from "@model";
 import { hash } from "@da/bcrypt";
 import { getAuth } from "@lib";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isManagerLike, isScopeBypass } from "../../../utils/authzPolicy.ts";
 import {
   assertRolesAssignable,
   assignRolesToUser,
@@ -26,7 +26,7 @@ export const addUserFn: ActFn = async (body) => {
   } = set;
 
   const { activeRole, user: actorUser } = await getAuth();
-  const isGhost = Boolean(actorUser?.isGhost);
+  const isGhost = isScopeBypass(activeRole, actorUser);
 
   const requestedRoles = (roles as RoleInput[] | undefined) ?? [];
   const suppliedOrganizations = (organizations as string[] | undefined) ?? [];

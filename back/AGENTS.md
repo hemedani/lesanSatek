@@ -612,7 +612,7 @@ Ware and Stuff models use denormalized relations to WareType, WareClass, WareGro
 
 ### User Roles
 - Manager, Admin, OrgHead, UnitHead, StoreHead, Employee, Ordinary
-- `isGhost` boolean replaces the former "Ghost" level (bootstrap user bypass).
+- `isGhost` boolean replaces the former "Ghost" level. Ghost users keep the bootstrap bypass only while the selected active role has no scope; scoped roles are enforced normally.
 - Each role has a unique `roleId` (UUID), `name`, optional `scopeType` ("organization" | "unit" | "store"), and optional `scopeId`.
 - *DeptHead was removed when Department model was eliminated.*
 - *Level was fully replaced by the `roles` array. Single-level no longer exists.*
@@ -637,7 +637,8 @@ Shared scope helpers:
 Bypass rules:
 
 - **Manager / Admin** bypass scope checks and feature checks (they still must be listed in a `grantAccess` check).
-- **Ghost** (`user.isGhost`) bypasses role, feature, and scope checks entirely.
+- **Ghost** (`user.isGhost`) bypasses role, feature, and scope checks only when the selected active role has no scope (the bootstrap `Ordinary` role from `tempUser`). Scoped ghost roles (`OrgHead`, `UnitHead`, `StoreHead`, or any role carrying `scopeType`/`scopeId`) are enforced exactly like non-ghost users.
+- **Shared scope bypass rule**: `utils/authzPolicy.ts` exports `isGhostScopeBypass` and `isScopeBypass`. Read, write, grant, finance, inventory, and role-assignment paths must use these helpers instead of testing `isGhost` directly. Manager/Admin still bypass scope/feature checks but must be listed in a `grantAccess` check.
 
 Role assignment matrix (`assignableRoles` in `utils/authzPolicy.ts`):
 

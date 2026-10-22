@@ -237,3 +237,24 @@ Deno.test("assertCanWritePurchasingRequest allows requesters and their units", (
     "denied",
   );
 });
+
+Deno.test("scoped Ghost roles do not bypass purchase request scopes", () => {
+  const activeRole = role({
+    name: "OrgHead",
+    scopeType: "organization",
+    scopeId: ORG_FOREIGN,
+  });
+  const ghost = user({ isGhost: true });
+
+  assertEquals(
+    (() => {
+      try {
+        assertCanWritePurchasingRequest(activeRole, ghost, requestDoc());
+        return "allowed";
+      } catch {
+        return "denied";
+      }
+    })(),
+    "denied",
+  );
+});

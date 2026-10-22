@@ -2,7 +2,7 @@ import { type ActFn, ObjectId } from "lesan";
 import { coreApp, unit, user } from "../../../mod.ts";
 import { throwError } from "../../../utils/throwError.ts";
 import type { ActiveRole } from "../../../utils/authzPolicy.ts";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import {
   loadUserTargetContextForActor,
   type UserTargetContext,
@@ -100,7 +100,7 @@ export const updateUserRelationsFn: ActFn = async (body) => {
   }
 
   const modelId = new ObjectId(_id as string);
-  const isBypass = Boolean(actor.isGhost) || isManagerLike(activeRole);
+  const isBypass = isScopeBypass(activeRole, actor);
   const actorOrganizationId = organizationIdOfRole(activeRole, actor);
   const requestedOrganizations = organizations
     ? idsOfPayload(organizations)
@@ -118,7 +118,7 @@ export const updateUserRelationsFn: ActFn = async (body) => {
     targetContext = await loadUserTargetContextForActor(
       modelId,
       activeRole,
-      Boolean(actor.isGhost),
+      isBypass,
     );
 
     if (requestedOrganizations) {

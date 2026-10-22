@@ -1,6 +1,6 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
 import { paymentOrder } from "../../../mod.ts";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import {
   checkFinanceUnitAccess,
   financeTargetOfPaymentOrder,
@@ -26,7 +26,7 @@ export const updateFn: ActFn = async (body) => {
   );
 
   const { user, activeRole } = await getAuth();
-  const bypass = Boolean(user?.isGhost) || isManagerLike(activeRole);
+  const bypass = isScopeBypass(activeRole, user);
 
   if (!bypass) {
     if (purchasingRequestId !== undefined && purchasingRequestId !== null) {

@@ -1,5 +1,9 @@
 import { ObjectId } from "lesan";
-import { type ActiveRole, isManagerLike } from "./authzPolicy.ts";
+import {
+  type ActiveRole,
+  isManagerLike,
+  isScopeBypass,
+} from "./authzPolicy.ts";
 import { throwError } from "./throwError.ts";
 
 export type ReadScope =
@@ -64,7 +68,7 @@ const validObjectIds = (ids: string[]): ObjectId[] => {
 };
 
 const isBypass = (activeRole: ActiveRole, user: ScopeUser | undefined) =>
-  Boolean(user?.isGhost) || isManagerLike(activeRole);
+  isScopeBypass(activeRole, user);
 
 const loadDescendantUnitIdsFromDb = async (
   unitId: string,

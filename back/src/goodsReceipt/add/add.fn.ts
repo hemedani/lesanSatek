@@ -1,7 +1,7 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
 import { goodsReceipt, purchasingRequest, paymentOrder, processStep, stepApproval, budgetEncumbrance, budgetLine, unit, ware, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
 import { getAuth } from "../../../utils/grantAccess.ts";
 import { addStock } from "../../../utils/inventoryManager.ts";
@@ -15,7 +15,7 @@ export const addFn: ActFn = async (body) => {
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
   const { activeRole } = await getAuth();
   const scopeUser = user as unknown as ScopeUser;
-  const bypass = Boolean(user.isGhost) || isManagerLike(activeRole);
+  const bypass = isScopeBypass(activeRole, user);
 
   const {
     activeRoleId: _activeRoleId,

@@ -2,7 +2,7 @@ import { type ActFn, ObjectId } from "lesan";
 import { coreApp, tender, tenderOffer } from "../../../mod.ts";
 import { throwError } from "../../../utils/throwError.ts";
 import type { ActiveRole } from "../../../utils/authzPolicy.ts";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import type { MyContext } from "@lib";
 
 export const submitFn: ActFn = async (body) => {
@@ -20,7 +20,7 @@ export const submitFn: ActFn = async (body) => {
     return;
   }
 
-  const canUseAnyStore = Boolean(user.isGhost) || isManagerLike(activeRole);
+  const canUseAnyStore = isScopeBypass(activeRole, user);
 
   if (!canUseAnyStore) {
     if (activeRole.scopeType !== "store" || !activeRole.scopeId) {

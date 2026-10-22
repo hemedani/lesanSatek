@@ -1,7 +1,7 @@
 import { type Document, ObjectId } from "lesan";
 import { process } from "../../mod.ts";
 import type { ActiveRole } from "../../utils/authzPolicy.ts";
-import { isManagerLike } from "../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../utils/authzPolicy.ts";
 import type { ScopeUser } from "../../utils/readScope.ts";
 import { throwError } from "../../utils/throwError.ts";
 import {
@@ -23,7 +23,7 @@ export const processStepProcessIds = async (
   activeRole: ActiveRole,
   user: ScopeUser | undefined,
 ): Promise<ObjectId[] | null> => {
-  if (user?.isGhost || isManagerLike(activeRole)) return null;
+  if (isScopeBypass(activeRole, user)) return null;
 
   const match = await processReadMatch(activeRole, user);
 
@@ -44,7 +44,7 @@ export const assertCanReadProcessStep = async (
   user: ScopeUser | undefined,
   stepDoc: ProcessStepRef | null | undefined,
 ): Promise<void> => {
-  if (user?.isGhost || isManagerLike(activeRole)) return;
+  if (isScopeBypass(activeRole, user)) return;
   if (!stepDoc) {
     throwError("You cant do this");
     return;

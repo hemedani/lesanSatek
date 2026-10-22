@@ -1,6 +1,6 @@
 import { type Document, ObjectId } from "lesan";
 import type { ActiveRole } from "../../utils/authzPolicy.ts";
-import { isManagerLike } from "../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../utils/authzPolicy.ts";
 import {
   organizationReadScope,
   type ScopeUser,
@@ -37,7 +37,7 @@ export const processReadMatch = async (
   activeRole: ActiveRole,
   user: ScopeUser | undefined,
 ): Promise<Document | null> => {
-  if (user?.isGhost || isManagerLike(activeRole)) return null;
+  if (isScopeBypass(activeRole, user)) return null;
 
   if (activeRole.name === "UnitHead") {
     const unitObjectIds = validObjectIds(
@@ -82,7 +82,7 @@ export const processMatchesReadScope = async (
   user: ScopeUser | undefined,
   processDoc: ProcessRef | null | undefined,
 ): Promise<boolean> => {
-  if (user?.isGhost || isManagerLike(activeRole)) return true;
+  if (isScopeBypass(activeRole, user)) return true;
   if (!processDoc) return false;
 
   const processUnitId = normalizeId(processDoc.unit?._id);

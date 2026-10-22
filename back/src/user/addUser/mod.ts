@@ -8,7 +8,7 @@ import {
   throwError,
 } from "@lib";
 import { coreApp, unit } from "../../../mod.ts";
-import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { addUserFn } from "./addUser.fn.ts";
 import { addUserValidator } from "./addUser.val.ts";
 
@@ -25,11 +25,9 @@ const toObjectId = (value: unknown): ObjectId | null => {
 export const authorizeNewUserScope = async () => {
   const context = coreApp.contextFns.getContextModel() as MyContext;
 
-  if (context.user?.isGhost) return;
-
   const { activeRole } = await getAuth();
 
-  if (isManagerLike(activeRole)) return;
+  if (isScopeBypass(activeRole, context.user)) return;
 
   if (activeRole.scopeType !== "organization" || !activeRole.scopeId) {
     return throwError("You cant do this");

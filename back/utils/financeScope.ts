@@ -1,5 +1,5 @@
 import { type Document, ObjectId } from "lesan";
-import { type ActiveRole, isManagerLike } from "./authzPolicy.ts";
+import { type ActiveRole, isScopeBypass } from "./authzPolicy.ts";
 import type { ScopeUser } from "./readScope.ts";
 import { throwError } from "./throwError.ts";
 
@@ -93,7 +93,7 @@ const loadUnit = async (
 const isBypass = (
   activeRole: ActiveRole,
   user: UserWithId | undefined,
-): boolean => Boolean(user?.isGhost) || isManagerLike(activeRole);
+): boolean => isScopeBypass(activeRole, user);
 
 export const isFinanceUnitHead = async (
   activeRole: ActiveRole,

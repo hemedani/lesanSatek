@@ -98,7 +98,9 @@ Deno.test("OrgHead matches finance documents in its organization", async () => {
   assertEquals(organizationId, ORG_OWN);
   assertEquals(await isFinanceUnitHead(activeRole), false);
 
-  const organizationMatch = { "organization._id": { $in: [new ObjectId(ORG_OWN)] } };
+  const organizationMatch = {
+    "organization._id": { $in: [new ObjectId(ORG_OWN)] },
+  };
 
   assertEquals(paymentOrderReadMatch(activeRole, normalUser, organizationId), {
     "purchasingRequest.organization._id": { $in: [new ObjectId(ORG_OWN)] },
@@ -120,7 +122,11 @@ Deno.test("OrgHead matches finance documents in its organization", async () => {
 });
 
 Deno.test("OrgHead without an organization scope fails closed", async () => {
-  const activeRole = role({ name: "OrgHead", scopeType: "unit", scopeId: ORG_OWN });
+  const activeRole = role({
+    name: "OrgHead",
+    scopeType: "unit",
+    scopeId: ORG_OWN,
+  });
   const normalUser = user();
 
   assertEquals(
@@ -156,7 +162,11 @@ Deno.test("Finance UnitHead reads its organization and its payment orders", asyn
     paymentOrderReadMatch(activeRole, normalUser, organizationId),
     {
       $or: [
-        { "purchasingRequest.organization._id": { $in: [new ObjectId(ORG_OWN)] } },
+        {
+          "purchasingRequest.organization._id": {
+            $in: [new ObjectId(ORG_OWN)],
+          },
+        },
         { "financialUnit._id": { $in: [new ObjectId(UNIT_FINANCE)] } },
       ],
     },
@@ -303,7 +313,8 @@ Deno.test("Assert helpers allow own organization and deny foreign documents", as
     "You cant do this",
   );
   await expectRejectsWith(
-    () => assertCanReadGoodsReceipt(activeRole, normalUser, null, organizationId),
+    () =>
+      assertCanReadGoodsReceipt(activeRole, normalUser, null, organizationId),
     "You cant do this",
   );
   await expectRejectsWith(
@@ -387,5 +398,22 @@ Deno.test("Payment order asserts scope UnitHeads to finance units in their organ
     normalUser,
     null,
     null,
+  );
+});
+
+Deno.test("scoped Ghost roles do not bypass finance read scopes", () => {
+  const ghost = user({ isGhost: true });
+  const orgHead = role({
+    name: "OrgHead",
+    scopeType: "organization",
+    scopeId: ORG_OWN,
+  });
+
+  assertEquals(paymentOrderReadMatch(orgHead, ghost, ORG_OWN), {
+    "purchasingRequest.organization._id": { $in: [new ObjectId(ORG_OWN)] },
+  });
+  assertEquals(
+    budgetLineReadMatch(orgHead, ghost, ORG_FOREIGN),
+    { "organization._id": { $in: [new ObjectId(ORG_FOREIGN)] } },
   );
 });

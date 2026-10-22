@@ -8,7 +8,7 @@ import {
   purchasingRequest,
   unit,
 } from "../mod.ts";
-import { isManagerLike } from "./authzPolicy.ts";
+import { isScopeBypass } from "./authzPolicy.ts";
 import { getAuth } from "./grantAccess.ts";
 import { throwError } from "./throwError.ts";
 
@@ -262,7 +262,7 @@ export const checkFinanceUnitAccess = async (
 ) => {
   const { user, activeRole } = await getAuth();
 
-  if (user?.isGhost || isManagerLike(activeRole)) return;
+  if (isScopeBypass(activeRole, user)) return;
 
   if (!target) {
     throwError("You cant do this");
