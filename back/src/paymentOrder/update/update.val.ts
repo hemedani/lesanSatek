@@ -14,7 +14,6 @@ export const updateValidator = () => {
       _id: objectIdValidation,
       ...optionalPure,
       purchasingRequestId: optional(objectIdValidation),
-      payToId: optional(objectIdValidation),
       financialUnitId: optional(objectIdValidation),
     }),
     get: selectStruct("paymentOrder", 2),

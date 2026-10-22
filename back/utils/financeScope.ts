@@ -107,12 +107,20 @@ export const isFinanceUnitHead = async (
     return false;
   }
 
-  const unitId = normalizeId(activeRole.scopeId);
-  if (!unitId) return false;
+  if (options.loadUnit) {
+    const unitId = normalizeId(activeRole.scopeId);
+    if (!unitId) return false;
 
-  const unitDoc = await loadUnit(unitId, options);
+    const unitDoc = await loadUnit(unitId, options);
 
-  return unitDoc?.type === "Finance";
+    return unitDoc?.type === "Finance";
+  }
+
+  const { isFinanceUnitHead: checkFinanceUnitHead } = await import(
+    "./checkFinanceUnitAccess.ts"
+  );
+
+  return await checkFinanceUnitHead(activeRole);
 };
 
 export const unitOrganizationId = async (
@@ -250,12 +258,13 @@ export const goodsReceiptReadMatch = (
     "purchasingRequest.organization._id",
   );
 
-export const assertCanReadPaymentOrder = (
+export const assertCanReadPaymentOrder = async (
   activeRole: ActiveRole,
   user: UserWithId | undefined,
   doc: PaymentOrderReadDoc | null | undefined,
   financeOrganizationId: string | null,
-): void => {
+  options: FinanceScopeOptions = {},
+): Promise<void> => {
   if (isBypass(activeRole, user)) return;
 
   const organizationId = toObjectId(financeOrganizationId);
@@ -270,11 +279,20 @@ export const assertCanReadPaymentOrder = (
     return;
   }
 
-  if (activeRole.name === "UnitHead") {
-    const unitId = toObjectId(activeRole.scopeId);
-    const documentUnitId = toObjectId(doc?.financialUnit?._id);
+  if (
+    activeRole.name === "UnitHead" &&
+    await isFinanceUnitHead(activeRole, options)
+  ) {
+    const financeUnitOrganizationId = toObjectId(
+      await unitOrganizationId(activeRole.scopeId, options),
+    );
 
-    if (unitId && documentUnitId && unitId.equals(documentUnitId)) return;
+    if (
+      financeUnitOrganizationId && documentOrganizationId &&
+      financeUnitOrganizationId.equals(documentOrganizationId)
+    ) {
+      return;
+    }
   }
 
   throwError("You cant do this");

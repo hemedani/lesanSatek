@@ -34,7 +34,7 @@ export const getFn: ActFn = async (body) => {
       throwError("You cant do this");
     }
   } else {
-    assertCanReadPaymentOrder(
+    await assertCanReadPaymentOrder(
       activeRole,
       user,
       founded,

@@ -2507,13 +2507,13 @@
       },
       {
         "key": "task12FinanceRoleId",
-        "value": "[body][user][roles][0][roleId]"
+        "value": "[body][user][roles][1][roleId]"
       }
     ]
   },
   {
     "id": "gen-task12-foreign-budget-line",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{roleId}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"code\": \"AUTHZ-T12-FOREIGN\", \"title\": \"خط بودجه سازمان دیگر\", \"totalAllocated\": 1000, \"fiscalYearId\": \"{authzOtherOrgFiscalYearId}\", \"organizationId\": \"{otherOrgId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"organization\": {\"_id\": 1}}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"code\": \"AUTHZ-T12-FOREIGN\", \"title\": \"خط بودجه سازمان دیگر\", \"totalAllocated\": 1000, \"fiscalYearId\": \"{authzOtherOrgFiscalYearId}\", \"organizationId\": \"{otherOrgId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"organization\": {\"_id\": 1}}}}}",
     "repeat": 1,
     "captures": [
       {
@@ -2524,7 +2524,7 @@
   },
   {
     "id": "gen-task12-foreign-payment-order",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{roleId}\"}, \"body\": {\"service\": \"main\", \"model\": \"paymentOrder\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"title\": \"دستور پرداخت سازمان دیگر\", \"amount\": 500, \"payToId\": \"{storeId}\", \"financialUnitId\": \"{financeUnitId}\", \"purchasingRequestId\": \"{task11ForeignPrId}\", \"issuedById\": \"{orgHeadUserId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"purchasingRequest\": {\"_id\": 1}}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"paymentOrder\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"title\": \"دستور پرداخت سازمان دیگر\", \"amount\": 500, \"payToId\": \"{storeId}\", \"financialUnitId\": \"{authzScopeOtherOrgUnitId}\", \"purchasingRequestId\": \"{task11ForeignPrId}\", \"issuedById\": \"{orgHeadUserId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"purchasingRequest\": {\"_id\": 1}}}}}",
     "repeat": 1,
     "captures": [
       {

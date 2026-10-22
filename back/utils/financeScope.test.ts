@@ -245,7 +245,7 @@ Deno.test("Assert helpers allow own organization and deny foreign documents", as
   const normalUser = user();
   const organizationId = ORG_OWN;
 
-  assertCanReadPaymentOrder(
+  await assertCanReadPaymentOrder(
     activeRole,
     normalUser,
     { purchasingRequest: { organization: { _id: ORG_OWN } } },
@@ -318,36 +318,71 @@ Deno.test("Assert helpers allow own organization and deny foreign documents", as
   );
 });
 
-Deno.test("Payment order asserts allow a finance unit head's financial unit", async () => {
-  const activeRole = role({
+Deno.test("Payment order asserts scope UnitHeads to finance units in their organization", async () => {
+  const financeHead = role({
     name: "UnitHead",
     scopeType: "unit",
     scopeId: UNIT_FINANCE,
   });
+  const generalHead = role({
+    name: "UnitHead",
+    scopeType: "unit",
+    scopeId: UNIT_GENERAL,
+  });
   const normalUser = user();
+  const options = { loadUnit: financeUnitLoader };
 
-  assertCanReadPaymentOrder(
-    activeRole,
+  await assertCanReadPaymentOrder(
+    financeHead,
     normalUser,
-    { financialUnit: { _id: UNIT_FINANCE } },
+    { purchasingRequest: { organization: { _id: ORG_OWN } } },
     ORG_OWN,
+    options,
   );
 
   await expectRejectsWith(
     () =>
       assertCanReadPaymentOrder(
-        activeRole,
+        financeHead,
         normalUser,
         {
           purchasingRequest: { organization: { _id: ORG_FOREIGN } },
-          financialUnit: { _id: UNIT_GENERAL },
+          financialUnit: { _id: UNIT_FINANCE },
         },
         ORG_OWN,
+        options,
       ),
     "You cant do this",
   );
 
-  assertCanReadPaymentOrder(
+  await expectRejectsWith(
+    () =>
+      assertCanReadPaymentOrder(
+        generalHead,
+        normalUser,
+        {
+          purchasingRequest: { organization: { _id: ORG_OWN } },
+          financialUnit: { _id: UNIT_GENERAL },
+        },
+        null,
+        options,
+      ),
+    "You cant do this",
+  );
+
+  await expectRejectsWith(
+    () =>
+      assertCanReadPaymentOrder(
+        financeHead,
+        normalUser,
+        { financialUnit: { _id: UNIT_FINANCE } },
+        ORG_OWN,
+        options,
+      ),
+    "You cant do this",
+  );
+
+  await assertCanReadPaymentOrder(
     role({ name: "Manager" }),
     normalUser,
     null,

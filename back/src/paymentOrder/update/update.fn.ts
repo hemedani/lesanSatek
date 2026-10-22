@@ -10,7 +10,14 @@ import { throwError } from "../../../utils/throwError.ts";
 
 export const updateFn: ActFn = async (body) => {
   const {
-    set: { _id, purchasingRequestId, financialUnitId, ...fields },
+    set: {
+      _id,
+      activeRoleId: _activeRoleId,
+      purchasingRequestId,
+      financialUnitId,
+      payToId: _payToId,
+      ...fields
+    },
     get,
   } = body.details;
 

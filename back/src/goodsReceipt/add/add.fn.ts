@@ -18,6 +18,7 @@ export const addFn: ActFn = async (body) => {
   const bypass = Boolean(user.isGhost) || isManagerLike(activeRole);
 
   const {
+    activeRoleId: _activeRoleId,
     purchasingRequestId,
     receivedById,
     receivingUnitId: _receivingUnitId,
@@ -53,6 +54,15 @@ export const addFn: ActFn = async (body) => {
     }
     const pr = prDoc as Record<string, unknown>;
 
+    const prOrganizationId =
+      (pr.organization as Record<string, unknown> | undefined)?._id
+        ?.toString();
+
+    if (!prOrganizationId) {
+      throwError("Purchasing request has no organization");
+      return;
+    }
+
     // Authorization: the requester, the head of the requesting unit, or a central
     // warehouse head can confirm goods delivery
     const isRequester = pr.requester &&
@@ -74,9 +84,48 @@ export const addFn: ActFn = async (body) => {
       pipeline: [
         { $match: { type: "Warehouse", "head._id": user._id } },
       ],
-      projection: { _id: 1 },
+      projection: { _id: 1, organization: { _id: 1 } },
     }).toArray();
-    const isWarehouseHead = warehouseUnits.length > 0;
+
+    // A warehouse-head bypass only applies inside the purchasing request's
+    // organization. If the active role is scoped to a Warehouse unit, that exact
+    // unit must belong to the PR organization; otherwise fall back to a Warehouse
+    // unit the actor heads inside the PR organization.
+    let authorizedWarehouseUnitId: string | undefined;
+    let scopedWarehouseUnitOutsidePrOrg = false;
+
+    if (activeRole?.scopeType === "unit" && activeRole.scopeId) {
+      const scopedUnit = await unit.findOne({
+        filters: { _id: new ObjectId(activeRole.scopeId) },
+        projection: { type: 1, organization: { _id: 1 } },
+      }) as Document | null;
+
+      if (scopedUnit?.type === "Warehouse") {
+        const scopedUnitOrganizationId =
+          (scopedUnit.organization as Record<string, unknown> | undefined)
+            ?._id?.toString();
+
+        if (scopedUnitOrganizationId === prOrganizationId) {
+          authorizedWarehouseUnitId = activeRole.scopeId as string;
+        } else {
+          scopedWarehouseUnitOutsidePrOrg = true;
+        }
+      }
+    }
+
+    if (!authorizedWarehouseUnitId && !scopedWarehouseUnitOutsidePrOrg) {
+      const warehouseUnitInOrganization = warehouseUnits.find(
+        (warehouseUnit) => {
+          const warehouseUnitOrganizationId =
+            (warehouseUnit.organization as Record<string, unknown> | undefined)
+              ?._id?.toString();
+          return warehouseUnitOrganizationId === prOrganizationId;
+        },
+      );
+      authorizedWarehouseUnitId = warehouseUnitInOrganization?._id?.toString();
+    }
+
+    const isWarehouseHeadInPrOrg = Boolean(authorizedWarehouseUnitId);
 
     try {
       await loadPurchasingRequestForActor(
@@ -87,41 +136,25 @@ export const addFn: ActFn = async (body) => {
     } catch (error) {
       // Central warehouse heads may receive goods for requests raised by other
       // units of the same organization; the organization is validated below.
-      if (!isWarehouseHead) throw error;
+      if (!isWarehouseHeadInPrOrg) throw error;
     }
 
-    if (!isRequester && !isRequestingUnitHead && !isWarehouseHead) {
+    if (!isRequester && !isRequestingUnitHead && !isWarehouseHeadInPrOrg) {
       throwError(
         "Only the requester, the requesting unit head, or the central warehouse head can confirm goods delivery",
       );
     }
 
     // Route received goods based on the active role's scoped unit (ignore any client-supplied unit):
-    // - active role scoped to a Warehouse unit (central warehouse head) → the central warehouse
-    // - otherwise (requesting unit employee/head/requester) → the requesting unit's own warehouse
+    // - active role scoped to a Warehouse unit in the PR org → that warehouse
+    // - otherwise a warehouse head in the PR org → the authorized warehouse unit
+    // - otherwise (requesting unit employee/head/requester) → the requesting unit
     receivingUnitId = prRequestingUnitId;
-    if (activeRole?.scopeType === "unit" && activeRole.scopeId) {
-      const scopedUnit = await unit.findOne({
-        filters: { _id: new ObjectId(activeRole.scopeId) },
-        projection: { type: 1 },
-      }) as Document | null;
-      if (scopedUnit?.type === "Warehouse") {
-        receivingUnitId = activeRole.scopeId as string;
-      }
+    if (authorizedWarehouseUnitId) {
+      receivingUnitId = authorizedWarehouseUnitId;
     }
 
-    const prOrganizationId =
-      (pr.organization as Record<string, unknown> | undefined)?._id
-        ?.toString();
-
-    if (!prOrganizationId) {
-      throwError("Purchasing request has no organization");
-      return;
-    }
-
-    if (receivingUnitId) {
-      await assertUnitInOrganization(receivingUnitId, prOrganizationId);
-    }
+    await assertUnitInOrganization(receivingUnitId, prOrganizationId);
 
     const prWareModelId =
       (pr.wareModel as Record<string, unknown> | undefined)?._id?.toString();

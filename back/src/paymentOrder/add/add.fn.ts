@@ -12,7 +12,7 @@ export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
 
-  const { purchasingRequestId, issuedById, approvedById, payToId, financialUnitId, ...rest } = set;
+  const { activeRoleId: _activeRoleId, purchasingRequestId, issuedById, approvedById, payToId, financialUnitId, ...rest } = set;
 
   await checkFinanceUnitAccess(
     await financeTargetOfPurchasingRequestBudget(purchasingRequestId),
