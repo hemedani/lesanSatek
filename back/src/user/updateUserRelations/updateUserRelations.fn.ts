@@ -102,10 +102,14 @@ export const updateUserRelationsFn: ActFn = async (body) => {
   const modelId = new ObjectId(_id as string);
   const isBypass = Boolean(actor.isGhost) || isManagerLike(activeRole);
   const actorOrganizationId = organizationIdOfRole(activeRole, actor);
+  const requestedOrganizations = organizations
+    ? idsOfPayload(organizations)
+    : null;
+  const requestedUnits = units ? idsOfPayload(units) : null;
 
   let targetContext: UserTargetContext | null = null;
 
-  if (!isBypass && (organizations || units)) {
+  if (!isBypass && (requestedOrganizations || requestedUnits)) {
     if (!actorOrganizationId) {
       throwError("You cant do this");
       return;
@@ -116,6 +120,35 @@ export const updateUserRelationsFn: ActFn = async (body) => {
       activeRole,
       Boolean(actor.isGhost),
     );
+
+    if (requestedOrganizations) {
+      for (const organizationId of requestedOrganizations) {
+        if (
+          organizationId !== actorOrganizationId &&
+          !targetContext.organizationIds.has(organizationId)
+        ) {
+          throwError("You cant do this");
+          return;
+        }
+      }
+    }
+
+    if (requestedUnits) {
+      for (const unitId of requestedUnits) {
+        const alreadyMember = targetContext.unitIds.has(unitId);
+        const insideActorScope = await unitIsInsideActorScope(
+          unitId,
+          activeRole,
+          actorOrganizationId,
+          targetContext,
+        );
+
+        if (!alreadyMember && !insideActorScope) {
+          throwError("You cant do this");
+          return;
+        }
+      }
+    }
   }
 
   if (avatar) {
@@ -133,23 +166,13 @@ export const updateUserRelationsFn: ActFn = async (body) => {
   }
 
   if (organizations) {
-    const requested = idsOfPayload(organizations);
+    const requested = requestedOrganizations ?? [];
     const preserved: string[] = [];
 
     if (!isBypass) {
       if (!targetContext) {
         throwError("You cant do this");
         return;
-      }
-
-      for (const organizationId of requested) {
-        if (
-          organizationId !== actorOrganizationId &&
-          !targetContext.organizationIds.has(organizationId)
-        ) {
-          throwError("You cant do this");
-          return;
-        }
       }
 
       for (const organizationId of targetContext.organizationIds) {
@@ -209,28 +232,13 @@ export const updateUserRelationsFn: ActFn = async (body) => {
   }
 
   if (units) {
-    const requested = idsOfPayload(units);
+    const requested = requestedUnits ?? [];
     const preserved: string[] = [];
 
     if (!isBypass) {
       if (!targetContext) {
         throwError("You cant do this");
         return;
-      }
-
-      for (const unitId of requested) {
-        const alreadyMember = targetContext.unitIds.has(unitId);
-        const insideActorScope = await unitIsInsideActorScope(
-          unitId,
-          activeRole,
-          actorOrganizationId as string,
-          targetContext,
-        );
-
-        if (!alreadyMember && !insideActorScope) {
-          throwError("You cant do this");
-          return;
-        }
       }
 
       for (const unitId of targetContext.unitIds) {
