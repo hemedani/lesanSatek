@@ -611,9 +611,9 @@ Ware and Stuff models use denormalized relations to WareType, WareClass, WareGro
 | **PaymentOrder** | add, get, gets, update | markPaid | Mixed |
 
 ### User Roles
-- Manager, Admin, OrgHead, UnitHead, Employee, Ordinary
+- Manager, Admin, OrgHead, UnitHead, StoreHead, Employee, Ordinary
 - `isGhost` boolean replaces the former "Ghost" level (bootstrap user bypass).
-- Each role has a unique `roleId` (UUID), `name`, optional `scopeType` ("organization" | "unit"), and optional `scopeId`.
+- Each role has a unique `roleId` (UUID), `name`, optional `scopeType` ("organization" | "unit" | "store"), and optional `scopeId`.
 - *DeptHead was removed when Department model was eliminated.*
 - *Level was fully replaced by the `roles` array. Single-level no longer exists.*
 
