@@ -4,13 +4,6 @@ import { isManagerLike } from "../../utils/authzPolicy.ts";
 import type { ScopeUser } from "../../utils/readScope.ts";
 import { throwError } from "../../utils/throwError.ts";
 
-type PurchasingRequestRef = {
-  organization?: { _id?: unknown } | null;
-  requestingUnit?: { _id?: unknown } | null;
-  requester?: { _id?: unknown } | null;
-  store?: { _id?: unknown } | null;
-};
-
 const normalizeId = (value: unknown): string | null => {
   if (value === null || value === undefined || value === "") return null;
 
@@ -32,6 +25,86 @@ const objectIdOf = (value: unknown): ObjectId | null => {
 const emptyMatch = (): Document => ({ _id: { $in: [] } });
 
 type UserWithId = ScopeUser & { _id?: unknown };
+
+export type PurchasingRequestRef = {
+  _id?: unknown;
+  organization?: { _id?: unknown } | null;
+  requestingUnit?: { _id?: unknown } | null;
+  requester?: { _id?: unknown } | null;
+  store?: { _id?: unknown } | null;
+  wareModel?: { _id?: unknown; name?: unknown; enName?: unknown } | null;
+  ware?: { _id?: unknown } | null;
+  wareType?: { _id?: unknown } | null;
+  wareClass?: { _id?: unknown } | null;
+  wareGroup?: { _id?: unknown } | null;
+  budgetLine?: { _id?: unknown } | null;
+  process?: { _id?: unknown } | null;
+  stuff?: { _id?: unknown } | null;
+  status?: unknown;
+  quantity?: unknown;
+  title?: unknown;
+  estimatedAmount?: unknown;
+  currentStep?: unknown;
+  selectionType?: unknown;
+  selectedTenderOfferId?: unknown;
+  stuffStatus?: unknown;
+};
+
+type PurchasingRequestLoader = (
+  id: string,
+) => Promise<PurchasingRequestRef | null>;
+
+export type PurchasingRequestLoadOptions = {
+  loadPurchasingRequest?: PurchasingRequestLoader;
+};
+
+export const purchasingRequestAccessProjection = {
+  _id: 1,
+  title: 1,
+  status: 1,
+  quantity: 1,
+  estimatedAmount: 1,
+  currentStep: 1,
+  selectionType: 1,
+  selectedTenderOfferId: 1,
+  stuffStatus: 1,
+  organization: { _id: 1 },
+  requestingUnit: { _id: 1 },
+  requester: { _id: 1 },
+  store: { _id: 1 },
+  wareModel: { _id: 1, name: 1, enName: 1 },
+  wareType: { _id: 1 },
+  wareClass: { _id: 1 },
+  wareGroup: { _id: 1 },
+  ware: { _id: 1 },
+  budgetLine: { _id: 1 },
+  process: { _id: 1 },
+  stuff: { _id: 1 },
+} as const;
+
+type CoreAppModule = {
+  purchasingRequest: {
+    findOne: (options: Record<string, unknown>) => Promise<unknown>;
+  };
+};
+
+const CORE_APP_MODULE = "../mod.ts";
+
+const loadPurchasingRequestFromDb = async (
+  id: string,
+): Promise<PurchasingRequestRef | null> => {
+  const objectId = objectIdOf(id);
+  if (!objectId) return null;
+
+  const { purchasingRequest } = await import(
+    CORE_APP_MODULE
+  ) as CoreAppModule;
+
+  return await purchasingRequest.findOne({
+    filters: { _id: objectId },
+    projection: purchasingRequestAccessProjection,
+  }) as PurchasingRequestRef | null;
+};
 
 export const purchasingRequestReadMatch = (
   activeRole: ActiveRole,
@@ -142,4 +215,38 @@ export const assertCanReadPurchasingRequest = (
   }
 
   throwError("You cant do this");
+};
+
+export const assertCanWritePurchasingRequest = (
+  activeRole: ActiveRole,
+  user: UserWithId | undefined,
+  requestDoc: PurchasingRequestRef | null | undefined,
+): void => {
+  assertCanReadPurchasingRequest(activeRole, user, requestDoc);
+};
+
+export const loadPurchasingRequestForActor = async (
+  activeRole: ActiveRole,
+  user: UserWithId | undefined,
+  id: unknown,
+  options: PurchasingRequestLoadOptions = {},
+): Promise<PurchasingRequestRef> => {
+  const normalizedId = normalizeId(id);
+  const objectId = objectIdOf(normalizedId);
+
+  if (!normalizedId || !objectId) {
+    throwError("You cant do this");
+  }
+
+  const loader = options.loadPurchasingRequest ??
+    loadPurchasingRequestFromDb;
+  const requestDoc = await loader(normalizedId as string);
+
+  if (!requestDoc) {
+    throwError("You cant do this");
+  }
+
+  assertCanReadPurchasingRequest(activeRole, user, requestDoc);
+
+  return requestDoc as PurchasingRequestRef;
 };

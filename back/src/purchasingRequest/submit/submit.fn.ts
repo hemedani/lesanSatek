@@ -8,8 +8,20 @@ import {
 import type { MyContext } from "@lib";
 import { assertWareModelAccess } from "../../../utils/checkWareModelAccess.ts";
 import type { ActiveRole } from "../../../utils/authzPolicy.ts";
+import { isManagerLike } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
+import { assertUnitInActorScope } from "../../../utils/unitScope.ts";
 import { resolveProcessForPR } from "../../../utils/resolveProcess.ts";
+import {
+  assertCanWritePurchasingRequest,
+  loadPurchasingRequestForActor,
+} from "../readScope.ts";
+
+const normalizeId = (value: unknown): string | null => {
+  if (value === null || value === undefined || value === "") return null;
+
+  return String(value);
+};
 
 export const submitFn: ActFn = async (body) => {
   const { set, get } = body.details;
@@ -20,38 +32,40 @@ export const submitFn: ActFn = async (body) => {
 
   const activeRole = (user.roles || []).find(
     (r: { roleId: string }) => r.roleId === activeRoleId,
-  );
+  ) as ActiveRole | undefined;
+
+  if (!activeRole) {
+    throwError("Active role not found");
+    return;
+  }
 
   const now = new Date();
   const prId = new ObjectId(_id as string);
 
-  // 1. Fetch Draft PR
-  const pr = await purchasingRequest.findOne({
-    filters: { _id: prId },
-    projection: {
-      _id: 1,
-      status: 1,
-      title: 1,
-      quantity: 1,
-      selectionType: 1,
-      selectedTenderOfferId: 1,
-      stuff: { _id: 1 },
-      wareModel: { _id: 1, name: 1, enName: 1 },
-      wareType: { _id: 1 },
-      wareClass: { _id: 1 },
-      wareGroup: { _id: 1 },
-      requestingUnit: { _id: 1, name: 1 },
-    },
-  }) as Record<string, unknown>;
-
-  if (!pr) {
-    throwError("Purchasing request not found");
-    return;
-  }
+  // 1. Load and authorize the purchasing request
+  const pr = await loadPurchasingRequestForActor(activeRole, user, _id);
+  assertCanWritePurchasingRequest(activeRole, user, pr);
 
   if (pr.status !== "Draft") {
     throwError("Only Draft purchasing requests can be submitted");
     return;
+  }
+
+  if (!isManagerLike(activeRole) && !user.isGhost) {
+    const prRequestingUnitId = normalizeId(pr.requestingUnit?._id);
+    const override = normalizeId(overrideUnitId);
+
+    if (!prRequestingUnitId) {
+      throwError("You cant do this");
+      return;
+    }
+
+    if (override && override !== prRequestingUnitId) {
+      throwError("You cant do this");
+      return;
+    }
+
+    await assertUnitInActorScope(user, activeRole, prRequestingUnitId);
   }
 
   // Validate that at least one selection method exists
@@ -74,59 +88,39 @@ export const submitFn: ActFn = async (body) => {
     return;
   }
 
-  if (!activeRole) {
-    throwError("Active role not found");
-    return;
-  }
-
-  await assertWareModelAccess(user, activeRole as ActiveRole, {
+  await assertWareModelAccess(user, activeRole, {
     _id: wareModelId,
     wareType: pr.wareType as { _id?: unknown },
     wareClass: pr.wareClass as { _id?: unknown },
     wareGroup: pr.wareGroup as { _id?: unknown },
   });
 
-  // 2. Derive organization
-  const userAny = user as Record<string, unknown>;
-  const userOrgs = userAny.organizations as
-    | Array<Record<string, unknown>>
-    | undefined;
-  if (!userOrgs || userOrgs.length === 0) {
+  // 2. Derive organization from the purchasing request
+  const organizationId = normalizeId(pr.organization?._id);
+  if (!organizationId) {
     throwError(
-      "Could not determine organization. Please ensure you belong to an organization.",
+      "Could not determine organization. Please ensure the purchasing request belongs to an organization.",
     );
     return;
   }
-  const orgId = (userOrgs[0]._id as ObjectId).toString();
 
-  // 3. Derive requesting unit
-  const requestingUnitId = overrideUnitId
-    ? (overrideUnitId as string)
-    : (activeRole?.scopeType === "unit" && activeRole?.scopeId
-      ? activeRole.scopeId
-      : undefined);
+  // 3. Derive requesting unit from the purchasing request
+  const requestingUnitId = normalizeId(pr.requestingUnit?._id) ??
+    normalizeId(overrideUnitId);
 
   if (!requestingUnitId) {
     throwError("Your active role does not have an associated unit.");
     return;
   }
 
-  // 4. Validate submitter's unit matches PR's requesting unit
-  const prRequestingUnitId = (pr.requestingUnit as Record<string, unknown>)?._id
-    ?.toString();
-  if (prRequestingUnitId && requestingUnitId !== prRequestingUnitId) {
-    throwError("You can only submit purchase requests for your own unit");
-    return;
-  }
-
-  // 5. Resolve process
+  // 4. Resolve process
   const resolvedProcessId = await resolveProcessForPR({
-    organizationId: orgId,
+    organizationId,
     requestingUnitId,
     wareModelId,
   });
 
-  // 6. Link process to PR
+  // 5. Link process to PR
   await purchasingRequest.addRelation({
     filters: { _id: prId },
     relations: {
@@ -139,7 +133,7 @@ export const submitFn: ActFn = async (body) => {
     replace: true,
   });
 
-  // 7. Create StepApprovals for first step
+  // 6. Create StepApprovals for first step
   const steps = await processStep.aggregation({
     pipeline: [
       { $match: { "process._id": new ObjectId(resolvedProcessId) } },
@@ -180,7 +174,7 @@ export const submitFn: ActFn = async (body) => {
     }
   }
 
-  // 8. Update PR status and push history
+  // 7. Update PR status and push history
   await purchasingRequest.findOneAndUpdate({
     filter: { _id: prId },
     update: {
@@ -197,14 +191,12 @@ export const submitFn: ActFn = async (body) => {
             by: user._id.toString(),
             name: `${user.first_name} ${user.last_name}`,
             at: now,
-            role: activeRole
-              ? {
-                id: activeRole.roleId,
-                name: activeRole.name,
-                scopeType: activeRole.scopeType,
-                scopeId: activeRole.scopeId,
-              }
-              : { id: "", name: "" },
+            role: {
+              id: activeRole.roleId,
+              name: activeRole.name,
+              scopeType: activeRole.scopeType,
+              scopeId: activeRole.scopeId,
+            },
           },
           details: {
             status: "Pending",

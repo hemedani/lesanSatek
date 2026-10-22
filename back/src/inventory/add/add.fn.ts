@@ -4,6 +4,7 @@ import { assertWareModelAccess } from "../../../utils/checkWareModelAccess.ts";
 import type { ActiveRole } from "../../../utils/authzPolicy.ts";
 import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
+import { assertUnitInActorScope } from "../../../utils/unitScope.ts";
 
 export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
@@ -13,21 +14,17 @@ export const addFn: ActFn = async (body) => {
 
   const activeRole = (user.roles || []).find(
     (r: { roleId: string }) => r.roleId === activeRoleId,
-  ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
+  ) as ActiveRole | undefined;
 
-  if (
-    !user.isGhost && activeRole &&
-    !["Manager", "Admin"].includes(activeRole.name)
-  ) {
-    if (activeRole.scopeType === "unit" && activeRole.scopeId) {
-      if (activeRole.scopeId.toString() !== unitId.toString()) {
-        throwError("You can only add inventory to your own unit");
-        return;
-      }
-    } else {
-      throwError("Your active role does not have an associated unit");
-      return;
-    }
+  if (!activeRole) {
+    throwError("Active role not found");
+    return;
+  }
+
+  await assertUnitInActorScope(user, activeRole, unitId);
+
+  if (warehouseUnitId !== undefined && warehouseUnitId !== null) {
+    await assertUnitInActorScope(user, activeRole, warehouseUnitId);
   }
 
   const wareDoc = await ware.findOne({

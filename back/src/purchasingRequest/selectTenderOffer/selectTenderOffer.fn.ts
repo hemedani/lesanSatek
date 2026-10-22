@@ -1,7 +1,12 @@
 import { type ActFn, ObjectId } from "lesan";
 import { purchasingRequest, tenderOffer, tender, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
+import type { ActiveRole } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
+import {
+  assertCanWritePurchasingRequest,
+  loadPurchasingRequestForActor,
+} from "../readScope.ts";
 
 export const selectTenderOfferFn: ActFn = async (body) => {
   const { set, get } = body.details;
@@ -10,9 +15,20 @@ export const selectTenderOfferFn: ActFn = async (body) => {
 
   const activeRole = (user.roles || []).find(
     (r: { roleId: string }) => r.roleId === activeRoleId,
-  );
+  ) as ActiveRole | undefined;
+
+  if (!activeRole) {
+    throw new Error("Active role not found");
+  }
   const now = new Date();
   const prId = new ObjectId(_id as string);
+
+  const authorizedPr = await loadPurchasingRequestForActor(
+    activeRole,
+    user,
+    _id,
+  );
+  assertCanWritePurchasingRequest(activeRole, user, authorizedPr);
 
   const pr = await purchasingRequest.findOne({
     filters: { _id: prId },

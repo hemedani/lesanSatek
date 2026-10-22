@@ -5,10 +5,25 @@ import {
   stepApproval,
   goodsReceipt,
   paymentOrder,
-  coreApp,
 } from "../../../mod.ts";
-import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
+import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { assertUnitInActorScope } from "../../../utils/unitScope.ts";
+import {
+  checkFinanceUnitAccess,
+  financeTargetOfBudgetLine,
+} from "../../../utils/checkFinanceUnitAccess.ts";
+import {
+  assertCanWritePurchasingRequest,
+  loadPurchasingRequestForActor,
+} from "../readScope.ts";
+
+const normalizeId = (value: unknown): string | null => {
+  if (value === null || value === undefined || value === "") return null;
+
+  return String(value);
+};
 
 export const updateRelationsFn: ActFn = async (body) => {
   const {
@@ -16,10 +31,52 @@ export const updateRelationsFn: ActFn = async (body) => {
     get,
   } = body.details;
 
-  const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
+  const { user, activeRole } = await getAuth();
+  const pr = await loadPurchasingRequestForActor(activeRole, user, _id);
+  assertCanWritePurchasingRequest(activeRole, user, pr);
+
+  const bypass = Boolean(user?.isGhost) || isManagerLike(activeRole);
+  const currentOrganizationId = normalizeId(pr.organization?._id);
+
+  if (organizationId !== undefined && !bypass) {
+    const targetOrganizationId = normalizeId(organizationId);
+    const orgHeadOrganizationId = activeRole.name === "OrgHead" &&
+        activeRole.scopeType === "organization"
+      ? normalizeId(activeRole.scopeId)
+      : null;
+
+    if (
+      !targetOrganizationId ||
+      (targetOrganizationId !== currentOrganizationId &&
+        targetOrganizationId !== orgHeadOrganizationId)
+    ) {
+      throwError("You cant do this");
+      return;
+    }
+  }
+
+  if (requestingUnitId !== undefined) {
+    await assertUnitInActorScope(user, activeRole, requestingUnitId);
+  }
+
+  if (budgetLineId !== undefined && budgetLineId && !bypass) {
+    if (activeRole.name === "OrgHead" || activeRole.name === "UnitHead") {
+      const target = await financeTargetOfBudgetLine(budgetLineId);
+      await checkFinanceUnitAccess(target);
+    } else {
+      const target = await financeTargetOfBudgetLine(budgetLineId);
+
+      if (
+        !target?.organizationId ||
+        normalizeId(target.organizationId) !== currentOrganizationId
+      ) {
+        throwError("You cant do this");
+        return;
+      }
+    }
+  }
 
   const requestId = new ObjectId(_id);
-  const now = new Date();
 
   if (requestingUnitId !== undefined) {
     await purchasingRequest.addRelation({

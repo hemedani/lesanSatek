@@ -2,7 +2,6 @@ import { coreApp } from "../../../mod.ts";
 import { updateFn } from "./update.fn.ts";
 import { updateValidator } from "./update.val.ts";
 import { grantAccess, setTokens, setUser } from "@lib";
-import { assertUnitFieldInScope } from "../../../utils/writeScope.ts";
 import {
   orgOfInventory,
   unitOfInventory,
@@ -21,7 +20,6 @@ export const updateSetup = () =>
         { roles: ["UnitHead"], scope: unitOfInventory() },
         { roles: ["OrgHead"], scope: orgOfInventory() },
       ]),
-      assertUnitFieldInScope("unitId"),
     ],
     validator: updateValidator(),
   });

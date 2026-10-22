@@ -10,6 +10,7 @@ export const addValidator = () => {
       description: optional(string()),
       quantity: number(),
       wareModelId: objectIdValidation,
+      requestingUnitId: optional(objectIdValidation),
     }),
     get: selectStruct("purchasingRequest", 2),
   });

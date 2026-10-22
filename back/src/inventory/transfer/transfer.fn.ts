@@ -1,9 +1,21 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { coreApp, inventory } from "../../../mod.ts";
+import { coreApp, inventory, unit } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { assertWareModelAccess } from "../../../utils/checkWareModelAccess.ts";
 import type { ActiveRole } from "../../../utils/authzPolicy.ts";
+import { isManagerLike } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
+
+const normalizeId = (value: unknown): string | null => {
+  if (value === null || value === undefined || value === "") return null;
+
+  return String(value);
+};
+
+type UnitDoc = {
+  _id?: unknown;
+  organization?: { _id?: unknown } | null;
+};
 
 export const transferFn: ActFn = async (body) => {
   const {
@@ -15,19 +27,87 @@ export const transferFn: ActFn = async (body) => {
 
   const activeRole = (user.roles || []).find(
     (r: { roleId: string }) => r.roleId === activeRoleId,
-  ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
+  ) as ActiveRole | undefined;
 
-  if (
-    !user.isGhost && activeRole &&
-    !["Manager", "Admin"].includes(activeRole.name)
-  ) {
-    if (activeRole.scopeType === "unit" && activeRole.scopeId) {
-      if (activeRole.scopeId.toString() !== fromUnitId.toString()) {
-        throwError("You can only transfer inventory from your own unit");
+  const bypass = Boolean(user.isGhost) ||
+    (activeRole !== undefined && isManagerLike(activeRole));
+
+  if (!bypass) {
+    if (!activeRole) {
+      throwError("Active role not found");
+      return;
+    }
+
+    const fromUnit = await unit.findOne({
+      filters: { _id: new ObjectId(fromUnitId as string) },
+      projection: { _id: 1, organization: { _id: 1 } },
+    }) as UnitDoc | null;
+
+    const toUnit = await unit.findOne({
+      filters: { _id: new ObjectId(toUnitId as string) },
+      projection: { _id: 1, organization: { _id: 1 } },
+    }) as UnitDoc | null;
+
+    if (!fromUnit || !toUnit) {
+      throwError("You cant do this");
+      return;
+    }
+
+    const from = normalizeId(fromUnitId);
+    const to = normalizeId(toUnitId);
+    const fromOrganizationId = normalizeId(fromUnit.organization?._id);
+    const toOrganizationId = normalizeId(toUnit.organization?._id);
+
+    if (!from || !to) {
+      throwError("You cant do this");
+      return;
+    }
+
+    if (activeRole.name === "OrgHead") {
+      const organizationId = activeRole.scopeType === "organization"
+        ? normalizeId(activeRole.scopeId)
+        : null;
+
+      if (
+        !organizationId || fromOrganizationId !== organizationId ||
+        toOrganizationId !== organizationId
+      ) {
+        throwError("You cant do this");
+        return;
+      }
+    } else if (activeRole.name === "UnitHead") {
+      const scopeId = activeRole.scopeType === "unit"
+        ? normalizeId(activeRole.scopeId)
+        : null;
+
+      if (
+        !scopeId || from !== scopeId || !fromOrganizationId ||
+        toOrganizationId !== fromOrganizationId
+      ) {
+        throwError("You cant do this");
+        return;
+      }
+    } else if (activeRole.name === "Employee") {
+      const scopedUnitId = activeRole.scopeType === "unit"
+        ? normalizeId(activeRole.scopeId)
+        : null;
+      const allowedUnitIds = scopedUnitId
+        ? new Set([scopedUnitId])
+        : new Set(
+          ((user as unknown as { units?: { _id?: unknown }[] }).units ?? [])
+            .map((candidate) => normalizeId(candidate._id))
+            .filter((id): id is string => id !== null),
+        );
+
+      if (
+        !allowedUnitIds.has(from) || !allowedUnitIds.has(to) ||
+        !fromOrganizationId || toOrganizationId !== fromOrganizationId
+      ) {
+        throwError("You cant do this");
         return;
       }
     } else {
-      throwError("Your active role does not have an associated unit");
+      throwError("You cant do this");
       return;
     }
   }
@@ -56,10 +136,7 @@ export const transferFn: ActFn = async (body) => {
     throw new Error("Insufficient quantity in source inventory");
   }
 
-  if (
-    !user.isGhost && activeRole &&
-    !["Manager", "Admin"].includes(activeRole.name)
-  ) {
+  if (activeRole && !bypass) {
     await assertWareModelAccess(user, activeRole as ActiveRole, {
       _id: (fromInv.wareModel as Record<string, unknown>)?._id,
       wareType: fromInv.wareType as { _id?: unknown },

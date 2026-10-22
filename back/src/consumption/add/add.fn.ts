@@ -1,10 +1,36 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { consumption, coreApp, purchasingRequest, ware } from "../../../mod.ts";
+import {
+  consumption,
+  coreApp,
+  inventory,
+  purchasingRequest,
+  unit,
+  ware,
+} from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { assertWareModelAccess } from "../../../utils/checkWareModelAccess.ts";
 import type { ActiveRole } from "../../../utils/authzPolicy.ts";
+import { isManagerLike } from "../../../utils/authzPolicy.ts";
 import { removeStock } from "../../../utils/inventoryManager.ts";
 import { throwError } from "../../../utils/throwError.ts";
+import { assertUnitInActorScope } from "../../../utils/unitScope.ts";
+import { loadPurchasingRequestForActor } from "../../purchasingRequest/readScope.ts";
+
+const normalizeId = (value: unknown): string | null => {
+  if (value === null || value === undefined || value === "") return null;
+
+  return String(value);
+};
+
+type UnitDoc = {
+  _id?: unknown;
+  organization?: { _id?: unknown } | null;
+};
+
+type InventoryDoc = {
+  _id?: unknown;
+  unit?: { _id?: unknown } | null;
+};
 
 export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
@@ -22,16 +48,26 @@ export const addFn: ActFn = async (body) => {
 
   const activeRole = (user.roles || []).find((r: { roleId: string }) =>
     r.roleId === activeRoleId
-  );
+  ) as ActiveRole | undefined;
+
+  if (!activeRole) {
+    throwError("Active role not found");
+    return;
+  }
 
   const unitId = rawUnitId ||
-    (activeRole?.scopeType === "unit" ? activeRole.scopeId : undefined);
-  const consumedById = rawConsumedById || user._id;
+    (activeRole.scopeType === "unit" ? activeRole.scopeId : undefined);
 
   if (!unitId) {
     throwError("unitId is required and cannot be derived from active role");
     return;
   }
+
+  await assertUnitInActorScope(user, activeRole, unitId);
+
+  const consumedById = !user.isGhost && !isManagerLike(activeRole)
+    ? user._id
+    : (rawConsumedById || user._id);
 
   // Fetch ware to derive hierarchy
   const wareDoc = await ware.findOne({
@@ -50,17 +86,56 @@ export const addFn: ActFn = async (body) => {
     return;
   }
 
-  if (!activeRole) {
-    throwError("Active role not found");
-    return;
-  }
-
-  await assertWareModelAccess(user, activeRole as ActiveRole, {
+  await assertWareModelAccess(user, activeRole, {
     _id: (wareDoc.wareModel as Record<string, unknown>)?._id,
     wareType: wareDoc.wareType as { _id?: unknown },
     wareClass: wareDoc.wareClass as { _id?: unknown },
     wareGroup: wareDoc.wareGroup as { _id?: unknown },
   });
+
+  if (inventoryId) {
+    const inventoryDoc = await inventory.findOne({
+      filters: { _id: new ObjectId(inventoryId as string) },
+      projection: { _id: 1, unit: { _id: 1 } },
+    }) as InventoryDoc | null;
+
+    if (
+      !inventoryDoc ||
+      normalizeId(inventoryDoc.unit?._id) !== normalizeId(unitId)
+    ) {
+      throwError("You cant do this");
+      return;
+    }
+  }
+
+  if (purchasingRequestId) {
+    const pr = await loadPurchasingRequestForActor(
+      activeRole,
+      user,
+      purchasingRequestId,
+    );
+
+    const unitDoc = await unit.findOne({
+      filters: { _id: new ObjectId(unitId as string) },
+      projection: { _id: 1, organization: { _id: 1 } },
+    }) as UnitDoc | null;
+
+    const prOrganizationId = normalizeId(pr.organization?._id);
+    const prRequestingUnitId = normalizeId(pr.requestingUnit?._id);
+    const unitOrganizationId = normalizeId(unitDoc?.organization?._id);
+    const normalizedUnitId = normalizeId(unitId);
+
+    const sameOrganization = prOrganizationId !== null &&
+      unitOrganizationId !== null &&
+      prOrganizationId === unitOrganizationId;
+    const sameRequestingUnit = prRequestingUnitId !== null &&
+      prRequestingUnitId === normalizedUnitId;
+
+    if (!sameOrganization && !sameRequestingUnit) {
+      throwError("You cant do this");
+      return;
+    }
+  }
 
   const relations: Record<string, unknown> = {};
 
@@ -146,14 +221,12 @@ export const addFn: ActFn = async (body) => {
               by: consumedById as string,
               name: `${user.first_name} ${user.last_name}`,
               at: new Date(),
-              role: activeRole
-                ? {
-                  id: activeRole.roleId,
-                  name: activeRole.name,
-                  scopeType: activeRole.scopeType,
-                  scopeId: activeRole.scopeId,
-                }
-                : { id: "", name: "" },
+              role: {
+                id: activeRole.roleId,
+                name: activeRole.name,
+                scopeType: activeRole.scopeType,
+                scopeId: activeRole.scopeId,
+              },
             },
             details: {
               consumptionId: result._id?.toString(),

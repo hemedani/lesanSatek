@@ -5,24 +5,64 @@ import {
   tenderOffer,
   stuff,
   budgetLine,
-  coreApp,
 } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
+import {
+  assertCanWritePurchasingRequest,
+  loadPurchasingRequestForActor,
+} from "../readScope.ts";
+
+const normalizeId = (value: unknown): string | null => {
+  if (value === null || value === undefined || value === "") return null;
+
+  return String(value);
+};
 
 export const finalizeFn: ActFn = async (body) => {
   const { set, get } = body.details;
-  const { user }: MyContext = coreApp.contextFns
-    .getContextModel() as MyContext;
 
-  const { activeRoleId, _id, finalWinner, budgetLineId, postCompletionSteps } = set;
+  const { _id, finalWinner, budgetLineId, postCompletionSteps } = set;
 
-  const activeRole = (user.roles || []).find(
-    (r: { roleId: string }) => r.roleId === activeRoleId,
+  const { user: authUser, activeRole } = await getAuth();
+  const user = authUser as MyContext["user"];
+  const authorizedPr = await loadPurchasingRequestForActor(
+    activeRole,
+    user,
+    _id,
   );
+  assertCanWritePurchasingRequest(activeRole, user, authorizedPr);
 
   const now = new Date();
   const prId = new ObjectId(_id as string);
+
+  if (budgetLineId) {
+    const budgetLineDocs = await budgetLine.aggregation({
+      pipeline: [{ $match: { _id: new ObjectId(budgetLineId as string) } }],
+      projection: { _id: 1, organization: { _id: 1 } },
+    }).toArray();
+
+    if (budgetLineDocs.length === 0) {
+      throwError("Budget line not found");
+      return;
+    }
+
+    const budgetLineOrganizationId = normalizeId(
+      (budgetLineDocs[0].organization as { _id?: unknown } | undefined)?._id,
+    );
+    const prOrganizationId = normalizeId(
+      authorizedPr.organization?._id,
+    );
+
+    if (
+      !budgetLineOrganizationId || !prOrganizationId ||
+      budgetLineOrganizationId !== prOrganizationId
+    ) {
+      throwError("You cant do this");
+      return;
+    }
+  }
 
   const reqs = await purchasingRequest.aggregation({
     pipeline: [{ $match: { _id: prId } }],
