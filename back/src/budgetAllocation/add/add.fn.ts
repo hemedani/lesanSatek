@@ -1,18 +1,27 @@
 import { type ActFn, ObjectId } from "lesan";
 import { budgetAllocation, budgetLine } from "../../../mod.ts";
+import { isManagerLike } from "../../../utils/authzPolicy.ts";
 import {
   checkFinanceUnitAccess,
   financeTargetOfBudgetLine,
 } from "../../../utils/checkFinanceUnitAccess.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
 
 export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
 
-  const { activeRoleId, budgetLineId, allocatedById, ...rest } = set;
+  const { activeRoleId: _activeRoleId, budgetLineId, allocatedById, ...rest } = set;
 
   await checkFinanceUnitAccess(
     await financeTargetOfBudgetLine(budgetLineId),
   );
+
+  const { user: authUser, activeRole } = await getAuth();
+  const actorId = String((authUser as { _id?: unknown })._id);
+  const bypass = Boolean(authUser?.isGhost) || isManagerLike(activeRole);
+  const effectiveAllocatedById = bypass
+    ? (allocatedById ? String(allocatedById) : actorId)
+    : actorId;
 
   const relations: Record<string, unknown> = {};
 
@@ -23,9 +32,9 @@ export const addFn: ActFn = async (body) => {
     },
   };
 
-  if (allocatedById) {
+  if (effectiveAllocatedById) {
     relations.allocatedBy = {
-      _ids: new ObjectId(allocatedById as string),
+      _ids: new ObjectId(effectiveAllocatedById),
       relatedRelations: {
         budgetAllocations: true,
       },

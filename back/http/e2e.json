@@ -2495,5 +2495,107 @@
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"consumption\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{wareId}\", \"quantity\": 1, \"consumedAt\": \"2026-06-02\", \"reason\": \"مصرف مجاز در سازمان خود\", \"unitId\": \"{warehouseUnitId}\", \"inventoryId\": \"{authzWarehouseInventoryId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"unit\": {\"_id\": 1}}}}}",
     "repeat": 1,
     "captures": []
+  },
+  {
+    "id": "gen-task12-finance-head-login",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"login\", \"details\": {\"set\": {\"email\": \"fatemeh@lesansatek.com\", \"password\": \"password123\"}, \"get\": {\"token\": 1, \"user\": {\"_id\": 1, \"email\": 1, \"roles\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "task12FinanceToken",
+        "value": "[body][token]"
+      },
+      {
+        "key": "task12FinanceRoleId",
+        "value": "[body][user][roles][0][roleId]"
+      }
+    ]
+  },
+  {
+    "id": "gen-task12-foreign-budget-line",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{roleId}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"code\": \"AUTHZ-T12-FOREIGN\", \"title\": \"خط بودجه سازمان دیگر\", \"totalAllocated\": 1000, \"fiscalYearId\": \"{authzOtherOrgFiscalYearId}\", \"organizationId\": \"{otherOrgId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"organization\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "task12ForeignBudgetLineId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-task12-foreign-payment-order",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{roleId}\"}, \"body\": {\"service\": \"main\", \"model\": \"paymentOrder\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"title\": \"دستور پرداخت سازمان دیگر\", \"amount\": 500, \"payToId\": \"{storeId}\", \"financialUnitId\": \"{financeUnitId}\", \"purchasingRequestId\": \"{task11ForeignPrId}\", \"issuedById\": \"{orgHeadUserId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"purchasingRequest\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "task12ForeignPaymentOrderId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "authz-task12-finance-head-payment-order-add-issued-by-ignored",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{task12FinanceToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"paymentOrder\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{task12FinanceRoleId}\", \"title\": \"دستور پرداخت سقف‌دار\", \"amount\": 250, \"payToId\": \"{storeId}\", \"financialUnitId\": \"{financeUnitId}\", \"purchasingRequestId\": \"{task11OrgHeadPrId}\", \"issuedById\": \"{orgHeadUserId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"issuedBy\": {\"_id\": 1, \"first_name\": 1, \"last_name\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "task12OwnPaymentOrderId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "authz-task12-orghead-payment-order-get-own",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"paymentOrder\", \"act\": \"get\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"_id\": \"{paymentOrderId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"purchasingRequest\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task12-orghead-foreign-budget-line-get",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"get\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"_id\": \"{task12ForeignBudgetLineId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"organization\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task12-orghead-foreign-payment-order-get",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"paymentOrder\", \"act\": \"get\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"_id\": \"{task12ForeignPaymentOrderId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"purchasingRequest\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task12-orghead-foreign-payment-order-update",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"paymentOrder\", \"act\": \"update\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"_id\": \"{task12ForeignPaymentOrderId}\", \"title\": \"تلاش غیرمجاز\"}, \"get\": {\"_id\": 1, \"title\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task12-orghead-own-payment-order-update",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"paymentOrder\", \"act\": \"update\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"_id\": \"{task12OwnPaymentOrderId}\", \"description\": \"به‌روزرسانی مجاز\"}, \"get\": {\"_id\": 1, \"title\": 1, \"description\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task12-orghead-foreign-goods-receipt-add",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"goodsReceipt\", \"act\": \"add\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"receiptNumber\": \"AUTHZ-T12-FOREIGN-RCPT\", \"receivedAt\": \"2026-01-01T00:00:00.000Z\", \"purchasingRequestId\": \"{task11ForeignPrId}\", \"receivedById\": \"{orgHeadUserId}\", \"receivingUnitId\": \"{authzRoleUnitId}\", \"items\": [{\"wareModelId\": \"{wareModelId}\", \"wareModelName\": \"مدل تست\", \"quantityReceived\": 1, \"quantityAccepted\": 1, \"quantityRejected\": 0}]}, \"get\": {\"_id\": 1, \"receiptNumber\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task12-finance-head-budget-line-gets-own-org",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{task12FinanceToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"budgetLine\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{task12FinanceRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"title\": 1, \"organization\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task12-finance-head-payment-order-gets-own-org",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{task12FinanceToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"paymentOrder\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{task12FinanceRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"title\": 1, \"purchasingRequest\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task12-employee-payment-order-gets-empty",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzCreatedToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"paymentOrder\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{authzCreatedRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"title\": 1}}}}",
+    "repeat": 1,
+    "captures": []
   }
 ]

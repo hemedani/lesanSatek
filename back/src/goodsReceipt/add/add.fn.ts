@@ -1,23 +1,32 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
 import { goodsReceipt, purchasingRequest, paymentOrder, processStep, stepApproval, budgetEncumbrance, budgetLine, unit, ware, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
+import { isManagerLike } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
 import { addStock } from "../../../utils/inventoryManager.ts";
+import type { ScopeUser } from "../../../utils/readScope.ts";
 import { evaluateStepStatus } from "../../../utils/stepEvaluator.ts";
+import { assertUnitInOrganization } from "../../../utils/unitScope.ts";
+import { loadPurchasingRequestForActor } from "../../purchasingRequest/readScope.ts";
 
 export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
+  const { activeRole } = await getAuth();
+  const scopeUser = user as unknown as ScopeUser;
+  const bypass = Boolean(user.isGhost) || isManagerLike(activeRole);
 
   const {
-    activeRoleId,
     purchasingRequestId,
     receivedById,
     receivingUnitId: _receivingUnitId,
     ...rest
   } = set;
 
-  const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
+  const effectiveReceivedById = bypass
+    ? (receivedById ? String(receivedById) : String(user._id))
+    : String(user._id);
 
   const now = new Date();
 
@@ -34,6 +43,7 @@ export const addFn: ActFn = async (body) => {
       projection: {
         store: { _id: 1 }, estimatedAmount: 1, quantity: 1, stuffStatus: 1,
         requester: { _id: 1 }, requestingUnit: { _id: 1 }, ware: { _id: 1 },
+        organization: { _id: 1 }, wareModel: { _id: 1 },
       },
     }) as Record<string, unknown> | null;
 
@@ -68,6 +78,18 @@ export const addFn: ActFn = async (body) => {
     }).toArray();
     const isWarehouseHead = warehouseUnits.length > 0;
 
+    try {
+      await loadPurchasingRequestForActor(
+        activeRole,
+        scopeUser,
+        purchasingRequestId,
+      );
+    } catch (error) {
+      // Central warehouse heads may receive goods for requests raised by other
+      // units of the same organization; the organization is validated below.
+      if (!isWarehouseHead) throw error;
+    }
+
     if (!isRequester && !isRequestingUnitHead && !isWarehouseHead) {
       throwError(
         "Only the requester, the requesting unit head, or the central warehouse head can confirm goods delivery",
@@ -88,6 +110,33 @@ export const addFn: ActFn = async (body) => {
       }
     }
 
+    const prOrganizationId =
+      (pr.organization as Record<string, unknown> | undefined)?._id
+        ?.toString();
+
+    if (!prOrganizationId) {
+      throwError("Purchasing request has no organization");
+      return;
+    }
+
+    if (receivingUnitId) {
+      await assertUnitInOrganization(receivingUnitId, prOrganizationId);
+    }
+
+    const prWareModelId =
+      (pr.wareModel as Record<string, unknown> | undefined)?._id?.toString();
+    const requestedItems = (rest.items as
+      | Array<{ wareModelId?: string }>
+      | undefined) || [];
+
+    if (prWareModelId) {
+      for (const item of requestedItems) {
+        if (String(item.wareModelId) !== prWareModelId) {
+          throwError("You cant do this");
+        }
+      }
+    }
+
     // Extract store/pricing data
     if (pr.store) {
       prStoreId = ((pr.store as Record<string, unknown>)._id as ObjectId).toString();
@@ -105,14 +154,12 @@ export const addFn: ActFn = async (body) => {
     },
   };
 
-  if (receivedById) {
-    relations.receivedBy = {
-      _ids: new ObjectId(receivedById as string),
-      relatedRelations: {
-        receivedGoods: true,
-      },
-    };
-  }
+  relations.receivedBy = {
+    _ids: new ObjectId(effectiveReceivedById),
+    relatedRelations: {
+      receivedGoods: true,
+    },
+  };
 
   if (receivingUnitId) {
     relations.receivingUnit = {
@@ -148,7 +195,7 @@ export const addFn: ActFn = async (body) => {
     quantityRejected: number;
   }>) || [];
 
-  const userId = receivedById ? (receivedById as string) : `${user._id}`;
+  const userId = effectiveReceivedById;
 
   // Calculate order total from PR's estimatedAmount (prorated by accepted quantity)
   let orderTotal = 0;

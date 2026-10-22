@@ -4,9 +4,9 @@ import { selectStruct } from "../../../mod.ts";
 import { paymentOrder_pure } from "@model";
 
 export const updateValidator = () => {
-  const { createdAt, updatedAt, ...updatePure } = paymentOrder_pure;
+  const { createdAt: _createdAt, updatedAt: _updatedAt, ...updatePure } = paymentOrder_pure;
   const optionalPure = Object.fromEntries(
-    Object.entries(updatePure).map(([key, val]) => [key, optional(val as any)])
+    Object.entries(updatePure).map(([key, val]) => [key, optional(val as never)])
   );
   return object({
     set: object({
@@ -14,8 +14,6 @@ export const updateValidator = () => {
       _id: objectIdValidation,
       ...optionalPure,
       purchasingRequestId: optional(objectIdValidation),
-      issuedById: optional(objectIdValidation),
-      approvedById: optional(objectIdValidation),
       payToId: optional(objectIdValidation),
       financialUnitId: optional(objectIdValidation),
     }),

@@ -13,7 +13,7 @@ export const addValidator = () => {
       status: optional(paymentOrder_status_emums),
       paidAt: optional(coerce(date(), string(), (value) => new Date(value))),
       purchasingRequestId: objectIdValidation,
-      issuedById: objectIdValidation,
+      issuedById: optional(objectIdValidation),
       approvedById: optional(objectIdValidation),
       payToId: objectIdValidation,
       financialUnitId: objectIdValidation,

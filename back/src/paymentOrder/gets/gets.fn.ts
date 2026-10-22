@@ -1,10 +1,12 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { paymentOrder, unit, coreApp } from "../../../mod.ts";
-import type { MyContext } from "@lib";
+import { paymentOrder } from "../../../mod.ts";
+import {
+  activeFinanceOrganizationId,
+  paymentOrderReadMatch,
+} from "../../../utils/financeScope.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
 
 export const getsFn: ActFn = async (body) => {
-  const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
-
   const {
     set: {
       page,
@@ -15,37 +17,36 @@ export const getsFn: ActFn = async (body) => {
       purchasingRequestId,
       status,
       financialUnitId,
-      activeRoleId,
     },
     get,
   } = body.details;
 
-  const activeRole = (user.roles || []).find(
-    (r: { roleId: string }) => r.roleId === activeRoleId,
-  ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
+  const { user, activeRole } = await getAuth();
+  const financeOrganizationId = await activeFinanceOrganizationId(
+    activeRole,
+    user,
+  );
+  const readMatch = paymentOrderReadMatch(
+    activeRole,
+    user,
+    financeOrganizationId,
+  );
 
   const pipeline: Document[] = [];
 
-  const match: Document = {};
-  purchasingRequestId && (match["purchasingRequest._id"] = new ObjectId(purchasingRequestId as string));
-  status && (match.status = status);
-  financialUnitId && (match["financialUnit._id"] = new ObjectId(financialUnitId as string));
+  readMatch && pipeline.push({ $match: readMatch });
 
-  if (activeRole?.name === "OrgHead" && activeRole.scopeType === "organization" && activeRole.scopeId) {
-    // OrgHead sees all payment orders in their org — no financialUnit filter needed
-  } else if (activeRole?.name === "UnitHead" && activeRole.scopeType === "unit" && activeRole.scopeId) {
-    const unitDoc = await unit.findOne({
-      filters: { _id: new ObjectId(activeRole.scopeId as string) },
-      projection: { type: 1 },
+  purchasingRequestId &&
+    pipeline.push({
+      $match: {
+        "purchasingRequest._id": new ObjectId(purchasingRequestId as string),
+      },
     });
-    if (unitDoc && (unitDoc as Record<string, unknown>).type !== "Finance") {
-      match["financialUnit._id"] = new ObjectId(activeRole.scopeId as string);
-    }
-  }
-
-  if (Object.keys(match).length > 0) {
-    pipeline.push({ $match: match });
-  }
+  status && pipeline.push({ $match: { status } });
+  financialUnitId &&
+    pipeline.push({
+      $match: { "financialUnit._id": new ObjectId(financialUnitId as string) },
+    });
 
   const sortField = sortBy || "_id";
   const sortDirection = sortOrder === "asc" ? 1 : -1;

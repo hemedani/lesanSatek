@@ -78,6 +78,36 @@ const loadUnit = async (
   }
 };
 
+export const assertUnitInOrganization = async (
+  unitId: unknown,
+  organizationId: unknown,
+  options: UnitScopeOptions = {},
+): Promise<void> => {
+  const normalizedUnitId = normalizeId(unitId);
+  const objectId = toObjectId(normalizedUnitId);
+  if (!normalizedUnitId || !objectId) {
+    throwError("You cant do this");
+    return;
+  }
+
+  const normalizedOrganizationId = normalizeId(organizationId);
+  if (!normalizedOrganizationId) {
+    throwError("You cant do this");
+    return;
+  }
+
+  const unitDoc = await loadUnit(normalizedUnitId, options);
+  if (!unitDoc) {
+    throwError("You cant do this");
+    return;
+  }
+
+  if (unitOrganizationId(unitDoc) !== normalizedOrganizationId) {
+    throwError("You cant do this");
+    return;
+  }
+};
+
 export const assertUnitInActorScope = async (
   user: ScopeUser | undefined,
   activeRole: ActiveRole,

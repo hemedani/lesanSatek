@@ -1,10 +1,17 @@
 import { type ActFn, ObjectId } from "lesan";
 import { fiscalYear } from "../../../mod.ts";
+import {
+  checkFinanceUnitAccess,
+  financeTargetOfFiscalYear,
+} from "../../../utils/checkFinanceUnitAccess.ts";
 
 export const removeFn: ActFn = async (body) => {
+  await checkFinanceUnitAccess(
+    await financeTargetOfFiscalYear(body.details.set._id),
+  );
+
   const {
     set: { _id, hardCascade },
-    get,
   } = body.details;
 
   return await fiscalYear.deleteOne({
