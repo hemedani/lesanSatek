@@ -132,17 +132,3 @@ export const grantAccess = (
   return checkAccess;
 };
 
-export const requireFeature = (feature: Feature) => {
-  const checkFeature = async () => {
-    const coreApp = await loadCoreApp();
-    const { user } = coreApp.contextFns.getContextModel() as AuthContext;
-
-    if (user?.isGhost) return;
-
-    if (!hasFeature(user!, feature)) {
-      throwError(`Missing feature: ${feature}`);
-    }
-  };
-
-  return checkFeature;
-};

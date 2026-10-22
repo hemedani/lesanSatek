@@ -122,18 +122,6 @@ Deno.test("Manager and Admin bypass feature checks", () => {
   assertEquals(hasFeature(user as never, feature, admin), true);
 });
 
-Deno.test("legacy two-argument call still considers any unit feature", () => {
-  const user = {
-    features: [],
-    units: [
-      { _id: "u1", organization: { _id: "org1" }, features: [] },
-      { _id: "u2", organization: { _id: "org2" }, features: [{ feature }] },
-    ],
-  };
-
-  assertEquals(hasFeature(user as never, feature), true);
-});
-
 Deno.test("missing role scope considers user features only", () => {
   const user = {
     features: [],

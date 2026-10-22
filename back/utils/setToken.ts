@@ -18,7 +18,7 @@ export const setTokens = async () => {
   const token = Headers.get("token");
 
   if (!token) {
-    throwError("you should send your id with token key in req header");
+    return throwError("you should send your id with token key in req header");
   }
 
   try {

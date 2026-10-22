@@ -20,13 +20,9 @@ const normalizeId = (value: unknown): string =>
 export function hasFeature(
   user: UserWithFeatures,
   feature: Feature,
-  activeRole?: ActiveRole,
+  activeRole: ActiveRole,
 ): boolean {
   if (user.features?.some((f) => f.feature === feature)) return true;
-
-  if (!activeRole) {
-    return user.units?.some((unit) => hasUnitFeature(unit, feature)) ?? false;
-  }
 
   if (isManagerLike(activeRole)) return true;
 

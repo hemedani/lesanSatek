@@ -6,7 +6,12 @@ import type { MyContext } from "@lib";
 export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
 
-  const { activeRoleId, purchasingRequestId, createdById, ...rest } = set;
+  const {
+    activeRoleId,
+    purchasingRequestId,
+    createdById: _createdById,
+    ...rest
+  } = set;
 
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
 
@@ -50,7 +55,7 @@ export const addFn: ActFn = async (body) => {
   };
 
   relations.createdBy = {
-    _ids: new ObjectId(user._id as string),
+    _ids: user._id,
     relatedRelations: {
       createdTenders: true,
     },

@@ -1,4 +1,4 @@
-import { grantAccess, requireFeature, setTokens, setUser } from "@lib";
+import { grantAccess, setTokens, setUser } from "@lib";
 import { coreApp } from "../../../mod.ts";
 import { removeFromPurchaseFn } from "./removeFromPurchase.fn.ts";
 import { removeFromPurchaseValidator } from "./removeFromPurchase.val.ts";

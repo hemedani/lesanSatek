@@ -93,17 +93,6 @@ export function unitCanAccessWareModel(
   );
 }
 
-export function userCanAccessWareModel(
-  user: WareModelAccessUser,
-  wareModel: WareModelRef,
-): boolean {
-  if (unitCanAccessWareModel(user, wareModel)) return true;
-  if (user.units?.some((unit) => unitCanAccessWareModel(unit, wareModel))) {
-    return true;
-  }
-  return false;
-}
-
 const loadUnitFromDb = async (
   unitId: string,
 ): Promise<AllowWareHolder | null> => {

@@ -1,4 +1,4 @@
-import { grantAccess, requireFeature, setTokens, setUser } from "@lib";
+import { grantAccess, setTokens, setUser } from "@lib";
 import { coreApp } from "../../../mod.ts";
 import { closeFn } from "./close.fn.ts";
 import { closeValidator } from "./close.val.ts";
