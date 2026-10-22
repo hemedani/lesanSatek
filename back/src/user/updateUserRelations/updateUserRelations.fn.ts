@@ -1,13 +1,91 @@
 import { type ActFn, ObjectId } from "lesan";
-import { user } from "../../../mod.ts";
+import { coreApp, user } from "../../../mod.ts";
+import { throwError } from "../../../utils/throwError.ts";
+import type { ActiveRole } from "../../../utils/authzPolicy.ts";
+import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import {
+  loadUserTargetContextForActor,
+  type UserTargetContext,
+} from "../shared/assignRoles.ts";
+import type { MyContext } from "@lib";
+
+type ContextUser = {
+  _id?: unknown;
+  isGhost?: boolean;
+  roles?: ActiveRole[];
+  units?: {
+    _id?: unknown;
+    organization?: { _id?: unknown } | null;
+  }[];
+};
+
+const idsOfPayload = (value: unknown): string[] => {
+  if (!Array.isArray(value)) return [];
+
+  return value.map((id) => String(id));
+};
+
+const uniqueIds = (ids: string[]): string[] => [...new Set(ids)];
+
+const organizationIdOfRole = (
+  activeRole: ActiveRole,
+  contextUser: ContextUser,
+): string | null => {
+  if (activeRole.scopeType === "organization" && activeRole.scopeId) {
+    return String(activeRole.scopeId);
+  }
+
+  if (activeRole.scopeType === "unit" && activeRole.scopeId) {
+    const scopedUnit = (contextUser.units ?? []).find((unit) =>
+      String(unit._id) === String(activeRole.scopeId)
+    );
+    const organizationId = scopedUnit?.organization?._id;
+
+    return organizationId === null || organizationId === undefined
+      ? null
+      : String(organizationId);
+  }
+
+  return null;
+};
 
 export const updateUserRelationsFn: ActFn = async (body) => {
   const {
-    set: { _id, avatar, organizations, state, city, units },
+    set: { _id, activeRoleId, avatar, organizations, state, city, units },
     get,
   } = body.details;
 
+  const { user: contextUser }: MyContext = coreApp.contextFns
+    .getContextModel() as MyContext;
+  const actor = contextUser as unknown as ContextUser;
+
+  const activeRole = (actor.roles ?? []).find((role) =>
+    role.roleId === activeRoleId
+  );
+
+  if (!activeRole) {
+    throwError("Active role not found");
+    return;
+  }
+
   const modelId = new ObjectId(_id as string);
+  const isBypass = Boolean(actor.isGhost) || isManagerLike(activeRole);
+  const actorOrganizationId = organizationIdOfRole(activeRole, actor);
+
+  let targetContext: UserTargetContext | null = null;
+
+  if (!isBypass && (organizations || units)) {
+    if (!actorOrganizationId) {
+      throwError("You cant do this");
+      return;
+    }
+
+    targetContext = await loadUserTargetContextForActor(
+      modelId,
+      activeRole,
+      Boolean(actor.isGhost),
+    );
+  }
 
   if (avatar) {
     await user.addRelation({
@@ -24,11 +102,24 @@ export const updateUserRelationsFn: ActFn = async (body) => {
   }
 
   if (organizations) {
+    const requested = idsOfPayload(organizations);
+    const preserved: string[] = [];
+
+    if (!isBypass) {
+      for (const organizationId of targetContext?.organizationIds ?? []) {
+        if (organizationId !== actorOrganizationId) {
+          preserved.push(organizationId);
+        }
+      }
+    }
+
     await user.addRelation({
       filters: { _id: modelId },
       relations: {
         organizations: {
-          _ids: (organizations as string[]).map((id: string) => new ObjectId(id)),
+          _ids: uniqueIds([...requested, ...preserved]).map((id) =>
+            new ObjectId(id)
+          ),
           relatedRelations: {
             users: true,
           },
@@ -72,11 +163,35 @@ export const updateUserRelationsFn: ActFn = async (body) => {
   }
 
   if (units) {
+    const requested = idsOfPayload(units);
+    const preserved: string[] = [];
+
+    if (!isBypass) {
+      for (const unitId of targetContext?.unitIds ?? []) {
+        if (activeRole.name === "UnitHead") {
+          if (String(unitId) !== String(activeRole.scopeId)) {
+            preserved.push(unitId);
+          }
+          continue;
+        }
+
+        const unitOrganizationId = targetContext?.unitOrganizationIds.get(
+          unitId,
+        ) ?? null;
+
+        if (unitOrganizationId !== actorOrganizationId) {
+          preserved.push(unitId);
+        }
+      }
+    }
+
     await user.addRelation({
       filters: { _id: modelId },
       relations: {
         units: {
-          _ids: (units as string[]).map((id: string) => new ObjectId(id)),
+          _ids: uniqueIds([...requested, ...preserved]).map((id) =>
+            new ObjectId(id)
+          ),
           relatedRelations: {
             members: true,
           },

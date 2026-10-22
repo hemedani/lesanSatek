@@ -1,11 +1,31 @@
-import { type ActFn, type Document, ObjectId } from "lesan";
-import { tender, tenderOffer, purchasingRequest, stuff, coreApp } from "../../../mod.ts";
+import { type ActFn, ObjectId } from "lesan";
+import {
+  coreApp,
+  purchasingRequest,
+  stuff,
+  tender,
+  tenderOffer,
+} from "../../../mod.ts";
+import { throwError } from "../../../utils/throwError.ts";
+import type { ActiveRole } from "../../../utils/authzPolicy.ts";
+import {
+  assertCanWritePurchasingRequest,
+  loadPurchasingRequestForActor,
+} from "../../purchasingRequest/readScope.ts";
 import type { MyContext } from "@lib";
 
 export const awardFn: ActFn = async (body) => {
   const { set, get } = body.details;
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
   const { activeRoleId, _id, winningOfferId } = set;
+
+  const activeRole = ((user as Record<string, unknown>).roles as ActiveRole[] || [])
+    .find((r) => r.roleId === activeRoleId);
+
+  if (!activeRole) {
+    throwError("Active role not found");
+    return;
+  }
 
   const now = new Date();
 
@@ -20,19 +40,39 @@ export const awardFn: ActFn = async (body) => {
 
   const prRef = (tenderDoc.purchasingRequest as Record<string, unknown>)?._id as string;
   if (!prRef) {
-    throw new Error("Tender has no linked purchasing request");
+    throwError("Tender has no linked purchasing request");
+    return;
   }
+
+  const prAccess = await loadPurchasingRequestForActor(
+    activeRole,
+    user,
+    prRef,
+  );
+  assertCanWritePurchasingRequest(activeRole, user, prAccess);
 
   const winningOffer = await tenderOffer.findOne({
     filters: { _id: new ObjectId(winningOfferId as string) },
-    projection: { _id: 1, status: 1, store: 1, price: 1 },
-  }) as Record<string, unknown>;
+    projection: { _id: 1, status: 1, tender: { _id: 1 }, store: { _id: 1 }, price: 1 },
+  }) as Record<string, unknown> | null;
 
   if (!winningOffer) {
-    throw new Error("Winning offer not found");
+    throwError("Winning offer not found");
+    return;
+  }
+
+  const offerTenderId = (winningOffer.tender as Record<string, unknown>)?._id;
+  if (String(offerTenderId ?? "") !== String(_id)) {
+    throwError("Winning offer does not belong to this tender");
+    return;
   }
 
   const winningStoreId = (winningOffer.store as Record<string, unknown>)?._id as string;
+  if (!winningStoreId) {
+    throwError("Winning offer has no store");
+    return;
+  }
+
   const offerPrice = (winningOffer.price as number) || 0;
 
   // Accept winning offer
@@ -126,9 +166,6 @@ export const awardFn: ActFn = async (body) => {
       replace: true,
     });
   }
-
-  const activeRole = ((user as Record<string, unknown>).roles as Array<{ roleId: string; name: string; scopeType?: string; scopeId?: string }> || [])
-    .find((r) => r.roleId === activeRoleId);
 
   await purchasingRequest.findOneAndUpdate({
     filter: { _id: new ObjectId(prRef) },

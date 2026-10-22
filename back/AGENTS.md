@@ -625,6 +625,15 @@ Authorization has three layers, and each action must use the right one:
 2. **DB-derived tenant checks — `scopeResolvers`, `writeScope`, `readScope`.** Scope is resolved from the database target (the unit, process, request, store, etc. named by the payload) and compared with the active role's `scopeType`/`scopeId`. Never derive scope from a client-provided `scopeId`. `readScope` builds Mongo filters for list/get endpoints so a payload filter cannot widen results.
 3. **Object rules — shared services.** Cross-cutting checks such as `checkStoreHeadAccess`, `checkFinanceUnitAccess`, `checkWareModelAccess`, `consumptionScope`, and role assignment authority live in shared utilities/services used by every relevant action.
 
+Shared scope helpers:
+
+- `utils/readScope.ts`: `unitScope` / `organizationScope` (aliases of `unitReadScope` / `organizationReadScope`) build authoritative Mongo filters for list/get endpoints. `userReadFilter` handles user lists.
+- `utils/financeScope.ts`: resolves and enforces Finance-unit scoping for budget, payment, and receipt actions.
+- `src/purchasingRequest/readScope.ts`: `loadPurchasingRequestForActor` loads a PR and enforces read scope; `assertCanWritePurchasingRequest` asserts write scope. Tender actions must load the linked PR and assert write access before mutating.
+- `src/user/shared/assignRoles.ts`: `actorCanManageUser` / `loadUserTargetContextForActor` / `userTargetScope` resolve the target user's full organization and unit memberships (any-org / any-unit intersection, never `organizations[0]`).
+
+**Every write must load the target and scope-check it; role-only `grantAccess` is insufficient.** A role gate proves *who* the caller is, not *which* tenant object they may mutate. Load the target document (or its owning PR/unit/store), derive scope from the database, and reject mismatches before any mutation.
+
 Bypass rules:
 
 - **Manager / Admin** bypass scope checks and feature checks (they still must be listed in a `grantAccess` check).

@@ -1,10 +1,43 @@
 import { type ActFn, ObjectId } from "lesan";
-import { tenderOffer } from "../../../mod.ts";
+import { coreApp, tenderOffer } from "../../../mod.ts";
+import { throwError } from "../../../utils/throwError.ts";
+import type { ActiveRole } from "../../../utils/authzPolicy.ts";
+import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import type { MyContext } from "@lib";
 
 export const submitFn: ActFn = async (body) => {
   const { set, get } = body.details;
 
   const { activeRoleId, tenderId, storeId, wareId, ...rest } = set;
+
+  const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
+  const activeRole = (user.roles || []).find(
+    (r: { roleId: string }) => r.roleId === activeRoleId,
+  ) as ActiveRole | undefined;
+
+  if (!activeRole) {
+    throwError("Active role not found");
+    return;
+  }
+
+  const canUseAnyStore = Boolean(user.isGhost) || isManagerLike(activeRole);
+
+  if (!canUseAnyStore) {
+    if (activeRole.scopeType !== "store" || !activeRole.scopeId) {
+      throwError("You cant do this");
+      return;
+    }
+
+    if (!storeId) {
+      throwError("storeId is required");
+      return;
+    }
+
+    if (String(storeId) !== String(activeRole.scopeId)) {
+      throwError("You cant do this");
+      return;
+    }
+  }
 
   const relations: Record<string, unknown> = {};
 

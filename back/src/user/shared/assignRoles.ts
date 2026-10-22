@@ -9,6 +9,7 @@ import {
   type ScopeType,
 } from "../../../utils/authzPolicy.ts";
 import { throwError } from "@lib";
+import type { ScopeResolver } from "../../../utils/grantAccess.ts";
 
 export type RoleInput = {
   roleId?: string;
@@ -47,9 +48,10 @@ const relationId = (doc: RelationDocument, field: string): string | null => {
   return id === null || id === undefined ? null : String(id);
 };
 
-type TargetContext = {
+export type UserTargetContext = {
   organizationIds: Set<string>;
   unitIds: Set<string>;
+  unitOrganizationIds: Map<string, string>;
   scope: ScopeRef | null;
 };
 
@@ -67,19 +69,49 @@ const idsOf = (docs: unknown): Set<string> => {
   return ids;
 };
 
+const unitOrganizationIdsOf = (docs: unknown): Map<string, string> => {
+  const ids = new Map<string, string>();
+
+  if (!Array.isArray(docs)) return ids;
+
+  for (const doc of docs) {
+    const unit = doc as {
+      _id?: unknown;
+      organization?: { _id?: unknown } | null;
+    } | null;
+    const unitId = unit?._id;
+    const organizationId = unit?.organization?._id;
+
+    if (
+      unitId === null || unitId === undefined ||
+      organizationId === null || organizationId === undefined
+    ) {
+      continue;
+    }
+
+    ids.set(String(unitId), String(organizationId));
+  }
+
+  return ids;
+};
+
 const targetContextOfUser = async (
   userId: ObjectId,
   actor: ActiveRole,
-): Promise<TargetContext> => {
+): Promise<UserTargetContext> => {
   const target = await user.findOne({
     filters: { _id: userId },
-    projection: { organizations: { _id: 1 }, units: { _id: 1 } },
+    projection: {
+      organizations: { _id: 1 },
+      units: { _id: 1, organization: { _id: 1 } },
+    },
   }) as RelationDocument;
 
   if (!target) throwError("You cant do this");
 
   const organizationIds = idsOf(target?.organizations);
   const unitIds = idsOf(target?.units);
+  const unitOrganizationIds = unitOrganizationIdsOf(target?.units);
 
   const actorOrganizationId = actor.scopeType === "organization" &&
       actor.scopeId
@@ -93,6 +125,7 @@ const targetContextOfUser = async (
   return {
     organizationIds,
     unitIds,
+    unitOrganizationIds,
     scope: preferredOrganizationId
       ? { scopeType: "organization", scopeId: preferredOrganizationId }
       : null,
@@ -101,7 +134,7 @@ const targetContextOfUser = async (
 
 const assertActorCanAccessTarget = (
   actor: ActiveRole,
-  target: TargetContext,
+  target: UserTargetContext,
   isGhost: boolean,
 ) => {
   if (isGhost || isManagerLike(actor)) return;
@@ -129,6 +162,68 @@ const assertActorCanAccessTarget = (
   }
 
   throwError("You cant do this");
+};
+
+const targetObjectId = (userId: string | ObjectId): ObjectId =>
+  userId instanceof ObjectId ? userId : new ObjectId(String(userId));
+
+export const loadUserTargetContextForActor = async (
+  userId: string | ObjectId,
+  actor: ActiveRole,
+  isGhost = false,
+): Promise<UserTargetContext> => {
+  const target = await targetContextOfUser(targetObjectId(userId), actor);
+  assertActorCanAccessTarget(actor, target, isGhost);
+
+  return target;
+};
+
+export const actorCanManageUser = async (
+  userId: string | ObjectId,
+  actor: ActiveRole,
+  isGhost = false,
+): Promise<boolean> => {
+  try {
+    await loadUserTargetContextForActor(userId, actor, isGhost);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export const userTargetScope = (): ScopeResolver => async (body, user) => {
+  const set = body?.details?.set ?? {};
+  const authUser = user as
+    | { roles?: ActiveRole[]; isGhost?: boolean }
+    | undefined;
+  const activeRole = (authUser?.roles ?? []).find((role) =>
+    role.roleId === set.activeRoleId
+  );
+  const userId = set._id;
+
+  if (
+    !activeRole ||
+    userId === null || userId === undefined || userId === ""
+  ) {
+    return null;
+  }
+
+  try {
+    await loadUserTargetContextForActor(
+      String(userId),
+      activeRole,
+      Boolean(authUser?.isGhost),
+    );
+  } catch {
+    return null;
+  }
+
+  if (!activeRole.scopeType || !activeRole.scopeId) return null;
+
+  return {
+    scopeType: activeRole.scopeType,
+    scopeId: String(activeRole.scopeId),
+  };
 };
 
 const assertScopeConsistency = (role: RoleInput) => {

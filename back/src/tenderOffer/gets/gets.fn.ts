@@ -1,5 +1,6 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { tenderOffer, coreApp } from "../../../mod.ts";
+import { coreApp, tenderOffer } from "../../../mod.ts";
+import { throwError } from "../../../utils/throwError.ts";
 import type { MyContext } from "@lib";
 
 export const getsFn: ActFn = async (body) => {
@@ -24,13 +25,23 @@ export const getsFn: ActFn = async (body) => {
   ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
 
   if (activeRole?.name === "StoreHead") {
-    if (activeRole.scopeType === "store" && activeRole.scopeId) {
-      matchStage["store._id"] = new ObjectId(activeRole.scopeId);
+    if (activeRole.scopeType !== "store" || !activeRole.scopeId) {
+      throwError("You cant do this");
+      return [];
     }
+
+    if (storeId && String(storeId) !== String(activeRole.scopeId)) {
+      throwError("You cant do this");
+      return [];
+    }
+
+    matchStage["store._id"] = new ObjectId(activeRole.scopeId);
   }
 
   if (tenderId) matchStage["tender._id"] = new ObjectId(tenderId as string);
-  if (storeId) matchStage["store._id"] = new ObjectId(storeId as string);
+  if (storeId && activeRole?.name !== "StoreHead") {
+    matchStage["store._id"] = new ObjectId(storeId as string);
+  }
   if (wareId) matchStage["ware._id"] = new ObjectId(wareId as string);
   if (status) matchStage.status = status;
   if (paymentTerms) matchStage.paymentTerms = { $regex: paymentTerms, $options: "i" };

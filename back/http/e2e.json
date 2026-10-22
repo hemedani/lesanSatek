@@ -2597,5 +2597,102 @@
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzCreatedToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"paymentOrder\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{authzCreatedRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"title\": 1}}}}",
     "repeat": 1,
     "captures": []
+  },
+  {
+    "id": "gen-task13-orghead-own-tender",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"tender\", \"act\": \"add\", \"details\": {\"set\": {\"title\": \"مناقصه مجاز سازمانی\", \"description\": \"مناقصه برای درخواست سازمان خود\", \"deadline\": \"2026-06-01\", \"purchasingRequestId\": \"{task11OrgHeadPrId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "task13OwnTenderId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "authz-task13-orghead-foreign-tender-add",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"tender\", \"act\": \"add\", \"details\": {\"set\": {\"title\": \"تلاش مناقصه سازمان دیگر\", \"description\": \"نباید برای درخواست سازمان دیگر مجاز باشد\", \"deadline\": \"2026-06-01\", \"purchasingRequestId\": \"{task11ForeignPrId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"title\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-task13-foreign-tender",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"tender\", \"act\": \"add\", \"details\": {\"set\": {\"title\": \"مناقصه سازمان دیگر\", \"description\": \"مناقصه برای تست رد دسترسی\", \"deadline\": \"2026-06-01\", \"purchasingRequestId\": \"{task11ForeignPrId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "task13ForeignTenderId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-task13-foreign-tender-offer",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"tenderOffer\", \"act\": \"submit\", \"details\": {\"set\": {\"price\": 1500000, \"deliveryTime\": 5, \"paymentTerms\": \"۳۰ روز\", \"status\": \"submitted\", \"submittedAt\": \"2026-05-20\", \"tenderId\": \"{task13ForeignTenderId}\", \"storeId\": \"{storeId}\", \"wareId\": \"{wareId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"price\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "task13ForeignOfferId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "authz-task13-orghead-foreign-tender-close",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"tender\", \"act\": \"close\", \"details\": {\"set\": {\"_id\": \"{task13ForeignTenderId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-task13-foreign-tender-close-as-manager",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"tender\", \"act\": \"close\", \"details\": {\"set\": {\"_id\": \"{task13ForeignTenderId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task13-orghead-foreign-tender-award",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"tender\", \"act\": \"award\", \"details\": {\"set\": {\"_id\": \"{task13ForeignTenderId}\", \"winningOfferId\": \"{task13ForeignOfferId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task13-storehead-offer-foreign-store",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"tenderOffer\", \"act\": \"submit\", \"details\": {\"set\": {\"price\": 1600000, \"deliveryTime\": 6, \"paymentTerms\": \"۳۰ روز\", \"status\": \"submitted\", \"submittedAt\": \"2026-05-21\", \"tenderId\": \"{task13OwnTenderId}\", \"storeId\": \"{store2Id}\", \"wareId\": \"{wareId}\", \"activeRoleId\": \"{storeHeadRoleId}\"}, \"get\": {\"_id\": 1, \"price\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task13-storehead-offer-own-store",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"tenderOffer\", \"act\": \"submit\", \"details\": {\"set\": {\"price\": 1700000, \"deliveryTime\": 6, \"paymentTerms\": \"۳۰ روز\", \"status\": \"submitted\", \"submittedAt\": \"2026-05-22\", \"tenderId\": \"{task13OwnTenderId}\", \"storeId\": \"{storeId}\", \"wareId\": \"{wareId}\", \"activeRoleId\": \"{storeHeadRoleId}\"}, \"get\": {\"_id\": 1, \"price\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "task13OwnOfferId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "authz-task13-storehead-stuff-gets-foreign-store",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{saraToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stuff\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{storeHeadRoleId}\", \"storeId\": \"{store2Id}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"price\": 1, \"store\": {\"_id\": 1, \"name\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-task13-multi-org-user",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"first_name\": \"چند\", \"last_name\": \"سازمانی\", \"email\": \"authz.task13.multi@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000029\", \"gender\": \"Male\", \"isActive\": true, \"is_verified\": true, \"organizations\": [\"{orgId}\", \"{otherOrgId}\"]}, \"get\": {\"_id\": 1, \"organizations\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "task13MultiOrgUserId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "authz-task13-orghead-update-multi-org-user",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"updateUserRelations\", \"details\": {\"set\": {\"_id\": \"{task13MultiOrgUserId}\", \"activeRoleId\": \"{orgHeadRoleId}\", \"organizations\": [\"{orgId}\"]}, \"get\": {\"_id\": 1, \"organizations\": {\"_id\": 1, \"name\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
   }
 ]

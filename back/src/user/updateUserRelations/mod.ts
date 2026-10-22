@@ -1,5 +1,5 @@
 import { grantAccess, setTokens, setUser } from "@lib";
-import { userOrgTarget } from "../../../utils/scopeResolvers.ts";
+import { userTargetScope } from "../shared/assignRoles.ts";
 import { assertUnitIdsInScope } from "../../../utils/writeScope.ts";
 import { coreApp } from "../../../mod.ts";
 import { updateUserRelationsFn } from "./updateUserRelations.fn.ts";
@@ -15,7 +15,7 @@ export const updateUserRelationsSetup = () =>
       setUser,
       grantAccess([
         { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead"], scope: userOrgTarget() },
+        { roles: ["OrgHead"], scope: userTargetScope() },
       ]),
       assertUnitIdsInScope("organizations"),
       assertUnitIdsInScope("units"),
