@@ -629,7 +629,7 @@ Shared scope helpers:
 
 - `utils/readScope.ts`: `unitScope` / `organizationScope` (aliases of `unitReadScope` / `organizationReadScope`) build authoritative Mongo filters for list/get endpoints. `userReadFilter` handles user lists.
 - `utils/financeScope.ts`: resolves and enforces Finance-unit scoping for budget, payment, and receipt actions.
-- `src/purchasingRequest/readScope.ts`: `loadPurchasingRequestForActor` loads a PR and enforces read scope; `assertCanWritePurchasingRequest` asserts write scope. Tender actions must load the linked PR and assert write access before mutating.
+- `src/purchasingRequest/readScope.ts`: `loadPurchasingRequestForActor` loads a PR and enforces read scope; `assertCanWritePurchasingRequest` asserts write scope. Tender `add`, `close`, and `award` load the linked PR and assert write access before mutating; tender `update`, `updateRelations`, and `remove` are Manager/Admin-only.
 - `src/user/shared/assignRoles.ts`: `actorCanManageUser` / `loadUserTargetContextForActor` / `userTargetScope` resolve the target user's full organization and unit memberships (any-org / any-unit intersection, never `organizations[0]`).
 
 **Every write must load the target and scope-check it; role-only `grantAccess` is insufficient.** A role gate proves *who* the caller is, not *which* tenant object they may mutate. Load the target document (or its owning PR/unit/store), derive scope from the database, and reject mismatches before any mutation.

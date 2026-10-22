@@ -453,7 +453,7 @@
   },
   {
     "id": "gen-orghead-user",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"first_name\": \"دکتر\", \"last_name\": \"احمدی\", \"email\": \"dr.ahmadi@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000012\", \"gender\": \"Male\", \"isActive\": true, \"is_verified\": true, \"organizations\": [\"{orgId}\"]}, \"get\": {\"_id\": 1}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"addUser\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"first_name\": \"دکتر\", \"last_name\": \"احمدی\", \"email\": \"dr.ahmadi@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000012\", \"gender\": \"Male\", \"isActive\": true, \"is_verified\": true, \"features\": [{\"feature\": \"canCreateTender\"}], \"organizations\": [\"{orgId}\"]}, \"get\": {\"_id\": 1}}}}",
     "repeat": 1,
     "captures": [
       {
@@ -2691,7 +2691,7 @@
   },
   {
     "id": "authz-task13-orghead-update-multi-org-user",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"updateUserRelations\", \"details\": {\"set\": {\"_id\": \"{task13MultiOrgUserId}\", \"activeRoleId\": \"{orgHeadRoleId}\", \"organizations\": [\"{orgId}\"]}, \"get\": {\"_id\": 1, \"organizations\": {\"_id\": 1, \"name\": 1}}}}}",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"updateUserRelations\", \"details\": {\"set\": {\"_id\": \"{task13MultiOrgUserId}\", \"activeRoleId\": \"{orgHeadRoleId}\", \"organizations\": [\"{orgId}\", \"{otherOrgId}\"]}, \"get\": {\"_id\": 1, \"organizations\": {\"_id\": 1, \"name\": 1}}}}}",
     "repeat": 1,
     "captures": []
   }

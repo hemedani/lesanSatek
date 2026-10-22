@@ -35,7 +35,8 @@ export const awardFn: ActFn = async (body) => {
   }) as Record<string, unknown>;
 
   if (!tenderDoc || (tenderDoc.status as string) !== "closed") {
-    throw new Error("Tender not found or not closed");
+    throwError("Tender not found or not closed");
+    return;
   }
 
   const prRef = (tenderDoc.purchasingRequest as Record<string, unknown>)?._id as string;

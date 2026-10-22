@@ -9,9 +9,8 @@ import {
   store,
   stuff,
   unit,
-  user,
 } from "../mod.ts";
-import type { ActiveRole, ScopeRef } from "./authzPolicy.ts";
+import type { ScopeRef } from "./authzPolicy.ts";
 import { getAuth } from "./grantAccess.ts";
 import type { GrantBody, ScopeResolver } from "./grantAccess.ts";
 
@@ -249,32 +248,3 @@ export const orgOfFiscalYear = (): ScopeResolver => async (body) => {
 
   return organizationScope(relationId(fiscalYearDoc, "organization"));
 };
-
-export const userOrgTarget =
-  (activeRole?: ActiveRole): ScopeResolver => async (body) => {
-    const userId = toObjectId(setOf(body)._id);
-
-    if (userId) {
-      const target = await user.findOne({
-        filters: { _id: userId },
-        projection: { organizations: { _id: 1 } },
-      }) as Document;
-
-      if (!target) return null;
-
-      const organizations = target.organizations;
-      const firstOrganization = Array.isArray(organizations)
-        ? organizations[0]
-        : undefined;
-
-      return organizationScope(
-        (firstOrganization as { _id?: unknown } | undefined)?._id,
-      );
-    }
-
-    if (activeRole?.scopeType === "organization" && activeRole.scopeId) {
-      return organizationScope(activeRole.scopeId);
-    }
-
-    return null;
-  };

@@ -1,5 +1,5 @@
 import { type ActFn, ObjectId } from "lesan";
-import { coreApp, user } from "../../../mod.ts";
+import { coreApp, unit, user } from "../../../mod.ts";
 import { throwError } from "../../../utils/throwError.ts";
 import type { ActiveRole } from "../../../utils/authzPolicy.ts";
 import { isManagerLike } from "../../../utils/authzPolicy.ts";
@@ -47,6 +47,37 @@ const organizationIdOfRole = (
   }
 
   return null;
+};
+
+const unitOrganizationIdOf = async (unitId: string): Promise<string | null> => {
+  const unitDoc = await unit.findOne({
+    filters: { _id: new ObjectId(unitId) },
+    projection: { organization: { _id: 1 } },
+  }) as { organization?: { _id?: unknown } | null } | null;
+
+  const organizationId = unitDoc?.organization?._id;
+
+  return organizationId === null || organizationId === undefined
+    ? null
+    : String(organizationId);
+};
+
+const unitIsInsideActorScope = async (
+  unitId: string,
+  activeRole: ActiveRole,
+  actorOrganizationId: string,
+  targetContext: UserTargetContext,
+): Promise<boolean> => {
+  if (activeRole.name === "UnitHead") {
+    return activeRole.scopeType === "unit" &&
+      Boolean(activeRole.scopeId) &&
+      String(activeRole.scopeId) === unitId;
+  }
+
+  const organizationId = targetContext.unitOrganizationIds.get(unitId) ??
+    await unitOrganizationIdOf(unitId);
+
+  return organizationId === actorOrganizationId;
 };
 
 export const updateUserRelationsFn: ActFn = async (body) => {
@@ -106,7 +137,22 @@ export const updateUserRelationsFn: ActFn = async (body) => {
     const preserved: string[] = [];
 
     if (!isBypass) {
-      for (const organizationId of targetContext?.organizationIds ?? []) {
+      if (!targetContext) {
+        throwError("You cant do this");
+        return;
+      }
+
+      for (const organizationId of requested) {
+        if (
+          organizationId !== actorOrganizationId &&
+          !targetContext.organizationIds.has(organizationId)
+        ) {
+          throwError("You cant do this");
+          return;
+        }
+      }
+
+      for (const organizationId of targetContext.organizationIds) {
         if (organizationId !== actorOrganizationId) {
           preserved.push(organizationId);
         }
@@ -167,7 +213,27 @@ export const updateUserRelationsFn: ActFn = async (body) => {
     const preserved: string[] = [];
 
     if (!isBypass) {
-      for (const unitId of targetContext?.unitIds ?? []) {
+      if (!targetContext) {
+        throwError("You cant do this");
+        return;
+      }
+
+      for (const unitId of requested) {
+        const alreadyMember = targetContext.unitIds.has(unitId);
+        const insideActorScope = await unitIsInsideActorScope(
+          unitId,
+          activeRole,
+          actorOrganizationId as string,
+          targetContext,
+        );
+
+        if (!alreadyMember && !insideActorScope) {
+          throwError("You cant do this");
+          return;
+        }
+      }
+
+      for (const unitId of targetContext.unitIds) {
         if (activeRole.name === "UnitHead") {
           if (String(unitId) !== String(activeRole.scopeId)) {
             preserved.push(unitId);
@@ -175,7 +241,7 @@ export const updateUserRelationsFn: ActFn = async (body) => {
           continue;
         }
 
-        const unitOrganizationId = targetContext?.unitOrganizationIds.get(
+        const unitOrganizationId = targetContext.unitOrganizationIds.get(
           unitId,
         ) ?? null;
 
