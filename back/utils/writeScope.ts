@@ -36,40 +36,6 @@ const setOf = (body: { details?: { set?: ScopeSet } } | undefined): ScopeSet =>
 const isBypass = (user: ScopeUser | undefined, role: ActiveRole) =>
   Boolean(user?.isGhost) || isManagerLike(role);
 
-const userUnitOrganization = (
-  user: ScopeUser | undefined,
-  scopeId: string | undefined,
-): string | null => {
-  if (!scopeId) return null;
-
-  const scopedUnit = user?.units?.find((candidate) =>
-    String(candidate._id) === scopeId
-  );
-
-  const organizationId = scopedUnit?.organization?._id;
-
-  return organizationId === null || organizationId === undefined
-    ? null
-    : String(organizationId);
-};
-
-export const actorOrganizationId = (
-  activeRole: ActiveRole,
-  user: ScopeUser | undefined,
-): string | null => {
-  if (
-    activeRole.scopeType === "organization" && activeRole.scopeId
-  ) {
-    return String(activeRole.scopeId);
-  }
-
-  if (activeRole.scopeType === "unit" && activeRole.scopeId) {
-    return userUnitOrganization(user, activeRole.scopeId);
-  }
-
-  return null;
-};
-
 const loadUnit = async (id: ObjectId): Promise<Document> =>
   await unit.findOne({
     filters: { _id: id },

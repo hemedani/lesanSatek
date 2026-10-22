@@ -2731,8 +2731,8 @@
     ]
   },
   {
-    "id": "gen-task14-foreign-inventory-adjust",
-    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"adjust\", \"details\": {\"set\": {\"_id\": \"{task14ForeignInventoryId}\", \"quantity\": 6, \"description\": \"ایجاد گردش انبار سازمان دیگر برای تست\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"unit\": {\"_id\": 1}}}}}",
+    "id": "gen-task14-foreign-stock-consumption",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"consumption\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{wareId}\", \"quantity\": 2, \"consumedAt\": \"2026-06-03\", \"unitId\": \"{authzScopeOtherOrgUnitId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"unit\": {\"_id\": 1}}}}}",
     "repeat": 1,
     "captures": []
   },
