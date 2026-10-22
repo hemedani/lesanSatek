@@ -78,42 +78,6 @@ const loadUnit = async (
   }
 };
 
-const actorOrganizationId = async (
-  user: ScopeUser | undefined,
-  activeRole: ActiveRole,
-  options: UnitScopeOptions,
-): Promise<string | null> => {
-  if (activeRole.scopeType === "organization" && activeRole.scopeId) {
-    return normalizeId(activeRole.scopeId);
-  }
-
-  if (activeRole.scopeType === "unit" && activeRole.scopeId) {
-    const scopedUnitId = normalizeId(activeRole.scopeId);
-    if (!scopedUnitId) return null;
-
-    const membership = (user?.units ?? []).find((unit) =>
-      normalizeId(unit?._id) === scopedUnitId
-    );
-    const membershipOrganizationId = normalizeId(
-      membership?.organization?._id,
-    );
-
-    if (membershipOrganizationId) return membershipOrganizationId;
-
-    const scopedUnit = await loadUnit(scopedUnitId, options);
-    return unitOrganizationId(scopedUnit);
-  }
-
-  if (activeRole.name === "Employee" || activeRole.name === "Ordinary") {
-    for (const unit of user?.units ?? []) {
-      const organizationId = normalizeId(unit?.organization?._id);
-      if (organizationId) return organizationId;
-    }
-  }
-
-  return null;
-};
-
 export const assertUnitInActorScope = async (
   user: ScopeUser | undefined,
   activeRole: ActiveRole,
@@ -164,41 +128,3 @@ export const assertUnitInActorScope = async (
 
   throwError("You cant do this");
 };
-
-export const assertUnitsShareActorOrganization = async (
-  user: ScopeUser | undefined,
-  activeRole: ActiveRole,
-  unitIds: unknown[],
-  options: UnitScopeOptions = {},
-): Promise<void> => {
-  if (isBypass(user, activeRole)) return;
-  if (unitIds.length === 0) return;
-
-  const organizationId = await actorOrganizationId(user, activeRole, options);
-  if (!organizationId) {
-    throwError("You cant do this");
-    return;
-  }
-
-  for (const unitId of unitIds) {
-    const normalizedUnitId = normalizeId(unitId);
-    const objectId = toObjectId(normalizedUnitId);
-    if (!normalizedUnitId || !objectId) {
-      throwError("You cant do this");
-      return;
-    }
-
-    const unitDoc = await loadUnit(normalizedUnitId, options);
-    if (!unitDoc) {
-      throwError("You cant do this");
-      return;
-    }
-
-    if (unitOrganizationId(unitDoc) !== organizationId) {
-      throwError("You cant do this");
-      return;
-    }
-  }
-};
-
-export const actorOrganizationIdForUnits = actorOrganizationId;

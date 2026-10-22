@@ -225,6 +225,17 @@ const checkUnitHeadTarget = async (
   throwError("You cant do this");
 };
 
+export const isFinanceUnitHead = async (
+  activeRole: { name: string; scopeType?: string; scopeId?: string },
+): Promise<boolean> => {
+  if (activeRole.name !== "UnitHead") return false;
+  if (activeRole.scopeType !== "unit" || !activeRole.scopeId) return false;
+
+  const unitDoc = await loadUnit(activeRole.scopeId);
+
+  return unitDoc?.type === "Finance";
+};
+
 export const assertFinanceTargetConsistency = async (
   target: FinanceTarget | null,
 ) => {

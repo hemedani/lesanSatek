@@ -88,7 +88,7 @@ type CoreAppModule = {
   };
 };
 
-const CORE_APP_MODULE = "../mod.ts";
+export const CORE_APP_MODULE = "../../mod.ts";
 
 const loadPurchasingRequestFromDb = async (
   id: string,

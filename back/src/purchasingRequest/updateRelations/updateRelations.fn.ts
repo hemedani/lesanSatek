@@ -13,6 +13,7 @@ import { assertUnitInActorScope } from "../../../utils/unitScope.ts";
 import {
   checkFinanceUnitAccess,
   financeTargetOfBudgetLine,
+  isFinanceUnitHead,
 } from "../../../utils/checkFinanceUnitAccess.ts";
 import {
   assertCanWritePurchasingRequest,
@@ -60,19 +61,19 @@ export const updateRelationsFn: ActFn = async (body) => {
   }
 
   if (budgetLineId !== undefined && budgetLineId && !bypass) {
-    if (activeRole.name === "OrgHead" || activeRole.name === "UnitHead") {
-      const target = await financeTargetOfBudgetLine(budgetLineId);
-      await checkFinanceUnitAccess(target);
-    } else {
-      const target = await financeTargetOfBudgetLine(budgetLineId);
+    const target = await financeTargetOfBudgetLine(budgetLineId);
+    const isFinanceRole = activeRole.name === "OrgHead" ||
+      (activeRole.name === "UnitHead" &&
+        await isFinanceUnitHead(activeRole));
 
-      if (
-        !target?.organizationId ||
-        normalizeId(target.organizationId) !== currentOrganizationId
-      ) {
-        throwError("You cant do this");
-        return;
-      }
+    if (isFinanceRole) {
+      await checkFinanceUnitAccess(target);
+    } else if (
+      !target?.organizationId ||
+      normalizeId(target.organizationId) !== currentOrganizationId
+    ) {
+      throwError("You cant do this");
+      return;
     }
   }
 

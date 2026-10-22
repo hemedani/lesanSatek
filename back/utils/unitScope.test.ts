@@ -3,7 +3,6 @@ import type { ActiveRole } from "./authzPolicy.ts";
 import type { ScopeUser } from "./readScope.ts";
 import {
   assertUnitInActorScope,
-  assertUnitsShareActorOrganization,
   type UnitScopeDocument,
   type UnitScopeOptions,
 } from "./unitScope.ts";
@@ -122,27 +121,6 @@ Deno.test("unknown units fail closed", async () => {
       userWithUnits([]),
       role({ name: "OrgHead", scopeType: "organization", scopeId: ORG_OWN }),
       "507f1f77bcf86cd799439099",
-      options,
-    ),
-    "You cant do this",
-  );
-});
-
-Deno.test("assertUnitsShareActorOrganization accepts same-org units", async () => {
-  await assertUnitsShareActorOrganization(
-    userWithUnits([]),
-    role({ name: "OrgHead", scopeType: "organization", scopeId: ORG_OWN }),
-    [UNIT_OWN, UNIT_SIBLING],
-    options,
-  );
-});
-
-Deno.test("assertUnitsShareActorOrganization rejects foreign units", async () => {
-  await expectRejectsWith(
-    assertUnitsShareActorOrganization(
-      userWithUnits([]),
-      role({ name: "OrgHead", scopeType: "organization", scopeId: ORG_OWN }),
-      [UNIT_OWN, UNIT_FOREIGN],
       options,
     ),
     "You cant do this",
