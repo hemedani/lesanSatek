@@ -1,4 +1,5 @@
 import { grantAccess, setTokens, setUser } from "@lib";
+import { orgOfProcess } from "../../../utils/scopeResolvers.ts";
 import { coreApp } from "../../../mod.ts";
 import { duplicateProcessFn } from "./duplicateProcess.fn.ts";
 import { duplicateProcessValidator } from "./duplicateProcess.val.ts";
@@ -13,7 +14,7 @@ export const duplicateProcessSetup = () =>
       setUser,
       grantAccess([
         { roles: ["Manager", "Admin"] },
-        { roles: ["OrgHead"] },
+        { roles: ["OrgHead"], scope: orgOfProcess() },
       ]),
     ],
     validator: duplicateProcessValidator(),

@@ -1,24 +1,26 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { purchasingRequest, stuff } from "../../../mod.ts";
+import { stuff } from "../../../mod.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
+import { throwError } from "../../../utils/throwError.ts";
+import { loadPurchasingRequestForActor } from "../readScope.ts";
 
 export const checkStoreAvailabilityFn: ActFn = async (body) => {
   const { set: { purchasingRequestId, storeId }, get } = body.details;
 
-  const pr = await purchasingRequest.findOne({
-    filters: { _id: new ObjectId(purchasingRequestId as string) },
-    projection: { _id: 1, quantity: 1, wareModel: { _id: 1, name: 1, enName: 1 } },
-  }) as Record<string, unknown>;
+  const { user, activeRole } = await getAuth();
 
-  if (!pr) {
-    throw new Error("Purchasing request not found");
-  }
+  const pr = await loadPurchasingRequestForActor(
+    activeRole,
+    user,
+    purchasingRequestId,
+  );
 
   const prQuantity = (pr.quantity as number) || 0;
 
-  const wareModel = pr.wareModel as Record<string, unknown> | undefined;
+  const wareModel = pr.wareModel;
   const wareModelId = wareModel?._id?.toString();
   if (!wareModelId) {
-    throw new Error("Purchasing request has no ware model");
+    throwError("Purchasing request has no ware model");
   }
 
   const match: Record<string, unknown> = { "wareModel._id": new ObjectId(wareModelId) };

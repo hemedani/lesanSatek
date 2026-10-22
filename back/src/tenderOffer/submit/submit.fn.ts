@@ -1,5 +1,5 @@
 import { type ActFn, ObjectId } from "lesan";
-import { coreApp, tenderOffer } from "../../../mod.ts";
+import { coreApp, tender, tenderOffer } from "../../../mod.ts";
 import { throwError } from "../../../utils/throwError.ts";
 import type { ActiveRole } from "../../../utils/authzPolicy.ts";
 import { isManagerLike } from "../../../utils/authzPolicy.ts";
@@ -37,6 +37,21 @@ export const submitFn: ActFn = async (body) => {
       throwError("You cant do this");
       return;
     }
+  }
+
+  const tenderDoc = await tender.findOne({
+    filters: { _id: new ObjectId(tenderId as string) },
+    projection: { _id: 1, status: 1 },
+  }) as Record<string, unknown> | null;
+
+  if (!tenderDoc) {
+    throwError("Tender not found");
+    return;
+  }
+
+  if (tenderDoc.status !== "open") {
+    throwError("Tender is not open for offers");
+    return;
   }
 
   const relations: Record<string, unknown> = {};

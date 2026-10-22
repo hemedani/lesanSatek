@@ -1,39 +1,44 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { coreApp, tenderOffer } from "../../../mod.ts";
+import { tenderOffer } from "../../../mod.ts";
+import { isManagerLike } from "../../../utils/authzPolicy.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
 import { throwError } from "../../../utils/throwError.ts";
-import type { MyContext } from "@lib";
+import { assertCanReadTenderOffer } from "../readScope.ts";
 
 export const getFn: ActFn = async (body) => {
   const {
-    set: { _id, activeRoleId },
+    set: { _id },
     get,
   } = body.details;
 
-  const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
+  const { user, activeRole } = await getAuth();
 
-  const activeRole = (user.roles || []).find(
-    (r: { roleId: string }) => r.roleId === activeRoleId,
-  ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
+  const offerId = new ObjectId(_id as string);
+  const founded = await tenderOffer.findOne({
+    filters: { _id: offerId },
+    projection: {
+      store: { _id: 1 },
+      tender: {
+        purchasingRequest: {
+          organization: { _id: 1 },
+          requestingUnit: { _id: 1 },
+          requester: { _id: 1 },
+        },
+      },
+    },
+  }) as Document | null;
 
-  if (!activeRole) {
-    throwError("Active role not found");
-    return [];
-  }
-
-  const match: Document = { _id: new ObjectId(_id as string) };
-
-  if (activeRole.name === "StoreHead") {
-    if (activeRole.scopeType !== "store" || !activeRole.scopeId) {
+  if (!founded) {
+    if (!(user.isGhost || isManagerLike(activeRole))) {
       throwError("You cant do this");
-      return [];
     }
-
-    match["store._id"] = new ObjectId(activeRole.scopeId);
+  } else {
+    assertCanReadTenderOffer(activeRole, user, founded);
   }
 
   return await tenderOffer
     .aggregation({
-      pipeline: [{ $match: match }],
+      pipeline: [{ $match: { _id: offerId } }],
       projection: get,
     })
     .toArray();

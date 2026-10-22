@@ -2,13 +2,12 @@ import { ObjectId } from "lesan";
 import { type ActiveRole, isManagerLike } from "./authzPolicy.ts";
 import { getAuth } from "./grantAccess.ts";
 import { throwError } from "./throwError.ts";
-import { organization, unit } from "../mod.ts";
+import { unit } from "../mod.ts";
 
 type Document = Record<string, unknown> | null | undefined;
 
 type ScopeUser = {
   isGhost?: boolean;
-  organizations?: { _id?: unknown }[];
   units?: { _id?: unknown; organization?: { _id?: unknown } | null }[];
 };
 
@@ -27,12 +26,6 @@ const toObjectId = (value: unknown): ObjectId | null => {
 const relationId = (doc: Document, field: string): string | null => {
   const relation = doc?.[field] as { _id?: unknown } | null | undefined;
   const id = relation?._id;
-
-  return id === null || id === undefined ? null : String(id);
-};
-
-const documentId = (doc: Document): string | null => {
-  const id = doc?._id;
 
   return id === null || id === undefined ? null : String(id);
 };
@@ -60,7 +53,7 @@ const userUnitOrganization = (
     : String(organizationId);
 };
 
-const actorOrganizationId = (
+export const actorOrganizationId = (
   activeRole: ActiveRole,
   user: ScopeUser | undefined,
 ): string | null => {
@@ -70,14 +63,11 @@ const actorOrganizationId = (
     return String(activeRole.scopeId);
   }
 
-  const fromScopedUnit = userUnitOrganization(user, activeRole.scopeId);
-  if (fromScopedUnit) return fromScopedUnit;
+  if (activeRole.scopeType === "unit" && activeRole.scopeId) {
+    return userUnitOrganization(user, activeRole.scopeId);
+  }
 
-  const firstOrganization = user?.organizations?.[0]?._id;
-
-  return firstOrganization === null || firstOrganization === undefined
-    ? null
-    : String(firstOrganization);
+  return null;
 };
 
 const loadUnit = async (id: ObjectId): Promise<Document> =>
@@ -199,66 +189,4 @@ export const assertUnitFieldInScope = (field = "unitId") => async () => {
   }
 
   throwError("You cant do this");
-};
-
-export const assertUnitIdsInScope = (
-  userOrField: ScopeUser | string | undefined,
-  maybeField?: string,
-) =>
-async () => {
-  const auth = await getAuth();
-  const field = typeof userOrField === "string" ? userOrField : maybeField;
-
-  if (!field) return throwError("You cant do this");
-
-  const user = (typeof userOrField === "string" ? auth.user : userOrField) as
-    | ScopeUser
-    | undefined;
-
-  if (isBypass(user, auth.activeRole)) return;
-
-  const value = setOf(
-    auth.body as { details?: { set?: ScopeSet } },
-  )[field];
-
-  if (value === null || value === undefined) return;
-
-  const ids = Array.isArray(value) ? value : [value];
-  if (ids.length === 0) return;
-
-  const actorOrganization = actorOrganizationId(auth.activeRole, user);
-  if (!actorOrganization) return throwError("You cant do this");
-
-  if (field === "organizations") {
-    for (const rawId of ids) {
-      const organizationId = toObjectId(rawId);
-      if (!organizationId) return throwError("You cant do this");
-
-      const organizationDoc = await organization.findOne({
-        filters: { _id: organizationId },
-        projection: { _id: 1 },
-      }) as Document;
-
-      if (
-        !organizationDoc ||
-        documentId(organizationDoc) !== actorOrganization
-      ) {
-        throwError("You cant do this");
-      }
-    }
-
-    return;
-  }
-
-  for (const rawId of ids) {
-    const unitId = toObjectId(rawId);
-    if (!unitId) return throwError("You cant do this");
-
-    const unitDoc = await loadUnit(unitId);
-    if (!unitDoc) return throwError("You cant do this");
-
-    if (relationId(unitDoc, "organization") !== actorOrganization) {
-      throwError("You cant do this");
-    }
-  }
 };

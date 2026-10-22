@@ -4,6 +4,7 @@ import {
   checkFinanceUnitAccess,
   financeTargetOfBudgetEncumbrance,
 } from "../../../utils/checkFinanceUnitAccess.ts";
+import { throwError } from "../../../utils/throwError.ts";
 
 export const releaseFn: ActFn = async (body) => {
   await checkFinanceUnitAccess(
@@ -18,7 +19,7 @@ export const releaseFn: ActFn = async (body) => {
   }) as Record<string, unknown>;
 
   if (!encumbrance || (encumbrance.status as string) !== "reserved") {
-    throw new Error("Encumbrance not found or already released/spent");
+    throwError("Encumbrance not found or already released/spent");
   }
 
   const amount = encumbrance.amount as number;

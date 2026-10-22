@@ -2694,5 +2694,81 @@
     "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"updateUserRelations\", \"details\": {\"set\": {\"_id\": \"{task13MultiOrgUserId}\", \"activeRoleId\": \"{orgHeadRoleId}\", \"organizations\": [\"{orgId}\", \"{otherOrgId}\"]}, \"get\": {\"_id\": 1, \"organizations\": {\"_id\": 1, \"name\": 1}}}}}",
     "repeat": 1,
     "captures": []
+  },
+  {
+    "id": "authz-task14-orghead-activate-foreign-process",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"activateProcess\", \"details\": {\"set\": {\"_id\": \"{authzScopeOtherOrgProcessId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"status\": 1, \"version\": 1, \"isActive\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task14-orghead-duplicate-foreign-process",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"process\", \"act\": \"duplicateProcess\", \"details\": {\"set\": {\"_id\": \"{authzScopeOtherOrgProcessId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"name\": 1, \"status\": 1, \"version\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task14-orghead-tender-gets",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"tender\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"title\": 1, \"status\": 1, \"purchasingRequest\": {\"_id\": 1, \"organization\": {\"_id\": 1}}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task14-orghead-tender-offer-gets",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"tenderOffer\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{orgHeadRoleId}\", \"limit\": 100}, \"get\": {\"_id\": 1, \"price\": 1, \"store\": {\"_id\": 1}, \"tender\": {\"_id\": 1, \"purchasingRequest\": {\"_id\": 1, \"organization\": {\"_id\": 1}}}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-task14-foreign-inventory",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{wareId}\", \"unitId\": \"{authzScopeOtherOrgUnitId}\", \"quantity\": 4, \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"unit\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "task14ForeignInventoryId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "gen-task14-foreign-inventory-adjust",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"adjust\", \"details\": {\"set\": {\"_id\": \"{task14ForeignInventoryId}\", \"quantity\": 6, \"description\": \"ایجاد گردش انبار سازمان دیگر برای تست\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"unit\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "gen-task14-foreign-stock-movement",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"stockMovement\", \"act\": \"gets\", \"details\": {\"set\": {\"activeRoleId\": \"{roleId}\", \"unitId\": \"{authzScopeOtherOrgUnitId}\", \"limit\": 10}, \"get\": {\"_id\": 1, \"reason\": 1, \"quantity\": 1, \"unit\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "task14ForeignStockMovementId",
+        "value": "[body][0][_id]"
+      }
+    ]
+  },
+  {
+    "id": "authz-task14-employee-stock-movement-get-foreign",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzCreatedToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stockMovement\", \"act\": \"get\", \"details\": {\"set\": {\"_id\": \"{task14ForeignStockMovementId}\", \"activeRoleId\": \"{authzCreatedRoleId}\"}, \"get\": {\"_id\": 1, \"reason\": 1, \"quantity\": 1, \"unit\": {\"_id\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task14-orghead-check-store-availability-foreign",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"purchasingRequest\", \"act\": \"checkStoreAvailability\", \"details\": {\"set\": {\"purchasingRequestId\": \"{task11ForeignPrId}\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"price\": 1, \"store\": {\"_id\": 1, \"name\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task14-orghead-step-approval-add-denied",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{orgHeadToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"add\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prId}\", \"processStepId\": \"{stepUnit1Id}\", \"unitId\": \"{warehouseUnitId}\", \"status\": \"approved\", \"activeRoleId\": \"{orgHeadRoleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "authz-task14-employee-step-approval-add-denied",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{authzCreatedToken}\"}, \"body\": {\"service\": \"main\", \"model\": \"stepApproval\", \"act\": \"add\", \"details\": {\"set\": {\"purchasingRequestId\": \"{prId}\", \"processStepId\": \"{stepUnit1Id}\", \"unitId\": \"{warehouseUnitId}\", \"status\": \"approved\", \"activeRoleId\": \"{authzCreatedRoleId}\"}, \"get\": {\"_id\": 1, \"status\": 1}}}}",
+    "repeat": 1,
+    "captures": []
   }
 ]

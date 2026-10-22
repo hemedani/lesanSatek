@@ -1,12 +1,13 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { coreApp, tenderOffer } from "../../../mod.ts";
+import { tenderOffer } from "../../../mod.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
 import { throwError } from "../../../utils/throwError.ts";
-import type { MyContext } from "@lib";
+import { tenderOfferReadMatch } from "../readScope.ts";
 
 export const getsFn: ActFn = async (body) => {
   const {
     set: {
-      page, limit, skip, search, sortBy, sortOrder, activeRoleId,
+      page, limit, skip, search, sortBy, sortOrder,
       tenderId, storeId, wareId, status,
       priceMin, priceMax, deliveryTimeMin, deliveryTimeMax,
       paymentTerms, submittedAtBefore, submittedAtAfter,
@@ -14,17 +15,16 @@ export const getsFn: ActFn = async (body) => {
     get,
   } = body.details;
 
-  const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
+  const { user, activeRole } = await getAuth();
 
   const pipeline: Document[] = [];
 
+  const readMatch = tenderOfferReadMatch(activeRole, user);
+  readMatch && pipeline.push({ $match: readMatch });
+
   const matchStage: Document = {};
 
-  const activeRole = (user.roles || []).find(
-    (r: { roleId: string }) => r.roleId === activeRoleId,
-  ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
-
-  if (activeRole?.name === "StoreHead") {
+  if (activeRole.name === "StoreHead") {
     if (activeRole.scopeType !== "store" || !activeRole.scopeId) {
       throwError("You cant do this");
       return [];
@@ -34,12 +34,10 @@ export const getsFn: ActFn = async (body) => {
       throwError("You cant do this");
       return [];
     }
-
-    matchStage["store._id"] = new ObjectId(activeRole.scopeId);
   }
 
   if (tenderId) matchStage["tender._id"] = new ObjectId(tenderId as string);
-  if (storeId && activeRole?.name !== "StoreHead") {
+  if (storeId && activeRole.name !== "StoreHead") {
     matchStage["store._id"] = new ObjectId(storeId as string);
   }
   if (wareId) matchStage["ware._id"] = new ObjectId(wareId as string);
