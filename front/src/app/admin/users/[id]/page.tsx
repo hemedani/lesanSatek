@@ -32,8 +32,8 @@ export default async function EditUserPage({ params }: Props) {
         features: 1,
       },
     ),
-    getOrganizations({ activeRoleId: "", page: 1, limit: 100 }, { _id: 1, name: 1 }),
-    getUnits({ activeRoleId: "", page: 1, limit: 100 }, { _id: 1, name: 1 }),
+    getOrganizations({ page: 1, limit: 100 }, { _id: 1, name: 1 }),
+    getUnits({ page: 1, limit: 100 }, { _id: 1, name: 1 }),
   ])
 
   const user = result.success && result.body ? result.body : null
