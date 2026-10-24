@@ -4568,6 +4568,12 @@ is_verified: boolean;
 features?: {
 feature: ("canRegisterPurchaseRequest" | "canApprovePurchaseRequest" | "canAssignItemsToOrder" | "canCreateTender" | "canRespondToTender" | "canViewWarehouse" | "canManageUnitInventory" | "canCreateConsumptionRecord" | "canManageBudget" | "canViewBudgetReports" | "canManageFeatures" | "canConfirmGoodsReceipt" | "canIssuePaymentOrder" | "canViewHistory" | "canSubmitPurchaseRequest" );
 }[];
+roles?: {
+roleId?: string;
+name: ("Manager" | "Admin" | "OrgHead" | "UnitHead" | "StoreHead" | "Employee" | "Ordinary" );
+scopeType?: ("organization" | "unit" | "store" );
+scopeId?: string;
+}[];
 allowWareTypeIds?: string[];
 allowWareClassIds?: string[];
 allowWareGroupIds?: string[];
@@ -40458,6 +40464,7 @@ title: string;
 description?: string;
 quantity: number;
 wareModelId: string;
+requestingUnitId?: string;
 };
 get: {
 _id?: (0 | 1 );
@@ -150981,8 +150988,6 @@ batchNo?: string;
 expirationDate?: Date;
 location?: string;
 lastCountedAt?: Date;
-unitId?: string;
-warehouseUnitId?: string;
 };
 get: {
 _id?: (0 | 1 );
@@ -161974,7 +161979,7 @@ description?: string;
 status?: ("draft" | "sent_to_finance" | "paid" | "cancelled" );
 paidAt?: Date;
 purchasingRequestId: string;
-issuedById: string;
+issuedById?: string;
 approvedById?: string;
 payToId: string;
 financialUnitId: string;
@@ -164539,8 +164544,6 @@ description?: string;
 status?: ("draft" | "sent_to_finance" | "paid" | "cancelled" );
 paidAt?: Date;
 purchasingRequestId?: string;
-issuedById?: string;
-approvedById?: string;
 payToId?: string;
 financialUnitId?: string;
 };
