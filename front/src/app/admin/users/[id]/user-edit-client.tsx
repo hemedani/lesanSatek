@@ -26,6 +26,7 @@ import { removeUser } from "@/app/actions/user/removeUser"
 import { FEATURES_OPTIONS } from "@/types/permissions"
 import type { FeatureName } from "@/types/permissions"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
+import { resolveActionErrorMessage } from "@/lib/action-errors"
 
 export interface UserEditRole {
   roleId?: string
@@ -180,7 +181,7 @@ export function UserEditClient({ user, scopeNameMap }: UserEditClientProps) {
         toast.success("کاربر با موفقیت به‌روزرسانی شد")
         router.refresh()
       } else {
-        toast.error(result.body?.message || "خطا در به‌روزرسانی کاربر")
+        toast.error(resolveActionErrorMessage(result.body?.message, "خطا در به‌روزرسانی کاربر"))
       }
     } catch {
       toast.error("خطا در به‌روزرسانی کاربر")
@@ -198,7 +199,7 @@ export function UserEditClient({ user, scopeNameMap }: UserEditClientProps) {
         toast.success("کاربر با موفقیت حذف شد")
         router.push("/admin/users")
       } else {
-        toast.error(result.body?.message || "خطا در حذف کاربر")
+        toast.error(resolveActionErrorMessage(result.body?.message, "خطا در حذف کاربر"))
         setDeleting(false)
       }
     } catch {
