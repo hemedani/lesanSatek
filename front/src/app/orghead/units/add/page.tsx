@@ -25,6 +25,8 @@ import { gets as getUnits } from "@/app/actions/unit/gets"
 import { getUsers } from "@/app/actions/user/getUsers"
 import type { ReqType } from "@/types/declarations/selectInp"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
+import { useAuthStore } from "@/stores/authStore"
+import { resolveActionErrorMessage } from "@/lib/action-errors"
 
 const unitSchema = z.object({
   name: z.string().min(1, "نام واحد الزامی است"),
@@ -83,9 +85,12 @@ export default function AddUnitPage() {
 
   const onSubmit = async (data: UnitData) => {
     try {
+      const scope = useAuthStore.getState().getActiveScope()
+      const organizationId = scope?.type === "organization" ? scope.id : undefined
       const result = await add(
         {
           activeRoleId: getActiveRoleIdFromStore(),
+          ...(organizationId ? { organizationId } : {}),
           name: data.name,
           enName: data.enName || undefined,
           description: data.description || undefined,
@@ -108,7 +113,7 @@ export default function AddUnitPage() {
         toast.success("واحد با موفقیت ایجاد شد")
         router.push("/orghead/units")
       } else {
-        toast.error(result.body?.message || "خطا در ایجاد واحد")
+        toast.error(resolveActionErrorMessage(result.body?.message, "خطا در ایجاد واحد"))
       }
     } catch {
       toast.error("خطا در ایجاد واحد")
