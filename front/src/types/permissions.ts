@@ -70,3 +70,48 @@ export const SCOPE_OPTIONS: { value: ScopeType | ""; label: string }[] = [
   { value: "unit", label: "واحد" },
   { value: "store", label: "فروشگاه" },
 ];
+
+export const ALL_ROLE_NAMES: RoleName[] = [
+  "Manager",
+  "Admin",
+  "OrgHead",
+  "UnitHead",
+  "StoreHead",
+  "Employee",
+  "Ordinary",
+];
+
+export const ORGHEAD_ASSIGNABLE_ROLE_NAMES: RoleName[] = [
+  "OrgHead",
+  "UnitHead",
+  "Employee",
+  "Ordinary",
+];
+
+export function getAssignableRoleNames(actorRoleName?: string | null): RoleName[] {
+  if (actorRoleName === "OrgHead") return [...ORGHEAD_ASSIGNABLE_ROLE_NAMES];
+  if (actorRoleName === "Admin") return ALL_ROLE_NAMES.filter((role) => role !== "Manager");
+  return [...ALL_ROLE_NAMES];
+}
+
+export function getAssignableRoleOptions(actorRoleName?: string | null): RoleOption[] {
+  const allowed = getAssignableRoleNames(actorRoleName);
+  return ROLE_OPTIONS.filter((option) => allowed.includes(option.value));
+}
+
+export function isRoleAssignableBy(
+  actorRoleName: string | null | undefined,
+  targetRoleName: string | null | undefined,
+): boolean {
+  if (!targetRoleName) return false;
+  return getAssignableRoleNames(actorRoleName).includes(targetRoleName as RoleName);
+}
+
+export function getAssignableScopeOptions(
+  actorRoleName?: string | null,
+): { value: ScopeType | ""; label: string }[] {
+  if (actorRoleName === "OrgHead") {
+    return SCOPE_OPTIONS.filter((option) => option.value !== "store");
+  }
+  return SCOPE_OPTIONS;
+}
