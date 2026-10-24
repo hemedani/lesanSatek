@@ -1,11 +1,13 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/stores/authStore"
 import { PANEL_NAV, filterNavSections, type PanelId } from "@/lib/nav-config"
 import { type PanelDef } from "@/lib/roles"
 import { setActiveRole } from "@/app/actions/auth/setActiveRole"
+import { resolveActionErrorMessage } from "@/lib/action-errors"
 import { Button } from "@/components/ui/button"
 import {
   Command,
@@ -72,12 +74,18 @@ function CommandSearch({ panel }: { panel: PanelId }) {
   const switchPanel = async (panelDef: PanelDef) => {
     setOpen(false)
     const role = user?.roles?.find((r) => panelDef.requiredRole?.includes(r.name)) ?? user?.roles?.[0]
+    let targetPath = panelDef.path
     if (role) {
+      const result = await setActiveRole(role.roleId, role.name)
+      if (!result.success) {
+        toast.error(resolveActionErrorMessage(result.body?.message, "خطا در تغییر نقش فعال"))
+        return
+      }
       setActiveRoleCookie(role.roleId)
       setActiveRoleId(role.roleId)
-      await setActiveRole(role.roleId, role.name)
+      targetPath = result.body?.targetPanel || panelDef.path
     }
-    router.push(panelDef.path)
+    window.location.assign(targetPath)
   }
 
   return (

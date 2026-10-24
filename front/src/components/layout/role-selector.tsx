@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useAuthStore } from "@/stores/authStore"
 import { setActiveRole } from "@/app/actions/auth/setActiveRole"
+import { resolveActionErrorMessage } from "@/lib/action-errors"
 import { cn } from "@/lib/utils"
 import {
   ShieldCheck,
@@ -86,7 +87,6 @@ function setActiveRoleCookie(roleId: string) {
 }
 
 function RoleSelector() {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const { user, activeRoleId, setActiveRoleId } = useAuthStore()
 
@@ -99,12 +99,16 @@ function RoleSelector() {
     const role = user.roles.find((r) => r.roleId === roleId)
     if (!role) return
 
-    setActiveRoleCookie(roleId)
-    setActiveRoleId(roleId)
     const { getPanelForRole } = await import("@/lib/roles")
     const targetPanel = getPanelForRole(role.name) || "/admin"
-    await setActiveRole(roleId, role.name)
-    router.push(targetPanel)
+    const result = await setActiveRole(roleId, role.name)
+    if (!result.success) {
+      toast.error(resolveActionErrorMessage(result.body?.message, "خطا در تغییر نقش فعال"))
+      return
+    }
+    setActiveRoleCookie(roleId)
+    setActiveRoleId(roleId)
+    window.location.assign(result.body?.targetPanel || targetPanel)
   }
 
   const ActiveIcon = (activeRole?.name && roleIconMap[activeRole.name]) || ShieldCheck
