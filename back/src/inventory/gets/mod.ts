@@ -1,4 +1,5 @@
 import { grantAccess, setTokens, setUser } from "@lib";
+import { roleScope } from "../../../utils/scopeResolvers.ts";
 import { coreApp } from "../../../mod.ts";
 import { getsFn } from "./gets.fn.ts";
 import { getsValidator } from "./gets.val.ts";
@@ -11,7 +12,10 @@ export const getsSetup = () =>
     preAct: [
       setTokens,
       setUser,
-      grantAccess([{ roles: ["Manager", "Admin", "OrgHead", "UnitHead", "Employee", "Ordinary"] }]),
+      grantAccess([
+        { roles: ["Manager", "Admin"] },
+        { roles: ["OrgHead", "UnitHead", "Employee"], scope: roleScope() },
+      ]),
     ],
     validator: getsValidator(),
   });

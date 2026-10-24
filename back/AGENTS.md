@@ -40,7 +40,7 @@ The backend defines models across four domains: Organizational, Procurement/Purc
 - **File** - File upload management (name, mimeType, size, type: image/video/docs/other, alt_text)
 - **Tag** - Metadata categorization (name, description, color, icon)
 - **Organization** - Organizations that own purchasing processes (name, enName, description, isActive)
-- **Unit** - Hierarchical units/subunits in a tree (name, enName, description, isActive, organization denormalized on all units, parentUnit for nesting, head as User, features, allowWareTypeIds, allowWareClassIds, allowWareGroupIds, allowWareModelIds). Unit has a `type` enum (General|Warehouse|Logistics|Production|Administration|Expert) and optional attribute fields (address, phone, email, warehouseCapacity, hasColdStorage, fleetSize, serviceRadius). *Department was eliminated.*
+- **Unit** - Hierarchical units/subunits in a tree (name, enName, description, isActive, organization denormalized on all units, parentUnit for nesting, head as User, features, allowWareTypeIds, allowWareClassIds, allowWareGroupIds, allowWareModelIds). Unit has a `type` enum (General|Warehouse|Logistics|Production|Administration|Finance|Expert) and optional attribute fields (address, phone, email, warehouseCapacity, hasColdStorage, fleetSize, serviceRadius). *Department was eliminated.*
 - **Process** - Process builder workflow definitions (name, description, status: Draft|Active|Archived, version, isActive). Scoping relations: unit, wareType, wareClass, wareGroup, wareModel, ware (all optional — unscoped process is org-wide). Custom actions: activateProcess, duplicateProcess.
 - **ProcessStep** - Individual steps within a process (name, description, stepType: Approval|Review|Notification|Action|Delivery|Receipt|Payment, order, required, groupsOperator: AND|OR, assigneeGroups: embedded array of {operator, unitIds}). *ProcessStepAssigneeGroup was eliminated — assignee groups are now embedded directly in ProcessStep.*
 
@@ -611,11 +611,45 @@ Ware and Stuff models use denormalized relations to WareType, WareClass, WareGro
 | **PaymentOrder** | add, get, gets, update | markPaid | Mixed |
 
 ### User Roles
-- Manager, Admin, OrgHead, UnitHead, Employee, Ordinary
-- `isGhost` boolean replaces the former "Ghost" level (bootstrap user bypass).
-- Each role has a unique `roleId` (UUID), `name`, optional `scopeType` ("organization" | "unit"), and optional `scopeId`.
+- Manager, Admin, OrgHead, UnitHead, StoreHead, Employee, Ordinary
+- `isGhost` boolean replaces the former "Ghost" level. Ghost users keep the bootstrap bypass only while the selected active role has no scope; scoped roles are enforced normally.
+- Each role has a unique `roleId` (UUID), `name`, optional `scopeType` ("organization" | "unit" | "store"), and optional `scopeId`.
 - *DeptHead was removed when Department model was eliminated.*
 - *Level was fully replaced by the `roles` array. Single-level no longer exists.*
+
+### Authorization model
+
+Authorization has three layers, and each action must use the right one:
+
+1. **Role gate — `grantAccess(checks)`.** Declares which roles may invoke an action (and optional features). It reads the caller's `activeRoleId`, finds that role on the loaded user, and enforces `isRoleAllowed`. It does **not** trust payload-supplied organization/unit/store IDs.
+2. **DB-derived tenant checks — `scopeResolvers`, `writeScope`, `readScope`.** Scope is resolved from the database target (the unit, process, request, store, etc. named by the payload) and compared with the active role's `scopeType`/`scopeId`. Never derive scope from a client-provided `scopeId`. `readScope` builds Mongo filters for list/get endpoints so a payload filter cannot widen results.
+3. **Object rules — shared services.** Cross-cutting checks such as `checkStoreHeadAccess`, `checkFinanceUnitAccess`, `checkWareModelAccess`, `consumptionScope`, and role assignment authority live in shared utilities/services used by every relevant action.
+
+Shared scope helpers:
+
+- `utils/readScope.ts`: `unitScope` / `organizationScope` (aliases of `unitReadScope` / `organizationReadScope`) build authoritative Mongo filters for list/get endpoints. `userReadFilter` handles user lists.
+- `utils/financeScope.ts`: resolves and enforces Finance-unit scoping for budget, payment, and receipt actions.
+- `src/purchasingRequest/readScope.ts`: `loadPurchasingRequestForActor` loads a PR and enforces read scope; `assertCanWritePurchasingRequest` asserts write scope. Tender `add`, `close`, and `award` load the linked PR and assert write access before mutating; tender `update`, `updateRelations`, and `remove` are Manager/Admin-only.
+- `src/user/shared/assignRoles.ts`: `actorCanManageUser` / `loadUserTargetContextForActor` / `userTargetScope` resolve the target user's full organization and unit memberships (any-org / any-unit intersection, never `organizations[0]`).
+
+**Every write must load the target and scope-check it; role-only `grantAccess` is insufficient.** A role gate proves *who* the caller is, not *which* tenant object they may mutate. Load the target document (or its owning PR/unit/store), derive scope from the database, and reject mismatches before any mutation.
+
+Bypass rules:
+
+- **Manager / Admin** bypass scope checks and feature checks (they still must be listed in a `grantAccess` check).
+- **Ghost** (`user.isGhost`) bypasses role, feature, and scope checks only when the selected active role has no scope (the bootstrap `Ordinary` role from `tempUser`). Scoped ghost roles (`OrgHead`, `UnitHead`, `StoreHead`, or any role carrying `scopeType`/`scopeId`) are enforced exactly like non-ghost users.
+- **Shared scope bypass rule**: `utils/authzPolicy.ts` exports `isGhostScopeBypass` and `isScopeBypass`. Read, write, grant, finance, inventory, and role-assignment paths must use these helpers instead of testing `isGhost` directly. Manager/Admin still bypass scope/feature checks but must be listed in a `grantAccess` check.
+
+Role assignment matrix (`assignableRoles` in `utils/authzPolicy.ts`):
+
+| Actor | May assign | Scope constraint |
+|-------|-----------|------------------|
+| Manager | All roles | Any |
+| Admin | All roles except Manager | Any |
+| OrgHead | OrgHead, UnitHead, Employee, Ordinary | Within own organization |
+| UnitHead | Employee, Ordinary | Within own unit |
+
+Unit types include `Finance` (used by finance/warehouse operations). Unit features are loaded onto the user by `setUser` (including the units in the active role's scope) so `hasFeature` can evaluate them without leaking across units.
 
 ### Pricing Logic (Stuff)
 1. **Ware.price** is the system base price.

@@ -1,5 +1,7 @@
 import type { ActFn, Document } from "lesan";
 import { user } from "../../../mod.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
+import { userReadFilter } from "../../../utils/readScope.ts";
 
 export const getUsersFn: ActFn = async (body) => {
   const {
@@ -17,12 +19,17 @@ export const getUsersFn: ActFn = async (body) => {
     get,
   } = body.details;
 
+  const { user: authUser, activeRole } = await getAuth();
+  const scopeFilter = userReadFilter(activeRole, authUser);
+
   const pipeline: Document[] = [];
 
   search &&
     pipeline.push({
       $match: { $text: { $search: search } },
     });
+
+  scopeFilter && pipeline.push({ $match: scopeFilter });
 
   roles && roles.length > 0 &&
     pipeline.push({

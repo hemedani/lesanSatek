@@ -1,8 +1,13 @@
 import type { ActFn, Document } from "lesan";
 import { ObjectId } from "lesan";
-import { inventory, unit, coreApp } from "../../../mod.ts";
-import type { MyContext } from "@lib";
-import { throwError } from "../../../utils/throwError.ts";
+import { inventory } from "../../../mod.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
+import {
+  idMatch,
+  intersectObjectIds,
+  inventoryAllowedUnitIds,
+  unitsOfOrganization,
+} from "../readScope.ts";
 
 export const getsFn: ActFn = async (body) => {
   const {
@@ -18,58 +23,32 @@ export const getsFn: ActFn = async (body) => {
       unitId,
       warehouseUnitId,
       organizationId,
-      activeRoleId,
     },
     get,
   } = body.details;
 
-  const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
-
-  const activeRole = (user.roles || []).find(
-    (r: { roleId: string }) => r.roleId === activeRoleId,
-  ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
-
-  if (!activeRole) {
-    throwError("Active role not found");
-    return;
-  }
+  const { user, activeRole } = await getAuth();
+  const allowedUnitIds = await inventoryAllowedUnitIds(activeRole, user);
 
   const pipeline: Document[] = [];
   const match: Document = {};
 
-  const isWarehouseHead = await (async () => {
-    if (activeRole.name !== "UnitHead") return false;
-    if (activeRole.scopeType !== "unit" || !activeRole.scopeId) return false;
-    const u = await unit.findOne({
-      filters: { _id: new ObjectId(activeRole.scopeId) },
-      projection: { type: 1 },
-    }) as Document | null;
-    return u?.type === "Warehouse";
-  })();
+  let effectiveUnitIds = allowedUnitIds;
 
-  if (activeRole.name === "Employee" || activeRole.name === "Ordinary") {
-    if (activeRole.scopeType === "unit" && activeRole.scopeId) {
-      match["unit._id"] = new ObjectId(activeRole.scopeId);
-    }
-  } else if (activeRole.name === "UnitHead") {
-    if (isWarehouseHead) {
-    } else if (activeRole.scopeType === "unit" && activeRole.scopeId) {
-      match["unit._id"] = new ObjectId(activeRole.scopeId);
-    }
-  } else if (activeRole.name === "OrgHead") {
-    if (activeRole.scopeType === "organization" && activeRole.scopeId) {
-      const orgUnits = await unit.aggregation({
-        pipeline: [
-          { $match: { "organization._id": new ObjectId(activeRole.scopeId) } },
-          { $project: { _id: 1 } },
-        ],
-      }).toArray();
-      if (orgUnits.length > 0) {
-        match["unit._id"] = {
-          $in: orgUnits.map((u: Document) => u._id),
-        };
-      }
-    }
+  if (unitId) {
+    effectiveUnitIds = intersectObjectIds(allowedUnitIds, [
+      new ObjectId(unitId as string),
+    ]);
+  }
+
+  if (organizationId) {
+    const organizationUnitIds = await unitsOfOrganization(
+      String(organizationId),
+    );
+    effectiveUnitIds = intersectObjectIds(
+      effectiveUnitIds,
+      organizationUnitIds,
+    );
   }
 
   if (search) {
@@ -80,21 +59,13 @@ export const getsFn: ActFn = async (body) => {
   }
   wareId && (match["ware._id"] = new ObjectId(wareId));
   wareModelId && (match["wareModel._id"] = new ObjectId(wareModelId));
-  unitId && (match["unit._id"] = new ObjectId(unitId as string));
-  warehouseUnitId && (match["warehouseUnit._id"] = new ObjectId(warehouseUnitId as string));
-  if (organizationId) {
-    const orgUnits = await unit.aggregation({
-      pipeline: [
-        { $match: { "organization._id": new ObjectId(organizationId as string) } },
-        { $project: { _id: 1 } },
-      ],
-    }).toArray();
-    if (orgUnits.length > 0) {
-      match["unit._id"] = {
-        $in: orgUnits.map((u: Document) => u._id),
-      };
-    }
+
+  if (effectiveUnitIds !== null) {
+    match["unit._id"] = idMatch(effectiveUnitIds);
   }
+
+  warehouseUnitId &&
+    (match["warehouseUnit._id"] = new ObjectId(warehouseUnitId as string));
 
   if (Object.keys(match).length > 0) {
     pipeline.push({ $match: match });

@@ -1,11 +1,12 @@
 import { type ActFn, ObjectId } from "lesan";
+import { throwError } from "../../../utils/throwError.ts";
 import { unit } from "../../../mod.ts";
 
 export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
 
   const {
-    activeRoleId,
+    activeRoleId: _activeRoleId,
     organizationId,
     parentUnitId,
     creatorId,
@@ -18,11 +19,31 @@ export const addFn: ActFn = async (body) => {
     ...rest
   } = set;
 
+  const parentUnit = parentUnitId
+    ? await unit.findOne({
+      filters: { _id: new ObjectId(parentUnitId as string) },
+      projection: { organization: { _id: 1 } },
+    }) as { organization?: { _id?: unknown } } | null
+    : null;
+
+  const parentOrganizationId = parentUnit?.organization?._id;
+
+  if (
+    organizationId &&
+    parentUnitId &&
+    (!parentOrganizationId ||
+      String(parentOrganizationId) !== String(organizationId))
+  ) {
+    throwError("You cant do this");
+  }
+
+  const resolvedOrganizationId = organizationId ?? parentOrganizationId;
+
   const relations: Record<string, unknown> = {};
 
-  if (organizationId) {
+  if (resolvedOrganizationId) {
     relations.organization = {
-      _ids: new ObjectId(organizationId as string),
+      _ids: new ObjectId(String(resolvedOrganizationId)),
       relatedRelations: {
         units: true,
       },
@@ -53,7 +74,7 @@ export const addFn: ActFn = async (body) => {
     };
   }
 
-	const createdUnit = await unit.insertOne({
+  const createdUnit = await unit.insertOne({
     doc: {
       ...rest,
       ...(features !== undefined && { features }),

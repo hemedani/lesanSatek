@@ -7,7 +7,7 @@ import { zodV4Resolver } from "@/lib/zod-v4-resolver"
 import { z } from "zod"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowRight, FileText, Loader2, Package, Send, Warehouse, X } from "lucide-react"
+import { ArrowRight, Building2, FileText, Loader2, Package, Send, Warehouse, X } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
@@ -21,13 +21,17 @@ import { SearchFieldSelect, type SearchFieldSelectOption } from "@/components/ui
 import { add as addPR } from "@/app/actions/purchasingRequest/add"
 import { gets as getWareModels } from "@/app/actions/wareModel/gets"
 import { gets as getInventories } from "@/app/actions/inventory/gets"
+import { gets as getUnits } from "@/app/actions/unit/gets"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
+import { resolveActionErrorMessage } from "@/lib/action-errors"
+import { useAuthStore } from "@/stores/authStore"
 
 const prSchema = z.object({
   title: z.string().min(1, "عنوان الزامی است"),
   description: z.string().optional(),
   quantity: z.string().min(1, "تعداد الزامی است"),
   wareModelId: z.string().min(1, "مدل کالا الزامی است"),
+  requestingUnitId: z.string().optional(),
 })
 
 type PRData = z.infer<typeof prSchema>
@@ -72,6 +76,11 @@ function RequiredMark() {
 export default function NewRequestPage() {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
+  const activeRoleId = useAuthStore((state) => state.activeRoleId)
+  const activeRole = useAuthStore((state) =>
+    state.user?.roles.find((role) => role.roleId === activeRoleId),
+  )
+  const requiresRequestingUnit = activeRole?.scopeType !== "unit"
 
   const form = useForm<PRData>({
     resolver: zodV4Resolver(prSchema),
@@ -134,7 +143,24 @@ export default function NewRequestPage() {
       : []
   }
 
+  const loadUnits = async (query?: string): Promise<SearchFieldSelectOption[]> => {
+    const res = await getUnits(
+      { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 20, search: query },
+      { _id: 1, name: 1 },
+    )
+    return res.success
+      ? (res.body || []).map((u: { _id?: string; name?: string }) => ({
+          _id: u._id || "",
+          name: u.name || "",
+        }))
+      : []
+  }
+
   const handleCreate = async (data: PRData) => {
+    if (requiresRequestingUnit && !data.requestingUnitId) {
+      toast.error("واحد درخواست‌کننده را انتخاب کنید")
+      return
+    }
     setSaving(true)
     try {
       const result = await addPR(
@@ -144,6 +170,7 @@ export default function NewRequestPage() {
           description: data.description || undefined,
           quantity: Number(data.quantity),
           wareModelId: data.wareModelId,
+          ...(data.requestingUnitId ? { requestingUnitId: data.requestingUnitId } : {}),
         },
         { _id: 1, title: 1, status: 1 },
       )
@@ -152,7 +179,7 @@ export default function NewRequestPage() {
         toast.success("درخواست خرید با موفقیت ایجاد شد")
         router.push(`/requests/${result.body._id}`)
       } else {
-        toast.error(result.body?.message || "خطا در ایجاد درخواست خرید")
+        toast.error(resolveActionErrorMessage(result.body?.message, "خطا در ایجاد درخواست خرید"))
       }
     } catch {
       toast.error("خطا در ایجاد درخواست")
@@ -204,6 +231,32 @@ export default function NewRequestPage() {
                   </FormItem>
                 )}
               />
+
+              {requiresRequestingUnit && (
+                <FormField
+                  control={form.control}
+                  name="requestingUnitId"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormLabel>
+                        واحد درخواست‌کننده <RequiredMark />
+                      </FormLabel>
+                      <FormControl>
+                        <SearchFieldSelect
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                          placeholder="جستجو و انتخاب واحد…"
+                          icon={Building2}
+                          fetcher={loadUnits}
+                          ariaLabel="واحد درخواست‌کننده"
+                          hasError={!!fieldState.error}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <FormField
                 control={form.control}

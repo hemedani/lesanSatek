@@ -53,7 +53,6 @@ export default async function ProcessesPage({
   const { sortBy, sortOrder } = SORT_MAP[sort]
 
   const listSet = {
-    activeRoleId: "",
     page,
     limit: LIMIT,
     sortBy,
@@ -65,11 +64,10 @@ export default async function ProcessesPage({
   const [listResult, countResult, orgsResult] = await Promise.all([
     getProcesses(listSet, PROCESS_PROJECTION),
     countProcesses({
-      activeRoleId: "",
       ...(search ? { name: search } : {}),
       ...(organization ? { organizationId: organization } : {}),
     }),
-    getOrganizations({ activeRoleId: "", page: 1, limit: 100 }, { _id: 1, name: 1 }),
+    getOrganizations({ page: 1, limit: 100 }, { _id: 1, name: 1 }),
   ])
 
   const items = (listResult.success ? listResult.body || [] : []) as Process[]

@@ -1,5 +1,8 @@
-import { type ActFn, ObjectId } from "lesan";
+import { type ActFn, type Document, ObjectId } from "lesan";
 import { stockMovement } from "../../../mod.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
+import { throwError } from "../../../utils/throwError.ts";
+import { stockMovementReadMatch } from "../readScope.ts";
 
 export const getFn: ActFn = async (body) => {
   const {
@@ -7,10 +10,27 @@ export const getFn: ActFn = async (body) => {
     get,
   } = body.details;
 
-  return await stockMovement
+  const { user, activeRole } = await getAuth();
+
+  const movementId = new ObjectId(_id as string);
+  const scopeMatch = await stockMovementReadMatch(activeRole, user);
+
+  const pipeline: Document[] = [{ $match: { _id: movementId } }];
+
+  if (scopeMatch) {
+    pipeline.push({ $match: scopeMatch });
+  }
+
+  const founded = await stockMovement
     .aggregation({
-      pipeline: [{ $match: { _id: new ObjectId(_id as string) } }],
+      pipeline,
       projection: get,
     })
     .toArray();
+
+  if (scopeMatch && founded.length === 0) {
+    throwError("You cant do this");
+  }
+
+  return founded;
 };

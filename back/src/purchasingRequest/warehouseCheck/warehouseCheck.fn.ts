@@ -1,15 +1,69 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { purchasingRequest } from "../../../mod.ts";
+import { purchasingRequest, unit } from "../../../mod.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
+import { throwError } from "../../../utils/throwError.ts";
 import { getWarehouseDashboard } from "../../../utils/inventoryManager.ts";
+import { loadPurchasingRequestForActor } from "../readScope.ts";
+
+const normalizeId = (value: unknown): string | null => {
+  if (value === null || value === undefined || value === "") return null;
+
+  return String(value);
+};
+
+type UnitDoc = {
+  _id?: unknown;
+  type?: unknown;
+  organization?: { _id?: unknown } | null;
+};
 
 export const warehouseCheckFn: ActFn = async (body) => {
   const {
     set: { purchasingRequestId, warehouseUnitId },
-    get,
   } = body.details;
 
-  const prId = new ObjectId(purchasingRequestId as string);
+  const { user, activeRole } = await getAuth();
+
+  const pr = await loadPurchasingRequestForActor(
+    activeRole,
+    user,
+    purchasingRequestId,
+  );
+
   const whId = new ObjectId(warehouseUnitId as string);
+
+  const warehouseUnit = await unit.findOne({
+    filters: { _id: whId },
+    projection: { _id: 1, type: 1, organization: { _id: 1 } },
+  }) as UnitDoc | null;
+
+  if (!warehouseUnit) {
+    throwError("Warehouse unit not found");
+    return;
+  }
+
+  if (!isScopeBypass(activeRole, user)) {
+    const prOrganizationId = normalizeId(pr.organization?._id);
+    const warehouseOrganizationId = normalizeId(
+      warehouseUnit.organization?._id,
+    );
+    const isOwnWarehouseUnit = activeRole.name === "UnitHead" &&
+      activeRole.scopeType === "unit" &&
+      normalizeId(activeRole.scopeId) === normalizeId(warehouseUnitId) &&
+      warehouseUnit.type === "Warehouse";
+
+    if (
+      !isOwnWarehouseUnit &&
+      (!prOrganizationId || !warehouseOrganizationId ||
+        prOrganizationId !== warehouseOrganizationId)
+    ) {
+      throwError("You cant do this");
+      return;
+    }
+  }
+
+  const prId = new ObjectId(purchasingRequestId as string);
 
   const requests = await purchasingRequest.aggregation({
     pipeline: [

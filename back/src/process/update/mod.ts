@@ -1,4 +1,5 @@
 import { grantAccess, setTokens, setUser } from "@lib";
+import { orgOfProcess } from "../../../utils/scopeResolvers.ts";
 import { updateFn } from "./update.fn.ts";
 import { updateValidator } from "./update.val.ts";
 import { coreApp } from "../../../mod.ts";
@@ -13,10 +14,7 @@ export const updateSetup = () =>
 			setUser,
 			grantAccess([
 				{ roles: ["Manager", "Admin"] },
-				{ roles: ["OrgHead"], getScope: (b) => ({
-					scopeType: "organization",
-					scopeId: b?.details?.set?.organizationId || b?.details?.set?._id,
-				})},
+				{ roles: ["OrgHead"], scope: orgOfProcess() },
 			]),
 		],
 		validator: updateValidator(),

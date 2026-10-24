@@ -43,7 +43,6 @@ export default async function OrganizationsPage({
   const { sortBy, sortOrder } = SORT_MAP[sort]
 
   const listSet = {
-    activeRoleId: "",
     page,
     limit: LIMIT,
     sortBy,
@@ -53,7 +52,7 @@ export default async function OrganizationsPage({
 
   const [listResult, countResult] = await Promise.all([
     getOrganizations(listSet, ORGANIZATION_PROJECTION),
-    countOrganizations({ activeRoleId: "", ...(search ? { search } : {}) }),
+    countOrganizations({ ...(search ? { search } : {}) }),
   ])
 
   const items = (listResult.success ? listResult.body || [] : []) as Organization[]

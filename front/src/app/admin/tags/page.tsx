@@ -11,7 +11,7 @@ export default async function TagsPage({
   const limit = 30;
 
   const result = await gets(
-    { activeRoleId: "", page, limit, search: resolvedSearchParams.search || undefined },
+    { page, limit, search: resolvedSearchParams.search || undefined },
     { _id: 1, name: 1, color: 1, icon: 1, description: 1, createdAt: 1 }
   );
 

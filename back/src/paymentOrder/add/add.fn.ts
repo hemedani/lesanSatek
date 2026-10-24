@@ -1,16 +1,33 @@
 import { type ActFn, ObjectId } from "lesan";
 import { paymentOrder, purchasingRequest, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
-import { checkFinanceUnitAccess } from "../../../utils/checkFinanceUnitAccess.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
+import {
+  checkFinanceUnitAccess,
+  financeTargetOfPurchasingRequestBudget,
+} from "../../../utils/checkFinanceUnitAccess.ts";
 
 export const addFn: ActFn = async (body) => {
-  await checkFinanceUnitAccess();
   const { set, get } = body.details;
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
 
-  const { activeRoleId, purchasingRequestId, issuedById, approvedById, payToId, financialUnitId, ...rest } = set;
+  const { activeRoleId: _activeRoleId, purchasingRequestId, issuedById, approvedById, payToId, financialUnitId, ...rest } = set;
 
-  const activeRole = (user.roles || []).find((r: { roleId: string }) => r.roleId === activeRoleId);
+  await checkFinanceUnitAccess(
+    await financeTargetOfPurchasingRequestBudget(purchasingRequestId),
+  );
+
+  const { activeRole } = await getAuth();
+  const bypass = activeRole !== undefined &&
+    isScopeBypass(activeRole, user);
+  const effectiveIssuedById = bypass
+    ? (issuedById ? String(issuedById) : String(user._id))
+    : String(user._id);
+
+  if (financialUnitId && !bypass) {
+    await checkFinanceUnitAccess({ unitId: String(financialUnitId) });
+  }
 
   const relations: Record<string, unknown> = {};
 
@@ -21,16 +38,16 @@ export const addFn: ActFn = async (body) => {
     },
   };
 
-  if (issuedById) {
+  if (effectiveIssuedById) {
     relations.issuedBy = {
-      _ids: new ObjectId(issuedById as string),
+      _ids: new ObjectId(effectiveIssuedById),
       relatedRelations: {
         issuedPaymentOrders: true,
       },
     };
   }
 
-  if (approvedById) {
+  if (approvedById && bypass) {
     relations.approvedBy = {
       _ids: new ObjectId(approvedById as string),
       relatedRelations: {

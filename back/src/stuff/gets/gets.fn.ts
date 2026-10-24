@@ -1,6 +1,7 @@
 import type { ActFn, Document } from "lesan";
 import { ObjectId } from "lesan";
-import { stuff, coreApp } from "../../../mod.ts";
+import { coreApp, stuff } from "../../../mod.ts";
+import { throwError } from "../../../utils/throwError.ts";
 import type { MyContext } from "@lib";
 
 const monthFieldMap: Record<string, string> = {
@@ -42,15 +43,26 @@ export const getsFn: ActFn = async (body) => {
 
   const matchStage: Document = {};
 
+  const storeHeadStoreId = activeRole?.name === "StoreHead"
+    ? activeRole.scopeId
+    : null;
+
   if (activeRole?.name === "StoreHead") {
-    if (activeRole.scopeType === "store" && activeRole.scopeId) {
-      matchStage["store._id"] = new ObjectId(activeRole.scopeId);
+    if (activeRole.scopeType !== "store" || !storeHeadStoreId) {
+      throwError("You cant do this");
+      return [];
     }
   }
 
   if (wareModelId) matchStage["wareModel._id"] = new ObjectId(wareModelId);
   if (wareId) matchStage["ware._id"] = new ObjectId(wareId);
-  if (storeId) matchStage["store._id"] = new ObjectId(storeId);
+  if (storeId && !storeHeadStoreId) {
+    matchStage["store._id"] = new ObjectId(storeId);
+  }
+
+  if (storeHeadStoreId) {
+    matchStage["store._id"] = new ObjectId(storeHeadStoreId);
+  }
   if (wareTypeId) matchStage["wareType._id"] = new ObjectId(wareTypeId);
   if (wareClassId) matchStage["wareClass._id"] = new ObjectId(wareClassId);
   if (wareGroupId) matchStage["wareGroup._id"] = new ObjectId(wareGroupId);

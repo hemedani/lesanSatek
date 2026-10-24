@@ -5,7 +5,7 @@ import { getToken, getActiveRoleId } from "@/lib/auth";
 
 export const count = async (
   data: {
-    activeRoleId: string;
+    activeRoleId?: string;
     unitId?: string;
     wareModelId?: string;
     reason?: "goods_receipt" | "goods_issue" | "transfer_in" | "transfer_out" | "consumption" | "adjustment" | "return" | "write_off";

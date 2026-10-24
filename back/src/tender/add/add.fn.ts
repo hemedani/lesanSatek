@@ -1,24 +1,41 @@
 import { type ActFn, ObjectId } from "lesan";
-import { tender, purchasingRequest, coreApp } from "../../../mod.ts";
+import { coreApp, purchasingRequest, tender } from "../../../mod.ts";
 import { throwError } from "../../../utils/throwError.ts";
+import type { ActiveRole } from "../../../utils/authzPolicy.ts";
+import {
+  assertCanWritePurchasingRequest,
+  loadPurchasingRequestForActor,
+} from "../../purchasingRequest/readScope.ts";
 import type { MyContext } from "@lib";
 
 export const addFn: ActFn = async (body) => {
   const { set, get } = body.details;
 
-  const { activeRoleId, purchasingRequestId, createdById, ...rest } = set;
+  const {
+    activeRoleId,
+    purchasingRequestId,
+    createdById: _createdById,
+    ...rest
+  } = set;
 
   const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
 
   const activeRole = (user.roles || []).find(
     (r: { roleId: string }) => r.roleId === activeRoleId,
-  );
+  ) as ActiveRole | undefined;
 
-  const pr = await purchasingRequest.findOne({
-    filters: { _id: new ObjectId(purchasingRequestId as string) },
-    projection: { _id: 1, status: 1 },
-  }) as Record<string, unknown>;
-  if (!pr) throwError("Purchasing request not found");
+  if (!activeRole) {
+    throwError("Active role not found");
+    return;
+  }
+
+  const pr = await loadPurchasingRequestForActor(
+    activeRole,
+    user,
+    purchasingRequestId,
+  );
+  assertCanWritePurchasingRequest(activeRole, user, pr);
+
   if (!["Draft", "Pending", "InProgress"].includes(pr.status as string)) {
     throwError("Can only create tender for a Draft or active purchasing request");
   }
@@ -50,7 +67,7 @@ export const addFn: ActFn = async (body) => {
   };
 
   relations.createdBy = {
-    _ids: new ObjectId(user._id as string),
+    _ids: user._id,
     relatedRelations: {
       createdTenders: true,
     },

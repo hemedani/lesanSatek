@@ -1,4 +1,4 @@
-import { type ActFn } from "lesan";
+import { type ActFn, type Document } from "lesan";
 import * as jwt from "djwt";
 import { jwtTokenKey, throwError } from "@lib";
 import { user } from "../../../mod.ts";
@@ -10,7 +10,7 @@ export const loginUserFn: ActFn = async (body) => {
     get,
   } = body.details;
 
-  const createToken = async (user: any) => {
+  const createToken = async (user: Document) => {
     const token = await jwt.create(
       { alg: "HS512", typ: "JWT" },
       {
@@ -27,6 +27,7 @@ export const loginUserFn: ActFn = async (body) => {
   get.user.email = 1;
   get.user.password = 1;
   get.user.roles = 1;
+  get.user.isActive = 1;
 
   const foundedUser = await user.findOne({
     filters: { email },
@@ -40,8 +41,11 @@ export const loginUserFn: ActFn = async (body) => {
   const passIsCorrect = await compare(password, foundedUser!.password);
 
   if (passIsCorrect) {
+    if (foundedUser!.isActive === false) {
+      throwError("Your account has been disabled. Please contact support.");
+    }
     delete foundedUser!.password;
-    return await createToken(foundedUser);
+    return await createToken(foundedUser!);
   } else {
     throwError("Your password is incorrect!");
   }

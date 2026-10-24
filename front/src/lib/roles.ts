@@ -154,8 +154,17 @@ export function getPanelForRole(
   roleName: string,
   features: string[] = [],
 ): string | null {
+  const rolePanels = PANEL_DEFINITIONS.filter((panel) =>
+    panel.requiredRole?.includes(roleName),
+  )
+  if (rolePanels.length > 0) {
+    rolePanels.sort(
+      (a, b) => (a.requiredRole?.length ?? Infinity) - (b.requiredRole?.length ?? Infinity),
+    )
+    return rolePanels[0].path
+  }
+
   for (const panel of PANEL_DEFINITIONS) {
-    if (panel.requiredRole?.includes(roleName)) return panel.path
     if (panel.requiredFeature?.some((f) => features.includes(f))) return panel.path
   }
   return null

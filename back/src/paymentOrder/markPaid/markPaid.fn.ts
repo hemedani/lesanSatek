@@ -1,11 +1,17 @@
 import { type ActFn, ObjectId } from "lesan";
 import { paymentOrder, budgetEncumbrance, budgetLine, purchasingRequest } from "../../../mod.ts";
-import { checkFinanceUnitAccess } from "../../../utils/checkFinanceUnitAccess.ts";
+import {
+  checkFinanceUnitAccess,
+  financeTargetOfPaymentOrder,
+} from "../../../utils/checkFinanceUnitAccess.ts";
 
 export const markPaidFn: ActFn = async (body) => {
-  await checkFinanceUnitAccess();
   const { set, get } = body.details;
   const { _id } = set;
+
+  await checkFinanceUnitAccess(
+    await financeTargetOfPaymentOrder(_id),
+  );
 
   const order = await paymentOrder.findOne({
     filters: { _id: new ObjectId(_id as string) },

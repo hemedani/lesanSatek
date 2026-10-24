@@ -3,6 +3,8 @@ import { ObjectId } from "lesan";
 import { inventory, unit, coreApp } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
+import type { ActiveRole } from "../../../utils/authzPolicy.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 
 export const getWarehouseInventoryFn: ActFn = async (body) => {
   const {
@@ -24,52 +26,95 @@ export const getWarehouseInventoryFn: ActFn = async (body) => {
 
   const activeRole = (user.roles || []).find(
     (r: { roleId: string }) => r.roleId === activeRoleId,
-  ) as { name: string; scopeType?: string; scopeId?: string } | undefined;
+  ) as ActiveRole | undefined;
 
   if (!activeRole) {
     throwError("Active role not found");
     return;
   }
 
-  if (activeRole.name !== "UnitHead") {
-    throwError("Only UnitHead can access warehouse inventory");
-    return;
-  }
-
-  if (activeRole.scopeType !== "unit" || !activeRole.scopeId) {
-    throwError("UnitHead active role must have a unit scope");
-    return;
-  }
-
-  const currentUnit = await unit.findOne({
-    filters: { _id: new ObjectId(activeRole.scopeId) },
-    projection: { type: 1, organization: { _id: 1 } },
-  }) as Document | null;
-
-  if (!currentUnit) {
-    throwError("Unit not found");
-    return;
-  }
-
-  if (currentUnit.type !== "Warehouse") {
-    throwError("This endpoint is only for heads of Warehouse-type units");
-    return;
-  }
-
-  const orgRaw = currentUnit.organization as Record<string, unknown> | undefined;
-  if (!orgRaw || !orgRaw._id) {
-    throwError("Unit has no associated organization");
-    return;
-  }
-
-  const orgObjectId = orgRaw._id instanceof ObjectId
-    ? orgRaw._id
-    : new ObjectId(orgRaw._id as string);
-
+  const isUnrestricted = isScopeBypass(activeRole, user);
   const unitCollection = coreApp.odm.getCollection("unit");
-  const allOrgUnits = await unitCollection.find({
-    "organization._id": orgObjectId,
-  }).project({ _id: 1, type: 1 }).toArray() as Document[];
+
+  let organizationObjectId: ObjectId | null = null;
+
+  if (!isUnrestricted) {
+    if (activeRole.name !== "UnitHead") {
+      throwError("You cant do this");
+      return;
+    }
+
+    if (activeRole.scopeType !== "unit" || !activeRole.scopeId) {
+      throwError("UnitHead active role must have a unit scope");
+      return;
+    }
+
+    const currentUnit = await unit.findOne({
+      filters: { _id: new ObjectId(activeRole.scopeId) },
+      projection: { type: 1, organization: { _id: 1 } },
+    }) as Document | null;
+
+    if (!currentUnit) {
+      throwError("Unit not found");
+      return;
+    }
+
+    if (currentUnit.type !== "Warehouse") {
+      throwError("This endpoint is only for heads of Warehouse-type units");
+      return;
+    }
+
+    const orgRaw = currentUnit.organization as
+      | Record<string, unknown>
+      | undefined;
+    if (!orgRaw || !orgRaw._id) {
+      throwError("Unit has no associated organization");
+      return;
+    }
+
+    organizationObjectId = orgRaw._id instanceof ObjectId
+      ? orgRaw._id
+      : new ObjectId(orgRaw._id as string);
+  } else if (
+    (activeRole.scopeType === "unit" ||
+      activeRole.scopeType === "organization") && activeRole.scopeId
+  ) {
+    let scopedOrganizationId: unknown = activeRole.scopeId;
+
+    if (activeRole.scopeType === "unit") {
+      const scopedUnit = await unit.findOne({
+        filters: { _id: new ObjectId(activeRole.scopeId) },
+        projection: { organization: { _id: 1 } },
+      }) as Document | null;
+
+      if (!scopedUnit) {
+        throwError("Unit not found");
+        return;
+      }
+
+      scopedOrganizationId = (scopedUnit.organization as
+        | Record<string, unknown>
+        | undefined)?._id;
+    }
+
+    if (!scopedOrganizationId) {
+      throwError("Unit has no associated organization");
+      return;
+    }
+
+    organizationObjectId = scopedOrganizationId instanceof ObjectId
+      ? scopedOrganizationId
+      : new ObjectId(scopedOrganizationId as string);
+  }
+
+  const allOrgUnits = organizationObjectId
+    ? await unitCollection.find({
+      "organization._id": organizationObjectId,
+    }).project({ _id: 1, type: 1 }).toArray() as Document[]
+    : await unitCollection.find({}).project({
+      _id: 1,
+      type: 1,
+    }).toArray() as Document[];
 
   const warehouseUnitIds = allOrgUnits
     .filter((u: Document) => u.type === "Warehouse")

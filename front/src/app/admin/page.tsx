@@ -53,14 +53,14 @@ export default async function AdminDashboard() {
     unitsRes,
     budgetLinesRes,
   ] = await Promise.all([
-    countOrganizations({ activeRoleId: "" }).catch(() => ({ success: false as const, body: undefined })),
-    countUsers({ activeRoleId: "" }).catch(() => ({ success: false as const, body: undefined })),
-    countPurchasingRequests({ activeRoleId: "" }).catch(() => ({ success: false as const, body: undefined })),
-    countProcesses({ activeRoleId: "" }).catch(() => ({ success: false as const, body: undefined })),
-    countTenders({ activeRoleId: "" }).catch(() => ({ success: false as const, body: undefined })),
-    countStores({ activeRoleId: "" }).catch(() => ({ success: false as const, body: undefined })),
-    countUnits({ activeRoleId: "" }).catch(() => ({ success: false as const, body: undefined })),
-    countBudgetLines({ activeRoleId: "" }).catch(() => ({ success: false as const, body: undefined })),
+    countOrganizations({}).catch(() => ({ success: false as const, body: undefined })),
+    countUsers({}).catch(() => ({ success: false as const, body: undefined })),
+    countPurchasingRequests({}).catch(() => ({ success: false as const, body: undefined })),
+    countProcesses({}).catch(() => ({ success: false as const, body: undefined })),
+    countTenders({}).catch(() => ({ success: false as const, body: undefined })),
+    countStores({}).catch(() => ({ success: false as const, body: undefined })),
+    countUnits({}).catch(() => ({ success: false as const, body: undefined })),
+    countBudgetLines({}).catch(() => ({ success: false as const, body: undefined })),
   ])
 
   const orgs = countOf(orgsRes)

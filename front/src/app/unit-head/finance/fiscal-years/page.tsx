@@ -23,6 +23,8 @@ import { gets as getFiscalYears } from "@/app/actions/fiscalYear/gets"
 import { add } from "@/app/actions/fiscalYear/add"
 import { close } from "@/app/actions/fiscalYear/close"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
+import { get as getUnit } from "@/app/actions/unit/get"
+import { resolveActionErrorMessage } from "@/lib/action-errors"
 import { useAuthStore } from "@/stores/authStore"
 
 interface FiscalYearItem {
@@ -103,7 +105,20 @@ export default function UnitHeadFinanceFiscalYearsPage() {
     setSaving(true)
     try {
       const scope = useAuthStore.getState().getActiveScope();
-      const organizationId = scope?.type === "organization" ? scope.id : "";
+      let organizationId = scope?.type === "organization" ? scope.id : "";
+      if (!organizationId && scope?.type === "unit") {
+        const unitResult = await getUnit(
+          { _id: scope.id },
+          { organization: { _id: 1 } },
+        );
+        organizationId = unitResult.success
+          ? unitResult.body?.[0]?.organization?._id || ""
+          : "";
+      }
+      if (!organizationId) {
+        toast.error("سازمان فعال یافت نشد");
+        return;
+      }
       const result = await add(
         {
           activeRoleId: getActiveRoleIdFromStore(),
@@ -120,7 +135,7 @@ export default function UnitHeadFinanceFiscalYearsPage() {
         form.reset()
         fetch()
       } else {
-        toast.error(result.body?.message || "خطا در ایجاد سال مالی")
+        toast.error(resolveActionErrorMessage(result.body?.message, "خطا در ایجاد سال مالی"))
       }
     } catch {
       toast.error("خطا در ایجاد سال مالی")

@@ -1,5 +1,7 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
 import { tender } from "../../../mod.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
+import { tenderReadMatch } from "../readScope.ts";
 
 export const getsFn: ActFn = async (body) => {
   const {
@@ -16,7 +18,12 @@ export const getsFn: ActFn = async (body) => {
     get,
   } = body.details;
 
+  const { user, activeRole } = await getAuth();
+
   const pipeline: Document[] = [];
+
+  const readMatch = tenderReadMatch(activeRole, user);
+  readMatch && pipeline.push({ $match: readMatch });
 
   const match: Document = {};
   title && (match.title = { $regex: title, $options: "i" });

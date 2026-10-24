@@ -1,5 +1,10 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
 import { goodsReceipt } from "../../../mod.ts";
+import {
+  activeFinanceOrganizationId,
+  goodsReceiptReadMatch,
+} from "../../../utils/financeScope.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
 
 export const getsFn: ActFn = async (body) => {
   const {
@@ -16,7 +21,20 @@ export const getsFn: ActFn = async (body) => {
     get,
   } = body.details;
 
+  const { user, activeRole } = await getAuth();
+  const financeOrganizationId = await activeFinanceOrganizationId(
+    activeRole,
+    user,
+  );
+  const readMatch = goodsReceiptReadMatch(
+    activeRole,
+    user,
+    financeOrganizationId,
+  );
+
   const pipeline: Document[] = [];
+
+  readMatch && pipeline.push({ $match: readMatch });
 
   const match: Document = {};
   purchasingRequestId && (match["purchasingRequest._id"] = new ObjectId(purchasingRequestId as string));

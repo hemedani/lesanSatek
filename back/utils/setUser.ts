@@ -18,10 +18,15 @@ export const setUser = async () => {
     projection: {
       ...userPureProjection,
       organizations: { _id: 1 },
+      units: { _id: 1, name: 1, features: 1, organization: { _id: 1 } },
     },
   });
 
   !foundedUser && throwError("user not exist");
+
+  if (foundedUser!.isActive === false) {
+    throwError("Account is disabled");
+  }
 
   coreApp.contextFns.setContext({ user: foundedUser });
 };

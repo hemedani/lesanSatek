@@ -1,10 +1,14 @@
 import type { ActFn, Document } from "lesan";
 import { organization } from "../../../mod.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
+import {
+  applyOrganizationReadScope,
+  organizationReadScope,
+} from "../../../utils/readScope.ts";
 
 export const getsFn: ActFn = async (body) => {
   const {
     set: {
-      activeRoleId,
       page,
       limit,
       skip,
@@ -15,12 +19,17 @@ export const getsFn: ActFn = async (body) => {
     get,
   } = body.details;
 
+  const { user, activeRole } = await getAuth();
+  const scope = await organizationReadScope(activeRole, user);
+
   const pipeline: Document[] = [];
 
   search &&
     pipeline.push({
       $match: { $text: { $search: search } },
     });
+
+  applyOrganizationReadScope(pipeline, scope);
 
   if (search && (!sortBy || sortBy === "relevance")) {
     pipeline.push({

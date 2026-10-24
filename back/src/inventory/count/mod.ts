@@ -2,6 +2,7 @@ import { coreApp } from "../../../mod.ts";
 import { countFn } from "./count.fn.ts";
 import { countValidator } from "./count.val.ts";
 import { grantAccess, setTokens, setUser } from "@lib";
+import { roleScope } from "../../../utils/scopeResolvers.ts";
 
 export const countSetup = () =>
   coreApp.acts.setAct({
@@ -11,7 +12,10 @@ export const countSetup = () =>
     preAct: [
       setTokens,
       setUser,
-      grantAccess([{ roles: ["Manager", "Admin"] }]),
+      grantAccess([
+        { roles: ["Manager", "Admin"] },
+        { roles: ["OrgHead", "UnitHead", "Employee"], scope: roleScope() },
+      ]),
     ],
     validator: countValidator(),
   });

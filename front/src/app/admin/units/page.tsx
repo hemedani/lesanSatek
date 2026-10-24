@@ -52,7 +52,6 @@ export default async function UnitsPage({
   const { sortBy, sortOrder } = SORT_MAP[sort]
 
   const listSet = {
-    activeRoleId: "",
     page,
     limit: LIMIT,
     sortBy,
@@ -65,12 +64,11 @@ export default async function UnitsPage({
   const [listResult, countResult, orgsResult] = await Promise.all([
     getUnits(listSet, UNIT_PROJECTION),
     countUnits({
-      activeRoleId: "",
       ...(search ? { name: search } : {}),
       ...(orgId ? { organizationId: orgId } : {}),
       ...(type ? { type } : {}),
     }),
-    getOrganizations({ activeRoleId: "", page: 1, limit: 50 }, { _id: 1, name: 1 }),
+    getOrganizations({ page: 1, limit: 50 }, { _id: 1, name: 1 }),
   ])
 
   const items = (listResult.success ? listResult.body || [] : []) as Unit[]

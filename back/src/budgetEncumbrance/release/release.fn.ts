@@ -1,9 +1,15 @@
 import { type ActFn, ObjectId } from "lesan";
 import { budgetEncumbrance, budgetLine } from "../../../mod.ts";
-import { checkFinanceUnitAccess } from "../../../utils/checkFinanceUnitAccess.ts";
+import {
+  checkFinanceUnitAccess,
+  financeTargetOfBudgetEncumbrance,
+} from "../../../utils/checkFinanceUnitAccess.ts";
+import { throwError } from "../../../utils/throwError.ts";
 
 export const releaseFn: ActFn = async (body) => {
-  await checkFinanceUnitAccess();
+  await checkFinanceUnitAccess(
+    await financeTargetOfBudgetEncumbrance(body.details.set._id),
+  );
   const { set, get } = body.details;
   const { _id } = set;
 
@@ -13,7 +19,7 @@ export const releaseFn: ActFn = async (body) => {
   }) as Record<string, unknown>;
 
   if (!encumbrance || (encumbrance.status as string) !== "reserved") {
-    throw new Error("Encumbrance not found or already released/spent");
+    throwError("Encumbrance not found or already released/spent");
   }
 
   const amount = encumbrance.amount as number;

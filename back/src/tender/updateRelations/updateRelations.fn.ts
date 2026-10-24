@@ -17,7 +17,7 @@ export const updateRelationsFn: ActFn = async (body) => {
           purchasingRequest: {
             _ids: new ObjectId(purchasingRequestId as string),
             relatedRelations: {
-              tender: true,
+              tenders: true,
             },
           },
         },

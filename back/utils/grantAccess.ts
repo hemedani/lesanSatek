@@ -1,76 +1,134 @@
-import { throwError } from "./throwError.ts";
-import type { MyContext } from "@lib";
-import { coreApp } from "../mod.ts";
+import {
+  type ActiveRole,
+  isGhostScopeBypass,
+  isRoleAllowed,
+  isScopeBypass,
+  type RoleName,
+  scopeMatches,
+  type ScopeRef,
+} from "./authzPolicy.ts";
 import { hasFeature } from "./checkFeature.ts";
+import { feature_array } from "../models/featureConstants.ts";
+import { throwError } from "./throwError.ts";
 
-export type RoleCheck = {
-  roles: string[];
-  features?: string[];
-  getScope?: (
-    body: any,
-  ) => { scopeType: string; scopeId: string } | null;
+export type Feature = typeof feature_array[number];
+
+export type GrantBody = {
+  details: { set: Record<string, unknown> };
 };
 
-export const grantAccess = (checks: RoleCheck[]) => {
-  const checkAccess = () => {
-    const { user }: MyContext = coreApp.contextFns
-      .getContextModel() as MyContext;
+export type ScopeResolver = (
+  body: GrantBody,
+  user: unknown,
+) => Promise<ScopeRef | null> | ScopeRef | null;
 
-    if (user.isGhost) return;
+export type RoleCheck = {
+  roles: RoleName[];
+  features?: Feature[];
+  scope?: ScopeResolver;
+};
 
-    const body = (coreApp.contextFns.getContextModel() as any)?.body;
-    const activeRoleId = body?.details?.set?.activeRoleId;
+type AuthUser = {
+  isGhost?: boolean;
+  features?: { feature: Feature }[];
+  units?: {
+    _id?: unknown;
+    features?: { feature: Feature }[];
+    organization?: { _id?: unknown } | null;
+  }[];
+  roles?: ActiveRole[];
+};
 
-    if (!activeRoleId) {
-      return throwError("activeRoleId is required");
+type AuthContext = {
+  user?: AuthUser;
+  body?: GrantBody;
+};
+
+type ContextGetter = () => AuthContext | Promise<AuthContext>;
+
+const CORE_APP_MODULE = "../mod.ts";
+
+type CoreApp = {
+  contextFns: { getContextModel: () => unknown };
+};
+
+const loadCoreApp = async (): Promise<CoreApp> => {
+  const mod = await import(CORE_APP_MODULE) as { coreApp: CoreApp };
+  return mod.coreApp;
+};
+
+const defaultGetContext: ContextGetter = async () => {
+  const coreApp = await loadCoreApp();
+  return coreApp.contextFns.getContextModel() as AuthContext;
+};
+
+const readAuth = (user: AuthUser | undefined, body: GrantBody | undefined) => {
+  if (!user) throwError("Active role not found");
+
+  const activeRoleId = body?.details?.set?.activeRoleId;
+
+  if (!activeRoleId) {
+    throwError("activeRoleId is required");
+  }
+
+  const activeRole = (user?.roles ?? []).find((role) =>
+    role.roleId === activeRoleId
+  );
+
+  if (!activeRole) {
+    throwError("Active role not found");
+  }
+
+  return { user: user!, activeRole: activeRole!, body };
+};
+
+export const getAuth = async (
+  getContext: ContextGetter = defaultGetContext,
+) => {
+  const context = await getContext();
+  return readAuth(context?.user, context?.body);
+};
+
+export const grantAccess = (
+  checks: RoleCheck[],
+  getContext: ContextGetter = defaultGetContext,
+) => {
+  const checkAccess = async () => {
+    const context = await getContext();
+    const user = context?.user;
+
+    const { activeRole, body } = readAuth(user, context?.body);
+
+    if (isGhostScopeBypass(activeRole, user)) return;
+
+    const matchingChecks = checks.filter((check) =>
+      isRoleAllowed(activeRole, check.roles)
+    );
+
+    if (matchingChecks.length === 0) {
+      throwError("You cant do this");
     }
 
-    const activeRole = user.roles?.find((r) => r.roleId === activeRoleId);
+    for (const check of matchingChecks) {
+      if (isScopeBypass(activeRole, user)) return;
 
-    if (!activeRole) {
-      return throwError("Active role not found");
-    }
-
-    for (const check of checks) {
-      if (!check.roles.includes(activeRole.name)) continue;
-
-      if (check.features && check.features.length > 0) {
-        for (const feature of check.features) {
-          if (!hasFeature(user, feature as any)) {
-            throwError(`Missing feature: ${feature}`);
-          }
-        }
-      }
-
-      if (!check.getScope) return;
-
-      const scope = check.getScope(body);
       if (
-        scope &&
-        activeRole.scopeType === scope.scopeType &&
-        activeRole.scopeId === scope.scopeId
+        check.features?.length &&
+        !check.features.every((feature) =>
+          hasFeature(user!, feature, activeRole)
+        )
       ) {
-        return;
+        continue;
       }
+
+      if (!check.scope) return;
+
+      const scope = await check.scope(body as GrantBody, user);
+      if (scopeMatches(activeRole, scope)) return;
     }
 
     throwError("You cant do this");
   };
 
   return checkAccess;
-};
-
-export const requireFeature = (feature: string) => {
-  const checkFeature = () => {
-    const { user }: MyContext = coreApp.contextFns
-      .getContextModel() as MyContext;
-
-    if (user.isGhost) return;
-
-    if (!hasFeature(user, feature as any)) {
-      throwError(`Missing feature: ${feature}`);
-    }
-  };
-
-  return checkFeature;
 };

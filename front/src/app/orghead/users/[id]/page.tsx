@@ -1,12 +1,12 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useEffect, useState, use } from "react"
+import { useCallback, useEffect, useMemo, useState, use } from "react"
 import { useForm } from "react-hook-form"
 import { zodV4Resolver } from "@/lib/zod-v4-resolver"
 import { z } from "zod"
 import { toast } from "sonner"
-import { ArrowRight, Loader2, Trash2, UserCog, Shield, ShieldCheck, Plus, Check, X } from "lucide-react"
+import { ArrowRight, Loader2, Lock, Trash2, UserCog, Shield, ShieldCheck, Plus, Check, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { FormInput } from "@/components/form/form-input"
 import { FormSelect } from "@/components/form/form-select"
@@ -19,7 +19,6 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { ErrorState } from "@/components/ui/error-state"
 import { FilterSelect } from "@/components/ui/filter-select"
 import { SearchSelect } from "@/components/form/form-search-select"
-import type { FilterOption } from "@/components/ui/filter-select"
 import { getUser } from "@/app/actions/user/getUser"
 import { updateUser } from "@/app/actions/user/updateUser"
 import { removeUser } from "@/app/actions/user/removeUser"
@@ -27,6 +26,14 @@ import { addOrRemoveRoles } from "@/app/actions/user/addOrRemoveRoles"
 import { gets as getOrganizations } from "@/app/actions/organization/gets"
 import { gets as getUnits } from "@/app/actions/unit/gets"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
+import { useAuthStore } from "@/stores/authStore"
+import { resolveActionErrorMessage } from "@/lib/action-errors"
+import {
+  getAssignableRoleNames,
+  getAssignableRoleOptions,
+  getAssignableScopeOptions,
+  isRoleAssignableBy,
+} from "@/types/permissions"
 import Link from "next/link"
 
 const userSchema = z.object({
@@ -49,16 +56,6 @@ interface UserRole {
   scopeId?: string
 }
 
-const roleOptions: FilterOption[] = [
-  { value: "Manager", label: "مدیر سیستم" },
-  { value: "Admin", label: "ادمین" },
-  { value: "OrgHead", label: "رئیس سازمان" },
-  { value: "UnitHead", label: "رئیس واحد" },
-  { value: "StoreHead", label: "سرپرست فروشگاه" },
-  { value: "Employee", label: "کارمند" },
-  { value: "Ordinary", label: "کاربر عادی" },
-]
-
 const ROLE_LABELS: Record<string, string> = {
   Manager: "مدیر سیستم",
   Admin: "ادمین",
@@ -74,13 +71,6 @@ const SCOPE_LABELS: Record<string, string> = {
   unit: "واحد",
   store: "فروشگاه",
 }
-
-const scopeOptions: FilterOption[] = [
-  { value: "", label: "بدون محدودیت" },
-  { value: "organization", label: "سازمان" },
-  { value: "unit", label: "واحد" },
-  { value: "store", label: "فروشگاه" },
-]
 
 type RoleName = "Manager" | "Admin" | "OrgHead" | "UnitHead" | "StoreHead" | "Employee" | "Ordinary"
 type ScopeType = "organization" | "unit" | "store"
@@ -103,6 +93,22 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
   const [newScopeType, setNewScopeType] = useState<ScopeType | "">("")
   const [newScopeId, setNewScopeId] = useState("")
 
+  const actorUser = useAuthStore((state) => state.user)
+  const activeRoleId = useAuthStore((state) => state.activeRoleId)
+  const actorRole = actorUser?.roles?.find((role) => role.roleId === activeRoleId)
+  const actorRoleName = actorRole?.name
+  const activeOrganizationId =
+    actorRoleName === "OrgHead"
+      ? actorRole?.scopeType === "organization"
+        ? actorRole.scopeId || ""
+        : actorUser?.organizations?.[0]?._id || ""
+      : ""
+  const activeOrganizationName =
+    actorUser?.organizations?.find((organization) => organization._id === activeOrganizationId)?.name || ""
+  const roleOptions = useMemo(() => getAssignableRoleOptions(actorRoleName), [actorRoleName])
+  const scopeOptions = useMemo(() => getAssignableScopeOptions(actorRoleName), [actorRoleName])
+  const assignableRoleNames = useMemo(() => getAssignableRoleNames(actorRoleName), [actorRoleName])
+
   const form = useForm<UserData>({
     resolver: zodV4Resolver(userSchema),
     defaultValues: {
@@ -117,11 +123,12 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
     },
   })
 
-  useEffect(() => {
-    const load = async () => {
+  const loadData = useCallback(
+    async (initial = false) => {
+      const currentRoleId = getActiveRoleIdFromStore()
       const [userResult, orgsResult, unitsResult] = await Promise.all([
         getUser(
-          { activeRoleId: getActiveRoleIdFromStore(), _id: id },
+          { activeRoleId: currentRoleId, _id: id },
           {
             _id: 1,
             first_name: 1,
@@ -135,8 +142,8 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
             roles: 1,
           },
         ),
-        getOrganizations({ activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 100 }, { _id: 1, name: 1 }),
-        getUnits({ activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 100 }, { _id: 1, name: 1 }),
+        getOrganizations({ activeRoleId: currentRoleId, page: 1, limit: 100 }, { _id: 1, name: 1 }),
+        getUnits({ activeRoleId: currentRoleId, page: 1, limit: 100 }, { _id: 1, name: 1 }),
       ])
       const map: Record<string, string> = {}
       if (orgsResult.success) orgsResult.body?.forEach((o: { _id?: string; name?: string }) => { if (o?._id) map[o._id] = o.name || "" })
@@ -146,24 +153,31 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
       if (userResult.success && userResult.body) {
         const user = userResult.body
         setUserName([user.first_name, user.last_name].filter(Boolean).join(" ") || "ویرایش کاربر")
-        setRoles(user.roles?.[0] ? user.roles : [])
-        form.reset({
-          first_name: user.first_name || "",
-          last_name: user.last_name || "",
-          email: user.email || "",
-          mobile: user.mobile || "",
-          gender: user.gender || "Male",
-          isActive: user.isActive ?? true,
-          is_verified: user.is_verified ?? false,
-          position: user.position || "",
-        })
-      } else {
+        setRoles(user.roles || [])
+        if (initial) {
+          form.reset({
+            first_name: user.first_name || "",
+            last_name: user.last_name || "",
+            email: user.email || "",
+            mobile: user.mobile || "",
+            gender: user.gender || "Male",
+            isActive: user.isActive ?? true,
+            is_verified: user.is_verified ?? false,
+            position: user.position || "",
+          })
+        }
+      } else if (initial) {
         setNotFound(true)
       }
-      setLoading(false)
-    }
-    load()
-  }, [form, id])
+      if (initial) setLoading(false)
+      return userResult.success && !!userResult.body
+    },
+    [form, id],
+  )
+
+  useEffect(() => {
+    void Promise.resolve().then(() => loadData(true))
+  }, [loadData])
 
   const onSubmit = async (data: UserData) => {
     try {
@@ -179,7 +193,7 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
         toast.success("کاربر با موفقیت به‌روزرسانی شد")
         router.refresh()
       } else {
-        toast.error(result.body?.message || "خطا در به‌روزرسانی کاربر")
+        toast.error(resolveActionErrorMessage(result.body?.message, "خطا در به‌روزرسانی کاربر"))
       }
     } catch {
       toast.error("خطا در به‌روزرسانی کاربر")
@@ -192,7 +206,7 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
       toast.success("کاربر با موفقیت حذف شد")
       router.push("/orghead/users")
     } else {
-      toast.error(result.body?.message || "خطا در حذف کاربر")
+      toast.error(resolveActionErrorMessage(result.body?.message, "خطا در حذف کاربر"))
     }
     setShowDelete(false)
   }
@@ -215,8 +229,14 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
   }
 
   const handleAddRole = async () => {
+    if (!isRoleAssignableBy(actorRoleName, newRoleName)) {
+      toast.error("شما مجاز به اختصاص این نقش نیستید.")
+      return
+    }
+
     setSavingRoles(true)
     try {
+      const scopeId = newScopeType === "organization" ? activeOrganizationId : newScopeId
       const result = await addOrRemoveRoles(
         {
           activeRoleId: getActiveRoleIdFromStore(),
@@ -225,7 +245,7 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
             {
               name: newRoleName,
               ...(newScopeType ? { scopeType: newScopeType as ScopeType } : {}),
-              ...(newScopeId ? { scopeId: newScopeId } : {}),
+              ...(scopeId ? { scopeId } : {}),
             },
           ],
         },
@@ -233,13 +253,13 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
       )
       if (result.success) {
         toast.success("نقش با موفقیت افزوده شد")
-        setRoles(result.body?.roles ?? roles)
+        setRoles(result.body?.roles ?? [])
         setNewRoleName("Ordinary")
         setNewScopeType("")
         setNewScopeId("")
-        router.refresh()
+        await loadData()
       } else {
-        toast.error(result.body?.message || "خطا در افزودن نقش")
+        toast.error(resolveActionErrorMessage(result.body?.message, "خطا در افزودن نقش"))
       }
     } catch {
       toast.error("خطا در افزودن نقش")
@@ -250,6 +270,12 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
 
   const handleRemoveRoleConfirm = async () => {
     if (!removingRole) return
+    if (!isRoleAssignableBy(actorRoleName, removingRole.name)) {
+      toast.error("شما مجاز به حذف این نقش نیستید.")
+      setRemovingRole(null)
+      return
+    }
+
     setRemovalLoading(true)
     try {
       const result = await addOrRemoveRoles(
@@ -268,10 +294,10 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
       )
       if (result.success) {
         toast.success("نقش با موفقیت حذف شد")
-        setRoles(result.body?.roles ?? roles.filter((r) => r.roleId !== removingRole.roleId))
-        router.refresh()
+        setRoles(result.body?.roles ?? [])
+        await loadData()
       } else {
-        toast.error(result.body?.message || "خطا در حذف نقش")
+        toast.error(resolveActionErrorMessage(result.body?.message, "خطا در حذف نقش"))
       }
     } catch {
       toast.error("خطا در حذف نقش")
@@ -281,7 +307,13 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
     }
   }
 
-  const addDisabled = savingRoles || !newRoleName || (newScopeType === "unit" && !newScopeId) || (newScopeType === "organization" && !newScopeId) || (newScopeType === "store" && !newScopeId)
+  const addDisabled =
+    savingRoles ||
+    !newRoleName ||
+    !isRoleAssignableBy(actorRoleName, newRoleName) ||
+    (newScopeType === "unit" && !newScopeId) ||
+    (newScopeType === "organization" && !activeOrganizationId && !newScopeId) ||
+    (newScopeType === "store" && !newScopeId)
 
   if (loading) return <LoadingSkeleton type="card" count={1} />
 
@@ -412,17 +444,24 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
                       )}
                     </div>
                   </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setRemovingRole(role)}
-                    disabled={savingRoles}
-                    className="shrink-0 gap-1.5 px-3 text-fog/70 hover:text-ember hover:bg-ember/5"
-                  >
-                    <Trash2 className="size-4" />
-                    حذف
-                  </Button>
+                  {assignableRoleNames.includes(role.name as RoleName) ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setRemovingRole(role)}
+                      disabled={savingRoles}
+                      className="shrink-0 gap-1.5 px-3 text-fog/70 hover:text-ember hover:bg-ember/5"
+                    >
+                      <Trash2 className="size-4" />
+                      حذف
+                    </Button>
+                  ) : (
+                    <span className="inline-flex shrink-0 items-center gap-1.5 px-3 text-xs text-fog/50">
+                      <Lock className="size-3.5" />
+                      غیرقابل تغییر
+                    </span>
+                  )}
                 </div>
               )
             })}
@@ -444,7 +483,15 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
               placeholder="انتخاب نقش…"
               ariaLabel="انتخاب نقش"
               value={newRoleName}
-              onValueChange={(v) => v && setNewRoleName(v as RoleName)}
+              onValueChange={(v) => {
+                if (!v) return
+                const roleName = v as RoleName
+                setNewRoleName(roleName)
+                if (roleName === "OrgHead" && activeOrganizationId) {
+                  setNewScopeType("organization")
+                  setNewScopeId(activeOrganizationId)
+                }
+              }}
               options={roleOptions}
             />
           </div>
@@ -455,8 +502,9 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
               ariaLabel="انتخاب حوزه دسترسی"
               value={newScopeType}
               onValueChange={(v) => {
-                setNewScopeType((v || "") as ScopeType | "")
-                if (!v) setNewScopeId("")
+                const scopeType = (v || "") as ScopeType | ""
+                setNewScopeType(scopeType)
+                setNewScopeId(scopeType === "organization" ? activeOrganizationId : "")
               }}
               options={scopeOptions}
             />
@@ -466,14 +514,23 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
         {newScopeType && (
           <div className="mt-5 space-y-2.5">
             <p className="text-body-sm font-medium text-moonlight">{SCOPE_LABELS[newScopeType]}</p>
-            <SearchSelect
-              value={newScopeId}
-              onChange={setNewScopeId}
-              placeholder={`انتخاب ${SCOPE_LABELS[newScopeType]}…`}
-              fetcher={scopeFetcher}
-              label={SCOPE_LABELS[newScopeType]}
-              disabled={savingRoles}
-            />
+            {newScopeType === "organization" ? (
+              <div
+                dir="rtl"
+                className="flex h-10 items-center rounded-sm border border-steel-border/40 bg-white/[0.02] px-3 text-sm text-moonlight"
+              >
+                {activeOrganizationName || "سازمان فعال"}
+              </div>
+            ) : (
+              <SearchSelect
+                value={newScopeId}
+                onChange={setNewScopeId}
+                placeholder={`انتخاب ${SCOPE_LABELS[newScopeType]}…`}
+                fetcher={scopeFetcher}
+                label={SCOPE_LABELS[newScopeType]}
+                disabled={savingRoles}
+              />
+            )}
           </div>
         )}
 

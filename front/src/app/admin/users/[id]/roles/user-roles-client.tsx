@@ -5,7 +5,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { toast } from "sonner"
-import { ArrowRight, Loader2, Shield, Plus, Trash2 } from "lucide-react"
+import { ArrowRight, Loader2, Shield, Plus, Trash2, Lock } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -19,6 +19,9 @@ import { addOrRemoveRoles } from "@/app/actions/user/addOrRemoveRoles"
 import { gets as getOrganizations } from "@/app/actions/organization/gets"
 import { gets as getUnits } from "@/app/actions/unit/gets"
 import { getActiveRoleIdFromStore } from "@/lib/client-active-role"
+import { useAuthStore } from "@/stores/authStore"
+import { getAssignableRoleOptions, isRoleAssignableBy } from "@/types/permissions"
+import { resolveActionErrorMessage } from "@/lib/action-errors"
 
 export interface UserRole {
   roleId?: string
@@ -38,16 +41,6 @@ export type ScopeNameMap = Record<string, string>
 
 type RoleName = "Manager" | "Admin" | "OrgHead" | "UnitHead" | "StoreHead" | "Employee" | "Ordinary"
 type ScopeType = "organization" | "unit"
-
-const roleOptions: FilterOption[] = [
-  { value: "Manager", label: "مدیر سیستم" },
-  { value: "Admin", label: "ادمین" },
-  { value: "OrgHead", label: "رئیس سازمان" },
-  { value: "UnitHead", label: "رئیس واحد" },
-  { value: "StoreHead", label: "رئیس فروشگاه" },
-  { value: "Employee", label: "کارمند" },
-  { value: "Ordinary", label: "کاربر عادی" },
-]
 
 const ROLE_LABELS: Record<string, string> = {
   Manager: "مدیر سیستم",
@@ -119,6 +112,14 @@ export function UserRolesClient({ user, scopeNameMap }: UserRolesClientProps) {
   const router = useRouter()
   const fullName = [user.first_name, user.last_name].filter(Boolean).join(" ") || "کاربر"
 
+  const actor = useAuthStore((state) => state.user)
+  const activeRoleId = useAuthStore((state) => state.activeRoleId)
+  const actorRoleName = React.useMemo(
+    () => actor?.roles?.find((role) => role.roleId === activeRoleId)?.name,
+    [actor, activeRoleId],
+  )
+  const roleOptions = React.useMemo(() => getAssignableRoleOptions(actorRoleName), [actorRoleName])
+
   const [roles, setRoles] = useState<UserRole[]>(user.roles || [])
   const [submitting, setSubmitting] = useState(false)
   const [removingRole, setRemovingRole] = useState<UserRole | null>(null)
@@ -153,7 +154,7 @@ export function UserRolesClient({ user, scopeNameMap }: UserRolesClientProps) {
         setNewScopeId("")
         router.refresh()
       } else {
-        toast.error(result.body?.message || "خطا در افزودن نقش")
+        toast.error(resolveActionErrorMessage(result.body?.message, "خطا در افزودن نقش"))
       }
     } catch {
       toast.error("خطا در افزودن نقش")
@@ -185,7 +186,7 @@ export function UserRolesClient({ user, scopeNameMap }: UserRolesClientProps) {
         setRoles(result.body?.roles || roles.filter((r) => r.roleId !== removingRole.roleId))
         router.refresh()
       } else {
-        toast.error(result.body?.message || "خطا در حذف نقش")
+        toast.error(resolveActionErrorMessage(result.body?.message, "خطا در حذف نقش"))
       }
     } catch {
       toast.error("خطا در حذف نقش")
@@ -283,17 +284,24 @@ export function UserRolesClient({ user, scopeNameMap }: UserRolesClientProps) {
                       )}
                     </div>
                   </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setRemovingRole(role)}
-                    disabled={submitting}
-                    className="shrink-0 gap-1.5 px-3 text-fog/70 hover:text-ember hover:bg-ember/5"
-                  >
-                    <Trash2 className="size-4" />
-                    حذف
-                  </Button>
+                  {isRoleAssignableBy(actorRoleName, role.name) ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setRemovingRole(role)}
+                      disabled={submitting}
+                      className="shrink-0 gap-1.5 px-3 text-fog/70 hover:text-ember hover:bg-ember/5"
+                    >
+                      <Trash2 className="size-4" />
+                      حذف
+                    </Button>
+                  ) : (
+                    <span className="inline-flex shrink-0 items-center gap-1.5 px-3 text-xs text-fog/50">
+                      <Lock className="size-3.5" />
+                      غیرقابل تغییر
+                    </span>
+                  )}
                 </div>
               )
             })}
@@ -314,7 +322,11 @@ export function UserRolesClient({ user, scopeNameMap }: UserRolesClientProps) {
               placeholder="انتخاب نقش…"
               ariaLabel="انتخاب نقش"
               value={newRoleName}
-              onValueChange={(v) => v && setNewRoleName(v as RoleName)}
+              onValueChange={(v) => {
+                if (!v) return
+                const roleName = v as RoleName
+                setNewRoleName(roleName)
+              }}
               options={roleOptions}
             />
           </div>

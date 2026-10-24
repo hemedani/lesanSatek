@@ -1,5 +1,10 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
 import { budgetLine } from "../../../mod.ts";
+import {
+  activeFinanceOrganizationId,
+  budgetLineReadMatch,
+} from "../../../utils/financeScope.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
 
 export const getBudgetReportFn: ActFn = async (body) => {
   const {
@@ -11,7 +16,22 @@ export const getBudgetReportFn: ActFn = async (body) => {
   };
   organizationId && (match["organization._id"] = new ObjectId(organizationId as string));
 
-  const pipeline: Document[] = [
+  const { user, activeRole } = await getAuth();
+  const financeOrganizationId = await activeFinanceOrganizationId(
+    activeRole,
+    user,
+  );
+  const readMatch = budgetLineReadMatch(
+    activeRole,
+    user,
+    financeOrganizationId,
+  );
+
+  const pipeline: Document[] = [];
+
+  readMatch && pipeline.push({ $match: readMatch });
+
+  pipeline.push(
     { $match: match },
     {
       $addFields: {
@@ -62,7 +82,7 @@ export const getBudgetReportFn: ActFn = async (body) => {
       },
     },
     { $sort: { code: 1 } },
-  ];
+  );
 
   return await budgetLine
     .aggregation({

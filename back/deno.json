@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "tasks": {
     "dev": "deno run --allow-all --watch mod.ts",
-    "bc-dev": "deno run --allow-all --watch mod.ts"
+    "bc-dev": "deno run --allow-all --watch mod.ts",
+    "test": "deno test --allow-all"
   },
   "fmt": {
     "include": ["src/", "models/", "utils/", "mod.ts"],
@@ -20,6 +21,7 @@
   "imports": {
     "@da/bcrypt": "jsr:@da/bcrypt@^1.0.1",
     "lesan": "jsr:@hemedani/lesan@^0.2.3",
+    "@std/assert": "jsr:@std/assert@^1.0.0",
     "@std/fs/ensure-dir": "jsr:@std/fs@0.223/ensure-dir",
     "djwt": "https://deno.land/x/djwt@v2.8/mod.ts",
     "@lib": "./utils/mod.ts",

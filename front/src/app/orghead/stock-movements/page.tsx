@@ -35,7 +35,7 @@ export default async function OrgHeadStockMovementsPage({
 
   const [listResult, countResult] = await Promise.all([
     getStockMovements({ page, limit: LIMIT, sortBy: "createdAt", sortOrder: "desc" }, PROJECTION),
-    count({ activeRoleId: "" }),
+    count({}),
   ])
 
   const items = (listResult.success ? listResult.body || [] : []) as StockMovement[]

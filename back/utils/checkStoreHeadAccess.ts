@@ -9,7 +9,8 @@ export const checkStoreHeadAccess = (mode: CheckMode) => {
   const check = async () => {
     const { user }: MyContext = coreApp.contextFns.getContextModel() as MyContext;
     const body = (coreApp.contextFns.getContextModel() as any)?.body;
-    const activeRoleId = body?.details?.set?.activeRoleId;
+    const set = body?.details?.set ?? {};
+    const activeRoleId = set.activeRoleId;
 
     if (!activeRoleId) {
       throwError("activeRoleId is required");
@@ -29,29 +30,29 @@ export const checkStoreHeadAccess = (mode: CheckMode) => {
       return;
     }
 
-    const managedStoreId = activeRole.scopeId;
+    const managedStoreId = String(activeRole.scopeId);
 
     if (mode === "add") {
-      const targetStoreId = body?.details?.set?.storeId;
+      const targetStoreId = set.storeId;
       if (!targetStoreId) {
         throwError("storeId is required");
         return;
       }
-      if (targetStoreId !== managedStoreId) {
-        throwError("You can only add items to your own store");
+      if (String(targetStoreId) !== managedStoreId) {
+        throwError("You cant do this");
         return;
       }
       return;
     }
 
-    const _id = body?.details?.set?._id;
+    const _id = set._id;
     if (!_id) {
       throwError("_id is required");
       return;
     }
 
     const doc = await stuff.findOne({
-      filters: { _id: new ObjectId(_id) },
+      filters: { _id: new ObjectId(String(_id)) },
       projection: { store: { _id: 1 } },
     });
 
@@ -62,8 +63,15 @@ export const checkStoreHeadAccess = (mode: CheckMode) => {
 
     const docStoreId = (doc.store as Record<string, unknown>)?._id?.toString();
     if (docStoreId !== managedStoreId) {
-      throwError("You can only manage stuff belonging to your own store");
+      throwError("You cant do this");
       return;
+    }
+
+    if (mode === "update" && set.storeId !== undefined) {
+      if (String(set.storeId) !== managedStoreId) {
+        throwError("You cant do this");
+        return;
+      }
     }
   };
 
