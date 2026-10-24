@@ -5,7 +5,7 @@ import { getToken, getActiveRoleId } from "@/lib/auth";
 
 export const count = async (
   data: {
-    activeRoleId: string;
+    activeRoleId?: string;
     name?: string;
     status?: string;
   }
