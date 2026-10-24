@@ -56,7 +56,6 @@ export default async function UsersPage({
   const { sortBy, sortOrder } = SORT_MAP[sort]
 
   const listSet = {
-    activeRoleId: "",
     page,
     limit: LIMIT,
     sortBy,
@@ -67,9 +66,9 @@ export default async function UsersPage({
 
   const [listResult, countResult, orgsResult, unitsResult] = await Promise.all([
     getUsers(listSet, USER_PROJECTION),
-    countUsers({ activeRoleId: "", ...(role ? { roles: [role] } : {}) }),
-    getOrganizations({ activeRoleId: "", page: 1, limit: 100 }, { _id: 1, name: 1 }),
-    getUnits({ activeRoleId: "", page: 1, limit: 100 }, { _id: 1, name: 1 }),
+    countUsers({ ...(role ? { roles: [role] } : {}) }),
+    getOrganizations({ page: 1, limit: 100 }, { _id: 1, name: 1 }),
+    getUnits({ page: 1, limit: 100 }, { _id: 1, name: 1 }),
   ])
 
   const items = (listResult.success ? listResult.body || [] : []) as User[]

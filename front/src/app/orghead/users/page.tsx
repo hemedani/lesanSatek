@@ -12,7 +12,7 @@ export default async function OrgHeadUsersPage({
   const limit = 20
 
   const result = await getUsers(
-    { activeRoleId: "", page, limit, search: resolvedSearchParams.search || undefined },
+    { page, limit, search: resolvedSearchParams.search || undefined },
     {
       _id: 1,
       first_name: 1,
