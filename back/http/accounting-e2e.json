@@ -1,0 +1,296 @@
+[
+  {
+    "id": "acc-setup-tempuser",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"tempUser\", \"details\": {\"set\": {\"first_name\": \"ادمین\", \"last_name\": \"سیستم\", \"email\": \"admin@lesansatek.com\", \"password\": \"password123\", \"mobile\": \"09120000000\", \"gender\": \"Male\"}, \"get\": {\"_id\": 1, \"email\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "ghostId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-login",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\"}, \"body\": {\"service\": \"main\", \"model\": \"user\", \"act\": \"login\", \"details\": {\"set\": {\"email\": \"admin@lesansatek.com\", \"password\": \"password123\"}, \"get\": {\"token\": 1, \"user\": {\"_id\": 1, \"roles\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "token",
+        "value": "[body][token]"
+      },
+      {
+        "key": "userId",
+        "value": "[body][user][_id]"
+      },
+      {
+        "key": "roleId",
+        "value": "[body][user][roles][0][roleId]"
+      }
+    ]
+  },
+  {
+    "id": "acc-org-add",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"organization\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"سازمان حسابداری E2E\", \"enName\": \"Accounting E2E Org\", \"description\": \"Organization used by the accounting E2E suite\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "orgId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-unit-add",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"unit\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"واحد مالی E2E\", \"enName\": \"Finance E2E Unit\", \"type\": \"Finance\", \"organizationId\": \"{orgId}\", \"headId\": \"{userId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1, \"type\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "unitId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-seed-coa",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"account\", \"act\": \"seedDefaultChartOfAccounts\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"success\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "acc-account-gets-revenue",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"account\", \"act\": \"gets\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"systemKey\": \"revenue\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"code\": 1, \"name\": 1, \"systemKey\": 1, \"accountType\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "revenueAccountId",
+        "value": "[body][0][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-account-count",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"account\", \"act\": \"count\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"count\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "acc-post-manual",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"journalEntry\", \"act\": \"postManual\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"entryDate\": \"2024-03-15\", \"description\": \"E2E manual journal entry\", \"reference\": \"ACC-E2E-1\", \"idempotencyKey\": \"accounting-e2e-manual-1\", \"lines\": [{\"systemKey\": \"cash\", \"debit\": 1000, \"description\": \"Cash\"}, {\"systemKey\": \"revenue\", \"credit\": 1000, \"description\": \"Revenue\"}], \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"entryNumber\": 1, \"totalDebit\": 1, \"totalCredit\": 1, \"isBalanced\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "manualEntryId",
+        "value": "[body][0][_id]"
+      },
+      {
+        "key": "manualEntryNumber",
+        "value": "[body][0][entryNumber]"
+      }
+    ]
+  },
+  {
+    "id": "acc-post-manual-retry",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"journalEntry\", \"act\": \"postManual\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"entryDate\": \"2024-03-15\", \"description\": \"E2E manual journal entry\", \"reference\": \"ACC-E2E-1\", \"idempotencyKey\": \"accounting-e2e-manual-1\", \"lines\": [{\"systemKey\": \"cash\", \"debit\": 1000}, {\"systemKey\": \"revenue\", \"credit\": 1000}], \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"entryNumber\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "retryEntryId",
+        "value": "[body][0][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-entry-get",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"journalEntry\", \"act\": \"get\", \"details\": {\"set\": {\"_id\": \"{manualEntryId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"entryNumber\": 1, \"status\": 1, \"sourceType\": 1, \"totalDebit\": 1, \"totalCredit\": 1, \"isBalanced\": 1, \"lines\": {\"_id\": 1, \"lineNumber\": 1, \"debit\": 1, \"credit\": 1, \"account\": {\"_id\": 1, \"code\": 1, \"systemKey\": 1}}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "acc-entry-gets",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"journalEntry\", \"act\": \"gets\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"sourceType\": \"manual\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"entryNumber\": 1, \"sourceType\": 1, \"totalDebit\": 1, \"totalCredit\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "acc-entry-count",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"journalEntry\", \"act\": \"count\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"count\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "acc-period-gets",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"accountingPeriod\", \"act\": \"gets\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"code\": 1, \"status\": 1, \"startDate\": 1, \"endDate\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "periodId",
+        "value": "[body][0][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-period-count",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"accountingPeriod\", \"act\": \"count\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"count\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "acc-costcenter-add",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"costCenter\", \"act\": \"add\", \"details\": {\"set\": {\"code\": \"CC-E2E-1\", \"name\": \"E2E Cost Center\", \"type\": \"cost\", \"organizationId\": \"{orgId}\", \"unitId\": \"{unitId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"code\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "costCenterId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-costcenter-gets",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"costCenter\", \"act\": \"gets\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"code\": 1, \"name\": 1, \"unit\": {\"_id\": 1, \"name\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "acc-post-with-costcenter",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"journalEntry\", \"act\": \"postManual\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"entryDate\": \"2024-03-16\", \"description\": \"E2E cost-center journal entry\", \"idempotencyKey\": \"accounting-e2e-costcenter-1\", \"lines\": [{\"systemKey\": \"operatingExpense\", \"debit\": 50, \"unitId\": \"{unitId}\", \"costCenterId\": \"{costCenterId}\"}, {\"systemKey\": \"cash\", \"credit\": 50, \"unitId\": \"{unitId}\"}], \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"entryNumber\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "costCenterEntryId",
+        "value": "[body][0][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-line-gets-by-costcenter",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"journalEntryLine\", \"act\": \"gets\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"costCenterId\": \"{costCenterId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"lineNumber\": 1, \"debit\": 1, \"credit\": 1, \"costCenter\": {\"_id\": 1, \"name\": 1}, \"account\": {\"_id\": 1, \"systemKey\": 1}}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "costCenterLineId",
+        "value": "[body][0][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-line-count",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"journalEntryLine\", \"act\": \"count\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"count\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "acc-trial-balance",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"journalEntry\", \"act\": \"getTrialBalance\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"startDate\": \"2024-03-01\", \"endDate\": \"2024-03-31\", \"activeRoleId\": \"{roleId}\"}, \"get\": {}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "acc-general-ledger",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"journalEntry\", \"act\": \"getGeneralLedger\", \"details\": {\"set\": {\"accountId\": \"{revenueAccountId}\", \"startDate\": \"2024-03-01\", \"endDate\": \"2024-03-31\", \"activeRoleId\": \"{roleId}\"}, \"get\": {}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "acc-income-statement",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"journalEntry\", \"act\": \"getIncomeStatement\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"startDate\": \"2024-03-01\", \"endDate\": \"2024-03-31\", \"activeRoleId\": \"{roleId}\"}, \"get\": {}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "acc-wareType-add",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareType\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"تجهیزات حسابداری E2E\", \"enName\": \"Accounting E2E WareType\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "wareTypeId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-wareClass-add",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareClass\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"کلاس حسابداری E2E\", \"enName\": \"Accounting E2E WareClass\", \"wareTypeId\": \"{wareTypeId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "wareClassId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-wareGroup-add",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareGroup\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"گروه حسابداری E2E\", \"enName\": \"Accounting E2E WareGroup\", \"wareTypeId\": \"{wareTypeId}\", \"wareClassIds\": [\"{wareClassId}\"], \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "wareGroupId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-wareModel-add",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"wareModel\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"مدل حسابداری E2E\", \"enName\": \"Accounting E2E WareModel\", \"wareTypeId\": \"{wareTypeId}\", \"wareClassId\": \"{wareClassId}\", \"wareGroupId\": \"{wareGroupId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "wareModelId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-ware-add",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"ware\", \"act\": \"add\", \"details\": {\"set\": {\"name\": \"کالای حسابداری E2E\", \"enName\": \"Accounting E2E Ware\", \"brand\": \"E2E\", \"price\": 250000, \"wareTypeId\": \"{wareTypeId}\", \"wareClassId\": \"{wareClassId}\", \"wareGroupId\": \"{wareGroupId}\", \"wareModelId\": \"{wareModelId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"name\": 1, \"price\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "wareId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-inventory-add",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"inventory\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{wareId}\", \"unitId\": \"{unitId}\", \"quantity\": 10, \"minQuantity\": 2, \"location\": \"E2E Shelf\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "inventoryId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-consumption-add",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"consumption\", \"act\": \"add\", \"details\": {\"set\": {\"wareId\": \"{wareId}\", \"quantity\": 2, \"consumedAt\": \"2024-03-20\", \"reason\": \"E2E accounting hook\", \"unitId\": \"{unitId}\", \"consumedById\": \"{userId}\", \"inventoryId\": \"{inventoryId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"quantity\": 1, \"unitCost\": 1, \"totalCost\": 1}}}}",
+    "repeat": 1,
+    "captures": [
+      {
+        "key": "consumptionId",
+        "value": "[body][_id]"
+      }
+    ]
+  },
+  {
+    "id": "acc-consumption-entries",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"journalEntry\", \"act\": \"gets\", \"details\": {\"set\": {\"organizationId\": \"{orgId}\", \"sourceType\": \"consumption\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"sourceType\": 1, \"sourceId\": 1, \"totalDebit\": 1, \"totalCredit\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "acc-close-period",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"accountingPeriod\", \"act\": \"closePeriod\", \"details\": {\"set\": {\"_id\": \"{periodId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"code\": 1, \"status\": 1, \"closedAt\": 1}}}}",
+    "repeat": 1,
+    "captures": []
+  },
+  {
+    "id": "acc-period-get-closed",
+    "bodyHeaders": "{\"headers\": {\"Content-Type\": \"application/json\", \"token\": \"{token}\"}, \"body\": {\"service\": \"main\", \"model\": \"accountingPeriod\", \"act\": \"get\", \"details\": {\"set\": {\"_id\": \"{periodId}\", \"activeRoleId\": \"{roleId}\"}, \"get\": {\"_id\": 1, \"code\": 1, \"status\": 1, \"closedAt\": 1, \"closedBy\": {\"_id\": 1, \"first_name\": 1, \"last_name\": 1}}}}}",
+    "repeat": 1,
+    "captures": []
+  }
+]
