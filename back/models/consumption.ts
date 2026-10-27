@@ -46,7 +46,16 @@ import {
   string,
 } from "lesan";
 import { createUpdateAt } from "@lib";
-import { inventory_excludes, unit_excludes, user_excludes, wareModel_excludes, ware_excludes, wareType_excludes, wareClass_excludes, wareGroup_excludes } from "./excludes.ts";
+import {
+  inventory_excludes,
+  unit_excludes,
+  user_excludes,
+  ware_excludes,
+  wareClass_excludes,
+  wareGroup_excludes,
+  wareModel_excludes,
+  wareType_excludes,
+} from "./excludes.ts";
 
 export const consumption_pure = {
   quantity: number(),
@@ -54,6 +63,8 @@ export const consumption_pure = {
   reason: optional(string()),
   consumedFor: optional(string()),
   notes: optional(string()),
+  unitCost: optional(number()),
+  totalCost: optional(number()),
   ...createUpdateAt,
 };
 

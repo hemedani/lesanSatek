@@ -1,10 +1,22 @@
 import { type ActFn, type Document, ObjectId } from "lesan";
-import { goodsReceipt, purchasingRequest, paymentOrder, processStep, stepApproval, budgetEncumbrance, budgetLine, unit, ware, coreApp } from "../../../mod.ts";
+import {
+  budgetEncumbrance,
+  budgetLine,
+  coreApp,
+  goodsReceipt,
+  paymentOrder,
+  processStep,
+  purchasingRequest,
+  stepApproval,
+  unit,
+  ware,
+} from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
 import { getAuth } from "../../../utils/grantAccess.ts";
 import { addStock } from "../../../utils/inventoryManager.ts";
+import { recordGoodsReceiptAccounting } from "../../../utils/accountingEngine.ts";
 import type { ScopeUser } from "../../../utils/readScope.ts";
 import { evaluateStepStatus } from "../../../utils/stepEvaluator.ts";
 import { assertUnitInOrganization } from "../../../utils/unitScope.ts";
@@ -37,14 +49,21 @@ export const addFn: ActFn = async (body) => {
   let prEstimatedAmount = 0;
   let prQuantity = 0;
   let receivingUnitId: string | undefined;
+  let prOrganizationId: string | undefined;
 
   if (purchasingRequestId) {
     prDoc = await purchasingRequest.findOne({
       filters: { _id: new ObjectId(purchasingRequestId as string) },
       projection: {
-        store: { _id: 1 }, estimatedAmount: 1, quantity: 1, stuffStatus: 1,
-        requester: { _id: 1 }, requestingUnit: { _id: 1 }, ware: { _id: 1 },
-        organization: { _id: 1 }, wareModel: { _id: 1 },
+        store: { _id: 1 },
+        estimatedAmount: 1,
+        quantity: 1,
+        stuffStatus: 1,
+        requester: { _id: 1 },
+        requestingUnit: { _id: 1 },
+        ware: { _id: 1 },
+        organization: { _id: 1 },
+        wareModel: { _id: 1 },
       },
     }) as Record<string, unknown> | null;
 
@@ -54,9 +73,9 @@ export const addFn: ActFn = async (body) => {
     }
     const pr = prDoc as Record<string, unknown>;
 
-    const prOrganizationId =
-      (pr.organization as Record<string, unknown> | undefined)?._id
-        ?.toString();
+    prOrganizationId = (pr.organization as Record<string, unknown> | undefined)
+      ?._id
+      ?.toString();
 
     if (!prOrganizationId) {
       throwError("Purchasing request has no organization");
@@ -66,11 +85,15 @@ export const addFn: ActFn = async (body) => {
     // Authorization: the requester, the head of the requesting unit, or a central
     // warehouse head can confirm goods delivery
     const isRequester = pr.requester &&
-      (pr.requester as Record<string, unknown>)._id?.toString() === user._id.toString();
+      (pr.requester as Record<string, unknown>)._id?.toString() ===
+        user._id.toString();
 
-    const prRequestingUnitId = (pr.requestingUnit as Record<string, unknown>)?._id?.toString();
+    const prRequestingUnitId = (pr.requestingUnit as Record<string, unknown>)
+      ?._id?.toString();
     if (!prRequestingUnitId) {
-      throwError("Purchasing request has no requesting unit to receive goods into");
+      throwError(
+        "Purchasing request has no requesting unit to receive goods into",
+      );
       return;
     }
 
@@ -78,7 +101,8 @@ export const addFn: ActFn = async (body) => {
       filters: { _id: new ObjectId(prRequestingUnitId) },
       projection: { head: { _id: 1 } },
     }) as Document | null;
-    const isRequestingUnitHead = requestingUnitDoc?.head?._id?.toString() === user._id.toString();
+    const isRequestingUnitHead =
+      requestingUnitDoc?.head?._id?.toString() === user._id.toString();
 
     const warehouseUnits = await unit.aggregation({
       pipeline: [
@@ -168,8 +192,8 @@ export const addFn: ActFn = async (body) => {
 
     await assertUnitInOrganization(receivingUnitId, prOrganizationId);
 
-    const prWareModelId =
-      (pr.wareModel as Record<string, unknown> | undefined)?._id?.toString();
+    const prWareModelId = (pr.wareModel as Record<string, unknown> | undefined)
+      ?._id?.toString();
     const requestedItems = (rest.items as
       | Array<{ wareModelId?: string }>
       | undefined) || [];
@@ -184,7 +208,8 @@ export const addFn: ActFn = async (body) => {
 
     // Extract store/pricing data
     if (pr.store) {
-      prStoreId = ((pr.store as Record<string, unknown>)._id as ObjectId).toString();
+      prStoreId = ((pr.store as Record<string, unknown>)._id as ObjectId)
+        .toString();
     }
     prEstimatedAmount = (pr.estimatedAmount as number) || 0;
     prQuantity = (pr.quantity as number) || 0;
@@ -217,7 +242,8 @@ export const addFn: ActFn = async (body) => {
 
   // Get PR's ware as fallback when items don't specify wareId
   const prWareId = prDoc
-    ? ((prDoc as Record<string, unknown>).ware as Record<string, unknown>)?._id as string | undefined
+    ? ((prDoc as Record<string, unknown>).ware as Record<string, unknown>)
+      ?._id as string | undefined
     : undefined;
 
   const result = await goodsReceipt.insertOne({
@@ -274,7 +300,9 @@ export const addFn: ActFn = async (body) => {
             wareModelId: item.wareModelId,
             referenceType: "goodsReceipt",
             referenceId: result._id?.toString(),
-            description: `Goods receipt for ${item.wareModelName || item.wareModelId}`,
+            description: `Goods receipt for ${
+              item.wareModelName || item.wareModelId
+            }`,
             storeId: prStoreId,
           },
         );
@@ -284,7 +312,8 @@ export const addFn: ActFn = async (body) => {
 
   // Compute prorated order total from PR's estimatedAmount
   if (totalAccepted > 0 && prQuantity > 0) {
-    orderTotal = Math.round((prEstimatedAmount / prQuantity) * totalAccepted * 100) / 100;
+    orderTotal =
+      Math.round((prEstimatedAmount / prQuantity) * totalAccepted * 100) / 100;
   }
 
   // Update PR's stuffStatus to "received"
@@ -308,14 +337,18 @@ export const addFn: ActFn = async (body) => {
               by: userId,
               name: `${user.first_name} ${user.last_name}`,
               at: now,
-              role: activeRole ? {
-                id: activeRole.roleId,
-                name: activeRole.name,
-                scopeType: activeRole.scopeType,
-                scopeId: activeRole.scopeId,
-              } : { id: "", name: "" },
+              role: activeRole
+                ? {
+                  id: activeRole.roleId,
+                  name: activeRole.name,
+                  scopeType: activeRole.scopeType,
+                  scopeId: activeRole.scopeId,
+                }
+                : { id: "", name: "" },
             },
-            unit: receivingUnitId ? { _id: receivingUnitId, name: "" } : undefined,
+            unit: receivingUnitId
+              ? { _id: receivingUnitId, name: "" }
+              : undefined,
             details: {
               goodsReceiptId: result._id?.toString(),
               itemCount: items.length,
@@ -339,7 +372,9 @@ export const addFn: ActFn = async (body) => {
 
     if (requests.length > 0) {
       const req = requests[0];
-      if (["Pending", "InProgress", "PendingFinalization"].includes(req.status)) {
+      if (
+        ["Pending", "InProgress", "PendingFinalization"].includes(req.status)
+      ) {
         const steps = await processStep.aggregation({
           pipeline: [
             { $match: { "process._id": req.process._id } },
@@ -370,7 +405,11 @@ export const addFn: ActFn = async (body) => {
             if (allUnitIds.includes(receivingUnitId)) {
               // Create auto-approved stepApproval
               await stepApproval.insertOne({
-                doc: { status: "approved", comment: "Auto-approved via goods receipt", decidedAt: now },
+                doc: {
+                  status: "approved",
+                  comment: "Auto-approved via goods receipt",
+                  decidedAt: now,
+                },
                 projection: { _id: 1 },
                 relations: {
                   purchasingRequest: {
@@ -394,7 +433,12 @@ export const addFn: ActFn = async (body) => {
 
               // Evaluate step status
               const allApprovals = await stepApproval.aggregation({
-                pipeline: [{ $match: { "purchasingRequest._id": prId, "processStep._id": step._id } }],
+                pipeline: [{
+                  $match: {
+                    "purchasingRequest._id": prId,
+                    "processStep._id": step._id,
+                  },
+                }],
                 projection: { unit: { _id: 1 }, status: 1 },
               }).toArray();
 
@@ -422,12 +466,14 @@ export const addFn: ActFn = async (body) => {
                           by: userId,
                           name: `${user.first_name} ${user.last_name}`,
                           at: now,
-                          role: activeRole ? {
-                            id: activeRole.roleId,
-                            name: activeRole.name,
-                            scopeType: activeRole.scopeType,
-                            scopeId: activeRole.scopeId,
-                          } : { id: "", name: "" },
+                          role: activeRole
+                            ? {
+                              id: activeRole.roleId,
+                              name: activeRole.name,
+                              scopeType: activeRole.scopeType,
+                              scopeId: activeRole.scopeId,
+                            }
+                            : { id: "", name: "" },
                         },
                         unit: { _id: receivingUnitId, name: step.name },
                         details: {
@@ -446,32 +492,49 @@ export const addFn: ActFn = async (body) => {
 
                 if (nextStepIndex < steps.length) {
                   const nextStep = steps[nextStepIndex];
-                  const nextUnitIds = [...new Set<string>(
-                    nextStep.assigneeGroups.flatMap(
-                      (g: { unitIds: string[] }) => g.unitIds,
+                  const nextUnitIds = [
+                    ...new Set<string>(
+                      nextStep.assigneeGroups.flatMap(
+                        (g: { unitIds: string[] }) => g.unitIds,
+                      ),
                     ),
-                  )];
+                  ];
                   for (const nuId of nextUnitIds) {
                     await stepApproval.insertOne({
                       doc: { status: "pending" },
                       projection: { _id: 1 },
                       relations: {
-                        purchasingRequest: { _ids: prId, relatedRelations: { stepApprovals: true } },
-                        processStep: { _ids: nextStep._id, relatedRelations: { approvals: true } },
-                        unit: { _ids: new ObjectId(nuId), relatedRelations: { stepApprovals: true } },
+                        purchasingRequest: {
+                          _ids: prId,
+                          relatedRelations: { stepApprovals: true },
+                        },
+                        processStep: {
+                          _ids: nextStep._id,
+                          relatedRelations: { approvals: true },
+                        },
+                        unit: {
+                          _ids: new ObjectId(nuId),
+                          relatedRelations: { stepApprovals: true },
+                        },
                       },
                     });
                   }
                   await purchasingRequest.findOneAndUpdate({
                     filter: { _id: prId },
-                    update: { $set: { currentStep: nextStepIndex, updatedAt: now } },
+                    update: {
+                      $set: { currentStep: nextStepIndex, updatedAt: now },
+                    },
                     projection: { _id: 1 },
                   });
                 } else {
                   await purchasingRequest.findOneAndUpdate({
                     filter: { _id: prId },
                     update: {
-                      $set: { status: "Completed", completedAt: now, updatedAt: now },
+                      $set: {
+                        status: "Completed",
+                        completedAt: now,
+                        updatedAt: now,
+                      },
                       $push: {
                         history: {
                           action: "step_approved",
@@ -479,15 +542,25 @@ export const addFn: ActFn = async (body) => {
                             by: userId,
                             name: `${user.first_name} ${user.last_name}`,
                             at: now,
-                            role: activeRole ? {
-                              id: activeRole.roleId,
-                              name: activeRole.name,
-                              scopeType: activeRole.scopeType,
-                              scopeId: activeRole.scopeId,
-                            } : { id: "", name: "" },
+                            role: activeRole
+                              ? {
+                                id: activeRole.roleId,
+                                name: activeRole.name,
+                                scopeType: activeRole.scopeType,
+                                scopeId: activeRole.scopeId,
+                              }
+                              : { id: "", name: "" },
                           },
                           unit: { _id: receivingUnitId, name: step.name },
-                          details: { stepName: step.name, stepIndex, stepType, unitId: receivingUnitId, comment: "Auto-approved via goods receipt", completed: true, autoApproved: true },
+                          details: {
+                            stepName: step.name,
+                            stepIndex,
+                            stepType,
+                            unitId: receivingUnitId,
+                            comment: "Auto-approved via goods receipt",
+                            completed: true,
+                            autoApproved: true,
+                          },
                         },
                       },
                     },
@@ -540,7 +613,8 @@ export const addFn: ActFn = async (body) => {
         title: poTitle,
         amount: Math.round(orderTotal * 100) / 100,
         status: "draft",
-        description: `Auto-created from goods receipt ${result._id?.toString()}`,
+        description:
+          `Auto-created from goods receipt ${result._id?.toString()}`,
       },
       projection: { _id: 1 },
       relations: paymentRelations,
@@ -554,7 +628,7 @@ export const addFn: ActFn = async (body) => {
         {
           $match: {
             referenceType: "purchasingRequest",
-            referenceId: (purchasingRequestId as string),
+            referenceId: purchasingRequestId as string,
             status: "reserved",
           },
         },
@@ -579,7 +653,10 @@ export const addFn: ActFn = async (body) => {
         // Partial conversion — keep remaining as reserved
         await budgetEncumbrance.findOneAndUpdate({
           filter: { _id: encId },
-          update: { $inc: { amount: -convertAmount }, $set: { updatedAt: now } },
+          update: {
+            $inc: { amount: -convertAmount },
+            $set: { updatedAt: now },
+          },
           projection: { _id: 1 },
         });
         // Create a new spent encumbrance for the converted portion
@@ -590,12 +667,19 @@ export const addFn: ActFn = async (body) => {
               status: "spent",
               referenceType: "goodsReceipt",
               referenceId: result._id?.toString(),
-              description: `Auto-converted from encumbrance ${encId.toString()} via goods receipt`,
+              description:
+                `Auto-converted from encumbrance ${encId.toString()} via goods receipt`,
             },
             projection: { _id: 1 },
             relations: {
-              budgetLine: { _ids: new ObjectId(blId), relatedRelations: { encumbrances: true } },
-              createdBy: { _ids: user._id, relatedRelations: { budgetEncumbrances: true } },
+              budgetLine: {
+                _ids: new ObjectId(blId),
+                relatedRelations: { encumbrances: true },
+              },
+              createdBy: {
+                _ids: user._id,
+                relatedRelations: { budgetEncumbrances: true },
+              },
             },
           });
         }
@@ -605,20 +689,33 @@ export const addFn: ActFn = async (body) => {
       if (blId) {
         const bl = await budgetLine.findOne({
           filters: { _id: new ObjectId(blId) },
-          projection: { _id: 1, totalEncumbered: 1, totalSpent: 1, totalAllocated: 1 },
+          projection: {
+            _id: 1,
+            totalEncumbered: 1,
+            totalSpent: 1,
+            totalAllocated: 1,
+          },
         }) as Record<string, unknown>;
 
         if (bl) {
           const currentEncumbered = (bl.totalEncumbered as number) || 0;
           const currentSpent = (bl.totalSpent as number) || 0;
           const currentAllocated = (bl.totalAllocated as number) || 0;
-          const actualConvert = Math.min(convertAmount || encAmount, currentEncumbered);
+          const actualConvert = Math.min(
+            convertAmount || encAmount,
+            currentEncumbered,
+          );
           await budgetLine.findOneAndUpdate({
             filter: { _id: new ObjectId(blId) },
             update: {
-              $inc: { totalEncumbered: -actualConvert, totalSpent: actualConvert },
+              $inc: {
+                totalEncumbered: -actualConvert,
+                totalSpent: actualConvert,
+              },
               $set: {
-                remainingBudget: currentAllocated - (currentEncumbered - actualConvert) - (currentSpent + actualConvert),
+                remainingBudget: currentAllocated -
+                  (currentEncumbered - actualConvert) -
+                  (currentSpent + actualConvert),
                 updatedAt: now,
               },
             },
@@ -626,6 +723,28 @@ export const addFn: ActFn = async (body) => {
           });
         }
       }
+    }
+  }
+
+  // Post the double-entry accounting side-effect. This is additive: a failure
+  // in the ledger must never roll back an already-received shipment.
+  if (prOrganizationId && orderTotal > 0) {
+    try {
+      await recordGoodsReceiptAccounting({
+        organizationId: prOrganizationId,
+        receiptId: String(result._id),
+        receiptNumber: (rest.receiptNumber as string) || undefined,
+        entryDate: (rest.receivedAt as Date) || now,
+        amount: orderTotal,
+        storeId: prStoreId,
+        receivingUnitId,
+        createdBy: userId,
+        description: `Goods receipt ${
+          (rest.receiptNumber as string) || String(result._id)
+        }`,
+      });
+    } catch (error) {
+      console.error("Failed to post goods receipt journal entry", error);
     }
   }
 

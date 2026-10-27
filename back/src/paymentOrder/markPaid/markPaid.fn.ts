@@ -1,9 +1,16 @@
 import { type ActFn, ObjectId } from "lesan";
-import { paymentOrder, budgetEncumbrance, budgetLine, purchasingRequest } from "../../../mod.ts";
+import {
+  budgetEncumbrance,
+  budgetLine,
+  paymentOrder,
+  purchasingRequest,
+} from "../../../mod.ts";
 import {
   checkFinanceUnitAccess,
   financeTargetOfPaymentOrder,
 } from "../../../utils/checkFinanceUnitAccess.ts";
+import { getAuth } from "../../../utils/grantAccess.ts";
+import { recordPaymentAccounting } from "../../../utils/accountingEngine.ts";
 
 export const markPaidFn: ActFn = async (body) => {
   const { set, get } = body.details;
@@ -15,7 +22,13 @@ export const markPaidFn: ActFn = async (body) => {
 
   const order = await paymentOrder.findOne({
     filters: { _id: new ObjectId(_id as string) },
-    projection: { _id: 1, purchasingRequest: 1, amount: 1 },
+    projection: {
+      _id: 1,
+      purchasingRequest: 1,
+      amount: 1,
+      payTo: { _id: 1 },
+      financialUnit: { _id: 1 },
+    },
   }) as Record<string, unknown>;
 
   const now = new Date();
@@ -34,7 +47,8 @@ export const markPaidFn: ActFn = async (body) => {
 
   // Auto-convert related encumbrances to spent
   if (order) {
-    const prRef = (order.purchasingRequest as Record<string, unknown>)?._id as string;
+    const prRef = (order.purchasingRequest as Record<string, unknown>)
+      ?._id as string;
     if (prRef) {
       const encumbrances = await budgetEncumbrance.aggregation({
         pipeline: [
@@ -64,7 +78,12 @@ export const markPaidFn: ActFn = async (body) => {
         if (blId) {
           const bl = await budgetLine.findOne({
             filters: { _id: new ObjectId(blId) },
-            projection: { _id: 1, totalEncumbered: 1, totalSpent: 1, totalAllocated: 1 },
+            projection: {
+              _id: 1,
+              totalEncumbered: 1,
+              totalSpent: 1,
+              totalAllocated: 1,
+            },
           }) as Record<string, unknown>;
 
           if (bl) {
@@ -76,7 +95,9 @@ export const markPaidFn: ActFn = async (body) => {
               update: {
                 $inc: { totalEncumbered: -encAmount, totalSpent: encAmount },
                 $set: {
-                  remainingBudget: currentAllocated - (currentEncumbered - encAmount) - (currentSpent + encAmount),
+                  remainingBudget: currentAllocated -
+                    (currentEncumbered - encAmount) -
+                    (currentSpent + encAmount),
                   updatedAt: now,
                 },
               },
@@ -90,20 +111,27 @@ export const markPaidFn: ActFn = async (body) => {
 
   // Deduct payment amount from budget line's totalAllocated
   if (order) {
-    const prRef = (order.purchasingRequest as Record<string, unknown>)?._id as string;
+    const prRef = (order.purchasingRequest as Record<string, unknown>)
+      ?._id as string;
     if (prRef) {
       const prDoc = await purchasingRequest.findOne({
         filters: { _id: new ObjectId(prRef) },
         projection: { budgetLine: { _id: 1 } },
       }) as Record<string, unknown> | null;
 
-      const prBlId = (prDoc?.budgetLine as Record<string, unknown>)?._id as string;
+      const prBlId = (prDoc?.budgetLine as Record<string, unknown>)
+        ?._id as string;
       const paymentAmount = (order.amount as number) || 0;
 
       if (prBlId && paymentAmount > 0) {
         const bl = await budgetLine.findOne({
           filters: { _id: new ObjectId(prBlId) },
-          projection: { _id: 1, totalAllocated: 1, totalEncumbered: 1, totalSpent: 1 },
+          projection: {
+            _id: 1,
+            totalAllocated: 1,
+            totalEncumbered: 1,
+            totalSpent: 1,
+          },
         }) as Record<string, unknown>;
 
         if (bl) {
@@ -115,13 +143,51 @@ export const markPaidFn: ActFn = async (body) => {
             update: {
               $inc: { totalAllocated: -paymentAmount },
               $set: {
-                remainingBudget: (currentAllocated - paymentAmount) - currentEncumbered - currentSpent,
+                remainingBudget: (currentAllocated - paymentAmount) -
+                  currentEncumbered - currentSpent,
                 updatedAt: new Date(),
               },
             },
             projection: { _id: 1 },
           });
         }
+      }
+    }
+  }
+
+  // Post the double-entry accounting side-effect (AP / Bank).
+  const prRefForAccounting =
+    (order?.purchasingRequest as Record<string, unknown> | undefined)
+      ?._id as string | undefined;
+
+  if (order && prRefForAccounting) {
+    const prAccountingDoc = await purchasingRequest.findOne({
+      filters: { _id: new ObjectId(prRefForAccounting) },
+      projection: { organization: { _id: 1 } },
+    }) as Record<string, unknown> | null;
+
+    const organizationId =
+      (prAccountingDoc?.organization as Record<string, unknown> | undefined)
+        ?._id?.toString();
+
+    if (organizationId) {
+      try {
+        const { user } = await getAuth();
+        await recordPaymentAccounting({
+          organizationId,
+          paymentOrderId: String(order._id),
+          entryDate: now,
+          amount: Number(order.amount) || 0,
+          storeId: (order.payTo as Record<string, unknown> | undefined)
+            ?._id?.toString(),
+          financialUnitId:
+            (order.financialUnit as Record<string, unknown> | undefined)
+              ?._id?.toString(),
+          createdBy: user?._id ? String(user._id) : undefined,
+          description: `Payment order ${String(order._id)}`,
+        });
+      } catch (error) {
+        console.error("Failed to post payment journal entry", error);
       }
     }
   }

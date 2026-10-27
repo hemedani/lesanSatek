@@ -1,4 +1,12 @@
-import { coerce, date, number, object, objectIdValidation, optional, string } from "lesan";
+import {
+  coerce,
+  date,
+  number,
+  object,
+  objectIdValidation,
+  optional,
+  string,
+} from "lesan";
 import { activeRoleMixin } from "@lib";
 import { selectStruct } from "../../../mod.ts";
 
@@ -12,6 +20,8 @@ export const addValidator = () => {
       reason: optional(string()),
       consumedFor: optional(string()),
       notes: optional(string()),
+      unitCost: optional(number()),
+      totalCost: optional(number()),
       unitId: optional(objectIdValidation),
       consumedById: optional(objectIdValidation),
       inventoryId: optional(objectIdValidation),

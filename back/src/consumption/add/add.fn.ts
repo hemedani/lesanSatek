@@ -12,6 +12,7 @@ import { assertWareModelAccess } from "../../../utils/checkWareModelAccess.ts";
 import type { ActiveRole } from "../../../utils/authzPolicy.ts";
 import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { removeStock } from "../../../utils/inventoryManager.ts";
+import { recordConsumptionAccounting } from "../../../utils/accountingEngine.ts";
 import { throwError } from "../../../utils/throwError.ts";
 import { assertUnitInActorScope } from "../../../utils/unitScope.ts";
 import { loadPurchasingRequestForActor } from "../../purchasingRequest/readScope.ts";
@@ -24,6 +25,7 @@ const normalizeId = (value: unknown): string | null => {
 
 type UnitDoc = {
   _id?: unknown;
+  name?: unknown;
   organization?: { _id?: unknown } | null;
 };
 
@@ -74,6 +76,8 @@ export const addFn: ActFn = async (body) => {
     filters: { _id: new ObjectId(wareId as string) },
     projection: {
       _id: 1,
+      name: 1,
+      price: 1,
       "wareModel._id": 1,
       "wareGroup._id": 1,
       "wareClass._id": 1,
@@ -108,6 +112,26 @@ export const addFn: ActFn = async (body) => {
     }
   }
 
+  const accountingUnitDoc = await unit.findOne({
+    filters: { _id: new ObjectId(unitId as string) },
+    projection: { _id: 1, name: 1, organization: { _id: 1 } },
+  }) as UnitDoc | null;
+
+  const accountingOrganizationId = normalizeId(
+    accountingUnitDoc?.organization?._id,
+  );
+  const wareName = String(
+    (wareDoc as Record<string, unknown>).name ?? "",
+  );
+  const quantity = Number(rest.quantity) || 0;
+  const resolvedUnitCost = rest.unitCost !== undefined
+    ? Number(rest.unitCost)
+    : (Number((wareDoc as Record<string, unknown>).price) || 0);
+  const totalCost = Math.round(resolvedUnitCost * quantity * 100) / 100;
+
+  rest.unitCost = resolvedUnitCost;
+  rest.totalCost = totalCost;
+
   if (purchasingRequestId) {
     const pr = await loadPurchasingRequestForActor(
       activeRole,
@@ -115,14 +139,11 @@ export const addFn: ActFn = async (body) => {
       purchasingRequestId,
     );
 
-    const unitDoc = await unit.findOne({
-      filters: { _id: new ObjectId(unitId as string) },
-      projection: { _id: 1, organization: { _id: 1 } },
-    }) as UnitDoc | null;
-
     const prOrganizationId = normalizeId(pr.organization?._id);
     const prRequestingUnitId = normalizeId(pr.requestingUnit?._id);
-    const unitOrganizationId = normalizeId(unitDoc?.organization?._id);
+    const unitOrganizationId = normalizeId(
+      accountingUnitDoc?.organization?._id,
+    );
     const normalizedUnitId = normalizeId(unitId);
 
     const sameOrganization = prOrganizationId !== null &&
@@ -204,6 +225,23 @@ export const addFn: ActFn = async (body) => {
       ...(inventoryId && { inventoryId: inventoryId as string }),
     },
   );
+
+  // Post the double-entry accounting side-effect (COGS / Inventory).
+  if (accountingOrganizationId && totalCost > 0) {
+    try {
+      await recordConsumptionAccounting({
+        organizationId: accountingOrganizationId,
+        consumptionId: String(result._id),
+        entryDate: (rest.consumedAt as Date) || new Date(),
+        amount: totalCost,
+        unitId: String(unitId),
+        createdBy: String(consumedById),
+        description: `Consumption of ${wareName || String(wareId)}`,
+      });
+    } catch (error) {
+      console.error("Failed to post consumption journal entry", error);
+    }
+  }
 
   // Push "goods_consumed" history on the purchasing request if linked
   if (purchasingRequestId) {
