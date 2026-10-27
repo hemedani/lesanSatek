@@ -165,3 +165,28 @@ export const consumption_excludes: string[] = [
   "updatedAt",
 ];
 
+export const account_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];
+
+export const accountingPeriod_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];
+
+export const costCenter_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];
+
+export const journalEntry_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+  "lineSnapshot",
+];
+
+export const journalEntryLine_excludes: string[] = [
+  "createdAt",
+  "updatedAt",
+];

@@ -29,6 +29,11 @@ import { budgetAllocationSetup } from "./budgetAllocation/mod.ts";
 import { budgetEncumbranceSetup } from "./budgetEncumbrance/mod.ts";
 
 import { consumptionSetup } from "./consumption/mod.ts";
+import { accountSetup } from "./account/mod.ts";
+import { accountingPeriodSetup } from "./accountingPeriod/mod.ts";
+import { costCenterSetup } from "./costCenter/mod.ts";
+import { journalEntrySetup } from "./journalEntry/mod.ts";
+import { journalEntryLineSetup } from "./journalEntryLine/mod.ts";
 
 export const functionsSetup = () => {
 	userSetup();
@@ -61,4 +66,9 @@ export const functionsSetup = () => {
   budgetAllocationSetup();
   budgetEncumbranceSetup();
   consumptionSetup();
+	accountSetup();
+	accountingPeriodSetup();
+	costCenterSetup();
+	journalEntrySetup();
+	journalEntryLineSetup();
 };

@@ -32,6 +32,10 @@ export const feature_array = [
   "canIssuePaymentOrder",
   "canViewHistory",
   "canSubmitPurchaseRequest",
+  "canViewAccounting",
+  "canManageAccounting",
+  "canCloseAccountingPeriod",
+  "canPostManualJournalEntry",
 ] as const;
 
 export const feature_enums = enums(feature_array);

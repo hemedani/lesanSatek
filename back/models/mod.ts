@@ -46,4 +46,8 @@ export * from "./budgetLine.ts";
 export * from "./budgetAllocation.ts";
 export * from "./budgetEncumbrance.ts";
 export * from "./consumption.ts";
-
+export * from "./account.ts";
+export * from "./accountingPeriod.ts";
+export * from "./costCenter.ts";
+export * from "./journalEntry.ts";
+export * from "./journalEntryLine.ts";

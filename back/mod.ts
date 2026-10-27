@@ -1,16 +1,21 @@
 import { lesan, MongoClient } from "lesan";
 import {
+  accountingPeriods,
+  accounts,
   budgetAllocations,
   budgetEncumbrances,
   budgetLines,
   cities,
   consumptions,
+  costCenters,
   createInventoryIndex,
   createUserTextIndex,
   files,
   fiscalYears,
   goodsReceipts,
   inventories,
+  journalEntries,
+  journalEntryLines,
   manufacturers,
   organizations,
   paymentOrders,
@@ -36,12 +41,13 @@ import {
 import { functionsSetup } from "./src/mod.ts";
 
 const MONGO_URI = Deno.env.get("MONGO_URI") || "mongodb://127.0.0.1:27017/";
+const MONGO_DB = Deno.env.get("MONGO_DB") || "lesanSatek";
 const APP_PORT = Deno.env.get("APP_PORT") || 1370;
 const ENV = Deno.env.get("ENV") || "development";
 
 export const coreApp = lesan();
 const client = await new MongoClient(MONGO_URI).connect();
-const db = client.db("lesanSatek");
+const db = client.db(MONGO_DB);
 coreApp.odm.setDb(db);
 
 export const user = users();
@@ -74,6 +80,11 @@ export const budgetLine = budgetLines();
 export const budgetAllocation = budgetAllocations();
 export const budgetEncumbrance = budgetEncumbrances();
 export const consumption = consumptions();
+export const account = accounts();
+export const accountingPeriod = accountingPeriods();
+export const costCenter = costCenters();
+export const journalEntry = journalEntries();
+export const journalEntryLine = journalEntryLines();
 
 export const { setAct, setService, getAtcsWithServices } = coreApp.acts;
 
