@@ -6,7 +6,7 @@ export default function UnitHeadFinanceLayout({
   children: React.ReactNode
 }) {
   return (
-    <PanelGuard requiredFeatures={["canManageBudget", "canIssuePaymentOrder", "canViewBudgetReports"]}>
+    <PanelGuard requiredFeatures={["canManageBudget", "canIssuePaymentOrder", "canViewBudgetReports", "canViewAccounting"]}>
       {children}
     </PanelGuard>
   )

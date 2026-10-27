@@ -25,6 +25,13 @@ import {
   Calendar,
   Calculator,
   FileSpreadsheet,
+  BookOpen,
+  ListTree,
+  BookText,
+  CalendarRange,
+  Scale,
+  Library,
+  FileBarChart,
   Network,
   Settings,
   Clock,
@@ -125,6 +132,20 @@ const adminSections: NavSection[] = [
       { label: "گزارش بودجه", href: "/admin/budget-reports", icon: FileSpreadsheet },
     ],
   },
+  {
+    label: "حسابداری",
+    requiredFeature: "canViewAccounting",
+    items: [
+      { label: "داشبورد حسابداری", href: "/admin/accounting", icon: BookOpen },
+      { label: "کدینگ حساب‌ها", href: "/admin/accounting/accounts", icon: ListTree },
+      { label: "اسناد حسابداری", href: "/admin/accounting/journal-entries", icon: BookText },
+      { label: "دوره‌های حسابداری", href: "/admin/accounting/periods", icon: CalendarRange },
+      { label: "مراکز هزینه", href: "/admin/accounting/cost-centers", icon: Landmark },
+      { label: "تراز آزمایشی", href: "/admin/accounting/reports/trial-balance", icon: Scale },
+      { label: "دفتر کل", href: "/admin/accounting/reports/general-ledger", icon: Library },
+      { label: "صورت سود و زیان", href: "/admin/accounting/reports/income-statement", icon: FileBarChart },
+    ],
+  },
 ]
 
 const orgheadSections: NavSection[] = [
@@ -185,6 +206,20 @@ const unitHeadSections: NavSection[] = [
       { label: "سال‌های مالی", href: "/unit-head/finance/fiscal-years", icon: Landmark, requiredFeature: "canViewBudgetReports" },
       { label: "دستورات پرداخت", href: "/unit-head/finance/payment-orders", icon: Receipt, requiredFeature: "canIssuePaymentOrder" },
       { label: "گزارش بودجه", href: "/unit-head/finance/budget-reports", icon: FileSpreadsheet, requiredFeature: "canViewBudgetReports" },
+    ],
+  },
+  {
+    label: "حسابداری",
+    requiredFeature: "canViewAccounting",
+    items: [
+      { label: "داشبورد حسابداری", href: "/unit-head/finance/accounting", icon: BookOpen },
+      { label: "کدینگ حساب‌ها", href: "/unit-head/finance/accounting/accounts", icon: ListTree },
+      { label: "اسناد حسابداری", href: "/unit-head/finance/accounting/journal-entries", icon: BookText },
+      { label: "دوره‌های حسابداری", href: "/unit-head/finance/accounting/periods", icon: CalendarRange },
+      { label: "مراکز هزینه", href: "/unit-head/finance/accounting/cost-centers", icon: Landmark },
+      { label: "تراز آزمایشی", href: "/unit-head/finance/accounting/reports/trial-balance", icon: Scale },
+      { label: "دفتر کل", href: "/unit-head/finance/accounting/reports/general-ledger", icon: Library },
+      { label: "صورت سود و زیان", href: "/unit-head/finance/accounting/reports/income-statement", icon: FileBarChart },
     ],
   },
   {
