@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/stores/authStore"
 import { PANEL_NAV, filterNavSections, type PanelId } from "@/lib/nav-config"
 import { type PanelDef } from "@/lib/roles"
+import { getEffectiveFeatures } from "@/lib/features"
 import { setActiveRole } from "@/app/actions/auth/setActiveRole"
 import { resolveActionErrorMessage } from "@/lib/action-errors"
 import { Button } from "@/components/ui/button"
@@ -28,10 +29,10 @@ function setActiveRoleCookie(roleId: string) {
 function CommandSearch({ panel }: { panel: PanelId }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
-  const { user, accessiblePanels, setActiveRoleId } = useAuthStore()
+  const { user, activeRoleId, accessiblePanels, setActiveRoleId } = useAuthStore()
 
   const roleNames = user?.roles?.map((r) => r.name) ?? []
-  const featureNames = user?.features?.map((f) => f.feature) ?? []
+  const featureNames = getEffectiveFeatures(user, activeRoleId)
   const roleKey = roleNames.join(",")
   const featureKey = featureNames.join(",")
 
@@ -48,7 +49,7 @@ function CommandSearch({ panel }: { panel: PanelId }) {
       })),
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nav, roleKey, featureKey])
+  }, [nav, roleKey, featureKey, activeRoleId])
 
   const switchablePanels = useMemo(() => {
     const routableIds = new Set(Object.keys(PANEL_NAV))

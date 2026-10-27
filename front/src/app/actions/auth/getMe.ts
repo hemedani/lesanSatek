@@ -7,6 +7,30 @@ import { cookies } from "next/headers";
 import { getHighestRole } from "@/lib/roles";
 import { isSecureRequest } from "@/lib/server-action";
 
+const DEFAULT_GET_ME_SELECTION = {
+  _id: 1,
+  first_name: 1,
+  last_name: 1,
+  mobile: 1,
+  email: 1,
+  is_verified: 1,
+  isActive: 1,
+  isGhost: 1,
+  position: 1,
+  features: 1,
+  roles: 1,
+  organizations: { _id: 1, name: 1 },
+  avatar: { _id: 1, name: 1 },
+  units: {
+    _id: 1,
+    name: 1,
+    type: 1,
+    organization: { _id: 1, name: 1 },
+    features: 1,
+  },
+  managedStore: { _id: 1, name: 1 },
+} as unknown as DeepPartial<ReqType["main"]["user"]["getMe"]["get"]>
+
 export const getMe = async (
   getSelection?: DeepPartial<ReqType["main"]["user"]["getMe"]["get"]>
 ) => {
@@ -22,23 +46,7 @@ export const getMe = async (
       act: "getMe",
       details: {
         set: {},
-        get: getSelection || {
-          _id: 1,
-          first_name: 1,
-          last_name: 1,
-          mobile: 1,
-          email: 1,
-          is_verified: 1,
-          isActive: 1,
-          isGhost: 1,
-          position: 1,
-          features: 1,
-          roles: 1,
-          organizations: { _id: 1, name: 1 },
-          avatar: { _id: 1, name: 1 },
-          units: { _id: 1, name: 1 },
-          managedStore: { _id: 1, name: 1 },
-        },
+        get: getSelection || DEFAULT_GET_ME_SELECTION,
       },
     });
 

@@ -3,12 +3,12 @@ import {
   GitBranch,
   ShoppingCart,
   Calculator,
-  ShoppingBag,
   Store,
-  Package,
   Building2,
   type LucideIcon,
 } from "lucide-react"
+
+import { getEffectiveFeatures, type FeatureUser } from "@/lib/features"
 
 export interface PanelDef {
   id: string
@@ -93,17 +93,14 @@ function getUserRoleNames(
   return user.roles?.map((r) => r.name) ?? []
 }
 
-function getUserFeatures(
-  user: { features?: { feature: string }[] },
-): string[] {
-  return user.features?.map((f) => f.feature) ?? []
-}
+type PanelUser = FeatureUser & { roles?: { roleId?: string; name: string }[] }
 
 export function getAccessiblePanels(
-  user: { roles?: { name: string }[]; features?: { feature: string }[] },
+  user: PanelUser,
+  activeRoleId?: string | null,
 ): PanelDef[] {
   const roleNames = getUserRoleNames(user)
-  const featureNames = getUserFeatures(user)
+  const featureNames = getEffectiveFeatures(user, activeRoleId)
 
   return PANEL_DEFINITIONS.filter((panel) => {
     if (panel.requiredRole && panel.requiredRole.length > 0) {
@@ -117,10 +114,11 @@ export function getAccessiblePanels(
 }
 
 export function getDefaultPanel(
-  user: { roles?: { name: string }[]; features?: { feature: string }[] },
+  user: PanelUser,
+  activeRoleId?: string | null,
 ): string {
   const roleNames = getUserRoleNames(user)
-  const featureNames = getUserFeatures(user)
+  const featureNames = getEffectiveFeatures(user, activeRoleId)
 
   if (roleNames.includes("OrgHead")) {
     return "/orghead"

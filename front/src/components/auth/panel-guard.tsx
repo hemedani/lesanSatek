@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import { useAuthStore } from "@/stores/authStore"
 import { getAccessiblePanels, getDefaultPanel } from "@/lib/roles"
+import { getEffectiveFeatures } from "@/lib/features"
 import { getMe } from "@/app/actions/auth/getMe"
 
 interface PanelGuardProps {
@@ -15,7 +16,7 @@ interface PanelGuardProps {
 
 function PanelGuard({ children, requiredRoles, requiredFeatures }: PanelGuardProps) {
   const router = useRouter()
-  const { user, isAuthenticated, isLoading, setUser, setLoading } = useAuthStore()
+  const { user, activeRoleId, isAuthenticated, isLoading, setUser, setLoading } = useAuthStore()
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
@@ -25,13 +26,13 @@ function PanelGuard({ children, requiredRoles, requiredFeatures }: PanelGuardPro
       setLoading(true)
       const result = await getMe()
       if (result.success && result.body) {
-        const panels = getAccessiblePanels(result.body)
-        setUser(result.body, panels)
         const activeRoleCookie = document.cookie.replace(/(?:(?:^|.*;\s*)activeRoleId\s*=\s*([^;]*).*$)|^.*$/, "$1")
         if (activeRoleCookie) {
           const { setActiveRoleId } = useAuthStore.getState()
           setActiveRoleId(activeRoleCookie)
         }
+        const panels = getAccessiblePanels(result.body, activeRoleCookie || undefined)
+        setUser(result.body, panels)
       } else {
         setUser(null)
         router.replace("/login")
@@ -46,7 +47,7 @@ function PanelGuard({ children, requiredRoles, requiredFeatures }: PanelGuardPro
     if (!isAuthenticated || !user) return
 
     const roleNames = user.roles?.map((r) => r.name) ?? []
-    const featureNames = user.features?.map((f) => f.feature) ?? []
+    const featureNames = getEffectiveFeatures(user, activeRoleId)
     const isPrivileged = roleNames.some((r) => ["Manager", "Admin", "OrgHead"].includes(r))
 
     let authorized = false
@@ -59,10 +60,10 @@ function PanelGuard({ children, requiredRoles, requiredFeatures }: PanelGuardPro
     }
 
     if (!authorized) {
-      const defaultPanel = getDefaultPanel(user)
+      const defaultPanel = getDefaultPanel(user, activeRoleId)
       router.replace(defaultPanel)
     }
-  }, [user, isAuthenticated, requiredRoles, requiredFeatures, router])
+  }, [user, activeRoleId, isAuthenticated, requiredRoles, requiredFeatures, router])
 
   if (isLoading && !user) {
     return (

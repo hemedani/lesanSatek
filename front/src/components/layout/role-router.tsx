@@ -9,7 +9,7 @@ import { getMe } from "@/app/actions/auth/getMe"
 
 function RoleRouter({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const { user, isAuthenticated, isLoading, setUser, setLoading } = useAuthStore()
+  const { user, isAuthenticated, isLoading, setUser, setActiveRoleId, setLoading } = useAuthStore()
 
   useEffect(() => {
     if (user) return
@@ -18,8 +18,10 @@ function RoleRouter({ children }: { children: React.ReactNode }) {
       setLoading(true)
       const result = await getMe()
       if (result.success && result.body) {
+        const activeRoleCookie = document.cookie.replace(/(?:(?:^|.*;\s*)activeRoleId\s*=\s*([^;]*).*$)|^.*$/, "$1")
+        if (activeRoleCookie) setActiveRoleId(activeRoleCookie)
         setUser(result.body)
-        const defaultPanel = getDefaultPanel(result.body)
+        const defaultPanel = getDefaultPanel(result.body, activeRoleCookie || undefined)
         if (window.location.pathname === "/login" || window.location.pathname === "/register") {
           router.replace(defaultPanel)
         }
@@ -30,7 +32,7 @@ function RoleRouter({ children }: { children: React.ReactNode }) {
     }
 
     check()
-  }, [user, setUser, setLoading, router])
+  }, [user, setUser, setActiveRoleId, setLoading, router])
 
   if (isLoading && !user) {
     return (

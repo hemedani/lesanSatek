@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { PanelDef } from "@/lib/roles";
+import { getEffectiveFeatures } from "@/lib/features";
 
 interface User {
   _id: string;
@@ -15,7 +16,13 @@ interface User {
   organizations?: { _id: string; name: string }[];
   features: { feature: string }[];
   roles: { roleId: string; name: string; scopeType?: string; scopeId?: string }[];
-  units?: { _id: string; name: string }[];
+  units?: {
+    _id: string;
+    name: string;
+    type?: string;
+    organization?: { _id: string; name?: string };
+    features?: { feature: string }[];
+  }[];
   managedStore?: { _id: string; name: string };
 }
 
@@ -63,11 +70,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       activePanel: "/",
     }),
   isFeatureEnabled: (feature) => {
-    const { user } = get();
+    const { user, activeRoleId } = get();
     const roleNames = user?.roles?.map((r) => r.name) ?? [];
     if (roleNames.some((r) => ["Manager", "Admin", "OrgHead"].includes(r)))
       return true;
-    return user?.features?.some((f) => f.feature === feature) ?? false;
+    return getEffectiveFeatures(user, activeRoleId).includes(feature);
   },
   getActiveRoleName: () => {
     const { user, activeRoleId } = get();

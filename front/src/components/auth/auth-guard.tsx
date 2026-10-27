@@ -23,20 +23,19 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
       if (result.success && result.body) {
         const { getAccessiblePanels, getDefaultPanel } = await import("@/lib/roles")
         const roleNames = result.body.roles?.map((r: { name: string }) => r.name) ?? []
+        const activeRoleCookie = document.cookie.replace(/(?:(?:^|.*;\s*)activeRoleId\s*=\s*([^;]*).*$)|^.*$/, "$1")
 
         if (!roleNames.some((r: string) => ADMIN_ROLES.includes(r))) {
-          const defaultPanel = getDefaultPanel(result.body)
+          const defaultPanel = getDefaultPanel(result.body, activeRoleCookie || undefined)
           router.replace(defaultPanel)
           return
         }
 
-        const panels = getAccessiblePanels(result.body)
-        setUser(result.body, panels)
-        const activeRoleCookie = document.cookie.replace(/(?:(?:^|.*;\s*)activeRoleId\s*=\s*([^;]*).*$)|^.*$/, "$1")
         if (activeRoleCookie) {
-          const { setActiveRoleId } = useAuthStore.getState()
           setActiveRoleId(activeRoleCookie)
         }
+        const panels = getAccessiblePanels(result.body, activeRoleCookie || undefined)
+        setUser(result.body, panels)
       } else {
         setUser(null)
         router.push("/login")

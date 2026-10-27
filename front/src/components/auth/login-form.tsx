@@ -41,14 +41,14 @@ function LoginForm() {
     if (result.success && result.body?.user) {
       const user = result.body.user
       const { getDefaultPanel, getAccessiblePanels, getHighestRole } = await import("@/lib/roles")
-      const panels = getAccessiblePanels(user)
-      setUser(user, panels)
       const firstRole = getHighestRole(user.roles) || user.roles?.[0]
       if (firstRole) {
         setActiveRoleId(firstRole.roleId)
         setActiveRoleCookie(firstRole.roleId)
       }
-      const defaultPanel = getDefaultPanel(user)
+      const panels = getAccessiblePanels(user, firstRole?.roleId)
+      setUser(user, panels)
+      const defaultPanel = getDefaultPanel(user, firstRole?.roleId)
       const redirect = new URLSearchParams(window.location.search).get("redirect")
       const isSafeRedirect = !!redirect && redirect.startsWith(defaultPanel)
       router.push(isSafeRedirect ? redirect : defaultPanel)

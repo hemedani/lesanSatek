@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { PANEL_NAV, filterNavSections, type PanelId, type PanelNav } from "@/lib/nav-config"
 import { useNavStore } from "@/stores/navStore"
 import { useAuthStore } from "@/stores/authStore"
+import { getEffectiveFeatures } from "@/lib/features"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -27,9 +28,9 @@ const roleLabelMap: Record<string, string> = {
 }
 
 function usePanelNav(panel: PanelId) {
-  const { user } = useAuthStore()
+  const { user, activeRoleId } = useAuthStore()
   const roleNames = user?.roles?.map((r) => r.name) ?? []
-  const featureNames = user?.features?.map((f) => f.feature) ?? []
+  const featureNames = getEffectiveFeatures(user, activeRoleId)
   const roleKey = roleNames.join(",")
   const featureKey = featureNames.join(",")
 
@@ -38,7 +39,7 @@ function usePanelNav(panel: PanelId) {
   const sections = useMemo(
     () => filterNavSections(nav.sections, roleNames, featureNames),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [nav, roleKey, featureKey],
+    [nav, roleKey, featureKey, activeRoleId],
   )
 
   return { nav, sections }

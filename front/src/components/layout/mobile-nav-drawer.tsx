@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { useNavStore } from "@/stores/navStore"
 import { useAuthStore } from "@/stores/authStore"
+import { getEffectiveFeatures } from "@/lib/features"
 import { PANEL_NAV, filterNavSections, type PanelId } from "@/lib/nav-config"
 import { SidebarBody } from "@/components/layout/sidebar-nav"
 import { Menu, X } from "lucide-react"
@@ -12,9 +13,9 @@ function MobileNavDrawer({ panel }: { panel: PanelId }) {
   const open = useNavStore((state) => state.mobileOpen)
   const setOpen = useNavStore((state) => state.setMobileOpen)
 
-  const { user } = useAuthStore()
+  const { user, activeRoleId } = useAuthStore()
   const roleNames = user?.roles?.map((r) => r.name) ?? []
-  const featureNames = user?.features?.map((f) => f.feature) ?? []
+  const featureNames = getEffectiveFeatures(user, activeRoleId)
 
   const nav = PANEL_NAV[panel]
   const sections = filterNavSections(nav.sections, roleNames, featureNames)
