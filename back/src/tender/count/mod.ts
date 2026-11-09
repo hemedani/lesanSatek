@@ -11,7 +11,7 @@ export const countSetup = () =>
     preAct: [
       setTokens,
       setUser,
-      grantAccess([{ roles: ["Manager", "Admin"] }]),
+      grantAccess([{ roles: ["Manager", "Admin", "OrgHead", "UnitHead", "StoreHead", "Employee", "Ordinary"] }]),
     ],
     validator: countValidator(),
   });
