@@ -357,5 +357,12 @@ export function filterNavSections(
 }
 
 export function isNavItemActive(pathname: string, href: string): boolean {
-  return pathname === href || pathname.startsWith(href + "/")
+  if (pathname === href) return true
+
+  // Panel roots (single segment, e.g. `/admin`) must only match exactly —
+  // otherwise every child route also highlights the dashboard link.
+  const isPanelRoot = href.split("/").filter(Boolean).length <= 1
+  if (isPanelRoot) return false
+
+  return pathname.startsWith(href + "/")
 }

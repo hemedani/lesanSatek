@@ -9,6 +9,7 @@ import { type PanelDef } from "@/lib/roles"
 import { getEffectiveFeatures } from "@/lib/features"
 import { setActiveRole } from "@/app/actions/auth/setActiveRole"
 import { resolveActionErrorMessage } from "@/lib/action-errors"
+import { ACTIVE_ROLE_COOKIE, writeClientCookie } from "@/lib/session-cookies"
 import { Button } from "@/components/ui/button"
 import {
   Command,
@@ -23,7 +24,7 @@ import {
 import { Search, CornerDownLeft } from "lucide-react"
 
 function setActiveRoleCookie(roleId: string) {
-  document.cookie = `activeRoleId=${encodeURIComponent(roleId)}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`
+  writeClientCookie(ACTIVE_ROLE_COOKIE, roleId)
 }
 
 function CommandSearch({ panel }: { panel: PanelId }) {
@@ -134,7 +135,9 @@ function CommandSearch({ panel }: { panel: PanelId }) {
                 {navItems.map((item) => (
                   <CommandItem
                     key={item.href}
-                    value={item.href}
+                    /* cmdk filters on `value`; include the Persian label so the
+                       palette is searchable by what the user actually sees. */
+                    value={`${item.label} ${item.href}`}
                     onSelect={() => go(item.href)}
                     className="gap-3 rounded-lg px-3 py-2.5"
                   >
@@ -154,7 +157,7 @@ function CommandSearch({ panel }: { panel: PanelId }) {
                   {switchablePanels.map((panelDef) => (
                     <CommandItem
                       key={panelDef.id}
-                      value={`panel-${panelDef.id}`}
+                      value={`${panelDef.label} ${panelDef.id}`}
                       onSelect={() => switchPanel(panelDef)}
                       className="gap-3 rounded-lg px-3 py-2.5"
                     >
