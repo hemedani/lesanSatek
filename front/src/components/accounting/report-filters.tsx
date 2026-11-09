@@ -2,6 +2,7 @@
 
 import { CalendarRange, Landmark } from "lucide-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { subMonths } from "date-fns-jalali"
 
 import { Button } from "@/components/ui/button"
 import { JalaliDatePicker } from "@/components/ui/jalali-date-picker"
@@ -62,8 +63,9 @@ function ReportFilters({
   }
 
   const lastMonth = () => {
-    const now = new Date()
-    const bounds = monthBounds(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1)))
+    // `monthBounds` works in the Jalali calendar, so step back one Jalali month
+    // rather than one Gregorian month.
+    const bounds = monthBounds(subMonths(new Date(), 1))
     setRange(bounds.startDate, bounds.endDate)
   }
 

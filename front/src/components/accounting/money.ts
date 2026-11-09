@@ -1,3 +1,9 @@
+import {
+  endOfMonth as endOfJalaliMonth,
+  startOfMonth as startOfJalaliMonth,
+  startOfYear as startOfJalaliYear,
+} from "date-fns-jalali"
+
 const numberFormatter = new Intl.NumberFormat("fa-IR", {
   maximumFractionDigits: 0,
 })
@@ -76,16 +82,42 @@ export function currentMonthBounds(): { startDate: string; endDate: string } {
   return monthBounds(now)
 }
 
+/**
+ * Calendar day of a Jalali-aware `date-fns-jalali` result, rebuilt as a UTC
+ * boundary. The jalali helpers return local midnights; rebuilding the same
+ * calendar day in UTC keeps the range independent of the machine's timezone,
+ * which matters because entry dates are stored as UTC instants.
+ */
+function utcBoundary(date: Date, endOfDay: boolean): Date {
+  return new Date(
+    Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      endOfDay ? 23 : 0,
+      endOfDay ? 59 : 0,
+      endOfDay ? 59 : 0,
+    ),
+  )
+}
+
+/**
+ * Bounds of the current **Jalali** month.
+ *
+ * The whole product is Jalali — fiscal years, accounting periods, date pickers
+ * and every rendered date — so the "this month" shortcut must follow the Jalali
+ * calendar. Using the Gregorian month silently dropped every entry dated in the
+ * Persian month that straddles a Gregorian month boundary (e.g. آبان).
+ */
 export function monthBounds(date: Date): { startDate: string; endDate: string } {
-  const year = date.getUTCFullYear()
-  const month = date.getUTCMonth()
-  const start = new Date(Date.UTC(year, month, 1, 0, 0, 0))
-  const end = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59))
-  return { startDate: start.toISOString(), endDate: end.toISOString() }
+  return {
+    startDate: utcBoundary(startOfJalaliMonth(date), false).toISOString(),
+    endDate: utcBoundary(endOfJalaliMonth(date), true).toISOString(),
+  }
 }
 
 export function startOfYearIso(date = new Date()): string {
-  return new Date(Date.UTC(date.getUTCFullYear(), 0, 1, 0, 0, 0)).toISOString()
+  return utcBoundary(startOfJalaliYear(date), false).toISOString()
 }
 
 export function endOfTodayIso(): string {
