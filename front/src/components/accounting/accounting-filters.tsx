@@ -63,6 +63,7 @@ function AccountingFilters({
         value={searchValue}
         onChange={(value) => push(searchKey, value)}
         placeholder={searchPlaceholder}
+        ariaLabel={searchPlaceholder}
         className="w-full sm:w-64"
       />
       {selects.map((select) => (

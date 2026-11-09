@@ -100,21 +100,33 @@ function FormLabel({
   )
 }
 
-function FormControl({ ...props }: React.ComponentProps<"div">) {
+function FormControl({
+  children,
+  ...props
+}: React.ComponentProps<"div">) {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
+  const describedBy = !error
+    ? formDescriptionId
+    : `${formDescriptionId} ${formMessageId}`
+
+  // The `<label htmlFor>` above targets `formItemId`, so the id has to live on
+  // the actual control — not on this wrapper — otherwise the input has no
+  // accessible name (screen readers fall back to the placeholder).
+  const childArray = React.Children.toArray(children)
+  const control =
+    childArray.length === 1 && React.isValidElement(childArray[0])
+      ? React.cloneElement(childArray[0] as React.ReactElement<Record<string, unknown>>, {
+          id: formItemId,
+          "aria-describedby": describedBy,
+          "aria-invalid": !!error,
+        })
+      : children
+
   return (
-    <div
-      data-slot="form-control"
-      id={formItemId}
-      aria-describedby={
-        !error
-          ? `${formDescriptionId}`
-          : `${formDescriptionId} ${formMessageId}`
-      }
-      aria-invalid={!!error}
-      {...props}
-    />
+    <div data-slot="form-control" {...props}>
+      {control}
+    </div>
   )
 }
 

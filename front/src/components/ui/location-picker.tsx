@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useId } from "react";
 import dynamic from "next/dynamic";
 import { Crosshair } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,9 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
   );
   const [lngInput, setLngInput] = useState(value ? String(value.coordinates[0]) : "");
   const [latInput, setLatInput] = useState(value ? String(value.coordinates[1]) : "");
+  // The coordinate inputs sit in a hand-rolled grid (not a `FormField`), so the
+  // labels must be bound to them explicitly to expose an accessible name.
+  const fieldId = useId();
 
   const handleMapClick = useCallback((lat: number, lng: number) => {
     setMarker([lat, lng]);
@@ -71,8 +74,9 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
       <div className="flex items-center gap-2">
         <div className="flex-1 grid grid-cols-2 gap-2">
           <div>
-            <label className="text-xs text-fog/50 mb-1 block">طول جغرافیایی (Longitude)</label>
+            <label htmlFor={`${fieldId}-lng`} className="text-xs text-fog/50 mb-1 block">طول جغرافیایی (Longitude)</label>
             <Input
+              id={`${fieldId}-lng`}
               value={lngInput}
               onChange={(e) => handleCoordinateChange(e.target.value, latInput)}
               placeholder="مثال: 51.3890"
@@ -82,8 +86,9 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
             />
           </div>
           <div>
-            <label className="text-xs text-fog/50 mb-1 block">عرض جغرافیایی (Latitude)</label>
+            <label htmlFor={`${fieldId}-lat`} className="text-xs text-fog/50 mb-1 block">عرض جغرافیایی (Latitude)</label>
             <Input
+              id={`${fieldId}-lat`}
               value={latInput}
               onChange={(e) => handleCoordinateChange(lngInput, e.target.value)}
               placeholder="مثال: 35.6892"
@@ -93,7 +98,7 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
             />
           </div>
         </div>
-        <Button type="button" variant="ghost" size="icon-sm" onClick={handleLocateMe} className="mt-5 shrink-0" title="موقعیت فعلی من">
+        <Button type="button" variant="ghost" size="icon-sm" onClick={handleLocateMe} className="mt-5 shrink-0" title="موقعیت فعلی من" aria-label="موقعیت فعلی من">
           <Crosshair className="size-4" />
         </Button>
       </div>
