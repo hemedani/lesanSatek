@@ -101,6 +101,24 @@ pnpm dev          # Next.js dev (Turbopack)
 
 App runs at `http://localhost:3000`. Backend must be running at `http://localhost:1370` (`cd back && deno task bc-dev`). Backend playground: `http://localhost:1370/playground`.
 
+## E2E Tests (Playwright)
+
+A browser suite lives in `front/e2e/`. **Run it before declaring a feature done** — it crawls every sidebar route for every role and fails on error boundaries, uncaught exceptions, and fatal console errors.
+
+```bash
+cd front
+pnpm test:e2e                    # full suite (needs backend + frontend + Mongo)
+npx playwright test --grep "pending approvals"
+E2E_ALLOW_MUTATIONS=1 pnpm test:e2e   # also run write-path specs
+```
+
+Rules when touching the UI:
+
+- Keep every route reachable from the sidebar **renderable with real content** — the crawl asserts `main` is non-empty.
+- Use `getByRole` / `getByLabel`; if you add a form field, make sure `FormLabel` + `FormControl` give it an accessible name. Hand-rolled `<label>` + `<input>`/`<select>` pairs need an explicit `htmlFor`/`id` — `e2e/specs/a11y-forms.spec.ts` fails otherwise.
+- Add a spec in `e2e/specs/` for new behaviour; never hard-code record ids (use `e2e/support/api.ts`).
+- Full docs: `front/e2e/README.md`.
+
 ## Environment Configuration
 
 Variables live in **`.env.local`** (the actual repo file — not `.env.frontend`):

@@ -9,7 +9,14 @@
     "build:local": "NODE_OPTIONS=\"--max-old-space-size=8192\" next build",
     "build:strict": "tsc --noEmit && eslint . && NODE_OPTIONS=\"--max-old-space-size=8192\" next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report e2e/.report",
+    "test:e2e:install": "playwright install --with-deps chromium",
+    "e2e:seed": "cd .. && python3 ignore-scripts/_run_e2e.py --base-url http://127.0.0.1:1370"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -37,6 +44,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.0",
     "@tailwindcss/postcss": "^4",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^20",
