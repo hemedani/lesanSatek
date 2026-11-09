@@ -3,8 +3,12 @@ import Link from "next/link"
 
 import { RegisterForm } from "@/components/auth/register-form"
 import { AuthPage } from "@/components/auth/auth-page"
+import { SessionBootstrap } from "@/components/auth/session-bootstrap"
+import { getToken } from "@/lib/auth"
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+  const token = await getToken()
+
   return (
     <AuthPage
       icon={Sparkles}
@@ -22,6 +26,7 @@ export default function RegisterPage() {
         </>
       }
     >
+      <SessionBootstrap hasToken={Boolean(token)} />
       <RegisterForm />
     </AuthPage>
   )

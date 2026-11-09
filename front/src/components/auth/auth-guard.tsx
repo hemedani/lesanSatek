@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
 
 import { getMe } from "@/app/actions/auth/getMe"
+import { clearSession } from "@/app/actions/auth/clearSession"
 import { useAuthStore } from "@/stores/authStore"
+import { ACTIVE_ROLE_COOKIE, readClientCookie } from "@/lib/session-cookies"
 
 const ADMIN_ROLES = ["Manager", "Admin", "OrgHead", "StoreHead"]
 
@@ -23,7 +25,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
       if (result.success && result.body) {
         const { getAccessiblePanels, getDefaultPanel } = await import("@/lib/roles")
         const roleNames = result.body.roles?.map((r: { name: string }) => r.name) ?? []
-        const activeRoleCookie = document.cookie.replace(/(?:(?:^|.*;\s*)activeRoleId\s*=\s*([^;]*).*$)|^.*$/, "$1")
+        const activeRoleCookie = readClientCookie(ACTIVE_ROLE_COOKIE)
 
         if (!roleNames.some((r: string) => ADMIN_ROLES.includes(r))) {
           const defaultPanel = getDefaultPanel(result.body, activeRoleCookie || undefined)
@@ -38,7 +40,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
         setUser(result.body, panels)
       } else {
         setUser(null)
-        router.push("/login")
+        await clearSession()
+        router.replace("/login")
       }
       setChecked(true)
     }

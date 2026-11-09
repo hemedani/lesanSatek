@@ -7,6 +7,8 @@ import { useAuthStore } from "@/stores/authStore"
 import { getAccessiblePanels, getDefaultPanel } from "@/lib/roles"
 import { getEffectiveFeatures } from "@/lib/features"
 import { getMe } from "@/app/actions/auth/getMe"
+import { clearSession } from "@/app/actions/auth/clearSession"
+import { ACTIVE_ROLE_COOKIE, readClientCookie } from "@/lib/session-cookies"
 
 interface PanelGuardProps {
   children: React.ReactNode
@@ -26,7 +28,7 @@ function PanelGuard({ children, requiredRoles, requiredFeatures }: PanelGuardPro
       setLoading(true)
       const result = await getMe()
       if (result.success && result.body) {
-        const activeRoleCookie = document.cookie.replace(/(?:(?:^|.*;\s*)activeRoleId\s*=\s*([^;]*).*$)|^.*$/, "$1")
+        const activeRoleCookie = readClientCookie(ACTIVE_ROLE_COOKIE)
         if (activeRoleCookie) {
           const { setActiveRoleId } = useAuthStore.getState()
           setActiveRoleId(activeRoleCookie)
@@ -35,6 +37,7 @@ function PanelGuard({ children, requiredRoles, requiredFeatures }: PanelGuardPro
         setUser(result.body, panels)
       } else {
         setUser(null)
+        await clearSession()
         router.replace("/login")
       }
       setChecked(true)

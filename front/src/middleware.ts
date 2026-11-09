@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
+import { TOKEN_COOKIE } from "@/lib/session-cookies"
+
 const publicRoutes = ["/login", "/register"]
 
 const panelRoutes = [
@@ -12,16 +14,6 @@ const panelRoutes = [
   "/orghead",
 ]
 
-const rolePanelMap: Record<string, string> = {
-  OrgHead: "/orghead",
-  Manager: "/admin",
-  Admin: "/admin",
-  UnitHead: "/unit-head",
-  StoreHead: "/storehead",
-  Employee: "/requests",
-  Ordinary: "/ordinary",
-}
-
 export function middleware(request: NextRequest) {
   // Server Functions (Server Actions) are POST requests to the route where
   // they are used. Redirecting them here breaks the client (e.g. "An
@@ -32,14 +24,9 @@ export function middleware(request: NextRequest) {
   }
 
   const { pathname } = request.nextUrl
-  const token = request.cookies.get("token")?.value
+  const token = request.cookies.get(TOKEN_COOKIE)?.value
 
   if (publicRoutes.includes(pathname)) {
-    if (token) {
-      const roleName = request.cookies.get("roleName")?.value
-      const target = (roleName && rolePanelMap[roleName]) || "/admin"
-      return NextResponse.redirect(new URL(target, request.url))
-    }
     return NextResponse.next()
   }
 

@@ -3,8 +3,12 @@ import Link from "next/link"
 
 import { LoginForm } from "@/components/auth/login-form"
 import { AuthPage } from "@/components/auth/auth-page"
+import { SessionBootstrap } from "@/components/auth/session-bootstrap"
+import { getToken } from "@/lib/auth"
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const token = await getToken()
+
   return (
     <AuthPage
       icon={LockKeyhole}
@@ -22,6 +26,7 @@ export default function LoginPage() {
         </>
       }
     >
+      <SessionBootstrap hasToken={Boolean(token)} />
       <LoginForm />
     </AuthPage>
   )

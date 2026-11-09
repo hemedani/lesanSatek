@@ -6,6 +6,8 @@ import { Loader2 } from "lucide-react"
 import { useAuthStore } from "@/stores/authStore"
 import { getDefaultPanel } from "@/lib/roles"
 import { getMe } from "@/app/actions/auth/getMe"
+import { clearSession } from "@/app/actions/auth/clearSession"
+import { ACTIVE_ROLE_COOKIE, readClientCookie } from "@/lib/session-cookies"
 
 function RoleRouter({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -18,7 +20,7 @@ function RoleRouter({ children }: { children: React.ReactNode }) {
       setLoading(true)
       const result = await getMe()
       if (result.success && result.body) {
-        const activeRoleCookie = document.cookie.replace(/(?:(?:^|.*;\s*)activeRoleId\s*=\s*([^;]*).*$)|^.*$/, "$1")
+        const activeRoleCookie = readClientCookie(ACTIVE_ROLE_COOKIE)
         if (activeRoleCookie) setActiveRoleId(activeRoleCookie)
         setUser(result.body)
         const defaultPanel = getDefaultPanel(result.body, activeRoleCookie || undefined)
@@ -27,6 +29,7 @@ function RoleRouter({ children }: { children: React.ReactNode }) {
         }
       } else {
         setUser(null)
+        await clearSession()
         router.replace("/login")
       }
     }
