@@ -16,6 +16,7 @@ import { useAuthStore } from "@/stores/authStore"
 import { setActiveRole } from "@/app/actions/auth/setActiveRole"
 import { resolveActionErrorMessage } from "@/lib/action-errors"
 import { cn } from "@/lib/utils"
+import { ACTIVE_ROLE_COOKIE, writeClientCookie } from "@/lib/session-cookies"
 import {
   ShieldCheck,
   Crown,
@@ -83,7 +84,7 @@ function getScopeName(
 }
 
 function setActiveRoleCookie(roleId: string) {
-  document.cookie = `activeRoleId=${encodeURIComponent(roleId)}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`
+  writeClientCookie(ACTIVE_ROLE_COOKIE, roleId)
 }
 
 function RoleSelector() {

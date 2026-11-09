@@ -11,6 +11,7 @@ import {
 } from "@/lib/accounting-access"
 import { getEffectiveFeatures, isPrivilegedRoleNames } from "@/lib/features"
 import { getHighestRole } from "@/lib/roles"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 export type AccountingMode = "admin" | "unit-head"
 
@@ -109,7 +110,7 @@ export async function resolveAccountingContext(
 
   const user = me.body as AccountingUser
   const cookieStore = await cookies()
-  const cookieRoleId = cookieStore.get("activeRoleId")?.value || ""
+  const cookieRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
   const fallbackRole = getHighestRole(user.roles ?? [])
   const activeRoleId = cookieRoleId || fallbackRole?.roleId || ""
   const activeRole = user.roles?.find((role) => role.roleId === activeRoleId)

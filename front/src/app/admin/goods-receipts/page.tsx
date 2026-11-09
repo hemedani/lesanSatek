@@ -2,6 +2,7 @@ import { cookies } from "next/headers"
 import { gets } from "@/app/actions/goodsReceipt/gets"
 import { GoodsReceiptsClient } from "./goods-receipts-client"
 import type { GoodsReceipt } from "./goods-receipts-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 const LIMIT = 20
 
@@ -54,7 +55,7 @@ export default async function GoodsReceiptsPage({
   const { sortBy, sortOrder } = SORT_MAP[sort]
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
 
   const listSet = {
     activeRoleId,

@@ -5,6 +5,12 @@ import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 import { cookies } from "next/headers";
 import { getHighestRole } from "@/lib/roles";
 import { isSecureRequest } from "@/lib/server-action";
+import {
+  ACTIVE_ROLE_COOKIE,
+  ROLE_NAME_COOKIE,
+  SESSION_MAX_AGE,
+  TOKEN_COOKIE,
+} from "@/lib/session-cookies";
 
 export const login = async (
   data: Omit<ReqType["main"]["user"]["login"]["set"], "activeRoleId"> & { activeRoleId?: string },
@@ -43,30 +49,30 @@ export const login = async (
     });
 
     if (result.success && result.body?.token) {
-      cookieStore.set("token", result.body.token, {
+      cookieStore.set(TOKEN_COOKIE, result.body.token, {
         httpOnly: true,
         secure,
         sameSite: "lax",
         path: "/",
-        maxAge: 60 * 60 * 24 * 7,
+        maxAge: SESSION_MAX_AGE,
       });
 
       if (result.body.user?.roles?.length > 0) {
         const highest = getHighestRole(result.body.user.roles);
         const selectedRole = highest || result.body.user.roles[0];
-        cookieStore.set("activeRoleId", selectedRole.roleId, {
+        cookieStore.set(ACTIVE_ROLE_COOKIE, selectedRole.roleId, {
           httpOnly: false,
           secure,
           sameSite: "lax",
           path: "/",
-          maxAge: 60 * 60 * 24 * 7,
+          maxAge: SESSION_MAX_AGE,
         });
-        cookieStore.set("roleName", selectedRole.name, {
+        cookieStore.set(ROLE_NAME_COOKIE, selectedRole.name, {
           httpOnly: false,
           secure,
           sameSite: "lax",
           path: "/",
-          maxAge: 60 * 60 * 24 * 7,
+          maxAge: SESSION_MAX_AGE,
         });
       }
     }

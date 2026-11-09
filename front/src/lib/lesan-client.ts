@@ -65,9 +65,10 @@ export const lesanApi = (
     ) {
       try {
         const { cookies } = await import("next/headers");
+        const { ACTIVE_ROLE_COOKIE, TOKEN_COOKIE } = await import("@/lib/session-cookies");
         const cookieStore = await cookies();
-        cookieStore.delete("token");
-        cookieStore.delete("activeRoleId");
+        cookieStore.delete(TOKEN_COOKIE);
+        cookieStore.delete(ACTIVE_ROLE_COOKIE);
       } catch {
         // Not in a server context — safe to ignore
       }

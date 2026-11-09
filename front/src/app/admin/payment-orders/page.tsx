@@ -2,6 +2,7 @@ import { cookies } from "next/headers"
 import { gets } from "@/app/actions/paymentOrder/gets"
 import { PaymentOrdersClient } from "./payment-orders-client"
 import type { PaymentOrder } from "./payment-orders-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 const LIMIT = 20
 
@@ -58,7 +59,7 @@ export default async function PaymentOrdersPage({
   const { sortBy, sortOrder } = SORT_MAP[sort]
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
 
   const listSet = {
     activeRoleId,

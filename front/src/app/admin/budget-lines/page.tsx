@@ -6,6 +6,7 @@ import { gets as getOrganizations } from "@/app/actions/organization/gets"
 import { gets as getUnits } from "@/app/actions/unit/gets"
 import { BudgetLinesClient } from "./budget-lines-client"
 import type { BudgetLine } from "./budget-lines-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 const LIMIT = 20
 
@@ -63,7 +64,7 @@ export default async function BudgetLinesPage({
   const unitId = typeof resolvedSearchParams.unitId === "string" ? resolvedSearchParams.unitId : ""
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
 
   const listSet = {
     activeRoleId,

@@ -4,6 +4,7 @@ import { AppApi } from "@/lib/api";
 import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 import { cookies } from "next/headers";
 import { isSecureRequest } from "@/lib/server-action";
+import { SESSION_MAX_AGE, TOKEN_COOKIE } from "@/lib/session-cookies";
 
 export const tempUser = async (
   data: Omit<ReqType["main"]["user"]["tempUser"]["set"], "activeRoleId"> & { activeRoleId?: string },
@@ -35,12 +36,12 @@ export const tempUser = async (
     });
 
     if (result.success && result.body?.token) {
-      cookieStore.set("token", result.body.token, {
+      cookieStore.set(TOKEN_COOKIE, result.body.token, {
         httpOnly: true,
         secure,
         sameSite: "lax",
         path: "/",
-        maxAge: 60 * 60 * 24 * 7,
+        maxAge: SESSION_MAX_AGE,
       });
     }
 

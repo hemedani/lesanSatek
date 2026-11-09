@@ -12,6 +12,7 @@ import { AuthInput } from "@/components/auth/auth-input"
 import { AuthButton } from "@/components/auth/auth-button"
 import { login } from "@/app/actions/auth/login"
 import { useAuthStore } from "@/stores/authStore"
+import { ACTIVE_ROLE_COOKIE, writeClientCookie } from "@/lib/session-cookies"
 
 const loginSchema = z.object({
   email: z.string().min(1, "ایمیل یا شماره موبایل را وارد کنید"),
@@ -21,7 +22,7 @@ const loginSchema = z.object({
 type LoginData = z.infer<typeof loginSchema>
 
 function setActiveRoleCookie(roleId: string) {
-  document.cookie = `activeRoleId=${encodeURIComponent(roleId)}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`
+  writeClientCookie(ACTIVE_ROLE_COOKIE, roleId)
 }
 
 function LoginForm() {

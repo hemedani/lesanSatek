@@ -10,10 +10,11 @@ import { getMe } from "@/app/actions/user/getMe"
 import { get as getUnit } from "@/app/actions/unit/get"
 import { InventoryClient } from "./inventory-client"
 import type { Inventory, InventoryCounts } from "./inventory-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 export default async function UnitHeadInventoryPage() {
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value
   let userUnitId: string | undefined
   let isWarehouse = false
 

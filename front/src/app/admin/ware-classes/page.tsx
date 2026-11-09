@@ -5,6 +5,7 @@ import { count } from "@/app/actions/wareClass/count"
 import { fetchWareCounts } from "@/lib/ware-counts"
 import { WareClassesClient } from "./ware-classes-client"
 import type { WareClass } from "./ware-classes-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 const LIMIT = 20
 
@@ -40,7 +41,7 @@ export default async function WareClassesPage({
   const wareTypeId = typeof resolvedSearchParams.wareTypeId === "string" ? resolvedSearchParams.wareTypeId : ""
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
 
   const listSet = {
     activeRoleId,

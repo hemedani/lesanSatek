@@ -37,6 +37,7 @@ import { ReceiveGoodsButton } from "./receive-goods-button"
 import { SubmitPRButton } from "./submit-pr-button"
 import { cookies } from "next/headers"
 import { getMe } from "@/app/actions/user/getMe"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 type StepApprovalInline = {
   _id: string
@@ -292,7 +293,7 @@ export default async function RequestDetailPage({
   const pr = prRes.body[0]
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value
   let isCurrentUserRequester = false
   let currentUserId: string | undefined
   let currentUserRoles: string[] = []

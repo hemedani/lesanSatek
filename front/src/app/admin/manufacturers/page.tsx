@@ -4,6 +4,7 @@ import { count } from "@/app/actions/manufacturer/count"
 import { fetchWareCounts } from "@/lib/ware-counts"
 import { ManufacturersClient } from "./manufacturers-client"
 import type { Manufacturer } from "./manufacturers-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 const LIMIT = 20
 
@@ -38,7 +39,7 @@ export default async function ManufacturersPage({
   const { sortBy, sortOrder } = SORT_MAP[sort]
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
 
   const listSet = { activeRoleId, page, limit: LIMIT, sortBy, sortOrder, ...(search ? { search } : {}) }
 

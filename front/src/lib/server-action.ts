@@ -1,9 +1,11 @@
 import { cookies, headers } from "next/headers"
 
+import { ACTIVE_ROLE_COOKIE, TOKEN_COOKIE } from "@/lib/session-cookies"
+
 export async function getServerHeaders() {
   const cookieStore = await cookies()
-  const token = cookieStore.get("token")?.value
-  const activeRoleId = cookieStore.get("activeRoleId")?.value
+  const token = cookieStore.get(TOKEN_COOKIE)?.value
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value
   return { token, activeRoleId }
 }
 

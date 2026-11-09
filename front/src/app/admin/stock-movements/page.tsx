@@ -3,6 +3,7 @@ import { gets } from "@/app/actions/stockMovement/gets"
 import { count } from "@/app/actions/stockMovement/count"
 import { StockMovementsClient } from "./stock-movements-client"
 import type { StockMovement } from "./stock-movements-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 const LIMIT = 20
 
@@ -53,7 +54,7 @@ export default async function StockMovementsPage({
   const { sortBy, sortOrder } = SORT_MAP[sort]
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
 
   const listSet = {
     activeRoleId,

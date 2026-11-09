@@ -19,6 +19,7 @@ import { WarehouseInventoryPanel } from "@/components/purchasing/warehouse-inven
 import { getWarehouseInventory } from "@/app/actions/inventory/getWarehouseInventory"
 import { cookies } from "next/headers"
 import { getMe } from "@/app/actions/user/getMe"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 type StepApprovalInline = {
   _id: string
@@ -270,7 +271,7 @@ export default async function UnitHeadRequestDetailPage({
   const pr: PrDetail = prRes.body[0]
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value
   let userUnitId: string | undefined
   let userUnitType: string | undefined
 

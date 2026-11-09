@@ -4,17 +4,18 @@ import { cookies } from "next/headers";
 
 import { getPanelForRole } from "@/lib/roles";
 import { isSecureRequest } from "@/lib/server-action";
+import { ACTIVE_ROLE_COOKIE, SESSION_MAX_AGE } from "@/lib/session-cookies";
 
 export const setActiveRole = async (roleId: string, roleName: string) => {
   try {
     const cookieStore = await cookies();
     const secure = await isSecureRequest();
-    cookieStore.set("activeRoleId", roleId, {
+    cookieStore.set(ACTIVE_ROLE_COOKIE, roleId, {
       httpOnly: false,
       secure,
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: SESSION_MAX_AGE,
     });
 
     const targetPanel = getPanelForRole(roleName) || "/admin";

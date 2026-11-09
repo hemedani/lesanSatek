@@ -4,6 +4,7 @@ import { gets as getWareTypes } from "@/app/actions/wareType/gets"
 import { count } from "@/app/actions/ware/count"
 import { WaresClient } from "./wares-client"
 import type { Ware } from "./wares-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 const LIMIT = 20
 
@@ -50,7 +51,7 @@ export default async function WaresPage({
   const wareTypeId = typeof resolvedSearchParams.wareTypeId === "string" ? resolvedSearchParams.wareTypeId : ""
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
 
   const listSet = {
     activeRoleId,

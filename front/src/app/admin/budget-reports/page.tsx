@@ -5,6 +5,7 @@ import { getBudgetReport } from "@/app/actions/budgetLine/getBudgetReport"
 import { getYearEndReport } from "@/app/actions/budgetLine/getYearEndReport"
 import { BudgetReportsClient } from "./budget-reports-client"
 import type { BudgetReportLine, YearEndSummary } from "./budget-reports-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 export default async function BudgetReportsPage({
   searchParams,
@@ -16,7 +17,7 @@ export default async function BudgetReportsPage({
   const organizationId = typeof resolvedSearchParams.organizationId === "string" ? resolvedSearchParams.organizationId : ""
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
 
   const reportSet: { activeRoleId: string; fiscalYearId: string; organizationId?: string } = {
     activeRoleId,

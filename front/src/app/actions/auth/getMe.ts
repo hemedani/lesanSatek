@@ -6,6 +6,11 @@ import type { ReqType, DeepPartial } from "@/types/declarations/selectInp";
 import { cookies } from "next/headers";
 import { getHighestRole } from "@/lib/roles";
 import { isSecureRequest } from "@/lib/server-action";
+import {
+  ACTIVE_ROLE_COOKIE,
+  ROLE_NAME_COOKIE,
+  SESSION_MAX_AGE,
+} from "@/lib/session-cookies";
 
 const DEFAULT_GET_ME_SELECTION = {
   _id: 1,
@@ -53,8 +58,8 @@ export const getMe = async (
     if (result.success && result.body) {
       const cookieStore = await cookies();
       const secure = await isSecureRequest();
-      const currentActiveRoleId = cookieStore.get("activeRoleId")?.value;
-      const currentRoleName = cookieStore.get("roleName")?.value;
+      const currentActiveRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value;
+      const currentRoleName = cookieStore.get(ROLE_NAME_COOKIE)?.value;
       if (result.body.roles?.length > 0) {
         const activeRole = result.body.roles.find(
           (r: { roleId: string }) => r.roleId === currentActiveRoleId
@@ -62,27 +67,27 @@ export const getMe = async (
         if (!currentActiveRoleId || !activeRole) {
           const highest = getHighestRole(result.body.roles);
           const selected = highest || result.body.roles[0];
-          cookieStore.set("activeRoleId", selected.roleId, {
+          cookieStore.set(ACTIVE_ROLE_COOKIE, selected.roleId, {
             httpOnly: false,
             secure,
             sameSite: "lax",
             path: "/",
-            maxAge: 60 * 60 * 24 * 7,
+            maxAge: SESSION_MAX_AGE,
           });
-          cookieStore.set("roleName", selected.name, {
+          cookieStore.set(ROLE_NAME_COOKIE, selected.name, {
             httpOnly: false,
             secure,
             sameSite: "lax",
             path: "/",
-            maxAge: 60 * 60 * 24 * 7,
+            maxAge: SESSION_MAX_AGE,
           });
         } else if (currentRoleName !== activeRole.name) {
-          cookieStore.set("roleName", activeRole.name, {
+          cookieStore.set(ROLE_NAME_COOKIE, activeRole.name, {
             httpOnly: false,
             secure,
             sameSite: "lax",
             path: "/",
-            maxAge: 60 * 60 * 24 * 7,
+            maxAge: SESSION_MAX_AGE,
           });
         }
       }

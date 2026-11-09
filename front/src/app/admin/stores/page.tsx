@@ -3,6 +3,7 @@ import { gets } from "@/app/actions/store/gets"
 import { count } from "@/app/actions/store/count"
 import { StoresClient } from "./stores-client"
 import type { Store } from "./stores-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 const LIMIT = 20
 
@@ -43,7 +44,7 @@ export default async function StoresPage({
   const { sortBy, sortOrder } = SORT_MAP[sort]
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
 
   const listSet = {
     activeRoleId,

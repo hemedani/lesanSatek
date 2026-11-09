@@ -3,6 +3,7 @@ import { gets } from "@/app/actions/state/gets"
 import { count } from "@/app/actions/state/count"
 import { StatesClient } from "./states-client"
 import type { State } from "./states-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 const LIMIT = 20
 
@@ -37,7 +38,7 @@ export default async function StatesPage({
   const { sortBy, sortOrder } = SORT_MAP[sort]
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
 
   const listSet = {
     activeRoleId,

@@ -3,6 +3,7 @@ import { gets } from "@/app/actions/purchasingRequest/gets"
 import { count } from "@/app/actions/purchasingRequest/count"
 import { PurchasingRequestsClient } from "./purchasing-requests-client"
 import type { PurchasingRequest } from "./purchasing-requests-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 const LIMIT = 20
 
@@ -72,7 +73,7 @@ export default async function PurchasingRequestsPage({
   const { sortBy, sortOrder } = SORT_MAP[sort]
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
 
   const listSet = {
     activeRoleId,

@@ -3,6 +3,7 @@ import { gets } from "@/app/actions/consumption/gets"
 import { count } from "@/app/actions/consumption/count"
 import { ConsumptionClient } from "./consumption-client"
 import type { ConsumptionRecord } from "./consumption-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 const LIMIT = 20
 
@@ -48,7 +49,7 @@ export default async function ConsumptionPage({
   const { sortBy, sortOrder } = SORT_MAP[sort]
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
 
   const listSet = {
     activeRoleId,

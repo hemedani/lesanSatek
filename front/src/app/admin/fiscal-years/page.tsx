@@ -2,6 +2,7 @@ import { cookies } from "next/headers"
 import { gets } from "@/app/actions/fiscalYear/gets"
 import { FiscalYearsClient } from "./fiscal-years-client"
 import type { FiscalYear } from "./fiscal-years-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 const LIMIT = 20
 
@@ -41,7 +42,7 @@ export default async function FiscalYearsPage({
   const status = resolvedSearchParams.status === "closed" ? ("closed" as const) : resolvedSearchParams.status === "open" ? ("open" as const) : ""
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
 
   const listSet = {
     activeRoleId,

@@ -7,6 +7,7 @@ import { gets as getUnits } from "@/app/actions/unit/gets"
 import { cookies } from "next/headers"
 import { getMe } from "@/app/actions/user/getMe"
 import { GoodsReceiptClient } from "./goods-receipt-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 interface PRItem {
   _id: string
@@ -22,7 +23,7 @@ interface PRItem {
 
 export default async function GoodsReceiptPage() {
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value
   let currentUserId: string | undefined
 
   if (activeRoleId) {

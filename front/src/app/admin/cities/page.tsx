@@ -4,6 +4,7 @@ import { count } from "@/app/actions/city/count"
 import { gets as getStates } from "@/app/actions/state/gets"
 import { CitiesClient } from "./cities-client"
 import type { City, State } from "./cities-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 const LIMIT = 20
 
@@ -39,7 +40,7 @@ export default async function CitiesPage({
   const stateId = typeof resolvedSearchParams.stateId === "string" ? resolvedSearchParams.stateId : ""
 
   const cookieStore = await cookies()
-  const activeRoleId = cookieStore.get("activeRoleId")?.value || ""
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
 
   const listSet = {
     activeRoleId,
