@@ -5,7 +5,33 @@ import { Providers } from "@/components/providers"
 import { Toaster } from "@/components/ui/sonner"
 
 const estedad = localFont({
-  src: "../../public/fonts/Estedad/Estedad[wght].woff2",
+  src: [
+    {
+      path: "../../public/fonts/Estedad/Statics/webfonts/Estedad-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Estedad/Statics/webfonts/Estedad-Medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Estedad/Statics/webfonts/Estedad-SemiBold.woff2",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Estedad/Statics/webfonts/Estedad-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Estedad/Statics/webfonts/Estedad-ExtraBold.woff2",
+      weight: "800",
+      style: "normal",
+    },
+  ],
   variable: "--font-sans",
   display: "swap",
 })
