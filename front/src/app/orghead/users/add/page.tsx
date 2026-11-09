@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useMemo, useState } from "react"
+import { useId, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodV4Resolver } from "@/lib/zod-v4-resolver"
 import { z } from "zod"
@@ -53,6 +53,7 @@ export default function AddUserPage() {
   const activeRoleId = useAuthStore((state) => state.activeRoleId)
   const activeRole = user?.roles?.find((role) => role.roleId === activeRoleId)
   const actorRoleName = activeRole?.name
+  const isOrgHeadActor = actorRoleName === "OrgHead"
   const activeOrganizationId =
     actorRoleName === "OrgHead"
       ? activeRole?.scopeType === "organization"
@@ -84,6 +85,15 @@ export default function AddUserPage() {
       const next = [...prev]
       const updated = { ...next[index], [field]: value }
 
+      if (isOrgHeadActor) {
+        if (field === "name") {
+          updated.scopeType = undefined
+          if (value === "OrgHead") updated.scopeId = ""
+        }
+        next[index] = updated
+        return next
+      }
+
       if (field === "name" && value === "OrgHead" && activeOrganizationId) {
         updated.scopeType = "organization"
         updated.scopeId = activeOrganizationId
@@ -107,6 +117,17 @@ export default function AddUserPage() {
   }
 
   const onSubmit = async (data: UserData) => {
+    if (isOrgHeadActor) {
+      if (roles.some((role) => role.name === "OrgHead" && !activeOrganizationId)) {
+        toast.error("سازمان فعال شما مشخص نیست.")
+        return
+      }
+      if (roles.some((role) => role.name === "UnitHead" && !role.scopeId)) {
+        toast.error("برای نقش رئیس واحد انتخاب واحد سازمانی الزامی است")
+        return
+      }
+    }
+
     try {
       const result = await addUser(
         {
@@ -120,17 +141,30 @@ export default function AddUserPage() {
           position: data.position || undefined,
           isActive: data.isActive,
           is_verified: data.is_verified,
-          roles: roles.map((r) => ({
-            name: r.name as "OrgHead" | "UnitHead" | "Employee" | "Ordinary",
-            ...(r.scopeType ? { scopeType: r.scopeType as "organization" | "unit" | "store" } : {}),
-            ...(r.scopeType === "organization"
-              ? activeOrganizationId
-                ? { scopeId: activeOrganizationId }
-                : {}
-              : r.scopeId
-                ? { scopeId: r.scopeId }
-                : {}),
-          })),
+          roles: roles.map((r) => {
+            const name = r.name as "OrgHead" | "UnitHead" | "Employee" | "Ordinary"
+
+            if (isOrgHeadActor) {
+              if (name === "OrgHead") {
+                return { name, scopeType: "organization" as const, scopeId: activeOrganizationId }
+              }
+              return r.scopeId
+                ? { name, scopeType: "unit" as const, scopeId: r.scopeId }
+                : { name }
+            }
+
+            return {
+              name,
+              ...(r.scopeType ? { scopeType: r.scopeType as "organization" | "unit" | "store" } : {}),
+              ...(r.scopeType === "organization"
+                ? activeOrganizationId
+                  ? { scopeId: activeOrganizationId }
+                  : {}
+                : r.scopeId
+                  ? { scopeId: r.scopeId }
+                  : {}),
+            }
+          }),
         },
         { _id: 1, first_name: 1, last_name: 1, email: 1 },
       )
@@ -145,7 +179,25 @@ export default function AddUserPage() {
     }
   }
 
+  const fetchOrgUnits = async (search?: string) => {
+    const result = await getUnits(
+      {
+        activeRoleId: getActiveRoleIdFromStore(),
+        page: 1,
+        limit: 50,
+        search: search || undefined,
+        ...(isOrgHeadActor && activeOrganizationId ? { organizationId: activeOrganizationId } : {}),
+      },
+      { _id: 1, name: 1 },
+    )
+    if (!result.success || !result.body) return []
+    return result.body.map((u: { _id?: string; name?: string }) => ({ _id: u._id || "", name: u.name || "" }))
+  }
+
   const isSubmitting = form.formState.isSubmitting
+  // Raw selects in the role editor are not `FormField`s, so bind each label to
+  // its control explicitly — otherwise the field has no accessible name.
+  const roleFieldId = useId()
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-6">
@@ -200,11 +252,23 @@ export default function AddUserPage() {
                 <div key={index} className="flex items-start gap-2 p-3.5 rounded-lg bg-white/[0.02] border border-steel-border/20">
                   <div className={cn(
                     "flex-1 grid gap-3",
-                    role.scopeType ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2",
+                    isOrgHeadActor
+                      ? role.name === "OrgHead"
+                        ? "grid-cols-1"
+                        : "grid-cols-1 sm:grid-cols-2"
+                      : role.scopeType
+                        ? "grid-cols-1 sm:grid-cols-3"
+                        : "grid-cols-1 sm:grid-cols-2",
                   )}>
                     <div className="space-y-1.5">
-                      <label className="text-xs text-fog/70 block font-medium">نقش</label>
+                      <label
+                        htmlFor={`${roleFieldId}-${index}-name`}
+                        className="text-xs text-fog/70 block font-medium"
+                      >
+                        نقش
+                      </label>
                       <select
+                        id={`${roleFieldId}-${index}-name`}
                         value={role.name}
                         onChange={(e) => updateRole(index, "name", e.target.value)}
                         disabled={isSubmitting}
@@ -215,56 +279,72 @@ export default function AddUserPage() {
                         ))}
                       </select>
                     </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs text-fog/70 block font-medium">حوزه</label>
-                      <select
-                        value={role.scopeType || ""}
-                        onChange={(e) => updateRole(index, "scopeType", e.target.value)}
-                        disabled={isSubmitting}
-                        className="w-full h-9 rounded-sm bg-white/[0.03] border border-steel-border/60 px-3 text-sm text-moonlight transition-all duration-200 outline-none hover:border-frost-link/20 focus:border-ring focus:ring-3 focus:ring-ring/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {scopeOptions.map((opt) => (
-                          <option key={opt.value} value={opt.value}>{opt.label}</option>
-                        ))}
-                      </select>
-                    </div>
-                    {role.scopeType && (
-                      <div className="space-y-1.5">
-                        <label className="text-xs text-fog/70 block font-medium">
-                          {role.scopeType === "unit" ? "واحد" : role.scopeType === "store" ? "فروشگاه" : "سازمان"}
-                        </label>
-                        {role.scopeType === "organization" ? (
-                          <div
-                            dir="rtl"
-                            className="flex h-9 items-center rounded-sm border border-steel-border/40 bg-white/[0.02] px-3 text-sm text-moonlight"
-                          >
-                            {activeOrganizationName || "سازمان فعال"}
-                          </div>
-                        ) : role.scopeType === "unit" ? (
+                    {isOrgHeadActor ? (
+                      role.name !== "OrgHead" && (
+                        <div className="space-y-1.5">
+                          <label className="text-xs text-fog/70 block font-medium">
+                            واحد سازمانی{role.name === "UnitHead" ? " *" : ""}
+                          </label>
                           <SearchSelect
                             value={role.scopeId || ""}
                             onChange={(v) => updateRole(index, "scopeId", v)}
-                            placeholder="انتخاب واحد..."
-                            fetcher={async (search?: string) => {
-                              const result = await getUnits(
-                                { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
-                                { _id: 1, name: 1 },
-                              )
-                              if (!result.success || !result.body) return []
-                              return result.body.map((u: { _id?: string; name?: string }) => ({
-                                _id: u._id || "",
-                                name: u.name || "",
-                              }))
-                            }}
-                            label="واحد"
+                            placeholder="انتخاب واحد سازمانی..."
+                            fetcher={fetchOrgUnits}
+                            label="واحد سازمانی"
                             disabled={isSubmitting}
                           />
-                        ) : null}
-                      </div>
+                        </div>
+                      )
+                    ) : (
+                      <>
+                        <div className="space-y-1.5">
+                          <label
+                            htmlFor={`${roleFieldId}-${index}-scope`}
+                            className="text-xs text-fog/70 block font-medium"
+                          >
+                            حوزه
+                          </label>
+                          <select
+                            id={`${roleFieldId}-${index}-scope`}
+                            value={role.scopeType || ""}
+                            onChange={(e) => updateRole(index, "scopeType", e.target.value)}
+                            disabled={isSubmitting}
+                            className="w-full h-9 rounded-sm bg-white/[0.03] border border-steel-border/60 px-3 text-sm text-moonlight transition-all duration-200 outline-none hover:border-frost-link/20 focus:border-ring focus:ring-3 focus:ring-ring/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {scopeOptions.map((opt) => (
+                              <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                          </select>
+                        </div>
+                        {role.scopeType && (
+                          <div className="space-y-1.5">
+                            <label className="text-xs text-fog/70 block font-medium">
+                              {role.scopeType === "unit" ? "واحد" : role.scopeType === "store" ? "فروشگاه" : "سازمان"}
+                            </label>
+                            {role.scopeType === "organization" ? (
+                              <div
+                                dir="rtl"
+                                className="flex h-9 items-center rounded-sm border border-steel-border/40 bg-white/[0.02] px-3 text-sm text-moonlight"
+                              >
+                                {activeOrganizationName || "سازمان فعال"}
+                              </div>
+                            ) : role.scopeType === "unit" ? (
+                              <SearchSelect
+                                value={role.scopeId || ""}
+                                onChange={(v) => updateRole(index, "scopeId", v)}
+                                placeholder="انتخاب واحد..."
+                                fetcher={fetchOrgUnits}
+                                label="واحد"
+                                disabled={isSubmitting}
+                              />
+                            ) : null}
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                   {roles.length > 1 && (
-                    <Button type="button" variant="ghost" size="icon-xs" className="mt-5 text-destructive shrink-0" onClick={() => removeRole(index)} disabled={isSubmitting}>
+                    <Button type="button" variant="ghost" size="icon-xs" className="mt-5 text-destructive shrink-0" onClick={() => removeRole(index)} disabled={isSubmitting} aria-label="حذف نقش">
                       <X className="size-3.5" />
                     </Button>
                   )}

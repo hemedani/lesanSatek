@@ -108,6 +108,7 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
   const roleOptions = useMemo(() => getAssignableRoleOptions(actorRoleName), [actorRoleName])
   const scopeOptions = useMemo(() => getAssignableScopeOptions(actorRoleName), [actorRoleName])
   const assignableRoleNames = useMemo(() => getAssignableRoleNames(actorRoleName), [actorRoleName])
+  const isOrgHeadActor = actorRoleName === "OrgHead"
 
   const form = useForm<UserData>({
     resolver: zodV4Resolver(userSchema),
@@ -221,7 +222,13 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
       return result.body.map((o: { _id?: string; name?: string }) => ({ _id: o._id || "", name: o.name || "" }))
     }
     const result = await getUnits(
-      { activeRoleId: getActiveRoleIdFromStore(), page: 1, limit: 50, search: search || undefined },
+      {
+        activeRoleId: getActiveRoleIdFromStore(),
+        page: 1,
+        limit: 50,
+        search: search || undefined,
+        ...(isOrgHeadActor && activeOrganizationId ? { organizationId: activeOrganizationId } : {}),
+      },
       { _id: 1, name: 1 },
     )
     if (!result.success || !result.body) return []
@@ -236,7 +243,21 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
 
     setSavingRoles(true)
     try {
-      const scopeId = newScopeType === "organization" ? activeOrganizationId : newScopeId
+      let scopeType: ScopeType | undefined
+      let scopeId: string | undefined
+      if (isOrgHeadActor) {
+        if (newRoleName === "OrgHead") {
+          scopeType = "organization"
+          scopeId = activeOrganizationId || undefined
+        } else if (newScopeId) {
+          scopeType = "unit"
+          scopeId = newScopeId
+        }
+      } else {
+        scopeType = (newScopeType || undefined) as ScopeType | undefined
+        scopeId = newScopeType === "organization" ? activeOrganizationId : newScopeId
+      }
+
       const result = await addOrRemoveRoles(
         {
           activeRoleId: getActiveRoleIdFromStore(),
@@ -244,7 +265,7 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
           addRoles: [
             {
               name: newRoleName,
-              ...(newScopeType ? { scopeType: newScopeType as ScopeType } : {}),
+              ...(scopeType ? { scopeType } : {}),
               ...(scopeId ? { scopeId } : {}),
             },
           ],
@@ -307,13 +328,20 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
     }
   }
 
+  const orgHeadScopeInvalid =
+    isOrgHeadActor &&
+    ((newRoleName === "OrgHead" && !activeOrganizationId) ||
+      (newRoleName === "UnitHead" && !newScopeId))
+
   const addDisabled =
     savingRoles ||
     !newRoleName ||
     !isRoleAssignableBy(actorRoleName, newRoleName) ||
-    (newScopeType === "unit" && !newScopeId) ||
-    (newScopeType === "organization" && !activeOrganizationId && !newScopeId) ||
-    (newScopeType === "store" && !newScopeId)
+    orgHeadScopeInvalid ||
+    (!isOrgHeadActor &&
+      ((newScopeType === "unit" && !newScopeId) ||
+        (newScopeType === "organization" && !activeOrganizationId && !newScopeId) ||
+        (newScopeType === "store" && !newScopeId)))
 
   if (loading) return <LoadingSkeleton type="card" count={1} />
 
@@ -476,7 +504,9 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
           </div>
         )}
 
-        <div className="mt-5 grid grid-cols-1 gap-5 border-t border-steel-border/15 pt-5 sm:grid-cols-2">
+        <div
+          className={`mt-5 grid grid-cols-1 gap-5 border-t border-steel-border/15 pt-5 ${isOrgHeadActor ? "" : "sm:grid-cols-2"}`}
+        >
           <div className="space-y-2.5">
             <p className="text-body-sm font-medium text-moonlight">نقش</p>
             <FilterSelect
@@ -487,6 +517,11 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
                 if (!v) return
                 const roleName = v as RoleName
                 setNewRoleName(roleName)
+                if (isOrgHeadActor) {
+                  setNewScopeType("")
+                  setNewScopeId("")
+                  return
+                }
                 if (roleName === "OrgHead" && activeOrganizationId) {
                   setNewScopeType("organization")
                   setNewScopeId(activeOrganizationId)
@@ -495,23 +530,48 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
               options={roleOptions}
             />
           </div>
-          <div className="space-y-2.5">
-            <p className="text-body-sm font-medium text-moonlight">حوزه دسترسی</p>
-            <FilterSelect
-              placeholder="انتخاب حوزه…"
-              ariaLabel="انتخاب حوزه دسترسی"
-              value={newScopeType}
-              onValueChange={(v) => {
-                const scopeType = (v || "") as ScopeType | ""
-                setNewScopeType(scopeType)
-                setNewScopeId(scopeType === "organization" ? activeOrganizationId : "")
-              }}
-              options={scopeOptions}
-            />
-          </div>
+          {!isOrgHeadActor && (
+            <div className="space-y-2.5">
+              <p className="text-body-sm font-medium text-moonlight">حوزه دسترسی</p>
+              <FilterSelect
+                placeholder="انتخاب حوزه…"
+                ariaLabel="انتخاب حوزه دسترسی"
+                value={newScopeType}
+                onValueChange={(v) => {
+                  const scopeType = (v || "") as ScopeType | ""
+                  setNewScopeType(scopeType)
+                  setNewScopeId(scopeType === "organization" ? activeOrganizationId : "")
+                }}
+                options={scopeOptions}
+              />
+            </div>
+          )}
         </div>
 
-        {newScopeType && (
+        {isOrgHeadActor ? (
+          newRoleName === "OrgHead" ? (
+            <p className="mt-5 rounded-lg border border-steel-border/30 bg-white/[0.02] px-3 py-2.5 text-xs text-fog/70">
+              این نقش در سطح سازمان {activeOrganizationName || "فعال"} ثبت می‌شود.
+            </p>
+          ) : (
+            <div className="mt-5 space-y-2.5">
+              <p className="text-body-sm font-medium text-moonlight">
+                واحد سازمانی{newRoleName === "UnitHead" ? " *" : ""}
+              </p>
+              <SearchSelect
+                value={newScopeId}
+                onChange={setNewScopeId}
+                placeholder="انتخاب واحد سازمانی…"
+                fetcher={scopeFetcher}
+                label="واحد سازمانی"
+                disabled={savingRoles}
+              />
+              {newRoleName !== "UnitHead" && (
+                <p className="text-xs text-fog/50">انتخاب واحد برای این نقش اختیاری است.</p>
+              )}
+            </div>
+          )
+        ) : newScopeType ? (
           <div className="mt-5 space-y-2.5">
             <p className="text-body-sm font-medium text-moonlight">{SCOPE_LABELS[newScopeType]}</p>
             {newScopeType === "organization" ? (
@@ -532,7 +592,7 @@ export default function EditUserPage({ params }: { params: Promise<{ id: string 
               />
             )}
           </div>
-        )}
+        ) : null}
 
         <Button type="button" onClick={handleAddRole} disabled={addDisabled} className="gap-2 px-5">
           {savingRoles ? <Loader2 className="size-5 animate-spin" /> : <Plus className="size-5" />}
