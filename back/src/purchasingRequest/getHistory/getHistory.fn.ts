@@ -3,7 +3,7 @@ import { purchasingRequest } from "../../../mod.ts";
 import { getAuth } from "../../../utils/grantAccess.ts";
 import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
-import { assertCanReadPurchasingRequest } from "../readScope.ts";
+import { assertCanReadPurchasingRequestAsync } from "../readScope.ts";
 
 export const getHistoryFn: ActFn = async (body) => {
   const { set: { _id, action, performer, fromDate, toDate } } = body.details;
@@ -18,6 +18,7 @@ export const getHistoryFn: ActFn = async (body) => {
       requestingUnit: { _id: 1 },
       requester: { _id: 1 },
       store: { _id: 1 },
+      process: { _id: 1 },
     },
   }) as Document | null;
 
@@ -26,7 +27,7 @@ export const getHistoryFn: ActFn = async (body) => {
       throwError("You cant do this");
     }
   } else {
-    assertCanReadPurchasingRequest(activeRole, user, founded);
+    await assertCanReadPurchasingRequestAsync(activeRole, user, founded);
   }
 
   const pipeline: Document[] = [

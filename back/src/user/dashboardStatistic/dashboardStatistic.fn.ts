@@ -14,6 +14,7 @@ import {
 } from "../../../mod.ts";
 import type { MyContext } from "@lib";
 import { throwError } from "../../../utils/throwError.ts";
+import { buildPendingApprovalPipeline } from "../../purchasingRequest/pendingPipeline.ts";
 
 export const dashboardStatisticFn: ActFn = async (body) => {
   const {
@@ -154,7 +155,30 @@ export const dashboardStatisticFn: ActFn = async (body) => {
     );
   }
 
-  if (get.pendingApprovalCount === 1 || get.recentApprovals === 1) {
+  // The pending count must be derived from the same definition as the
+  // `getPendingByUnit` list, otherwise the dashboard badge and the list
+  // disagree (e.g. stale `stepApproval` rows left behind after a step moved on).
+  if (get.pendingApprovalCount === 1) {
+    tasks.push(
+      purchasingRequest.aggregation({
+        pipeline: [
+          ...buildPendingApprovalPipeline({
+            unitIds: effectiveUnitId ? [String(effectiveUnitId)] : null,
+            organizationId: !effectiveUnitId && effectiveOrgId
+              ? String(effectiveOrgId)
+              : null,
+          }),
+          { $count: "count" },
+        ],
+      })
+        .toArray()
+        .then((arr) => {
+          result.pendingApprovalCount = arr[0]?.count ?? 0;
+        }),
+    );
+  }
+
+  if (get.recentApprovals === 1) {
     const saFacet: Record<string, unknown[]> = {};
     const saMatch: Document = {};
 
@@ -162,21 +186,12 @@ export const dashboardStatisticFn: ActFn = async (body) => {
       saMatch["unit._id"] = effectiveUnitId;
     }
 
-    if (get.pendingApprovalCount === 1) {
-      saFacet.pendingApprovalCount = [
-        { $match: { status: "pending" } },
-        { $count: "count" },
-      ];
-    }
-
-    if (get.recentApprovals === 1) {
-      saFacet.recentApprovals = [
-        { $match: { status: "pending" } },
-        { $sort: { createdAt: -1 } },
-        { $limit: 5 },
-        { $project: { _id: 1, status: 1, createdAt: 1 } },
-      ];
-    }
+    saFacet.recentApprovals = [
+      { $match: { status: "pending" } },
+      { $sort: { createdAt: -1 } },
+      { $limit: 5 },
+      { $project: { _id: 1, status: 1, createdAt: 1 } },
+    ];
 
     const pipeline: Document[] = [];
     if (Object.keys(saMatch).length > 0) {
@@ -189,11 +204,6 @@ export const dashboardStatisticFn: ActFn = async (body) => {
         .toArray()
         .then((arr) => {
           const facet = arr[0] || {};
-          if (facet.pendingApprovalCount?.[0]) {
-            result.pendingApprovalCount = facet.pendingApprovalCount[0].count;
-          } else if (get.pendingApprovalCount === 1) {
-            result.pendingApprovalCount = 0;
-          }
           result.recentApprovals = (facet.recentApprovals || []);
         }),
     );

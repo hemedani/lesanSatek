@@ -1,10 +1,24 @@
-import type { ActFn, Document } from "lesan";
-import { ObjectId } from "lesan";
+import type { ActFn } from "lesan";
 import { purchasingRequest } from "../../../mod.ts";
 import { getAuth } from "../../../utils/grantAccess.ts";
+import { isScopeBypass } from "../../../utils/authzPolicy.ts";
 import { throwError } from "../../../utils/throwError.ts";
-import { purchasingRequestReadMatch } from "../readScope.ts";
+import { buildPendingApprovalPipeline } from "../pendingPipeline.ts";
 
+const normalizeId = (value: unknown): string | null => {
+  if (value === null || value === undefined || value === "") return null;
+
+  return String(value);
+};
+
+/**
+ * Returns the purchasing requests the active role's unit(s) must act on now.
+ *
+ * The queue is scoped by **approval assignment** (the current step's
+ * `assigneeGroups.unitIds`), never by `requestingUnit` — a unit head approves
+ * requests raised by other units, so a requesting-unit scope would always come
+ * back empty.
+ */
 export const getPendingByUnitFn: ActFn = async (body) => {
   const {
     set: { unitId: rawUnitId, page, limit, search },
@@ -12,97 +26,53 @@ export const getPendingByUnitFn: ActFn = async (body) => {
   } = body.details;
 
   const { user, activeRole } = await getAuth();
-  const readMatch = purchasingRequestReadMatch(activeRole, user);
+  const bypass = isScopeBypass(activeRole, user);
 
-  let unitId = rawUnitId;
+  const requestedUnitId = normalizeId(rawUnitId);
+  const roleScopeId = normalizeId(activeRole.scopeId);
 
-  if (!unitId) {
-    if (
-      activeRole.name === "UnitHead" &&
-      activeRole.scopeType === "unit" &&
-      activeRole.scopeId
-    ) {
-      unitId = activeRole.scopeId;
-    } else if (activeRole.name !== "StoreHead") {
-      throwError("Unit ID is required");
+  let unitIds: string[] | null = null;
+  let organizationId: string | null = null;
+
+  if (requestedUnitId) {
+    // An explicit unit is only allowed when the actor governs that unit.
+    if (!bypass && activeRole.name === "UnitHead" && requestedUnitId !== roleScopeId) {
+      throwError("You cant do this");
     }
+
+    if (!bypass && activeRole.name !== "UnitHead" && activeRole.name !== "OrgHead") {
+      throwError("You cant do this");
+    }
+
+    unitIds = [requestedUnitId];
+  } else if (bypass) {
+    // Manager / Admin see every open request.
+    unitIds = null;
+  } else if (activeRole.name === "UnitHead") {
+    if (!roleScopeId) {
+      throwError("Unit ID is required");
+      return [];
+    }
+    unitIds = [roleScopeId];
+  } else if (activeRole.name === "OrgHead") {
+    if (!roleScopeId) {
+      throwError("You cant do this");
+      return [];
+    }
+    organizationId = roleScopeId;
+    unitIds = null;
+  } else {
+    // StoreHead / Employee / Ordinary have no approval queue.
+    return [];
   }
 
   const calculatedSkip = (limit || 50) * ((page || 1) - 1);
 
-  const pipeline: Document[] = [
-    {
-      $match: {
-        status: {
-          $nin: ["PendingFinalization", "Completed", "Rejected", "Cancelled"],
-        },
-      },
-    },
-  ];
-
-  if (search) {
-    pipeline[0].$match.$text = { $search: search };
-  }
-
-  readMatch && pipeline.push({ $match: readMatch });
-
-  if (unitId) {
-    const unitObjId = new ObjectId(unitId as string);
-
-    pipeline.push(
-      {
-        $lookup: {
-          from: "processStep",
-          let: { processId: "$process._id" },
-          pipeline: [
-            { $match: { $expr: { $eq: ["$process._id", "$$processId"] } } },
-            { $sort: { order: 1 } },
-          ],
-          as: "steps",
-        },
-      },
-      { $match: { steps: { $ne: [] } } },
-      {
-        $addFields: {
-          currentStepDoc: { $arrayElemAt: ["$steps", "$currentStep"] },
-        },
-      },
-      {
-        $match: {
-          "currentStepDoc.assigneeGroups.unitIds": unitId,
-        },
-      },
-      {
-        $lookup: {
-          from: "stepApproval",
-          let: { prId: "$_id", stepId: "$currentStepDoc._id", uId: unitObjId },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$purchasingRequest._id", "$$prId"] },
-                    { $eq: ["$processStep._id", "$$stepId"] },
-                    { $eq: ["$unit._id", "$$uId"] },
-                  ],
-                },
-              },
-            },
-          ],
-          as: "approvals",
-        },
-      },
-      {
-        $match: {
-          $or: [
-            { approvals: { $size: 0 } },
-            { "approvals.status": "pending" },
-          ],
-        },
-      },
-      { $project: { steps: 0, currentStepDoc: 0, approvals: 0 } },
-    );
-  }
+  const pipeline = buildPendingApprovalPipeline({
+    unitIds,
+    organizationId,
+    search,
+  });
 
   pipeline.push(
     { $sort: { createdAt: -1 } },

@@ -161,6 +161,82 @@ export const purchasingRequestReadMatch = (
   }
 };
 
+type ProcessStepModule = {
+  processStep: {
+    aggregation: (options: {
+      pipeline: Record<string, unknown>[];
+    }) => { toArray: () => Promise<Record<string, unknown>[]> };
+  };
+};
+
+/**
+ * True when the unit is an assignee of any step of the given process — i.e. the
+ * unit is expected to approve this request at some point.
+ */
+const unitApprovesProcess = async (
+  unitId: string,
+  processId: string,
+): Promise<boolean> => {
+  const processObjId = objectIdOf(processId);
+  const normalizedUnitId = normalizeId(unitId);
+
+  if (!processObjId || !normalizedUnitId) return false;
+
+  try {
+    const { processStep } = await import(CORE_APP_MODULE) as ProcessStepModule;
+    const steps = await processStep
+      .aggregation({
+        pipeline: [
+          {
+            $match: {
+              "process._id": processObjId,
+              "assigneeGroups.unitIds": normalizedUnitId,
+            },
+          },
+          { $limit: 1 },
+          { $project: { _id: 1 } },
+        ],
+      })
+      .toArray();
+
+    return steps.length > 0;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Read check for a single request.
+ *
+ * Extends the synchronous scope rules with one business rule that a plain
+ * filter cannot express: a unit head must be able to open a request whose
+ * current step is assigned to their unit, even when another unit raised it.
+ * Without this the "در انتظار تأیید" card links to a 404.
+ */
+export const assertCanReadPurchasingRequestAsync = async (
+  activeRole: ActiveRole,
+  user: UserWithId | undefined,
+  requestDoc: PurchasingRequestRef | null | undefined,
+): Promise<void> => {
+  try {
+    assertCanReadPurchasingRequest(activeRole, user, requestDoc);
+    return;
+  } catch (error) {
+    if (
+      activeRole.name === "UnitHead" &&
+      activeRole.scopeType === "unit" &&
+      activeRole.scopeId
+    ) {
+      const processId = normalizeId(requestDoc?.process?._id);
+      if (processId && (await unitApprovesProcess(activeRole.scopeId, processId))) {
+        return;
+      }
+    }
+
+    throw error;
+  }
+};
+
 export const assertCanReadPurchasingRequest = (
   activeRole: ActiveRole,
   user: UserWithId | undefined,
