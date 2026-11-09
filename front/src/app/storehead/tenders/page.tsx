@@ -1,8 +1,10 @@
+import { cookies } from "next/headers"
 import { PageHeader } from "@/components/ui/page-header"
 import { HelpLauncher } from "@/components/help/help-launcher"
 import { gets } from "@/app/actions/tender/gets"
 import { count } from "@/app/actions/tender/count"
 import { TendersListClient } from "./tenders-list-client"
+import { ACTIVE_ROLE_COOKIE } from "@/lib/session-cookies"
 
 const VALID_STATUSES = ["open", "closed", "awarded", "cancelled"]
 
@@ -14,6 +16,12 @@ export default async function StoreTendersPage({
   const resolvedSearchParams = await searchParams
   const page = Math.max(1, Number(resolvedSearchParams.page) || 1)
   const limit = 20
+
+  // The active role must be sent with every call: the backend scopes tenders by
+  // it, and `count` fails closed (returning 0) when it is empty — which is why
+  // the KPI cards used to read 0 while the list rendered rows.
+  const cookieStore = await cookies()
+  const activeRoleId = cookieStore.get(ACTIVE_ROLE_COOKIE)?.value || ""
 
   const search = typeof resolvedSearchParams.search === "string" ? resolvedSearchParams.search : ""
   const status =
@@ -31,7 +39,7 @@ export default async function StoreTendersPage({
 
   const [result, totalRes, openRes, awardedRes, closedRes] = await Promise.all([
     gets(
-      { activeRoleId: "", ...listSet },
+      { activeRoleId, ...listSet },
       {
         _id: 1,
         title: 1,
@@ -41,10 +49,10 @@ export default async function StoreTendersPage({
         purchasingRequest: { _id: 1, title: 1 },
       },
     ),
-    count({ activeRoleId: "" }),
-    count({ activeRoleId: "", status: "open" }),
-    count({ activeRoleId: "", status: "awarded" }),
-    count({ activeRoleId: "", status: "closed" }),
+    count({ activeRoleId }),
+    count({ activeRoleId, status: "open" }),
+    count({ activeRoleId, status: "awarded" }),
+    count({ activeRoleId, status: "closed" }),
   ])
 
   const items = result.success ? result.body || [] : []
